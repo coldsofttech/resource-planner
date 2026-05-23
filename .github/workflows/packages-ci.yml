@@ -1,0 +1,39 @@
+name: Packages CI
+
+on:
+  pull_request:
+    paths:
+      - "packages/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install pytest ruff mypy bandit pip-audit build
+
+      - name: Ruff
+        run: ruff check packages
+
+      - name: mypy
+        run: mypy packages
+
+      - name: pytest
+        run: pytest packages
+
+      - name: Build Validation
+        run: python -m build
+
+      - name: Bandit
+        run: bandit -r packages
+
+      - name: pip-audit
+        run: pip-audit

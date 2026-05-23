@@ -1,0 +1,19 @@
+.rp-subtle {
+  color: var(--rp-text-subtle) !important;
+}
+.rp-muted {
+  color: var(--rp-text-muted) !important;
+}
+.rp-mono {
+  font-family: var(--rp-font-mono);
+  font-feature-settings: "ss02";
+}
+.rp-label {
+  font-size: var(--rp-fs-13);
+  font-weight: 600;
+  color: var(--rp-text);
+}
+.rp-label .rp-req {
+  color: var(--rp-danger);
+  margin-left: 2px;
+}

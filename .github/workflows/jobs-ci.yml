@@ -1,0 +1,33 @@
+name: Jobs CI
+
+on:
+  pull_request:
+    paths:
+      - "apps/jobs/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install pytest ruff bandit pip-audit
+
+      - name: Ruff
+        run: ruff check apps/jobs
+
+      - name: pytest
+        run: pytest apps/jobs
+
+      - name: Bandit
+        run: bandit -r apps/jobs
+
+      - name: pip-audit
+        run: pip-audit

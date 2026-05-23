@@ -1,0 +1,53 @@
+﻿@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+@import "./tokens.css";
+
+@import "./components/type.css";
+@import "./components/logo.css";
+@import "./components/buttons.css";
+@import "./components/form-fields.css";
+@import "./components/wizard.css";
+@import "./components/progress-bar.css";
+@import "./components/badges.css";
+@import "./components/cards.css";
+@import "./components/links.css";
+@import "./components/website.css";
+@import "./components/setup-bar.css";
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+  background: var(--rp-bg);
+  color: var(--rp-text);
+}
+body {
+  font-family: var(--rp-font-sans);
+  font-size: var(--rp-fs-14);
+  line-height: 1.5;
+  font-feature-settings: "cv11", "ss01";
+}
+
+::selection {
+  background: var(--rp-accent-soft);
+  color: var(--rp-accent-soft-text);
+}
+
+[x-cloak] {
+  display: none !important;
+}
+
+code,
+kbd,
+samp {
+  font-family: var(--rp-font-mono);
+  font-size: 0.85em;
+  background: var(--rp-bg-sunken);
+  color: var(--rp-accent-soft-text);
+  border: 1px solid var(--rp-border);
+  border-radius: var(--rp-r-4);
+  padding: 1px 5px;
+}

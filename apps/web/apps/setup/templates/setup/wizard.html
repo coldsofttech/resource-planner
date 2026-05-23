@@ -1,0 +1,738 @@
+﻿<!doctype html>
+{% load static %}
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Setup - Resource Planner</title>
+
+    <script>
+      (function () {
+        var t = localStorage.getItem("rp-theme");
+        if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", t);
+      })();
+    </script>
+
+    <script type="module" src="{% static 'js/dist/components.min.js' %}"></script>
+    <script type="module" src="{% static 'js/dist/setup.min.js' %}"></script>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="{% static 'css/dist/styles.min.css' %}" />
+
+    <style>
+      body {
+        min-height: 100vh;
+      }
+    </style>
+  </head>
+  <body data-screen-label="Setup Wizard">
+    <header class="rp-setup-bar">
+      <div class="rp-logo">
+        <i class="bi bi-diagram-3-fill"></i>
+      </div>
+      <div>
+        <div style="font-weight: 700; line-height: 1">Resource Planner</div>
+        <div class="rp-subtle" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em">
+          Initial Setup
+        </div>
+      </div>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <span class="rp-setup-pill">
+          <i class="bi bi-shield-exclamation"></i>
+          <span class="rp-setup-pill-label">First-run mode</span>
+        </span>
+        <rp-theme-toggle></rp-theme-toggle>
+      </div>
+    </header>
+
+    <div class="rp-setup-shell">
+      <div class="rp-setup-hero">
+        <h1>Welcome — let's get Resource Planner running</h1>
+        <p class="rp-muted">
+          This one-time wizard configures the admin account, runtime, database, auth, and optional integrations. You can
+          change anything later from
+          <span class="rp-mono">Admin → Configurations</span>.
+        </p>
+      </div>
+
+      <rp-wizard
+        field-id="rp-setup-wizard"
+        name="setup-wizard"
+        navigation="sequential"
+        route-type="route"
+        route-prefix="step"
+      >
+        <wizard-steps title="Setup Steps" estimated-time="6 minutes" show-progress>
+          <!-- Step 1: Admin account -->
+          <wizard-step nav-title="Admin account" nav-subtitle="Owner credentials">
+            <wizard-step-header
+              icon="bi-person-fill-gear"
+              title="Create the owner account"
+              subtitle="This account has full access to all workspaces, integrations, and audit logs. Choose a strong password."
+            ></wizard-step-header>
+            <wizard-step-body>
+              <rp-field-first-name
+                col="col-md-6"
+                field-id="rp-setup-admin-first-name"
+                name="first-name"
+                required
+              ></rp-field-first-name>
+              <rp-field-last-name
+                col="col-md-6"
+                field-id="rp-setup-admin-last-name"
+                name="last-name"
+                required
+              ></rp-field-last-name>
+              <rp-field-email
+                col="col-md-12"
+                prefix-icon
+                field-id="rp-setup-admin-email"
+                name="email"
+                required
+              ></rp-field-email>
+              <rp-field-password
+                col="col-md-6"
+                prefix-icon
+                eye-icon
+                field-id="rp-setup-admin-password"
+                name="password"
+                strength
+                required
+              ></rp-field-password>
+              <rp-field-confirm-password
+                col="col-md-6"
+                prefix-icon
+                eye-icon
+                field-id="rp-setup-admin-confirm-password"
+                name="confirm-password"
+                password-field-id="rp-setup-admin-password"
+                required
+              ></rp-field-confirm-password>
+            </wizard-step-body>
+          </wizard-step>
+
+          <!-- Step 2: Application -->
+          <wizard-step nav-title="Application" nav-subtitle="Name & base URL">
+            <wizard-step-header
+              icon="bi-gear"
+              title="Configure the application"
+              subtitle="Set the application name and base URL used for email links and SSO redirects."
+            ></wizard-step-header>
+            <wizard-step-body>
+              <rp-field-text
+                col="col-md-12"
+                label="Application name"
+                field-id="rp-setup-app-name"
+                name="app-name"
+                placeholder="Resource<b>Planner</b>"
+                value="Resource<b>Planner</b>"
+                hint="HTML is accepted. Shown in the top navigation bar."
+                required
+              ></rp-field-text>
+              <rp-field-website
+                col="col-md-12"
+                label="Base URL"
+                prefix-icon
+                field-id="rp-setup-app-base-url"
+                name="base-url"
+                placeholder="localhost:8000"
+                hint="Used to build SSO redirect URIs and email links. No trailing slash."
+              >
+                <scheme-list>
+                  <scheme>https://</scheme>
+                  <scheme>http://</scheme>
+                </scheme-list>
+              </rp-field-website>
+            </wizard-step-body>
+          </wizard-step>
+
+          <!-- Step 3: Database -->
+          <wizard-step nav-title="Database" nav-subtitle="Engine & connection">
+            <wizard-step-header
+              icon="bi-database"
+              title="Configure the database"
+              subtitle="Choose a database engine and provide connection details."
+            ></wizard-step-header>
+            <wizard-step-body>
+              <rp-field-dropdown
+                col="col-md-12"
+                label="Engine type"
+                field-id="rp-setup-db-engine-type"
+                name="engine-type"
+                required
+              >
+                <values-list>
+                  <value selected>SQLite</value>
+                  <value>PostgreSQL</value>
+                </values-list>
+              </rp-field-dropdown>
+
+              <!-- SQLite — shown when "SQLite" is selected -->
+              <div id="rp-setup-db-sqlite" class="col-12" hidden>
+                <div class="row g-3">
+                  <rp-field-hint>SQLite is recommended for development purposes only.</rp-field-hint>
+                </div>
+              </div>
+
+              <!-- PostgreSQL — shown when "PostgreSQL" is selected -->
+              <div id="rp-setup-db-postgresql" class="col-12" hidden>
+                <div class="row g-3">
+                  <rp-field-text
+                    col="col-md-6"
+                    label="Host name"
+                    field-id="rp-setup-db-host-name"
+                    name="host-name"
+                    placeholder="localhost"
+                    required
+                  ></rp-field-text>
+                  <rp-field-number
+                    col="col-md-6"
+                    label="Port"
+                    field-id="rp-setup-db-port"
+                    name="db-port"
+                    min="1"
+                    max="65535"
+                    value="5432"
+                    required
+                  ></rp-field-number>
+                  <rp-field-text
+                    col="col-md-6"
+                    label="Database name"
+                    field-id="rp-setup-db-database-name"
+                    name="database-name"
+                    placeholder="resourceplanner"
+                    required
+                  ></rp-field-text>
+                  <rp-field-text
+                    col="col-md-6"
+                    label="User name"
+                    field-id="rp-setup-db-user-name"
+                    name="user-name"
+                    required
+                  ></rp-field-text>
+                  <rp-field-password
+                    col="col-md-6"
+                    prefix-icon
+                    eye-icon
+                    field-id="rp-setup-db-password"
+                    name="password"
+                    required
+                  ></rp-field-password>
+                  <rp-field-confirm-password
+                    col="col-md-6"
+                    prefix-icon
+                    eye-icon
+                    field-id="rp-setup-db-confirm-password"
+                    name="confirm-password"
+                    password-field-id="rp-setup-db-password"
+                    required
+                  ></rp-field-confirm-password>
+                  <div class="col-12 d-flex justify-content-end">
+                    <rp-button-engine label="Test Connection" prefix-icon="bi-plug"></rp-button-engine>
+                  </div>
+                </div>
+              </div>
+            </wizard-step-body>
+          </wizard-step>
+
+          <!-- Step 4: Authentication -->
+          <wizard-step nav-title="Authentication" nav-subtitle="Login method">
+            <wizard-step-header
+              icon="bi-shield-lock"
+              title="Configure authentication"
+              subtitle="Set up authentication for the application. Supported methods include Classic, SAML, and OAuth. The owner account defaults to Classic authentication."
+            ></wizard-step-header>
+            <wizard-step-body>
+              <rp-field-dropdown
+                col="col-md-12"
+                label="Authentication type"
+                field-id="rp-setup-auth-type"
+                name="auth-type"
+                required
+              >
+                <field-hint>You can change this later in <b>Settings &gt; Security</b></field-hint>
+                <values-list>
+                  <value selected>Classic - email &amp; password</value>
+                  <value>SAML 2.0</value>
+                  <value>OAuth / OpenID Connect</value>
+                </values-list>
+              </rp-field-dropdown>
+
+              <!-- SAML 2.0 — shown only when "SAML 2.0" is selected -->
+              <div id="rp-setup-auth-saml" class="col-12" hidden>
+                <div class="row g-3">
+                  <rp-panel
+                    col="col-md-12"
+                    field-id="rp-setup-auth-saml-info"
+                    title="Service Provider (SP) Configuration - register with your IdP"
+                  >
+                    <panel-body>
+                      <ul class="mt-2" style="font-size: 13px; color: var(--rp-text-muted); line-height: 1.7">
+                        <li>
+                          <span class="rp-mono">
+                            SP Entity ID -
+                            <a
+                              class="rp-link"
+                              target="_blank"
+                              id="rp-setup-auth-saml-info-entity-id"
+                              rel="noopener noreferrer"
+                              href="http://localhost:8000"
+                              style="font-size: 13px"
+                              >http://localhost:8000</a
+                            >
+                          </span>
+                        </li>
+                        <li>
+                          <span class="rp-mono">
+                            ACS URL -
+                            <a
+                              class="rp-link"
+                              target="_blank"
+                              id="rp-setup-auth-saml-info-acs-url"
+                              rel="noopener noreferrer"
+                              href="http://localhost:8000/saml/acs/"
+                              style="font-size: 13px"
+                              >http://localhost:8000/saml/acs/</a
+                            >
+                          </span>
+                        </li>
+                        <li>
+                          <span class="rp-mono">
+                            SP Metadata URL -
+                            <a
+                              class="rp-link"
+                              target="_blank"
+                              id="rp-setup-auth-saml-info-sp-metadata-url"
+                              rel="noopener noreferrer"
+                              href="http://localhost:8000/saml2/metadata/"
+                              style="font-size: 13px"
+                              >http://localhost:8000/saml2/metadata/</a
+                            >
+                          </span>
+                        </li>
+                      </ul>
+                      <rp-field-hint>
+                        Download the SP metadata XML from the URL above and upload it to your IdP, or fill in the fields
+                        manually.
+                      </rp-field-hint>
+                    </panel-body>
+                  </rp-panel>
+
+                  <rp-field-text
+                    col="col-md-12"
+                    label="Provider display name"
+                    field-id="rp-setup-auth-saml-provider-name"
+                    name="provider-name"
+                    placeholder="Azure AD"
+                    required
+                  >
+                    <field-hint>Name shown on the login page, e.g., <em>GitHub</em>, <em>Azure AD</em></field-hint>
+                  </rp-field-text>
+
+                  <div class="col-12">
+                    <h6>SAML 2.0 — Identity Provider</h6>
+                  </div>
+                  <rp-field-text
+                    col="col-md-6"
+                    label="IdP entity ID"
+                    field-id="rp-setup-auth-saml-idp-entity-id"
+                    name="saml-idp-entity-id"
+                    hint="The IdP's entity ID / Issuer found in the metadata XML"
+                    required
+                  ></rp-field-text>
+                  <rp-field-text
+                    col="col-md-6"
+                    label="IdP SSO URL"
+                    field-id="rp-setup-auth-saml-sso-url"
+                    name="saml-sso-url"
+                    hint="The IdP's Single Sign-On URL (HTTP-Redirect binding)"
+                    required
+                  ></rp-field-text>
+                  <rp-field-secret
+                    col="col-md-12"
+                    label="IdP X.509 certificate"
+                    field-id="rp-setup-auth-saml-x509-cert"
+                    name="saml-x509-cert"
+                    prefix-icon
+                    eye-icon
+                    required
+                  >
+                    <field-hint
+                      >Public certificate used to verify SAML assertion signatures — PEM / base64, no
+                      <code>-----BEGIN CERTIFICATE-----</code> header or footer.</field-hint
+                    >
+                  </rp-field-secret>
+
+                  <div class="col-12">
+                    <h6>SAML 2.0 — Service Provider</h6>
+                  </div>
+                  <rp-field-website
+                    col="col-md-6"
+                    label="SP entity ID"
+                    field-id="rp-setup-auth-saml-sp-entity-id"
+                    name="saml-sp-entity-id"
+                    hint="This app's entity ID registered with the IdP — usually your base URL."
+                    placeholder="localhost:8000"
+                    prefix-icon
+                    required
+                  >
+                    <scheme-list>
+                      <scheme>https://</scheme>
+                      <scheme>http://</scheme>
+                    </scheme-list>
+                  </rp-field-website>
+                  <rp-field-website
+                    col="col-md-6"
+                    label="Assertion consumer service URL"
+                    field-id="rp-setup-auth-saml-service-url"
+                    name="saml-service-url"
+                    placeholder="localhost:8000/saml/acs/"
+                    prefix-icon
+                    required
+                  >
+                    <field-hint
+                      >URL the IdP posts SAML responses to — typically
+                      <code>https://yourhost/saml/acs/</code>.</field-hint
+                    >
+                    <scheme-list>
+                      <scheme>https://</scheme>
+                      <scheme>http://</scheme>
+                    </scheme-list>
+                  </rp-field-website>
+                </div>
+              </div>
+
+              <!-- OAuth / OpenID Connect — shown only when "OAuth / OpenID Connect" is selected -->
+              <div id="rp-setup-auth-oauth" class="col-12" hidden>
+                <div class="row g-3">
+                  <rp-panel
+                    col="col-md-12"
+                    field-id="rp-setup-auth-oauth-info"
+                    title="Register this in your Identity Provider"
+                  >
+                    <panel-body>
+                      <ul class="mt-2" style="font-size: 13px; color: var(--rp-text-muted); line-height: 1.7">
+                        <li>
+                          <span class="rp-mono">
+                            Callback/Redirect URL:
+                            <a
+                              class="rp-link"
+                              href="http://localhost:8000/sso/oauth/callback"
+                              target="_blank"
+                              id="rp-setup-auth-oauth-info-callback-url"
+                              rel="noopener noreferrer"
+                              style="font-size: 13px"
+                            >
+                              http://localhost:8000/sso/oauth/callback
+                            </a>
+                          </span>
+                        </li>
+                      </ul>
+                      <rp-field-hint>
+                        Add this URI to the list of allowed redirect URIs in your OAuth2/OIDC application.
+                      </rp-field-hint>
+                    </panel-body>
+                  </rp-panel>
+
+                  <rp-field-text
+                    col="col-md-12"
+                    label="Provider display name"
+                    field-id="rp-setup-auth-oauth-provider-name"
+                    name="provider-name"
+                    placeholder="GitHub"
+                    required
+                  >
+                    <field-hint>Name shown on the login page, e.g., <em>GitHub</em>, <em>Azure AD</em></field-hint>
+                  </rp-field-text>
+
+                  <div class="col-12">
+                    <h6>OAuth2/OpenID Connection Settings</h6>
+                  </div>
+                  <rp-field-secret
+                    col="col-md-6"
+                    label="Client ID"
+                    field-id="rp-setup-auth-oauth-client-id"
+                    name="oauth-client-id"
+                    prefix-icon
+                    eye-icon
+                    required
+                    hint="Application (client) ID from the identity provider."
+                  ></rp-field-secret>
+                  <rp-field-secret
+                    col="col-md-6"
+                    label="Client secret"
+                    field-id="rp-setup-auth-oauth-client-secret"
+                    name="oauth-client-secret"
+                    prefix-icon
+                    eye-icon
+                    required
+                    hint="Client secret from the identity provider."
+                  ></rp-field-secret>
+                  <rp-field-website
+                    col="col-md-6"
+                    label="Authorisation endpoint"
+                    field-id="rp-setup-auth-oauth-auth-endpoint"
+                    name="oauth-auth-endpoint"
+                    hint="The IdP URL users are redirected to for authentication."
+                    placeholder="localhost:8000"
+                    prefix-icon
+                    required
+                  >
+                    <scheme-list>
+                      <scheme>https://</scheme>
+                      <scheme>http://</scheme>
+                    </scheme-list>
+                  </rp-field-website>
+                  <rp-field-website
+                    col="col-md-6"
+                    label="Token endpoint"
+                    field-id="rp-setup-auth-oauth-token-endpoint"
+                    name="oauth-token-endpoint"
+                    hint="URL to exchange the authorisation code for tokens."
+                    placeholder="localhost:8000"
+                    prefix-icon
+                    required
+                  >
+                    <scheme-list>
+                      <scheme>https://</scheme>
+                      <scheme>http://</scheme>
+                    </scheme-list>
+                  </rp-field-website>
+                  <rp-field-website
+                    col="col-md-6"
+                    label="Users info endpoint"
+                    field-id="rp-setup-auth-oauth-uinfo-endpoint"
+                    name="oauth-uinfo-endpoint"
+                    hint="URL to fetch the user's profile. Leave blank if claims are in the ID token."
+                    placeholder="localhost:8000"
+                    prefix-icon
+                  >
+                    <scheme-list>
+                      <scheme>https://</scheme>
+                      <scheme>http://</scheme>
+                    </scheme-list>
+                  </rp-field-website>
+                  <rp-field-text
+                    col="col-md-6"
+                    label="Scope"
+                    field-id="rp-setup-auth-oauth-scope"
+                    name="oauth-scope"
+                    placeholder="openid email profile"
+                    value="openid email profile"
+                    required
+                  >
+                    <field-hint>Space-separated OAuth2 scopes. Typical: <code>openid email profile</code></field-hint>
+                  </rp-field-text>
+                </div>
+              </div>
+
+              <rp-field-checkbox
+                col="col-md-12"
+                label="Allow public self-registration"
+                field-id="rp-setup-auth-self-regt"
+                name="self-registration"
+                value="true"
+              ></rp-field-checkbox>
+            </wizard-step-body>
+          </wizard-step>
+
+          <!-- Step 5: Storage -->
+          <wizard-step nav-title="Storage" nav-subtitle="Media & attachments">
+            <wizard-step-header
+              icon="bi-hdd"
+              title="Configure storage"
+              subtitle="Set up storage options for user avatars and file attachments."
+            ></wizard-step-header>
+            <wizard-step-body>
+              <rp-field-dropdown
+                col="col-md-12"
+                label="Storage type"
+                field-id="rp-setup-storage-type"
+                name="storage-type"
+                required
+              >
+                <values-list>
+                  <value selected>Database</value>
+                  <value>Local Filesystem</value>
+                  <value>Amazon S3</value>
+                </values-list>
+              </rp-field-dropdown>
+
+              <!-- Database — shown when "Database" is selected -->
+              <div id="rp-setup-storage-database" class="col-12" hidden>
+                <div class="row g-3">
+                  <rp-field-hint>
+                    Avatars and attachments are stored in the database. No extra configuration needed.
+                  </rp-field-hint>
+                </div>
+              </div>
+
+              <!-- Local Filesystem — shown when "Local Filesystem" is selected -->
+              <div id="rp-setup-storage-files" class="col-12" hidden>
+                <div class="row g-3">
+                  <rp-field-hint>Files saved to a directory on the server.</rp-field-hint>
+                  <rp-field-text
+                    col="col-md-12"
+                    field-id="rp-setup-storage-file-dir"
+                    label="Path"
+                    name="file-path"
+                    placeholder="/var/rp/media/"
+                    required
+                  ></rp-field-text>
+                </div>
+              </div>
+
+              <!-- Amazon S3 — shown when "Amazon S3" is selected -->
+              <div id="rp-setup-storage-s3" class="col-12" hidden>
+                <div class="row g-3">
+                  <rp-field-hint>Files stored in an S3 bucket.</rp-field-hint>
+                  <rp-field-text
+                    col="col-md-12"
+                    field-id="rp-setup-storage-s3-bucket"
+                    label="S3 bucket ARN"
+                    name="s3-bucket-arn"
+                    placeholder="arn:aws:s3:::my-bucket"
+                    required
+                  ></rp-field-text>
+                </div>
+              </div>
+            </wizard-step-body>
+          </wizard-step>
+
+          <!-- Step 6: Email -->
+          <wizard-step nav-title="Email" nav-subtitle="Outbound mail">
+            <wizard-step-header
+              icon="bi-envelope"
+              title="Configure email"
+              subtitle="Set up outbound email for notifications, password resets, and account activity."
+            ></wizard-step-header>
+            <wizard-step-body>
+              <rp-field-dropdown
+                col="col-md-12"
+                label="Email type"
+                field-id="rp-setup-email-type"
+                name="email-type"
+                required
+              >
+                <values-list>
+                  <value selected>Console</value>
+                  <value>SMTP</value>
+                </values-list>
+              </rp-field-dropdown>
+
+              <rp-field-email
+                col="col-md-6"
+                prefix-icon
+                field-id="rp-setup-email-from"
+                name="email-from"
+                label="From email address"
+                placeholder="noreply@example.com"
+                hint="The 'From' address used for all outbound system emails."
+                required
+              ></rp-field-email>
+              <rp-field-text
+                col="col-md-6"
+                label="From name"
+                field-id="rp-setup-email-name"
+                name="email-name"
+                placeholder="Resource Planner"
+                hint="The sender name displayed alongside the From address."
+                required
+              ></rp-field-text>
+
+              <!-- Console — shown when "Console" is selected -->
+              <div id="rp-setup-email-console" class="col-12" hidden>
+                <div class="row g-3">
+                  <rp-field-hint>Prints to server logs and terminal (recommended for dev only).</rp-field-hint>
+                </div>
+              </div>
+
+              <!-- SMTP — shown when "SMTP" is selected -->
+              <div id="rp-setup-email-smtp" class="col-12" hidden>
+                <div class="row g-3">
+                  <rp-field-text
+                    col="col-md-6"
+                    label="SMTP host"
+                    field-id="rp-setup-email-smtp-host"
+                    name="smtp-host"
+                    placeholder="smtp.example.com"
+                    hint="Hostname or IP address of the outbound SMTP server."
+                    required
+                  ></rp-field-text>
+                  <rp-field-dropdown
+                    col="col-md-6"
+                    label="Encryption type"
+                    field-id="rp-setup-email-enc-type"
+                    name="enc-type"
+                    required
+                  >
+                    <values-list>
+                      <value selected>None</value>
+                      <value>STARTTLS</value>
+                      <value>SSL/TLS</value>
+                    </values-list>
+                  </rp-field-dropdown>
+                  <rp-field-number
+                    col="col-md-6"
+                    label="SMTP port"
+                    field-id="rp-setup-email-smtp-port"
+                    name="smtp-port"
+                    min="1"
+                    max="65535"
+                    value="25"
+                    hint="Port auto-fills based on encryption type; edit to override."
+                    required
+                  ></rp-field-number>
+                  <rp-field-toggle
+                    col="col-md-6"
+                    label="Enable SMTP authentication"
+                    field-id="rp-setup-email-smtp-auth"
+                    name="smtp-auth"
+                    value="true"
+                  ></rp-field-toggle>
+
+                  <!-- Auth credentials — shown only when SMTP auth is enabled -->
+                  <div id="rp-setup-email-smtp-auth-fields" class="col-12" hidden>
+                    <div class="row g-3">
+                      <rp-field-text
+                        col="col-md-6"
+                        label="Username"
+                        field-id="rp-setup-email-user-name"
+                        name="user-name"
+                        required
+                      ></rp-field-text>
+                      <rp-field-password
+                        col="col-md-6"
+                        prefix-icon
+                        eye-icon
+                        field-id="rp-setup-email-password"
+                        name="password"
+                        required
+                      ></rp-field-password>
+                      <rp-field-confirm-password
+                        col="col-md-6"
+                        prefix-icon
+                        eye-icon
+                        field-id="rp-setup-email-confirm-password"
+                        name="confirm-password"
+                        password-field-id="rp-setup-email-password"
+                        required
+                      ></rp-field-confirm-password>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </wizard-step-body>
+          </wizard-step>
+        </wizard-steps>
+      </rp-wizard>
+    </div>
+  </body>
+</html>

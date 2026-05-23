@@ -1,0 +1,35 @@
+{
+  "devDependencies": {
+    "cssnano": "^8.0.1",
+    "esbuild": "^0.28.0",
+    "postcss": "^8.5.15",
+    "postcss-cli": "^11.0.1",
+    "postcss-import": "^16.1.1",
+    "prettier": "^3.8.3",
+    "prettier-plugin-jinja-template": "^2.2.0"
+  },
+  "name": "resource-planner",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:css": "postcss apps/web/static/css/styles/styles.css -o apps/web/static/css/dist/styles.min.css",
+    "build:js": "node build-js.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coldsofttech/resource-planner.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/coldsofttech/resource-planner/issues"
+  },
+  "homepage": "https://github.com/coldsofttech/resource-planner#readme"
+}

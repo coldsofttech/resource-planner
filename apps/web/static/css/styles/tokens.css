@@ -1,0 +1,137 @@
+:root {
+  /* ----- Type ----- */
+  --rp-font-sans:
+    "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --rp-font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --rp-fs-12: 0.75rem;
+  --rp-fs-13: 0.8125rem;
+  --rp-fs-14: 0.875rem;
+  --rp-fs-15: 0.9375rem;
+  --rp-fs-16: 1rem;
+  --rp-fs-18: 1.125rem;
+  --rp-fs-20: 1.25rem;
+  --rp-fs-24: 1.5rem;
+  --rp-fs-32: 2rem;
+
+  /* ----- Spacing ----- */
+  --rp-s-2: 2px;
+  --rp-s-4: 4px;
+  --rp-s-6: 6px;
+  --rp-s-8: 8px;
+  --rp-s-12: 12px;
+  --rp-s-16: 16px;
+  --rp-s-20: 20px;
+  --rp-s-24: 24px;
+  --rp-s-32: 32px;
+  --rp-s-40: 40px;
+
+  /* ----- Radius ----- */
+  --rp-r-4: 4px;
+  --rp-r-6: 6px;
+  --rp-r-8: 8px;
+  --rp-r-12: 12px;
+  --rp-r-pill: 999px;
+
+  /* ----- Light palette ----- */
+  --rp-bg: oklch(0.985 0.003 250);
+  --rp-bg-elev: #ffffff;
+  --rp-bg-sunken: oklch(0.965 0.005 250);
+  --rp-surface: #ffffff;
+  --rp-surface-2: oklch(0.975 0.004 250);
+  --rp-surface-hover: oklch(0.96 0.005 250);
+
+  --rp-border: oklch(0.91 0.006 250);
+  --rp-border-strong: oklch(0.85 0.008 250);
+  --rp-divider: oklch(0.93 0.005 250);
+
+  --rp-text: oklch(0.22 0.012 260);
+  --rp-text-muted: oklch(0.48 0.012 260);
+  --rp-text-subtle: oklch(0.62 0.012 260);
+  --rp-text-on-accent: #ffffff;
+
+  /* Accents — all share chroma 0.18, lightness 0.55 (hover 0.50) */
+  --rp-accent: oklch(0.55 0.18 270);
+  --rp-accent-hover: oklch(0.5 0.18 270);
+  --rp-accent-soft: oklch(0.95 0.04 270);
+  --rp-accent-soft-text: oklch(0.4 0.18 270);
+
+  --rp-success: oklch(0.58 0.15 150);
+  --rp-success-soft: oklch(0.95 0.05 150);
+  --rp-success-soft-text: oklch(0.4 0.15 150);
+
+  --rp-warning: oklch(0.72 0.17 75);
+  --rp-warning-soft: oklch(0.95 0.07 80);
+  --rp-warning-soft-text: oklch(0.45 0.13 60);
+
+  --rp-danger: oklch(0.58 0.2 25);
+  --rp-danger-soft: oklch(0.95 0.05 25);
+  --rp-danger-soft-text: oklch(0.45 0.18 25);
+
+  --rp-info: oklch(0.6 0.13 230);
+  --rp-info-soft: oklch(0.95 0.04 230);
+  --rp-info-soft-text: oklch(0.4 0.15 230);
+
+  --rp-purple: oklch(0.55 0.18 305);
+  --rp-purple-soft: oklch(0.95 0.04 305);
+  --rp-purple-soft-text: oklch(0.4 0.18 305);
+
+  /* ----- Shadow ----- */
+  --rp-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --rp-shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --rp-shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.1), 0 2px 4px rgba(15, 23, 42, 0.04);
+  --rp-shadow-focus: 0 0 0 3px oklch(0.55 0.18 270 / 0.18);
+
+  /* ----- Layout ----- */
+  --rp-side-w: 248px;
+  --rp-side-w-collapsed: 56px;
+  --rp-topbar-h: 52px;
+  --rp-banner-h: 36px;
+}
+
+[data-theme="dark"] {
+  --rp-bg: oklch(0.18 0.01 260);
+  --rp-bg-elev: oklch(0.22 0.012 260);
+  --rp-bg-sunken: oklch(0.155 0.01 260);
+  --rp-surface: oklch(0.22 0.012 260);
+  --rp-surface-2: oklch(0.25 0.012 260);
+  --rp-surface-hover: oklch(0.28 0.014 260);
+
+  --rp-border: oklch(0.3 0.014 260);
+  --rp-border-strong: oklch(0.38 0.016 260);
+  --rp-divider: oklch(0.28 0.012 260);
+
+  --rp-text: oklch(0.96 0.005 250);
+  --rp-text-muted: oklch(0.72 0.012 250);
+  --rp-text-subtle: oklch(0.58 0.012 250);
+
+  --rp-accent: oklch(0.7 0.16 270);
+  --rp-accent-hover: oklch(0.76 0.16 270);
+  --rp-accent-soft: oklch(0.3 0.08 270);
+  --rp-accent-soft-text: oklch(0.85 0.14 270);
+
+  --rp-success: oklch(0.72 0.16 150);
+  --rp-success-soft: oklch(0.3 0.08 150);
+  --rp-success-soft-text: oklch(0.85 0.14 150);
+
+  --rp-warning: oklch(0.8 0.16 75);
+  --rp-warning-soft: oklch(0.32 0.1 75);
+  --rp-warning-soft-text: oklch(0.85 0.15 75);
+
+  --rp-danger: oklch(0.7 0.18 25);
+  --rp-danger-soft: oklch(0.3 0.1 25);
+  --rp-danger-soft-text: oklch(0.86 0.14 25);
+
+  --rp-info: oklch(0.72 0.13 230);
+  --rp-info-soft: oklch(0.3 0.08 230);
+  --rp-info-soft-text: oklch(0.85 0.12 230);
+
+  --rp-purple: oklch(0.72 0.16 305);
+  --rp-purple-soft: oklch(0.3 0.08 305);
+  --rp-purple-soft-text: oklch(0.85 0.14 305);
+
+  --rp-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --rp-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --rp-shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55), 0 2px 4px rgba(0, 0, 0, 0.3);
+  --rp-shadow-focus: 0 0 0 3px oklch(0.7 0.16 270 / 0.3);
+}

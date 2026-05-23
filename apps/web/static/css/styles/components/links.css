@@ -1,0 +1,13 @@
+.rp-link {
+  color: var(--rp-accent);
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.rp-link:hover {
+  color: var(--rp-accent-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

@@ -1,0 +1,52 @@
+.rp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: var(--rp-r-pill);
+  font-size: var(--rp-fs-12);
+  font-weight: 600;
+  line-height: 1;
+  background: var(--rp-bg-sunken);
+  color: var(--rp-text);
+  border: 1px solid var(--rp-border);
+  white-space: nowrap;
+}
+.rp-badge .rp-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.rp-badge-soft {
+  border: 0;
+}
+.rp-badge-accent {
+  background: var(--rp-accent-soft);
+  color: var(--rp-accent-soft-text);
+}
+.rp-badge-success {
+  background: var(--rp-success-soft);
+  color: var(--rp-success-soft-text);
+}
+.rp-badge-warning {
+  background: var(--rp-warning-soft);
+  color: var(--rp-warning-soft-text);
+}
+.rp-badge-danger {
+  background: var(--rp-danger-soft);
+  color: var(--rp-danger-soft-text);
+}
+.rp-badge-info {
+  background: var(--rp-info-soft);
+  color: var(--rp-info-soft-text);
+}
+.rp-badge-purple {
+  background: var(--rp-purple-soft);
+  color: var(--rp-purple-soft-text);
+}
+.rp-badge-neutral {
+  background: var(--rp-bg-sunken);
+  color: var(--rp-text-muted);
+}
