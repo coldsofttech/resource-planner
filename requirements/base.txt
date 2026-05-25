@@ -1,3 +1,10 @@
 django~=6.0.5
 djangorestframework~=3.17.1
 boto3~=1.43.12
+psycopg2-binary~=2.9
+cryptography~=44.0
+watchtower~=3.3
+drf_spectacular~=0.29.0
+-e ./packages/pycore
+-e ./packages/awscore
+-e ./packages/emailcore

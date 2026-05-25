@@ -157,6 +157,10 @@
   margin: 4px 0 0;
 }
 
+.rp-wiz-ellipsis {
+  display: none;
+}
+
 @media (max-width: 900px) {
   .rp-setup-grid {
     grid-template-columns: 1fr;
@@ -186,6 +190,20 @@
   }
   .rp-wiz-step + .rp-wiz-step::before {
     display: none;
+  }
+  .rp-wiz-step[data-wiz-mobile-hidden] {
+    display: none;
+  }
+  .rp-wiz-ellipsis {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    padding: 8px 2px;
+    color: var(--rp-text-muted);
+    font-size: 14px;
+    user-select: none;
+    flex-shrink: 0;
   }
 }
 

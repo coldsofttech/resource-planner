@@ -2,6 +2,7 @@ from django.shortcuts import redirect
 
 _BYPASS_PREFIXES = (
     "/setup/",
+    "/api/v1/setup/",
     "/static/",
     "/favicon",
     "/media/",
@@ -15,9 +16,9 @@ class SetupMiddleware:
     def __call__(self, request):
         path = request.path_info
         if not any(path.startswith(p) for p in _BYPASS_PREFIXES):
-            from apps.setup.selectors import get_setup_status
+            from apps.configurations.selectors import Setup
 
-            if not get_setup_status():
+            if not Setup.is_setup_complete():
                 return redirect("/setup/")
 
         return self.get_response(request)

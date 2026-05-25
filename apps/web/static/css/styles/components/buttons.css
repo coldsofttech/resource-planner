@@ -142,3 +142,51 @@
 [data-theme="dark"] .rp-btn-activate {
   --b-fg: #0b0f12;
 }
+
+.rp-iconbtn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--rp-r-6);
+  background: transparent;
+  border: 0;
+  color: var(--rp-text-muted);
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+  position: relative;
+}
+.rp-iconbtn:hover {
+  background: var(--rp-surface-hover);
+  color: var(--rp-text);
+}
+.rp-iconbtn .rp-dot-indicator {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--rp-danger);
+  border: 2px solid var(--rp-bg-elev);
+}
+.rp-iconbtn-wrap {
+  position: relative;
+}
+.rp-iconbtn .rp-count-pill {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: var(--rp-danger);
+  color: #fff;
+  border: 2px solid var(--rp-bg-elev);
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  font-family: var(--rp-font-sans);
+  line-height: 1;
+}

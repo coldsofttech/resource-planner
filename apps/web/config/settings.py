@@ -10,29 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
-import os
 from pathlib import Path
+
+from pycore import DotEnv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load .env before any module that reads os.environ at import time
+# (e.g. config.logging).
+DotEnv(BASE_DIR).load_environ()
 
-def _load_dotenv(env_path: Path) -> None:
-    """Minimal .env loader - sets os.environ from KEY=VALUE lines."""
-    if not env_path.exists():
-        return
-
-    with open(env_path, encoding="utf-8") as f_handler:
-        for line in f_handler:
-            line = line.strip()
-            if not line or line.startswith("#") or "=" not in line:
-                continue
-            key, _, val = line.partition("=")
-            os.environ.setdefault(key.strip(), val.strip().strip('"').strip("'"))
-
-
-_load_dotenv(BASE_DIR / ".env")
-
+from config import database, logging  # noqa: E402
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -57,6 +46,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "apps.setup.apps.SetupConfig",
     "apps.configurations.apps.ConfigurationConfig",
+    "apps.auth.apps.AuthConfig",
+    "apps.oauth.apps.OAuthConfig",
+    "apps.saml.apps.SAMLConfig",
+    "apps.users.apps.UserConfig",
 ]
 
 MIDDLEWARE = [
@@ -91,81 +84,8 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-#
-# Engine Selection:
-#   DB_ENGINE=sqlite        > SQLite (default, local dev)
-#   DB_ENGINE=postgresql    > PostgreSQL (production)
-#
-# PostgreSQL connection env vars:
-#   DB_NAME, DB_USER, DB_HOST, DB_PORT
-#
-# Password resolution (DB_PASSWORD_SOURCE):
-#   env (default)           > DB_PASSWORD env var
-#   aws                     > AWS Secrets Manager, secret named DB_SECRET_NAME
-#                             expects either a plain string or JSON {"password": "..."}
-#                             key overridable via DB_SECRET_KEY (default "password")
-
-
-def _resolve_db_password() -> str:
-    source = os.environ.get("DB_PASSWORD_SOURCE", "env").lower()
-
-    if source == "aws":
-        import json
-
-        import boto3
-        from botocore.exceptions import ClientError
-
-        secret_name = os.environ.get("DB_SECRET_NAME", "resource-planner/db/password")
-        region = os.environ.get(
-            "AWS_DEFAULT_REGION", os.environ.get("AWS_REGION", "eu-west-1")
-        )
-        secret_key = os.environ.get("DB_SECRET_KEY", "password")
-
-        try:
-            client = boto3.client("secretsmanager", region_name=region)
-            response = client.get_secret_value(SecretId=secret_name)
-            raw = response.get("SecretString", "")
-
-            try:
-                return json.loads(raw).get(secret_key, raw)
-            except (json.JSONDecodeError, AttributeError):
-                return raw
-        except ClientError as exc:
-            import logging
-
-            logging.getLogger(__name__).error(
-                "Failed to fetch DB password from AWS Secrets Manager (%s): %s",
-                secret_name,
-                exc,
-            )
-            return ""
-
-    return os.environ.get("DB_PASSWORD", "")
-
-
-_DB_ENGINE = os.environ.get("DB_ENGINE", "sqlite").lower()
-
-if _DB_ENGINE == "postgresql":
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ.get("DB_NAME", "resourceplanner"),
-            "USER": os.environ.get("DB_USER", "postgres"),
-            "PASSWORD": _resolve_db_password(),
-            "HOST": os.environ.get("DB_HOST", "localhost"),
-            "PORT": os.environ.get("DB_PORT", "5432"),
-            "OPTIONS": {"connect_timeout": 10},
-        }
-    }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": str(BASE_DIR / "db.sqlite3"),
-        }
-    }
+# Database — see config/database.py for engine selection and connection details.
+DATABASES = database.DATABASES
 
 
 # Password validation
@@ -174,8 +94,7 @@ else:
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": (
-            "django.contrib.auth.password_validation"
-            ".UserAttributeSimilarityValidator"
+            "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
         ),
     },
     {
@@ -212,8 +131,10 @@ STATIC_URL = "/static/"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+LOGGING = logging.LOGGING
 
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 25,
+    "EXCEPTION_HANDLER": "apps.core.exceptions.custom_exception_handler",
 }

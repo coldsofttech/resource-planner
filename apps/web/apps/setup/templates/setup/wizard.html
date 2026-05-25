@@ -63,13 +63,14 @@
       </div>
 
       <rp-wizard
-        field-id="rp-setup-wizard"
+        id="rp-setup-wizard"
         name="setup-wizard"
         navigation="sequential"
         route-type="route"
         route-prefix="step"
+        validate-on-next
       >
-        <wizard-steps title="Setup Steps" estimated-time="6 minutes" show-progress>
+        <wizard-steps title="Setup Steps" show-progress>
           <!-- Step 1: Admin account -->
           <wizard-step nav-title="Admin account" nav-subtitle="Owner credentials">
             <wizard-step-header
@@ -80,20 +81,20 @@
             <wizard-step-body>
               <rp-field-first-name
                 col="col-md-6"
-                field-id="rp-setup-admin-first-name"
+                id="rp-setup-admin-first-name"
                 name="first-name"
                 required
               ></rp-field-first-name>
               <rp-field-last-name
                 col="col-md-6"
-                field-id="rp-setup-admin-last-name"
+                id="rp-setup-admin-last-name"
                 name="last-name"
                 required
               ></rp-field-last-name>
               <rp-field-email
                 col="col-md-12"
                 prefix-icon
-                field-id="rp-setup-admin-email"
+                id="rp-setup-admin-email"
                 name="email"
                 required
               ></rp-field-email>
@@ -101,7 +102,7 @@
                 col="col-md-6"
                 prefix-icon
                 eye-icon
-                field-id="rp-setup-admin-password"
+                id="rp-setup-admin-password"
                 name="password"
                 strength
                 required
@@ -110,7 +111,7 @@
                 col="col-md-6"
                 prefix-icon
                 eye-icon
-                field-id="rp-setup-admin-confirm-password"
+                id="rp-setup-admin-confirm-password"
                 name="confirm-password"
                 password-field-id="rp-setup-admin-password"
                 required
@@ -119,7 +120,7 @@
           </wizard-step>
 
           <!-- Step 2: Application -->
-          <wizard-step nav-title="Application" nav-subtitle="Name & base URL">
+          <wizard-step nav-title="Application" nav-subtitle="Name &amp; base URL">
             <wizard-step-header
               icon="bi-gear"
               title="Configure the application"
@@ -129,7 +130,7 @@
               <rp-field-text
                 col="col-md-12"
                 label="Application name"
-                field-id="rp-setup-app-name"
+                id="rp-setup-app-name"
                 name="app-name"
                 placeholder="Resource<b>Planner</b>"
                 value="Resource<b>Planner</b>"
@@ -140,10 +141,11 @@
                 col="col-md-12"
                 label="Base URL"
                 prefix-icon
-                field-id="rp-setup-app-base-url"
+                id="rp-setup-app-base-url"
                 name="base-url"
                 placeholder="localhost:8000"
                 hint="Used to build SSO redirect URIs and email links. No trailing slash."
+                required
               >
                 <scheme-list>
                   <scheme>https://</scheme>
@@ -153,8 +155,142 @@
             </wizard-step-body>
           </wizard-step>
 
-          <!-- Step 3: Database -->
-          <wizard-step nav-title="Database" nav-subtitle="Engine & connection">
+          <!-- Step 3: Infrastructure -->
+          <wizard-step nav-title="Infrastructure" nav-subtitle="Deployment &amp; secrets">
+            <wizard-step-header
+              icon="bi-server"
+              title="Configure infrastructure"
+              subtitle="Choose where secrets are stored. Local uses Fernet-encrypted database storage. AWS stores secrets in Secrets Manager."
+            ></wizard-step-header>
+            <wizard-step-body>
+              <rp-field-dropdown
+                col="col-md-12"
+                label="Deployment type"
+                id="rp-setup-infra-type"
+                name="infra-type"
+                required
+              >
+                <values-list>
+                  <value value="local" selected>Local</value>
+                  <value value="aws">AWS</value>
+                </values-list>
+              </rp-field-dropdown>
+
+              <!-- Local — Fernet key -->
+              <div id="rp-setup-infra-local" class="col-12" hidden>
+                <div class="row g-3">
+                  <rp-field-hint>
+                    Secrets are encrypted with the Fernet key and stored in the database as
+                    <code>enc:&lt;ciphertext&gt;</code>. Keep this key safe — losing it makes encrypted values
+                    unrecoverable.
+                  </rp-field-hint>
+                  <rp-field-secret
+                    col="col-md-12"
+                    label="Fernet encryption key"
+                    id="rp-setup-infra-fernet-key"
+                    name="fernet-key"
+                    prefix-icon
+                    eye-icon
+                    required
+                  >
+                    <field-hint>32-byte URL-safe base64 string. Use the Generate button to create one.</field-hint>
+                  </rp-field-secret>
+                  <div class="col-12 d-flex justify-content-end">
+                    <rp-button-engine
+                      id="rp-setup-infra-gen-key-btn"
+                      label="Generate Key"
+                      prefix-icon="bi-key"
+                    ></rp-button-engine>
+                  </div>
+                </div>
+              </div>
+
+              <!-- AWS -->
+              <div id="rp-setup-infra-aws" class="col-12" hidden>
+                <div class="row g-3">
+                  <rp-field-text
+                    col="col-md-6"
+                    label="AWS region"
+                    id="rp-setup-infra-aws-region"
+                    name="aws-region"
+                    placeholder="eu-west-1"
+                    required
+                  ></rp-field-text>
+                  <rp-field-text
+                    col="col-md-6"
+                    label="Secrets prefix"
+                    id="rp-setup-infra-secrets-prefix"
+                    name="secrets-prefix"
+                    placeholder="/resourceplanner"
+                    required
+                  >
+                    <field-hint
+                      >All secrets are stored under this prefix in Secrets Manager (e.g.
+                      <code>/resourceplanner/db</code>).</field-hint
+                    >
+                  </rp-field-text>
+                  <rp-field-text
+                    col="col-md-12"
+                    label="DB secret name"
+                    id="rp-setup-infra-db-secret-name"
+                    name="db-secret-name"
+                    placeholder="/resourceplanner/db"
+                  >
+                    <field-hint
+                      >Auto-derived from prefix. Written to <code>.env</code> as
+                      <code>DB_SECRET_NAME</code>.</field-hint
+                    >
+                  </rp-field-text>
+
+                  <rp-field-dropdown
+                    col="col-md-12"
+                    label="AWS authentication"
+                    id="rp-setup-infra-aws-auth-mode"
+                    name="aws-auth-mode"
+                    required
+                  >
+                    <field-hint
+                      >Role-based uses the instance profile or environment credentials — no keys needed.</field-hint
+                    >
+                    <values-list>
+                      <value value="role" selected>IAM Role (recommended)</value>
+                      <value value="user">Access Key / Secret Key</value>
+                    </values-list>
+                  </rp-field-dropdown>
+
+                  <!-- User-based credentials -->
+                  <div id="rp-setup-infra-aws-user-creds" class="col-12" hidden>
+                    <div class="row g-3">
+                      <rp-field-hint type="warning">
+                        Access keys are written to <code>.env</code> in plaintext. Use IAM roles where possible.
+                      </rp-field-hint>
+                      <rp-field-secret
+                        col="col-md-6"
+                        label="AWS Access Key ID"
+                        id="rp-setup-infra-aws-access-key"
+                        name="aws-access-key"
+                        prefix-icon
+                        eye-icon
+                        required
+                      ></rp-field-secret>
+                      <rp-field-secret
+                        col="col-md-6"
+                        label="AWS Secret Access Key"
+                        id="rp-setup-infra-aws-secret-key"
+                        name="aws-secret-key"
+                        prefix-icon
+                        eye-icon
+                        required
+                      ></rp-field-secret>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </wizard-step-body>
+          </wizard-step>
+
+          <!-- Step 4: Database -->
+          <wizard-step nav-title="Database" nav-subtitle="Engine &amp; connection">
             <wizard-step-header
               icon="bi-database"
               title="Configure the database"
@@ -164,13 +300,13 @@
               <rp-field-dropdown
                 col="col-md-12"
                 label="Engine type"
-                field-id="rp-setup-db-engine-type"
+                id="rp-setup-db-engine-type"
                 name="engine-type"
                 required
               >
                 <values-list>
-                  <value selected>SQLite</value>
-                  <value>PostgreSQL</value>
+                  <value value="sqlite" selected>SQLite</value>
+                  <value value="postgresql">PostgreSQL</value>
                 </values-list>
               </rp-field-dropdown>
 
@@ -187,7 +323,7 @@
                   <rp-field-text
                     col="col-md-6"
                     label="Host name"
-                    field-id="rp-setup-db-host-name"
+                    id="rp-setup-db-host-name"
                     name="host-name"
                     placeholder="localhost"
                     required
@@ -195,7 +331,7 @@
                   <rp-field-number
                     col="col-md-6"
                     label="Port"
-                    field-id="rp-setup-db-port"
+                    id="rp-setup-db-port"
                     name="db-port"
                     min="1"
                     max="65535"
@@ -205,7 +341,7 @@
                   <rp-field-text
                     col="col-md-6"
                     label="Database name"
-                    field-id="rp-setup-db-database-name"
+                    id="rp-setup-db-database-name"
                     name="database-name"
                     placeholder="resourceplanner"
                     required
@@ -213,7 +349,7 @@
                   <rp-field-text
                     col="col-md-6"
                     label="User name"
-                    field-id="rp-setup-db-user-name"
+                    id="rp-setup-db-user-name"
                     name="user-name"
                     required
                   ></rp-field-text>
@@ -221,7 +357,7 @@
                     col="col-md-6"
                     prefix-icon
                     eye-icon
-                    field-id="rp-setup-db-password"
+                    id="rp-setup-db-password"
                     name="password"
                     required
                   ></rp-field-password>
@@ -229,13 +365,17 @@
                     col="col-md-6"
                     prefix-icon
                     eye-icon
-                    field-id="rp-setup-db-confirm-password"
+                    id="rp-setup-db-confirm-password"
                     name="confirm-password"
                     password-field-id="rp-setup-db-password"
                     required
                   ></rp-field-confirm-password>
                   <div class="col-12 d-flex justify-content-end">
-                    <rp-button-engine label="Test Connection" prefix-icon="bi-plug"></rp-button-engine>
+                    <rp-button-engine
+                      id="rp-setup-db-test-btn"
+                      label="Test Connection"
+                      prefix-icon="bi-plug"
+                    ></rp-button-engine>
                   </div>
                 </div>
               </div>
@@ -253,24 +393,35 @@
               <rp-field-dropdown
                 col="col-md-12"
                 label="Authentication type"
-                field-id="rp-setup-auth-type"
+                id="rp-setup-auth-type"
                 name="auth-type"
                 required
               >
-                <field-hint>You can change this later in <b>Settings &gt; Security</b></field-hint>
+                <field-hint>You can change this later in <b>Settings &gt; Authentication</b></field-hint>
                 <values-list>
-                  <value selected>Classic - email &amp; password</value>
-                  <value>SAML 2.0</value>
-                  <value>OAuth / OpenID Connect</value>
+                  <value value="classic" selected>Classic - email &amp; password</value>
+                  <value value="saml">SAML 2.0</value>
+                  <value value="oauth">OAuth / OpenID Connect</value>
                 </values-list>
               </rp-field-dropdown>
+
+              <!-- Classic - shown only when "Classic" is selected -->
+              <div id="rp-setup-auth-classic" class="col-12" hidden>
+                <rp-field-checkbox
+                  col="col-md-12"
+                  label="Allow public self-registration"
+                  id="rp-setup-auth-self-regt"
+                  name="self-registration"
+                  value="true"
+                ></rp-field-checkbox>
+              </div>
 
               <!-- SAML 2.0 — shown only when "SAML 2.0" is selected -->
               <div id="rp-setup-auth-saml" class="col-12" hidden>
                 <div class="row g-3">
                   <rp-panel
                     col="col-md-12"
-                    field-id="rp-setup-auth-saml-info"
+                    id="rp-setup-auth-saml-info"
                     title="Service Provider (SP) Configuration - register with your IdP"
                   >
                     <panel-body>
@@ -328,7 +479,7 @@
                   <rp-field-text
                     col="col-md-12"
                     label="Provider display name"
-                    field-id="rp-setup-auth-saml-provider-name"
+                    id="rp-setup-auth-saml-provider-name"
                     name="provider-name"
                     placeholder="Azure AD"
                     required
@@ -339,26 +490,38 @@
                   <div class="col-12">
                     <h6>SAML 2.0 — Identity Provider</h6>
                   </div>
-                  <rp-field-text
+                  <rp-field-website
                     col="col-md-6"
                     label="IdP entity ID"
-                    field-id="rp-setup-auth-saml-idp-entity-id"
+                    id="rp-setup-auth-saml-idp-entity-id"
                     name="saml-idp-entity-id"
                     hint="The IdP's entity ID / Issuer found in the metadata XML"
+                    prefix-icon
                     required
-                  ></rp-field-text>
-                  <rp-field-text
+                  >
+                    <scheme-list>
+                      <scheme>https://</scheme>
+                      <scheme>http://</scheme>
+                    </scheme-list>
+                  </rp-field-website>
+                  <rp-field-website
                     col="col-md-6"
                     label="IdP SSO URL"
-                    field-id="rp-setup-auth-saml-sso-url"
+                    id="rp-setup-auth-saml-sso-url"
                     name="saml-sso-url"
                     hint="The IdP's Single Sign-On URL (HTTP-Redirect binding)"
+                    prefix-icon
                     required
-                  ></rp-field-text>
+                  >
+                    <scheme-list>
+                      <scheme>https://</scheme>
+                      <scheme>http://</scheme>
+                    </scheme-list>
+                  </rp-field-website>
                   <rp-field-secret
                     col="col-md-12"
                     label="IdP X.509 certificate"
-                    field-id="rp-setup-auth-saml-x509-cert"
+                    id="rp-setup-auth-saml-x509-cert"
                     name="saml-x509-cert"
                     prefix-icon
                     eye-icon
@@ -376,12 +539,11 @@
                   <rp-field-website
                     col="col-md-6"
                     label="SP entity ID"
-                    field-id="rp-setup-auth-saml-sp-entity-id"
+                    id="rp-setup-auth-saml-sp-entity-id"
                     name="saml-sp-entity-id"
                     hint="This app's entity ID registered with the IdP — usually your base URL."
                     placeholder="localhost:8000"
                     prefix-icon
-                    required
                   >
                     <scheme-list>
                       <scheme>https://</scheme>
@@ -391,7 +553,7 @@
                   <rp-field-website
                     col="col-md-6"
                     label="Assertion consumer service URL"
-                    field-id="rp-setup-auth-saml-service-url"
+                    id="rp-setup-auth-saml-service-url"
                     name="saml-service-url"
                     placeholder="localhost:8000/saml/acs/"
                     prefix-icon
@@ -414,7 +576,7 @@
                 <div class="row g-3">
                   <rp-panel
                     col="col-md-12"
-                    field-id="rp-setup-auth-oauth-info"
+                    id="rp-setup-auth-oauth-info"
                     title="Register this in your Identity Provider"
                   >
                     <panel-body>
@@ -444,7 +606,7 @@
                   <rp-field-text
                     col="col-md-12"
                     label="Provider display name"
-                    field-id="rp-setup-auth-oauth-provider-name"
+                    id="rp-setup-auth-oauth-provider-name"
                     name="provider-name"
                     placeholder="GitHub"
                     required
@@ -458,7 +620,7 @@
                   <rp-field-secret
                     col="col-md-6"
                     label="Client ID"
-                    field-id="rp-setup-auth-oauth-client-id"
+                    id="rp-setup-auth-oauth-client-id"
                     name="oauth-client-id"
                     prefix-icon
                     eye-icon
@@ -468,7 +630,7 @@
                   <rp-field-secret
                     col="col-md-6"
                     label="Client secret"
-                    field-id="rp-setup-auth-oauth-client-secret"
+                    id="rp-setup-auth-oauth-client-secret"
                     name="oauth-client-secret"
                     prefix-icon
                     eye-icon
@@ -478,7 +640,7 @@
                   <rp-field-website
                     col="col-md-6"
                     label="Authorisation endpoint"
-                    field-id="rp-setup-auth-oauth-auth-endpoint"
+                    id="rp-setup-auth-oauth-auth-endpoint"
                     name="oauth-auth-endpoint"
                     hint="The IdP URL users are redirected to for authentication."
                     placeholder="localhost:8000"
@@ -493,7 +655,7 @@
                   <rp-field-website
                     col="col-md-6"
                     label="Token endpoint"
-                    field-id="rp-setup-auth-oauth-token-endpoint"
+                    id="rp-setup-auth-oauth-token-endpoint"
                     name="oauth-token-endpoint"
                     hint="URL to exchange the authorisation code for tokens."
                     placeholder="localhost:8000"
@@ -508,7 +670,7 @@
                   <rp-field-website
                     col="col-md-6"
                     label="Users info endpoint"
-                    field-id="rp-setup-auth-oauth-uinfo-endpoint"
+                    id="rp-setup-auth-oauth-uinfo-endpoint"
                     name="oauth-uinfo-endpoint"
                     hint="URL to fetch the user's profile. Leave blank if claims are in the ID token."
                     placeholder="localhost:8000"
@@ -522,7 +684,7 @@
                   <rp-field-text
                     col="col-md-6"
                     label="Scope"
-                    field-id="rp-setup-auth-oauth-scope"
+                    id="rp-setup-auth-oauth-scope"
                     name="oauth-scope"
                     placeholder="openid email profile"
                     value="openid email profile"
@@ -532,19 +694,11 @@
                   </rp-field-text>
                 </div>
               </div>
-
-              <rp-field-checkbox
-                col="col-md-12"
-                label="Allow public self-registration"
-                field-id="rp-setup-auth-self-regt"
-                name="self-registration"
-                value="true"
-              ></rp-field-checkbox>
             </wizard-step-body>
           </wizard-step>
 
           <!-- Step 5: Storage -->
-          <wizard-step nav-title="Storage" nav-subtitle="Media & attachments">
+          <wizard-step nav-title="Storage" nav-subtitle="Media &amp; attachments">
             <wizard-step-header
               icon="bi-hdd"
               title="Configure storage"
@@ -554,14 +708,14 @@
               <rp-field-dropdown
                 col="col-md-12"
                 label="Storage type"
-                field-id="rp-setup-storage-type"
+                id="rp-setup-storage-type"
                 name="storage-type"
                 required
               >
                 <values-list>
-                  <value selected>Database</value>
-                  <value>Local Filesystem</value>
-                  <value>Amazon S3</value>
+                  <value value="database" selected>Database</value>
+                  <value value="filesystem">Local Filesystem</value>
+                  <value value="s3">Amazon S3</value>
                 </values-list>
               </rp-field-dropdown>
 
@@ -580,7 +734,7 @@
                   <rp-field-hint>Files saved to a directory on the server.</rp-field-hint>
                   <rp-field-text
                     col="col-md-12"
-                    field-id="rp-setup-storage-file-dir"
+                    id="rp-setup-storage-file-dir"
                     label="Path"
                     name="file-path"
                     placeholder="/var/rp/media/"
@@ -592,10 +746,12 @@
               <!-- Amazon S3 — shown when "Amazon S3" is selected -->
               <div id="rp-setup-storage-s3" class="col-12" hidden>
                 <div class="row g-3">
-                  <rp-field-hint>Files stored in an S3 bucket.</rp-field-hint>
+                  <rp-field-hint
+                    >Files stored in an S3 bucket. AWS region is inherited from the Infrastructure step.</rp-field-hint
+                  >
                   <rp-field-text
                     col="col-md-12"
-                    field-id="rp-setup-storage-s3-bucket"
+                    id="rp-setup-storage-s3-bucket"
                     label="S3 bucket ARN"
                     name="s3-bucket-arn"
                     placeholder="arn:aws:s3:::my-bucket"
@@ -614,23 +770,17 @@
               subtitle="Set up outbound email for notifications, password resets, and account activity."
             ></wizard-step-header>
             <wizard-step-body>
-              <rp-field-dropdown
-                col="col-md-12"
-                label="Email type"
-                field-id="rp-setup-email-type"
-                name="email-type"
-                required
-              >
+              <rp-field-dropdown col="col-md-12" label="Email type" id="rp-setup-email-type" name="email-type" required>
                 <values-list>
-                  <value selected>Console</value>
-                  <value>SMTP</value>
+                  <value value="console" selected>Console</value>
+                  <value value="smtp">SMTP</value>
                 </values-list>
               </rp-field-dropdown>
 
               <rp-field-email
                 col="col-md-6"
                 prefix-icon
-                field-id="rp-setup-email-from"
+                id="rp-setup-email-from"
                 name="email-from"
                 label="From email address"
                 placeholder="noreply@example.com"
@@ -640,7 +790,7 @@
               <rp-field-text
                 col="col-md-6"
                 label="From name"
-                field-id="rp-setup-email-name"
+                id="rp-setup-email-name"
                 name="email-name"
                 placeholder="Resource Planner"
                 hint="The sender name displayed alongside the From address."
@@ -660,7 +810,7 @@
                   <rp-field-text
                     col="col-md-6"
                     label="SMTP host"
-                    field-id="rp-setup-email-smtp-host"
+                    id="rp-setup-email-smtp-host"
                     name="smtp-host"
                     placeholder="smtp.example.com"
                     hint="Hostname or IP address of the outbound SMTP server."
@@ -669,20 +819,20 @@
                   <rp-field-dropdown
                     col="col-md-6"
                     label="Encryption type"
-                    field-id="rp-setup-email-enc-type"
+                    id="rp-setup-email-enc-type"
                     name="enc-type"
                     required
                   >
                     <values-list>
-                      <value selected>None</value>
-                      <value>STARTTLS</value>
-                      <value>SSL/TLS</value>
+                      <value value="none" selected>None</value>
+                      <value value="starttls">STARTTLS</value>
+                      <value value="ssl">SSL/TLS</value>
                     </values-list>
                   </rp-field-dropdown>
                   <rp-field-number
                     col="col-md-6"
                     label="SMTP port"
-                    field-id="rp-setup-email-smtp-port"
+                    id="rp-setup-email-smtp-port"
                     name="smtp-port"
                     min="1"
                     max="65535"
@@ -693,7 +843,7 @@
                   <rp-field-toggle
                     col="col-md-6"
                     label="Enable SMTP authentication"
-                    field-id="rp-setup-email-smtp-auth"
+                    id="rp-setup-email-smtp-auth"
                     name="smtp-auth"
                     value="true"
                   ></rp-field-toggle>
@@ -704,7 +854,7 @@
                       <rp-field-text
                         col="col-md-6"
                         label="Username"
-                        field-id="rp-setup-email-user-name"
+                        id="rp-setup-email-user-name"
                         name="user-name"
                         required
                       ></rp-field-text>
@@ -712,7 +862,7 @@
                         col="col-md-6"
                         prefix-icon
                         eye-icon
-                        field-id="rp-setup-email-password"
+                        id="rp-setup-email-password"
                         name="password"
                         required
                       ></rp-field-password>
@@ -720,13 +870,152 @@
                         col="col-md-6"
                         prefix-icon
                         eye-icon
-                        field-id="rp-setup-email-confirm-password"
+                        id="rp-setup-email-confirm-password"
                         name="confirm-password"
                         password-field-id="rp-setup-email-password"
                         required
                       ></rp-field-confirm-password>
                     </div>
                   </div>
+                  <div class="col-12 d-flex justify-content-end">
+                    <rp-button-engine
+                      id="rp-setup-email-test-btn"
+                      label="Send Test Email"
+                      prefix-icon="bi-envelope-check"
+                    ></rp-button-engine>
+                  </div>
+                </div>
+              </div>
+            </wizard-step-body>
+          </wizard-step>
+
+          <!-- Step 8: Logging -->
+          <wizard-step nav-title="Logging" nav-subtitle="Destination &amp; rotation">
+            <wizard-step-header
+              icon="bi-journal-text"
+              title="Configure logging"
+              subtitle="Set where application logs are written, how they are named, and when they rotate."
+            ></wizard-step-header>
+            <wizard-step-body>
+              <rp-field-dropdown
+                col="col-md-6"
+                label="Log destination"
+                id="rp-setup-log-destination"
+                name="log-destination"
+                required
+              >
+                <values-list>
+                  <value value="local" selected>Local / Server folder</value>
+                  <value value="s3">Amazon S3</value>
+                  <value value="cloudwatch">CloudWatch Logs</value>
+                </values-list>
+              </rp-field-dropdown>
+
+              <rp-field-text
+                col="col-md-6"
+                label="Log name"
+                id="rp-setup-log-name"
+                name="log-name"
+                placeholder="application"
+                value="application"
+                required
+              >
+                <field-hint>File name (local/S3) or CloudWatch log group name. No extension needed.</field-hint>
+              </rp-field-text>
+
+              <!-- Local path -->
+              <div id="rp-setup-log-local" class="col-12" hidden>
+                <div class="row g-3">
+                  <rp-field-text
+                    col="col-md-12"
+                    label="Log directory path"
+                    id="rp-setup-log-path"
+                    name="log-path"
+                    placeholder="/var/log/resourceplanner"
+                    required
+                  >
+                    <field-hint>Absolute path on the server where log files will be written.</field-hint>
+                  </rp-field-text>
+                </div>
+              </div>
+
+              <!-- S3 -->
+              <div id="rp-setup-log-s3" class="col-12" hidden>
+                <div class="row g-3">
+                  <rp-field-text
+                    col="col-md-12"
+                    label="S3 bucket ARN"
+                    id="rp-setup-log-s3-bucket"
+                    name="log-s3-bucket"
+                    placeholder="arn:aws:s3:::my-log-bucket"
+                    required
+                  ></rp-field-text>
+                </div>
+              </div>
+
+              <!-- CloudWatch — no extra fields; uses AWS credentials from Infrastructure step -->
+              <div id="rp-setup-log-cloudwatch" class="col-12" hidden>
+                <div class="row g-3">
+                  <rp-field-hint>
+                    Logs are sent to the CloudWatch log group named above. AWS credentials and region are taken from the
+                    Infrastructure step.
+                  </rp-field-hint>
+                </div>
+              </div>
+
+              <rp-field-dropdown
+                col="col-md-6"
+                label="Log rotation"
+                id="rp-setup-log-rotation"
+                name="log-rotation"
+                required
+              >
+                <values-list>
+                  <value value="none" selected>None</value>
+                  <value value="daily">Daily</value>
+                  <value value="weekly">Weekly</value>
+                  <value value="monthly">Monthly</value>
+                  <value value="size">Size-based</value>
+                </values-list>
+              </rp-field-dropdown>
+
+              <!-- Size rotation -->
+              <div id="rp-setup-log-size-fields" class="col-md-6" hidden>
+                <div class="row g-3">
+                  <rp-field-number
+                    col="col-md-12"
+                    label="Max size (MB)"
+                    id="rp-setup-log-rotation-size"
+                    name="log-rotation-size"
+                    value="10"
+                    min="1"
+                    required
+                  ></rp-field-number>
+                </div>
+              </div>
+
+              <!-- Cleanup — shown when rotation != none -->
+              <div id="rp-setup-log-cleanup" class="col-12" hidden>
+                <div class="row g-3">
+                  <rp-field-number
+                    col="col-md-6"
+                    label="Keep files (count)"
+                    id="rp-setup-log-cleanup-keep-files"
+                    name="log-cleanup-keep-files"
+                    value="5"
+                    min="1"
+                  >
+                    <field-hint>Maximum number of rotated log files to retain.</field-hint>
+                  </rp-field-number>
+                  <rp-field-number
+                    col="col-md-6"
+                    label="Keep files (days)"
+                    id="rp-setup-log-cleanup-keep-days"
+                    name="log-cleanup-keep-days"
+                    min="1"
+                  >
+                    <field-hint>Delete rotated files older than this many days. Leave blank to disable.</field-hint>
+                  </rp-field-number>
                 </div>
               </div>
             </wizard-step-body>

@@ -24,7 +24,8 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install -r apps/web/requirements.txt
+          pip install -r apps/web/requirements/base.txt
+          pip install -r apps/web/requirements/dev.txt
           pip install ruff mypy pytest bandit pip-audit
 
       - name: Install Node dependencies
@@ -38,6 +39,8 @@ jobs:
       - name: Verify frontend build outputs
         run: |
           test -f apps/web/static/css/dist/styles.min.css
+          test -f apps/web/static/js/dist/main.min.js
+          test -f apps/web/static/js/dist/utils.min.js
           test -f apps/web/static/js/dist/components.min.js
           test -f apps/web/static/js/dist/setup.min.js
 

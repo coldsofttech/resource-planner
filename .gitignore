@@ -221,5 +221,6 @@ __marimo__/
 .claude/
 graphify-out/
 .graphify*
+.vscode/
 node_modules/
 apps/web/logs/

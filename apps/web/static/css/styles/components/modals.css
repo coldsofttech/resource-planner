@@ -1,0 +1,124 @@
+.rp-modal-back {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: grid;
+  place-items: center;
+  z-index: 100;
+  padding: 20px;
+  backdrop-filter: blur(2px);
+}
+.rp-modal {
+  width: 100%;
+  max-width: 480px;
+  background: var(--rp-bg-elev);
+  border-radius: var(--rp-r-12);
+  border: 1px solid var(--rp-border);
+  box-shadow: var(--rp-shadow-lg);
+  overflow: hidden;
+}
+.rp-modal-head {
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--rp-divider);
+}
+.rp-modal-body {
+  padding: 20px;
+}
+.rp-modal-foot {
+  padding: 14px 20px;
+  background: var(--rp-bg-sunken);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  border-top: 1px solid var(--rp-divider);
+}
+
+rp-status-modal .rp-modal {
+  max-width: 460px;
+}
+.rp-status-modal .rp-modal-head {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.rp-status-modal .rp-status-hero {
+  text-align: center;
+  padding: 28px 24px 8px;
+}
+.rp-status-modal .rp-status-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 14px;
+  font-size: 30px;
+}
+.rp-status-modal .rp-status-hero h3 {
+  font-size: 20px;
+  margin: 0 0 6px;
+  letter-spacing: -0.01em;
+}
+.rp-status-modal .rp-status-hero p {
+  color: var(--rp-text-muted);
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.55;
+}
+.rp-status-modal.danger .rp-status-icon {
+  background: var(--rp-danger-soft);
+  color: var(--rp-danger-soft-text);
+}
+.rp-status-modal.warning .rp-status-icon {
+  background: var(--rp-warning-soft);
+  color: var(--rp-warning-soft-text);
+}
+.rp-status-modal.info .rp-status-icon {
+  background: var(--rp-info-soft);
+  color: var(--rp-info-soft-text);
+}
+.rp-status-modal.success .rp-status-icon {
+  background: var(--rp-success-soft);
+  color: var(--rp-success-soft-text);
+}
+.rp-status-modal .rp-status-details {
+  padding: 0 24px 16px;
+  font-size: 13px;
+  color: var(--rp-text-muted);
+  line-height: 1.6;
+}
+.rp-status-modal .rp-status-additional {
+  padding: 0 24px 16px;
+}
+.rp-status-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rp-status-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--rp-text-muted);
+  padding: 3px 0;
+}
+.rp-status-step i {
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.rp-status-step.done {
+  color: var(--rp-success-soft-text);
+}
+.rp-status-step.done i {
+  color: var(--rp-success-soft-text);
+}
+.rp-status-step.active {
+  color: var(--rp-text);
+  font-weight: 500;
+}
+.rp-status-step.active i {
+  color: var(--rp-accent);
+}

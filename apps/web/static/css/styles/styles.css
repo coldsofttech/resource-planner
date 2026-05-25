@@ -11,6 +11,8 @@
 @import "./components/badges.css";
 @import "./components/cards.css";
 @import "./components/links.css";
+@import "./components/toasts.css";
+@import "./components/modals.css";
 @import "./components/website.css";
 @import "./components/setup-bar.css";
 

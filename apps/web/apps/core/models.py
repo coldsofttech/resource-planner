@@ -48,7 +48,7 @@ class BaseModel(models.Model):
         abstract = True
 
 
-class CodeModel(BaseModel):
+class CodeModel(models.Model):
     """Base model with code field. Examples: SUB-1, CONFIG-2, etc."""
 
     MODEL_CODE = "BASE"
@@ -67,7 +67,7 @@ class CodeModel(BaseModel):
             super().save(update_fields=["code"])
 
 
-class TimeStampedModel(BaseModel):
+class TimeStampedModel(models.Model):
     """Adds created_at and updated_at timestamp fields."""
 
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -77,7 +77,7 @@ class TimeStampedModel(BaseModel):
         abstract = True
 
 
-class AuditableModel(TimeStampedModel):
+class AuditableModel(models.Model):
     """Adds created_at, created_by, updated_at, updated_by fields."""
 
     created_by = models.ForeignKey(
@@ -87,6 +87,7 @@ class AuditableModel(TimeStampedModel):
         on_delete=models.SET_NULL,
         related_name="created_%(class)s_set",
     )
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,
@@ -94,12 +95,13 @@ class AuditableModel(TimeStampedModel):
         on_delete=models.SET_NULL,
         related_name="updated_%(class)s_set",
     )
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
 
     class Meta:
         abstract = True
 
 
-class CreatedAtModel(BaseModel):
+class CreatedAtModel(models.Model):
     """Adds created_at field."""
 
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -108,7 +110,7 @@ class CreatedAtModel(BaseModel):
         abstract = True
 
 
-class ActivatableModel(BaseModel):
+class ActivatableModel(models.Model):
     """Adds is_active=TRUE/FALSE field."""
 
     is_active = models.BooleanField(default=True, db_index=True)
@@ -117,7 +119,7 @@ class ActivatableModel(BaseModel):
         abstract = True
 
 
-class NamedModel(BaseModel):
+class NamedModel(models.Model):
     """Adds name field with MAX_LENGTH=255."""
 
     name = models.CharField(max_length=255, db_index=True)
@@ -129,7 +131,7 @@ class NamedModel(BaseModel):
         return self.name
 
 
-class DescriptionModel(BaseModel):
+class DescriptionModel(models.Model):
     """Adds description field."""
 
     description = models.CharField(blank=True)

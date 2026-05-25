@@ -1,7 +1,7 @@
 /* PanelField: <rp-panel> */
 class PanelField extends HTMLElement {
   static get observedAttributes() {
-    return ["col", "title", "icon", "field-id", "name"];
+    return ["col", "title", "icon", "id", "name"];
   }
 
   connectedCallback() {
@@ -33,7 +33,7 @@ class PanelField extends HTMLElement {
     return this.getAttribute("icon") || "";
   }
   get _fieldId() {
-    return this.getAttribute("field-id") || "";
+    return this.id || "";
   }
   get _name() {
     return this.getAttribute("name") || this._fieldId;

@@ -7,7 +7,7 @@ class BaseField extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ["col", "label", "required", "field-id", "name", "hint", "hint-type", "value"];
+    return ["col", "label", "required", "id", "name", "hint", "hint-type", "value"];
   }
 
   connectedCallback() {
@@ -22,6 +22,15 @@ class BaseField extends HTMLElement {
     this._doRender();
     const panel = this.closest("[data-wiz-panel]");
     (panel || this).addEventListener("rp:validate", () => this._onValidate());
+  }
+
+  get value() {
+    return this._value;
+  }
+
+  set value(v) {
+    const input = this.querySelector(".rp-input");
+    if (input) input.value = v;
   }
 
   attributeChangedCallback(name, oldVal, newVal) {
@@ -63,7 +72,7 @@ class BaseField extends HTMLElement {
     return this.hasAttribute("required");
   }
   get _fieldId() {
-    return this.getAttribute("field-id") || "";
+    return this.id || "";
   }
   get _name() {
     return this.getAttribute("name") || this._fieldId;
@@ -84,6 +93,7 @@ class BaseField extends HTMLElement {
   }
 
   _onValidate() {
+    if (this.closest("[hidden]")) return;
     this._touched = true;
     this._updateError();
   }
@@ -101,7 +111,7 @@ class BaseField extends HTMLElement {
 
   _labelHTML() {
     const req = this._required ? ' <span class="rp-req">*</span>' : "";
-    return `<label class="rp-label" for="${this._esc(this._fieldId)}">${this._esc(this._label)}${req}</label>`;
+    return `<label class="rp-label" for="${this._esc(this._fieldId)}-input">${this._esc(this._label)}${req}</label>`;
   }
 
   _hintHTML() {
@@ -162,7 +172,7 @@ class TextField extends BaseField {
         <input
           class="rp-input"
           type="text"
-          id="${this._esc(this._fieldId)}"
+          id="${this._esc(this._fieldId)}-input"
           name="${this._esc(this._name)}"
           placeholder="${this._esc(this._placeholder)}"
           value="${this._esc(this._value)}"${maxlen}${req}
@@ -328,7 +338,7 @@ class EmailField extends TextField {
           <input
             class="${inputClasses.join(" ")}"
             type="email"
-            id="${this._esc(this._fieldId)}"
+            id="${this._esc(this._fieldId)}-input"
             name="${this._esc(this._name)}"
             placeholder="${this._esc(this._placeholder)}"
             value="${this._esc(this._value)}"
@@ -350,8 +360,14 @@ class WebsiteField extends TextField {
   connectedCallback() {
     if (this._initialSchemes === undefined) {
       this._initialSchemes = Array.from(this.querySelectorAll("scheme-list scheme"))
-        .map((el) => el.textContent.trim())
-        .filter(Boolean);
+        .map((el) => ({
+          id: el.getAttribute("id") || "",
+          label: el.textContent.trim(),
+          value: el.getAttribute("value") ?? el.textContent.trim(),
+          selected: el.hasAttribute("selected"),
+          disabled: el.hasAttribute("disabled"),
+        }))
+        .filter((s) => s.value);
     }
     if (this._pasteError === undefined) this._pasteError = "";
 
@@ -363,14 +379,24 @@ class WebsiteField extends TextField {
 
   get _schemes() {
     if (this._initialSchemes && this._initialSchemes.length) {
-      return this._initialSchemes;
+      return this._initialSchemes.map((s) => s.value);
     }
 
     return ["https://"];
   }
 
   get _scheme() {
-    return this.getAttribute("scheme") || this._schemes[0];
+    if (this.hasAttribute("scheme")) return this.getAttribute("scheme");
+    const preselected = this._initialSchemes?.find((s) => s.selected);
+    return preselected?.value ?? this._schemes[0] ?? "";
+  }
+
+  get _rawValue() {
+    return this.querySelector(".rp-input")?.value ?? (this.getAttribute("value") || "");
+  }
+
+  get _value() {
+    return this._fullUrl;
   }
 
   get _showPrefixIcon() {
@@ -381,8 +407,36 @@ class WebsiteField extends TextField {
     return this.hasAttribute("open-button");
   }
 
+  get scheme() {
+    return this._scheme;
+  }
+
+  get rawValue() {
+    return this._rawValue;
+  }
+
+  get value() {
+    return this._fullUrl;
+  }
+
+  set value(v) {
+    const input = this.querySelector(".rp-input");
+    const select = this.querySelector(".rp-scheme-select");
+    if (!input) return;
+    const match = this._schemes.find((s) => v.toLowerCase().startsWith(s.toLowerCase()));
+    if (match) {
+      if (select) {
+        select.value = match;
+        this.setAttribute("scheme", match);
+      }
+      input.value = v.slice(match.length);
+    } else {
+      input.value = v;
+    }
+  }
+
   get _fullUrl() {
-    const value = this._value.trim();
+    const value = this._rawValue.trim();
 
     if (!value) return "";
 
@@ -390,7 +444,7 @@ class WebsiteField extends TextField {
   }
 
   get _validUrl() {
-    if (!this._value.trim()) {
+    if (!this._rawValue.trim()) {
       return false;
     }
 
@@ -405,7 +459,7 @@ class WebsiteField extends TextField {
 
   _validate() {
     if (this._pasteError) return this._pasteError;
-    const value = this._value.trim();
+    const value = this._rawValue.trim();
 
     if (this._required && !value) {
       return "Website is required.";
@@ -425,14 +479,14 @@ class WebsiteField extends TextField {
   }
 
   _buildSchemeOptions() {
-    return this._schemes
-      .map(
-        (scheme) => `<option
-            value="${this._esc(scheme)}"
-            ${scheme === this._scheme ? "selected" : ""}>
-            ${this._esc(scheme)}
-          </option>`,
-      )
+    const current = this._scheme;
+    return (this._initialSchemes || [])
+      .map((s) => {
+        const idAttr = s.id ? ` id="${this._esc(s.id)}"` : "";
+        const selectedAttr = s.value === current ? " selected" : "";
+        const disabledAttr = s.disabled ? " disabled" : "";
+        return `<option${idAttr} value="${this._esc(s.value)}"${selectedAttr}${disabledAttr}>${this._esc(s.label)}</option>`;
+      })
       .join("");
   }
 
@@ -468,11 +522,11 @@ class WebsiteField extends TextField {
           </label>
           <input
             class="${inputClasses.join(" ")}"
-            type="url"
-            id="${this._esc(this._fieldId)}"
+            type="text"
+            id="${this._esc(this._fieldId)}-input"
             name="${this._esc(this._name)}"
             placeholder="${this._esc(this._placeholder)}"
-            value="${this._esc(this._value)}"
+            value="${this._esc(this._rawValue)}"
             ${maxlen}
             ${req}
           />
@@ -642,7 +696,7 @@ class PasswordField extends TextField {
           <input
             class="${inputClasses.join(" ")}"
             type="password"
-            id="${this._esc(this._fieldId)}"
+            id="${this._esc(this._fieldId)}-input"
             name="${this._esc(this._name)}"
             placeholder="${this._esc(this._placeholder)}"
             ${req}
@@ -706,8 +760,8 @@ class ConfirmPasswordField extends PasswordField {
     return this.getAttribute("password-field-id") || "";
   }
 
-  // password-field-id is the field-id value of <field-password>, which becomes
-  // the id on that element's inner <input> — so getElementById gives us the input directly
+  // password-field-id holds the id of the sibling <rp-field-password> element.
+  // getElementById returns the custom element; .value goes through its public get value().
   get _passwordInput() {
     return this._passwordFieldId ? document.getElementById(this._passwordFieldId) : null;
   }
@@ -780,7 +834,7 @@ class ConfirmPasswordField extends PasswordField {
           <input
             class="${inputClasses.join(" ")}"
             type="password"
-            id="${this._esc(this._fieldId)}"
+            id="${this._esc(this._fieldId)}-input"
             name="${this._esc(this._name)}"
             placeholder="${this._esc(this._placeholder)}"
             ${req}
@@ -834,7 +888,7 @@ class SecretField extends TextField {
   _labelHTML() {
     const req = this._required ? ' <span class="rp-req">*</span>' : "";
     const badge = `<span class="rp-badge rp-badge-soft rp-badge-warning"><i class="bi bi-lock-fill"></i> Encrypted</span>`;
-    return `<label class="rp-label" for="${this._esc(this._fieldId)}">${this._esc(this._label)} ${badge}${req}</label>`;
+    return `<label class="rp-label" for="${this._esc(this._fieldId)}-input">${this._esc(this._label)} ${badge}${req}</label>`;
   }
 
   _buildHTML() {
@@ -857,7 +911,7 @@ class SecretField extends TextField {
           <input
             class="${inputClasses.join(" ")}"
             type="password"
-            id="${this._esc(this._fieldId)}"
+            id="${this._esc(this._fieldId)}-input"
             name="${this._esc(this._name)}"
             placeholder="${this._esc(this._placeholder)}"
             ${req}
@@ -906,7 +960,7 @@ class DropdownField extends BaseField {
     return this.getAttribute("placeholder") || "";
   }
   get _value() {
-    return this.getAttribute("value") || "";
+    return this.querySelector(".rp-input")?.value ?? (this.getAttribute("value") || "");
   }
 
   connectedCallback() {
@@ -938,7 +992,7 @@ class DropdownField extends BaseField {
 
   _buildOptions() {
     const opts = [];
-    const attrVal = this._value;
+    const attrVal = this.getAttribute("value") || "";
     if (this._placeholder) {
       opts.push(
         `<option value="" disabled selected hidden>${this._esc(this._placeholder)}</option>`,
@@ -961,7 +1015,7 @@ class DropdownField extends BaseField {
         ${this._labelHTML()}
         <select
           class="rp-input rp-select"
-          id="${this._esc(this._fieldId)}"
+          id="${this._esc(this._fieldId)}-input"
           name="${this._esc(this._name)}"${req}
         >
           ${this._buildOptions()}
@@ -1034,7 +1088,7 @@ class NumberField extends BaseField {
         <input
           class="rp-input"
           type="number"
-          id="${this._esc(this._fieldId)}"
+          id="${this._esc(this._fieldId)}-input"
           name="${this._esc(this._name)}"
           placeholder="${this._esc(this._placeholder)}"
           value="${this._esc(this._value)}"${min}${max}${step}${req}
@@ -1116,13 +1170,22 @@ class ChoiceField extends BaseField {
     }
   }
 
+  get checked() {
+    return this.querySelector(`.${this._inputClass}`)?.checked ?? false;
+  }
+
+  set checked(v) {
+    const input = this.querySelector(`.${this._inputClass}`);
+    if (input) input.checked = v;
+  }
+
   _buildHTML() {
     return `
       <label class="rp-field-row">
         <input
           type="${this._type}"
           class="${this._inputClass}"
-          ${this._fieldId ? `id="${this._esc(this._fieldId)}"` : ""}
+          ${this._fieldId ? `id="${this._esc(this._fieldId)}-input"` : ""}
           name="${this._esc(this._name)}"
           value="${this._esc(this._value)}"
           ${this._checked ? "checked" : ""}
@@ -1171,6 +1234,12 @@ class ChoiceGroupField extends BaseField {
   }
   get _value() {
     return this.getAttribute("value") || "";
+  }
+
+  get value() {
+    return Array.from(this.querySelectorAll(`.${this._inputClass}:checked`))
+      .map((cb) => cb.value)
+      .join(",");
   }
 
   _isOptionChecked(o) {
@@ -1282,6 +1351,10 @@ customElements.define("rp-field-radio", RadioField);
 class RadioGroupField extends ChoiceGroupField {
   get _type() {
     return "radio";
+  }
+
+  get value() {
+    return this.querySelector(`.${this._inputClass}:checked`)?.value ?? "";
   }
 
   _isOptionChecked(o) {

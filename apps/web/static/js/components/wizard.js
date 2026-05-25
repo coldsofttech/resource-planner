@@ -111,7 +111,6 @@ class Wizard extends HTMLElement {
   }
 
   _initState() {
-    this.fieldId = this.getAttribute("field-id");
     this.name = this.getAttribute("name");
     this.navigation = this.getAttribute("navigation") || "sequential";
     this.routePrefix = this.getAttribute("route-prefix") || "step";
@@ -175,6 +174,7 @@ class Wizard extends HTMLElement {
     const fields = panel.querySelectorAll("input, select, textarea, [data-validate]");
     let valid = true;
     fields.forEach((f) => {
+      if (f.closest("[hidden]")) return;
       if (typeof f.reportValidity === "function" && !f.reportValidity()) valid = false;
     });
     return valid;
@@ -221,6 +221,37 @@ class Wizard extends HTMLElement {
       nextBtn.setAttribute("label", isLast ? this._finishLabel : this._nextLabel);
       nextBtn.setAttribute("suffix-icon", isLast ? "bi-check2" : "bi-arrow-right");
     }
+
+    this._applyMobileNav(i, total);
+  }
+
+  _applyMobileNav(i, total) {
+    this.querySelectorAll(".rp-wiz-ellipsis").forEach((el) => el.remove());
+
+    if (total <= 5) {
+      this.navButtons.forEach((btn) => btn.removeAttribute("data-wiz-mobile-hidden"));
+      return;
+    }
+
+    const visible = new Set([0, total - 1, i]);
+    if (i - 1 >= 0) visible.add(i - 1);
+    if (i + 1 < total) visible.add(i + 1);
+
+    this.navButtons.forEach((btn, idx) => {
+      if (visible.has(idx)) btn.removeAttribute("data-wiz-mobile-hidden");
+      else btn.setAttribute("data-wiz-mobile-hidden", "");
+    });
+
+    const sorted = [...visible].sort((a, b) => a - b);
+    for (let k = 0; k < sorted.length - 1; k++) {
+      if (sorted[k + 1] - sorted[k] > 1) {
+        const ellipsis = document.createElement("span");
+        ellipsis.className = "rp-wiz-ellipsis";
+        ellipsis.setAttribute("aria-hidden", "true");
+        ellipsis.textContent = "…";
+        this.navButtons[sorted[k]].after(ellipsis);
+      }
+    }
   }
 
   _bind() {
@@ -233,7 +264,13 @@ class Wizard extends HTMLElement {
 
       const nextEl = e.target.closest("[data-wiz-next]");
       if (nextEl) {
-        if (!nextEl.querySelector("button")?.disabled) this.next();
+        if (!nextEl.querySelector("button")?.disabled) {
+          if (this.currentIndex === this.panels.length - 1) {
+            this.dispatchEvent(new CustomEvent("rp:finish", { bubbles: true }));
+          } else {
+            this.next();
+          }
+        }
         return;
       }
       const backEl = e.target.closest("[data-wiz-back]");

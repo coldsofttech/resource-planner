@@ -11,3 +11,6 @@ class DataType(models.TextChoices):
 class Module(models.TextChoices):
     SETUP = "setup", "Setup"
     GENERAL = "general", "General"
+    AUTHENTICATION = "auth", "Authentication"
+    INFRA = "infra", "Infrastructure"
+    EMAIL = "email", "Email"
