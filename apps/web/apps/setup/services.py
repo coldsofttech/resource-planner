@@ -145,9 +145,27 @@ class SetupService(ContextService):
                 config_code="STORAGE_PATH", value=storage["storage_path"]
             )
 
+        if storage_type == StorageType.FILE_SYSTEM:
+            storage_path = storage["storage_path"]
+            os.makedirs(storage_path, exist_ok=True)
+            logger.info("Storage directory created at '%s'.", storage_path)
+
     def _save_email_configs(self, *, email_data):
         """Persist email config values to the database"""
         email_type = EmailType(email_data["email_type"])
+
+        if email_type == EmailType.SMTP:
+            self._test_service().test_email_connection(
+                email_type=email_data["email_type"],
+                from_address=email_data.get("from_address", ""),
+                from_name=email_data.get("from_name", ""),
+                smtp_host=email_data.get("smtp_host", ""),
+                smtp_port=email_data.get("smtp_port", 587),
+                smtp_enc_type=email_data.get("smtp_enc_type", "none"),
+                smtp_auth_enabled=email_data.get("smtp_auth_enabled", False),
+                smtp_username=email_data.get("smtp_username", ""),
+                smtp_password=email_data.get("smtp_password", ""),
+            )
 
         self._config_service().set_config(
             config_code="EMAIL_TYPE", value=email_type.value
@@ -248,6 +266,22 @@ class SetupService(ContextService):
         from apps.auth.constants import AuthMode
 
         auth_type = AuthMode(auth_data["auth_type"])
+
+        if auth_type == AuthMode.SAML:
+            self._test_service().test_saml_connection(
+                idp_sso_url=auth_data.get("idp_sso_url", ""),
+                idp_x509_cert=auth_data.get("idp_x509_cert", ""),
+            )
+        elif auth_type == AuthMode.OAUTH:
+            self._test_service().test_oauth_connection(
+                client_id=auth_data.get("client_id", ""),
+                client_secret=auth_data.get("client_secret", ""),
+                auth_endpoint=auth_data.get("auth_endpoint", ""),
+                token_endpoint=auth_data.get("token_endpoint", ""),
+                userinfo_endpoint=auth_data.get("userinfo_endpoint", ""),
+                scope=auth_data.get("scope", ""),
+            )
+
         self._config_service().set_config(
             config_code="AUTH_MODE", value=auth_type.value
         )
@@ -312,6 +346,11 @@ class SetupService(ContextService):
         logger.info(
             "Logging configuration written to .env (destination=%s).", log_destination
         )
+
+    def _set_base_url(self):
+        from apps.setup.apps import patch_allowed_hosts
+
+        patch_allowed_hosts()
 
     def _mark_setup_complete(self):
         self._config_service().set_config(config_code="SETUP_COMPLETE", value=True)
@@ -394,6 +433,8 @@ class SetupService(ContextService):
                 self._mark_setup_complete()
                 _status.advance("complete")
 
+            self._set_base_url()
+
             _status.complete()
 
         except Exception as exc:
@@ -402,6 +443,57 @@ class SetupService(ContextService):
 
 
 class TestService(ContextService):
+    def test_saml_connection(self, *, idp_sso_url, idp_x509_cert):
+        import base64
+        import datetime
+        import urllib.error
+        import urllib.request
+
+        from apps.core.exceptions import ValidationException
+
+        # --- Validate X.509 certificate and check expiry ---
+        try:
+            from cryptography import x509
+
+            padded = idp_x509_cert + "=" * (-len(idp_x509_cert) % 4)
+            cert_obj = x509.load_der_x509_certificate(base64.b64decode(padded))
+
+            now = datetime.datetime.now(tz=datetime.timezone.utc)
+            try:
+                not_after = cert_obj.not_valid_after_utc
+            except AttributeError:
+                not_after = cert_obj.not_valid_after.replace(
+                    tzinfo=datetime.timezone.utc
+                )
+
+            if not_after < now:
+                raise ValidationException(
+                    f"IdP X.509 certificate expired on "
+                    f"{not_after.strftime('%Y-%m-%d')}. "
+                    "Please update the certificate from your IdP."
+                )
+        except ValidationException:
+            raise
+        except Exception as exc:
+            raise ValidationException(f"Invalid X.509 certificate: {exc}") from exc
+
+        # --- Verify IdP SSO URL is reachable ---
+        req = urllib.request.Request(idp_sso_url, method="GET")  # nosec B310
+        req.add_header("Accept", "text/html,application/json")
+        try:
+            with urllib.request.urlopen(req, timeout=10):  # nosec B310
+                pass
+        except urllib.error.HTTPError:
+            pass  # Any HTTP response confirms the endpoint is up
+        except urllib.error.URLError as exc:
+            raise ValidationException(
+                f"Cannot reach IdP SSO URL: {exc.reason}"
+            ) from exc
+        except Exception as exc:
+            raise ValidationException(str(exc)) from exc
+
+        logger.info("SAML connection test succeeded (idp_sso_url=%s).", idp_sso_url)
+
     def test_email_connection(
         self,
         *,
@@ -444,6 +536,94 @@ class TestService(ContextService):
             raise ValidationException(str(exc)) from exc
 
         logger.info("Email connection test succeeded (type=%s).", email_type)
+
+    def test_oauth_connection(
+        self,
+        *,
+        client_id,
+        client_secret,
+        auth_endpoint,
+        token_endpoint,
+        userinfo_endpoint="",
+        scope="openid email profile",
+    ):
+        import json
+        import urllib.error
+        import urllib.parse
+        import urllib.request
+
+        from apps.core.exceptions import ValidationException
+
+        def _post_token(params):
+            payload = urllib.parse.urlencode(params).encode()
+            req = urllib.request.Request(token_endpoint, data=payload, method="POST")  # nosec B310
+            req.add_header("Content-Type", "application/x-www-form-urlencoded")
+            req.add_header("Accept", "application/json")
+            try:
+                with urllib.request.urlopen(req, timeout=10) as resp:  # nosec B310
+                    try:
+                        return resp.status, json.loads(
+                            resp.read().decode("utf-8", errors="replace")
+                        )
+                    except (json.JSONDecodeError, UnicodeDecodeError):
+                        return resp.status, {}
+            except urllib.error.HTTPError as exc:
+                try:
+                    body = json.loads(exc.read().decode("utf-8", errors="replace"))
+                except (json.JSONDecodeError, UnicodeDecodeError):
+                    body = {}
+                return exc.code, body
+
+        # Probe the token endpoint using authorization_code + a dummy code.
+        #
+        # Providers validate client credentials BEFORE checking the code, so:
+        #   valid credentials + wrong code  → "invalid_grant"
+        #                                     (expected — credentials OK)
+        #   invalid credentials             → "invalid_client" (credentials bad)
+        #
+        # This works for standard authorization_code clients regardless of whether
+        # service accounts / client_credentials grant is enabled on the provider.
+        try:
+            _, body = _post_token(
+                {
+                    "grant_type": "authorization_code",
+                    "client_id": client_id,
+                    "client_secret": client_secret,
+                    "code": "rp_test_probe",
+                    "redirect_uri": "http://localhost/oauth/callback",
+                }
+            )
+        except urllib.error.URLError as exc:
+            raise ValidationException(
+                f"Cannot reach token endpoint: {exc.reason}"
+            ) from exc
+        except Exception as exc:
+            raise ValidationException(str(exc)) from exc
+
+        if body.get("error") == "invalid_client":
+            raise ValidationException(
+                "Token endpoint is reachable but the client credentials were rejected. "
+                "Check your Client ID and Client Secret."
+            )
+
+        # Verify the authorisation endpoint is reachable (any HTTP response is fine).
+        auth_req = urllib.request.Request(auth_endpoint, method="GET")  # nosec B310
+        auth_req.add_header("Accept", "text/html,application/json")
+        try:
+            with urllib.request.urlopen(auth_req, timeout=10):  # nosec B310
+                pass
+        except urllib.error.HTTPError:
+            pass  # Any HTTP response confirms reachability
+        except urllib.error.URLError as exc:
+            raise ValidationException(
+                f"Cannot reach authorisation endpoint: {exc.reason}"
+            ) from exc
+        except Exception as exc:
+            raise ValidationException(str(exc)) from exc
+
+        logger.info(
+            "OAuth connection test succeeded (token_endpoint=%s).", token_endpoint
+        )
 
     def test_db_connection(self, *, host, port, db_name, user_name, password):
         from apps.core.exceptions import ValidationException

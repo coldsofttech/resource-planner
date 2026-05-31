@@ -1,9 +1,18 @@
+import re
+
 from django.contrib.auth.password_validation import (
     validate_password as django_validate_password,
 )
 from rest_framework import serializers
 
 from apps.core.serializers import BaseSerializer, ReadMixin, WriteMixin
+from apps.setup.validators import (
+    AWS_ACCESS_KEY_ID_VALIDATOR,
+    AWS_REGION_VALIDATOR,
+    AWS_SECRET_ACCESS_KEY_VALIDATOR,
+    S3_ARN_VALIDATOR,
+    validate_x509_cert,
+)
 
 
 class AdminInputSerializer(WriteMixin, BaseSerializer):
@@ -13,6 +22,19 @@ class AdminInputSerializer(WriteMixin, BaseSerializer):
     password = serializers.CharField(write_only=True)
 
     def validate_password(self, value):
+        errors = []
+        if len(value) < 12:
+            errors.append("Password must be at least 12 characters.")
+        if not re.search(r"[A-Z]", value):
+            errors.append("Password must contain at least one uppercase letter.")
+        if not re.search(r"[a-z]", value):
+            errors.append("Password must contain at least one lowercase letter.")
+        if not re.search(r"\d", value):
+            errors.append("Password must contain at least one number.")
+        if not re.search(r"[^A-Za-z0-9]", value):
+            errors.append("Password must contain at least one symbol.")
+        if errors:
+            raise serializers.ValidationError(errors)
         django_validate_password(value)
         return value
 
@@ -29,11 +51,17 @@ class InfrastructureInputSerializer(WriteMixin, BaseSerializer):
     fernet_key = serializers.CharField(required=False, write_only=True)
 
     # AWS
-    aws_region = serializers.CharField(required=False)
+    aws_region = serializers.CharField(
+        required=False, validators=[AWS_REGION_VALIDATOR]
+    )
     secrets_prefix = serializers.CharField(required=False)
     aws_auth_mode = serializers.ChoiceField(choices=["role", "user"], required=False)
-    aws_access_key_id = serializers.CharField(required=False, write_only=True)
-    aws_secret_access_key = serializers.CharField(required=False, write_only=True)
+    aws_access_key_id = serializers.CharField(
+        required=False, write_only=True, validators=[AWS_ACCESS_KEY_ID_VALIDATOR]
+    )
+    aws_secret_access_key = serializers.CharField(
+        required=False, write_only=True, validators=[AWS_SECRET_ACCESS_KEY_VALIDATOR]
+    )
 
     def validate_fernet_key(self, value):
         if not value:
@@ -92,8 +120,16 @@ class StorageInputSerializer(WriteMixin, BaseSerializer):
     storage_path = serializers.CharField(required=False)
 
     def validate(self, attrs):
-        if attrs.get("storage_type") in ("filesystem", "s3"):
+        storage_type = attrs.get("storage_type")
+        if storage_type in ("filesystem", "s3"):
             self.validate_required_fields(attrs, ["storage_path"])
+        if storage_type == "s3":
+            try:
+                S3_ARN_VALIDATOR(attrs.get("storage_path", ""))
+            except Exception as exc:
+                raise serializers.ValidationError(
+                    {"storage_path": S3_ARN_VALIDATOR.message}
+                ) from exc
         return attrs
 
 
@@ -117,7 +153,9 @@ class AuthenticationInputSerializer(WriteMixin, BaseSerializer):
     # SAML
     idp_entity_id = serializers.URLField(required=False)
     idp_sso_url = serializers.URLField(required=False)
-    idp_x509_cert = serializers.CharField(required=False)
+    idp_x509_cert = serializers.CharField(
+        required=False, validators=[validate_x509_cert]
+    )
     sp_entity_id = serializers.URLField(required=False, allow_blank=True)
     sp_assertion_url = serializers.URLField(required=False)
 
@@ -168,7 +206,7 @@ class LoggingInputSerializer(WriteMixin, BaseSerializer):
     log_rotation_size_mb = serializers.IntegerField(required=False, min_value=1)
     log_cleanup_keep_files = serializers.IntegerField(required=False, min_value=1)
     log_cleanup_keep_days = serializers.IntegerField(required=False, min_value=1)
-    log_s3_bucket = serializers.CharField(required=False)
+    log_s3_bucket = serializers.CharField(required=False, validators=[S3_ARN_VALIDATOR])
 
     def validate(self, attrs):
         destination = attrs.get("log_destination")
@@ -247,6 +285,20 @@ class EmailTestInputSerializer(WriteMixin, BaseSerializer):
         return attrs
 
 
+class SAMLTestInputSerializer(WriteMixin, BaseSerializer):
+    idp_sso_url = serializers.URLField()
+    idp_x509_cert = serializers.CharField(validators=[validate_x509_cert])
+
+
+class OAuthTestInputSerializer(WriteMixin, BaseSerializer):
+    client_id = serializers.CharField()
+    client_secret = serializers.CharField(write_only=True)
+    auth_endpoint = serializers.URLField()
+    token_endpoint = serializers.URLField()
+    userinfo_endpoint = serializers.URLField(required=False, allow_blank=True)
+    scope = serializers.CharField(required=False, default="openid email profile")
+
+
 class DbTestInputSerializer(WriteMixin, BaseSerializer):
     host = serializers.CharField()
     port = serializers.CharField()
@@ -272,7 +324,7 @@ class SetupStatusSerializer(ReadMixin, BaseSerializer):
     error = serializers.CharField(read_only=True, allow_null=True)
 
 
-class SetupDefaultsSerializer(ReadMixin, BaseSerializer):
+class SetupDefaultsDataSerializer(ReadMixin, BaseSerializer):
     app_name = serializers.CharField(read_only=True)
     self_register = serializers.BooleanField(read_only=True)
     storage_type = serializers.CharField(read_only=True)
@@ -283,3 +335,8 @@ class SetupDefaultsSerializer(ReadMixin, BaseSerializer):
     log_rotation_size_mb = serializers.IntegerField(read_only=True)
     log_cleanup_keep_files = serializers.IntegerField(read_only=True)
     log_cleanup_keep_days = serializers.IntegerField(read_only=True)
+
+
+class SetupDefaultsSerializer(ReadMixin, BaseSerializer):
+    setup_complete = serializers.BooleanField(read_only=True)
+    defaults = SetupDefaultsDataSerializer(read_only=True)
