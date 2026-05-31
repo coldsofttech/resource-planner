@@ -177,6 +177,7 @@ function getAuthApiBody() {
     });
   } else if (auth.auth_type === "saml") {
     Object.assign(auth, {
+      icon: document.getElementById("rp-setup-auth-saml-icon")?.value ?? "",
       provider_name:
         document.getElementById("rp-setup-auth-saml-provider-name")?.value?.trim() ?? "",
       idp_entity_id:
@@ -189,6 +190,7 @@ function getAuthApiBody() {
     });
   } else if (auth.auth_type === "oauth") {
     Object.assign(auth, {
+      icon: document.getElementById("rp-setup-auth-oauth-icon")?.value ?? "",
       provider_name:
         document.getElementById("rp-setup-auth-oauth-provider-name")?.value?.trim() ?? "",
       client_id: document.getElementById("rp-setup-auth-oauth-client-id")?.value?.trim() ?? "",
@@ -335,6 +337,7 @@ setTimeout(() => {
   setupLoggingToggle();
   setupLoggingAwsFilter();
   setupCustomFieldValidators();
+  setupProviderIconDefaults();
   loadDefaults();
 }, 0);
 
@@ -569,6 +572,35 @@ function setupDbEngineToggle() {
   sync();
 }
 
+const _PROVIDER_ICON_DEFAULTS = [
+  "shield-lock-fill",
+  "key-fill",
+  "fingerprint",
+  "person-badge-fill",
+  "box-arrow-in-right",
+  "door-open-fill",
+  "pass-fill",
+  "lock-fill",
+  "safe-fill",
+  "globe2",
+  "diagram-3-fill",
+  "cloud-lock-fill",
+  "buildings-fill",
+  "briefcase-fill",
+  "person-circle",
+];
+
+function _pickRandomIcon() {
+  return _PROVIDER_ICON_DEFAULTS[Math.floor(Math.random() * _PROVIDER_ICON_DEFAULTS.length)];
+}
+
+function setupProviderIconDefaults() {
+  const samlPicker = document.getElementById("rp-setup-auth-saml-icon");
+  const oauthPicker = document.getElementById("rp-setup-auth-oauth-icon");
+  if (samlPicker && !samlPicker.value) samlPicker.value = _pickRandomIcon();
+  if (oauthPicker && !oauthPicker.value) oauthPicker.value = _pickRandomIcon();
+}
+
 function setupAuthTypeToggle() {
   const authTypeSelect = document.getElementById("rp-setup-auth-type");
   const classicSection = document.getElementById("rp-setup-auth-classic");
@@ -608,11 +640,11 @@ function setupBaseUrlSync() {
     const base = rawHost ? scheme + rawHost : "";
 
     if (spInput && !spLocked) spInput.value = base + "/sp";
-    if (acsInput && !acsLocked) acsInput.value = rawHost ? base + "/api/v1/saml/acs/" : "";
+    if (acsInput && !acsLocked) acsInput.value = rawHost ? base + "/api/v1/auth/saml/acs/" : "";
 
     setLink(infoEntityId, base);
-    setLink(infoAcsUrl, base ? base + "/api/v1/saml/acs/" : "");
-    setLink(infoMetaUrl, base ? base + "/api/v1/saml/metadata/" : "");
+    setLink(infoAcsUrl, base ? base + "/api/v1/auth/saml/acs/" : "");
+    setLink(infoMetaUrl, base ? base + "/api/v1/auth/saml/metadata/" : "");
     setLink(oauthCallback, base ? base + "/api/v1/oauth/callback" : "");
   }
 

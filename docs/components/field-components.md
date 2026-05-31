@@ -550,3 +550,82 @@ A numeric one-time-password (OTP) input that renders N individual digit boxes wi
 ```html
 <rp-field-otp id="rp-fp-otp" name="code" digits="6" col="col-12" required></rp-field-otp>
 ```
+
+---
+
+## `<rp-field-icon-picker>`
+
+A button-triggered icon picker that loads all 2,050 Bootstrap Icons from a lazy-fetched JSON file (`/static/js/data/bootstrap-icons.json`). The selected icon name (without the `bi-` prefix) is stored in a hidden `<input>` for form submission and exposed via `.value`.
+
+**Extra attributes:**
+
+| Attribute     | Type    | Default          | Description                                 |
+| ------------- | ------- | ---------------- | ------------------------------------------- |
+| `placeholder` | string  | `Select an icon` | Text shown on the trigger button when empty |
+| `disabled`    | boolean | —                | Disables the trigger button                 |
+
+**Programmatic API:**
+
+| Member    | Type             | Description                                                                      |
+| --------- | ---------------- | -------------------------------------------------------------------------------- |
+| `value`   | string (get/set) | Bootstrap Icon name without prefix, e.g. `"rocket-takeoff"`. Empty string = none |
+| `open()`  | method           | Open the picker panel                                                            |
+| `close()` | method           | Close the picker panel                                                           |
+
+**Emits:** `change` (bubbles) — fired when the user selects or clears an icon.
+
+**Panel behaviour:**
+
+- **Singleton** — one panel is shared across all instances on the page; it repositions itself to the triggering button on each open.
+- **Lazy-loaded** — icon data is fetched from `/static/js/data/bootstrap-icons.json` only on the first open; subsequent opens reuse the cached data.
+- **Search** — full substring search across all 2,050 icon names, filtered live as the user types.
+- **Categories** — 20 category tabs (Arrows, Media, Communication, …) generated from JSON; an "All" tab is always present.
+- **IntersectionObserver batching** — the grid renders icons in 300-item batches to keep the main thread unblocked even in the All category.
+- **Keyboard navigation** — `Escape` closes; arrow keys move focus through the grid; `Enter` selects the focused icon.
+- **Mobile** — CSS positions the panel as a bottom sheet on viewports ≤ 640 px.
+- **Single-click selection** — clicking an icon immediately confirms and closes the panel.
+
+**Icon data generation:**
+
+The JSON is generated from the Bootstrap Icons CDN CSS by running:
+
+```bash
+python scripts/build/generate_icons_json.py
+```
+
+This script is also integrated into `scripts/dev/dev.py` and runs automatically when you start the dev server if the JSON is absent or the script has changed.
+
+**Example:**
+
+```html
+<rp-field-icon-picker
+  id="project-icon"
+  name="icon"
+  label="Project icon"
+  value="rocket-takeoff"
+  hint="Used on cards, breadcrumbs, and the project list."
+  required
+  col="col-md-6"
+></rp-field-icon-picker>
+```
+
+**Programmatic example:**
+
+```js
+const picker = document.getElementById("project-icon");
+
+// Read value
+console.log(picker.value); // "rocket-takeoff"
+
+// Set value
+picker.value = "star-fill";
+
+// Open/close
+picker.open();
+picker.close();
+
+// React to change
+picker.addEventListener("change", (e) => {
+  console.log("Selected:", e.target.value);
+});
+```

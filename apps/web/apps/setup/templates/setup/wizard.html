@@ -437,8 +437,8 @@
                               target="_blank"
                               id="rp-setup-auth-saml-info-acs-url"
                               rel="noopener noreferrer"
-                              href="https://resourceplanner.example.com/saml/acs/"
-                              >https://resourceplanner.example.com/saml/acs/</a
+                              href="https://resourceplanner.example.com/api/v1/auth/saml/acs/"
+                              >https://resourceplanner.example.com/api/v1/auth/saml/acs/</a
                             >
                           </span>
                         </li>
@@ -450,8 +450,8 @@
                               target="_blank"
                               id="rp-setup-auth-saml-info-sp-metadata-url"
                               rel="noopener noreferrer"
-                              href="https://resourceplanner.example.com/saml2/metadata/"
-                              >https://resourceplanner.example.com/saml2/metadata/</a
+                              href="https://resourceplanner.example.com/api/v1/auth/saml2/metadata/"
+                              >https://resourceplanner.example.com/api/v1/auth/saml2/metadata/</a
                             >
                           </span>
                         </li>
@@ -463,8 +463,16 @@
                     </panel-body>
                   </rp-panel>
 
+                  <rp-field-icon-picker
+                    col="col-md-4"
+                    label="Provider icon"
+                    id="rp-setup-auth-saml-icon"
+                    name="saml-icon"
+                    hint="Shown on the login page next to the provider name."
+                  ></rp-field-icon-picker>
+
                   <rp-field-text
-                    col="col-md-12"
+                    col="col-md-8"
                     label="Provider display name"
                     id="rp-setup-auth-saml-provider-name"
                     name="provider-name"
@@ -542,13 +550,13 @@
                     label="Assertion consumer service URL"
                     id="rp-setup-auth-saml-service-url"
                     name="saml-service-url"
-                    placeholder="resourceplanner.example.com/saml/acs/"
+                    placeholder="resourceplanner.example.com/api/v1/auth/saml/acs/"
                     prefix-icon
                     required
                   >
                     <field-hint
                       >URL the IdP posts SAML responses to — typically
-                      <code>https://yourhost/saml/acs/</code>.</field-hint
+                      <code>https://yourhost/api/v1/auth/saml/acs/</code>.</field-hint
                     >
                     <scheme-list>
                       <scheme>https://</scheme>
@@ -596,8 +604,16 @@
                     </panel-body>
                   </rp-panel>
 
+                  <rp-field-icon-picker
+                    col="col-md-4"
+                    label="Provider icon"
+                    id="rp-setup-auth-oauth-icon"
+                    name="oauth-icon"
+                    hint="Shown on the login page next to the provider name."
+                  ></rp-field-icon-picker>
+
                   <rp-field-text
-                    col="col-md-12"
+                    col="col-md-8"
                     label="Provider display name"
                     id="rp-setup-auth-oauth-provider-name"
                     name="provider-name"
