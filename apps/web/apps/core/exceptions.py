@@ -35,6 +35,12 @@ class ConflictException(DomainException):
     default_code = "conflict"
 
 
+class AuthFailedException(DomainException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    default_detail = "Authentication failed."
+    default_code = "authentication_failed"
+
+
 class PermissionException(DomainException):
     status_code = status.HTTP_403_FORBIDDEN
     default_detail = "You do not have permission to perform this action."

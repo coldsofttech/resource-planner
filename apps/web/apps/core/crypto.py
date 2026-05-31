@@ -1,6 +1,27 @@
 import os
 
-from pycore import fernet_encrypt
+from pycore import fernet_decrypt, fernet_encrypt
+
+
+def decrypt_value(value: str) -> str:
+    """Reverse of encrypt_value. Handles enc: (Fernet) and aws: (Secrets Manager)."""
+    if value.startswith("enc:"):
+        fernet_key = os.environ.get("FERNET_KEY", "")
+        return fernet_decrypt(value, fernet_key)
+
+    if value.startswith("aws:"):
+        from awscore import SecretsManager
+
+        secret_name = value.removeprefix("aws:")
+        region = os.environ.get("AWS_REGION", "")
+        access_key = os.environ.get("AWS_ACCESS_KEY_ID", "")
+        aws_secret_key = os.environ.get("AWS_SECRET_ACCESS_KEY", "")
+        sm = SecretsManager(
+            region=region, access_key=access_key, secret_key=aws_secret_key
+        )
+        return sm.get(secret_name)
+
+    return value
 
 
 def encrypt_value(value: str, secret_name: str) -> str:

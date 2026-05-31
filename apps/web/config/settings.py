@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 from pycore import DotEnv
@@ -32,7 +33,18 @@ SECRET_KEY = "django-insecure-n@t4zu#yq!@jwml0)x1rtn87rnnpo_z@_mg6=$$tgsy-ry!h$k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS: list[str] = []
+# AppConfig.ready() will append the BASE_URL host after DB is available
+ALLOWED_HOSTS: list[str] = ["localhost", "127.0.0.1", "[::1]"]
+
+# Injected by scripts/dev/dev.py at runserver time for LAN access
+_dev_lan_ip = os.environ.get("DEV_LAN_IP", "").strip()
+if _dev_lan_ip and _dev_lan_ip not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(_dev_lan_ip)
+
+# COOP is only honoured by browsers on HTTPS (secure) origins.
+# Sending it over plain HTTP causes a browser console warning and is ignored.
+# Production deployments run HTTPS, so the header is restored there.
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None if DEBUG else "same-origin"
 
 
 # Application definition
@@ -44,12 +56,16 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
+    "drf_spectacular",
     "apps.setup.apps.SetupConfig",
     "apps.configurations.apps.ConfigurationConfig",
     "apps.auth.apps.AuthConfig",
     "apps.oauth.apps.OAuthConfig",
     "apps.saml.apps.SAMLConfig",
     "apps.users.apps.UserConfig",
+    "apps.meta.apps.MetaConfig",
+    "apps.dashboard.apps.DashboardConfig",
 ]
 
 MIDDLEWARE = [

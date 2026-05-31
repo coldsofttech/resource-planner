@@ -23,7 +23,11 @@ from django.urls import include, path
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("setup/", include("apps.setup.urls")),
+    path("", include("apps.auth.urls")),
+    path("", include("apps.dashboard.urls")),
     path("api/v1/", include("apps.setup.api_urls")),
+    path("api/v1/", include("apps.meta.api_urls")),
+    path("api/v1/", include("apps.auth.api_urls")),
     path("api/v1/", include("apps.oauth.api_urls")),
     path("api/v1/", include("apps.saml.api_urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

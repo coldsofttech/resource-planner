@@ -20,7 +20,7 @@ def build_constraint_name(*parts: str) -> str:
 
     import hashlib
 
-    digest = hashlib.md5(joined.encode()).hexdigest()[:8]  # nosec B324
+    digest = hashlib.md5(joined.encode(), usedforsecurity=False).hexdigest()[:8]
     truncated = joined[:50]
     return f"{truncated}_{digest}"
 

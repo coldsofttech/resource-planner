@@ -14,7 +14,12 @@
 @import "./components/toasts.css";
 @import "./components/modals.css";
 @import "./components/website.css";
-@import "./components/setup-bar.css";
+@import "./components/cookies.css";
+@import "./components/generic.css";
+@import "./components/banners.css";
+
+@import "./features/login.css";
+@import "./features/setup.css";
 
 * {
   -webkit-font-smoothing: antialiased;

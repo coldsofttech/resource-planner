@@ -1,3 +1,6 @@
+from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
+
 from apps.core.exceptions import AlreadyExistsException, ConflictException
 from apps.core.services import ContextService
 from apps.users.models import User, UserProfile
@@ -48,6 +51,91 @@ class BaseUserService:
 
         return user
 
+    def _create_sso_user(
+        self,
+        *,
+        first_name,
+        last_name,
+        email,
+        sso_provider,
+        sso_uid,
+        created_by=None,
+    ):
+        """Create a new user and link them to an SSO provider."""
+        if user_exists(email):
+            raise AlreadyExistsException(detail="User already exists.")
+
+        ct = ContentType.objects.get_for_model(sso_provider)
+
+        with transaction.atomic():
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                first_name=first_name or "",
+                last_name=last_name or "",
+            )
+            user.set_unusable_password()
+            user.save()
+
+            UserProfile.objects.create(
+                user=user,
+                sso_provider_content_type=ct,
+                sso_provider_object_id=sso_provider.pk,
+                sso_uid=sso_uid,
+                created_by=created_by,
+            )
+
+        return user
+
+    def _get_or_create_sso_user(
+        self,
+        *,
+        email,
+        first_name,
+        last_name,
+        sso_provider,
+        sso_uid,
+        created_by=None,
+    ):
+        """Find or create a user for an SSO login. Returns (user, created)."""
+        ct = ContentType.objects.get_for_model(sso_provider)
+
+        # 1. Lookup by SSO UID + provider — fastest path for returning users.
+        profile = (
+            UserProfile.objects.filter(
+                sso_provider_content_type=ct,
+                sso_provider_object_id=sso_provider.pk,
+                sso_uid=sso_uid,
+            )
+            .select_related("user")
+            .first()
+        )
+        if profile:
+            return profile.user, False
+
+        # 2. Existing user (created by admin) with matching email — link them.
+        try:
+            user = User.objects.get(email=email)
+            profile = user.profile
+            profile.sso_provider_content_type = ct
+            profile.sso_provider_object_id = sso_provider.pk
+            profile.sso_uid = sso_uid
+            profile.save()
+            return user, False
+        except User.DoesNotExist:
+            pass
+
+        # 3. Brand-new SSO user.
+        user = self._create_sso_user(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            sso_provider=sso_provider,
+            sso_uid=sso_uid,
+            created_by=created_by,
+        )
+        return user, True
+
 
 class AdminUserService(BaseUserService, ContextService):
     def create(self, *, first_name, last_name, email, password):
@@ -57,4 +145,15 @@ class AdminUserService(BaseUserService, ContextService):
             email=email,
             is_superuser=True,
             password=password,
+        )
+
+
+class SSOUserService(BaseUserService, ContextService):
+    def get_or_create(self, *, email, first_name, last_name, sso_provider, sso_uid):
+        return self._get_or_create_sso_user(
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            sso_provider=sso_provider,
+            sso_uid=sso_uid,
         )
