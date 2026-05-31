@@ -1,5 +1,6 @@
 import os
 import xml.etree.ElementTree as ET  # nosec B405
+from urllib.parse import urlparse
 
 from django.db import transaction
 
@@ -34,6 +35,7 @@ class BaseSAMLService:
         idp_x509_cert,
         sp_entity_id,
         sp_assertion_url,
+        icon="",
         created_by=None,
     ):
         if provider_exists(name):
@@ -56,11 +58,13 @@ class BaseSAMLService:
             "idp_x509_cert": encrypted_x509_cert,
             "sp_entity_id": sp_entity_id or "",
             "sp_assertion_url": sp_assertion_url,
+            "icon": icon or "",
             "is_active": True,
             "created_by": real_created_by,
         }
 
         with transaction.atomic():
+            SAML.objects.filter(is_active=True).update(is_active=False)
             provider = SAML(**data)
             provider.full_clean()
             provider.save()
@@ -78,6 +82,7 @@ class SAMLService(BaseSAMLService, CommandService):
         idp_x509_cert,
         sp_entity_id,
         sp_assertion_url,
+        icon="",
     ):
         return self._create_provider(
             name=name,
@@ -86,6 +91,7 @@ class SAMLService(BaseSAMLService, CommandService):
             idp_x509_cert=idp_x509_cert,
             sp_entity_id=sp_entity_id,
             sp_assertion_url=sp_assertion_url,
+            icon=icon,
             created_by=self.user,
         )
 
@@ -106,6 +112,7 @@ class AdminSAMLService(BaseSAMLService, ContextService):
         idp_x509_cert,
         sp_entity_id,
         sp_assertion_url,
+        icon="",
     ):
         return self._create_provider(
             name=name,
@@ -114,6 +121,7 @@ class AdminSAMLService(BaseSAMLService, ContextService):
             idp_x509_cert=idp_x509_cert,
             sp_entity_id=sp_entity_id,
             sp_assertion_url=sp_assertion_url,
+            icon=icon,
         )
 
 
@@ -139,7 +147,16 @@ class SAMLFlowService(ContextService):
     )
 
     def build_authorize_url(self, *, provider, relay_state: str = "") -> str:
-        acs_url = provider.sp_assertion_url
+        # Extract the path from the stored ACS URL, then rebuild it using the
+        # current request's host. This lets localhost, 127.0.0.1, and LAN-IP
+        # clients all get an ACS URL that Keycloak will POST back to correctly,
+        # without needing a separate provider record for each address.
+        stored = provider.sp_assertion_url.rstrip("/") + "/"
+        acs_path = urlparse(stored).path
+        if self.request is not None:
+            acs_url = self.request.build_absolute_uri(acs_path)
+        else:
+            acs_url = stored
         sp_entity_id = provider.sp_entity_id or acs_url
         return build_authn_request_redirect_url(
             idp_sso_url=provider.idp_sso_url,

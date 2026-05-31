@@ -298,6 +298,7 @@ class SetupService(ContextService):
                 idp_x509_cert=auth_data.get("idp_x509_cert"),
                 sp_entity_id=auth_data.get("sp_entity_id"),
                 sp_assertion_url=auth_data.get("sp_assertion_url"),
+                icon=auth_data.get("icon", ""),
             )
         elif auth_type == AuthMode.OAUTH:
             self._oauth_service().create(
@@ -308,6 +309,7 @@ class SetupService(ContextService):
                 token_endpoint=auth_data.get("token_endpoint"),
                 userinfo_endpoint=auth_data.get("userinfo_endpoint"),
                 scope=auth_data.get("scope"),
+                icon=auth_data.get("icon", ""),
             )
 
         logger.info("Authentication type set to: '%s'.", auth_type)

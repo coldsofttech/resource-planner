@@ -141,6 +141,7 @@ class AuthenticationInputSerializer(WriteMixin, BaseSerializer):
 
     # OAuth & SAML
     provider_name = serializers.CharField(required=False)
+    icon = serializers.CharField(required=False, allow_blank=True, default="")
 
     # OAuth
     client_id = serializers.CharField(required=False)

@@ -17,6 +17,7 @@ class OAuthSerializer(ReadMixin, AuditableSerializer, CodeSerializer):
     token_endpoint = serializers.URLField(read_only=True)
     userinfo_endpoint = serializers.URLField(read_only=True)
     scope = serializers.CharField(read_only=True)
+    icon = serializers.CharField(read_only=True)
     is_active = serializers.BooleanField(read_only=True)
 
     class Meta(AuditableSerializer.Meta):
@@ -29,6 +30,7 @@ class OAuthSerializer(ReadMixin, AuditableSerializer, CodeSerializer):
             "token_endpoint",
             "userinfo_endpoint",
             "scope",
+            "icon",
             "is_active",
             "created_at",
             "created_by",
@@ -45,3 +47,4 @@ class OAuthCreateSerializer(WriteMixin, BaseSerializer):
     token_endpoint = serializers.CharField(required=True)
     userinfo_endpoint = serializers.CharField(required=True)
     scope = serializers.CharField(required=True)
+    icon = serializers.CharField(required=False, allow_blank=True, default="")

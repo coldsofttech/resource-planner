@@ -5,10 +5,11 @@ from apps.core.models import (
     AuditableModel,
     BaseModel,
     CodeModel,
+    IconModel,
 )
 
 
-class OAuth(BaseModel, AuditableModel, ActivatableModel, CodeModel):
+class OAuth(BaseModel, AuditableModel, ActivatableModel, CodeModel, IconModel):
     MODEL_CODE = "OAUTH"
 
     name = models.CharField(max_length=100, db_index=True, unique=True)

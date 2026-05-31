@@ -17,6 +17,7 @@ class SAMLSerializer(ReadMixin, AuditableSerializer, CodeSerializer):
     idp_x509_cert = serializers.CharField(read_only=True)
     sp_entity_id = serializers.URLField(read_only=True)
     sp_assertion_url = serializers.URLField(read_only=True)
+    icon = serializers.CharField(read_only=True)
     is_active = serializers.BooleanField(read_only=True)
 
     class Meta(AuditableSerializer.Meta):
@@ -29,6 +30,7 @@ class SAMLSerializer(ReadMixin, AuditableSerializer, CodeSerializer):
             "idp_x509_cert",
             "sp_entity_id",
             "sp_assertion_url",
+            "icon",
             "is_active",
             "created_at",
             "created_by",
@@ -44,3 +46,4 @@ class SAMLCreateSerializer(WriteMixin, BaseSerializer):
     idp_x509_cert = serializers.CharField(required=True)
     sp_entity_id = serializers.URLField(required=False, allow_blank=True)
     sp_assertion_url = serializers.URLField(required=True)
+    icon = serializers.CharField(required=False, allow_blank=True, default="")

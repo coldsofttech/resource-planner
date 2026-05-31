@@ -27,6 +27,7 @@ class BaseOAuthService:
         token_endpoint,
         userinfo_endpoint,
         scope,
+        icon="",
         created_by=None,
     ):
         if provider_exists(name):
@@ -53,11 +54,13 @@ class BaseOAuthService:
             "token_endpoint": token_endpoint,
             "userinfo_endpoint": userinfo_endpoint,
             "scope": scope,
+            "icon": icon or "",
             "is_active": True,
             "created_by": real_created_by,
         }
 
         with transaction.atomic():
+            OAuth.objects.filter(is_active=True).update(is_active=False)
             provider = OAuth(**data)
             provider.full_clean()
             provider.save()
@@ -76,6 +79,7 @@ class OAuthService(BaseOAuthService, CommandService):
         token_endpoint,
         userinfo_endpoint,
         scope,
+        icon="",
     ):
         return self._create_provider(
             name=name,
@@ -85,6 +89,7 @@ class OAuthService(BaseOAuthService, CommandService):
             token_endpoint=token_endpoint,
             userinfo_endpoint=userinfo_endpoint,
             scope=scope,
+            icon=icon,
             created_by=self.user,
         )
 
@@ -106,6 +111,7 @@ class AdminOAuthService(BaseOAuthService, ContextService):
         token_endpoint,
         userinfo_endpoint,
         scope,
+        icon="",
     ):
         return self._create_provider(
             name=name,
@@ -115,6 +121,7 @@ class AdminOAuthService(BaseOAuthService, ContextService):
             token_endpoint=token_endpoint,
             userinfo_endpoint=userinfo_endpoint,
             scope=scope,
+            icon=icon,
         )
 
 

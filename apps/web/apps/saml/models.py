@@ -1,9 +1,15 @@
 from django.db import models
 
-from apps.core.models import ActivatableModel, AuditableModel, BaseModel, CodeModel
+from apps.core.models import (
+    ActivatableModel,
+    AuditableModel,
+    BaseModel,
+    CodeModel,
+    IconModel,
+)
 
 
-class SAML(BaseModel, AuditableModel, ActivatableModel, CodeModel):
+class SAML(BaseModel, AuditableModel, ActivatableModel, CodeModel, IconModel):
     MODEL_CODE = "SAML"
 
     name = models.CharField(max_length=100, db_index=True, unique=True)

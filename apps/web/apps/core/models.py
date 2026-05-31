@@ -138,3 +138,12 @@ class DescriptionModel(models.Model):
 
     class Meta:
         abstract = True
+
+
+class IconModel(models.Model):
+    """Adds an icon field storing a Bootstrap Icons name (without the bi- prefix)."""
+
+    icon = models.CharField(max_length=100, blank=True, default="")
+
+    class Meta:
+        abstract = True
