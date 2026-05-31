@@ -4,10 +4,11 @@ class BaseField extends HTMLElement {
     this._touched = false;
     this._connected = false;
     this._hintContent = undefined; // undefined = not yet read; null = no <field-hint> found
+    this._customValidators = [];
   }
 
   static get observedAttributes() {
-    return ["col", "label", "required", "id", "name", "hint", "hint-type", "value"];
+    return ["col", "label", "required", "id", "name", "hint", "hint-type", "value", "autocomplete"];
   }
 
   connectedCallback() {
@@ -59,6 +60,9 @@ class BaseField extends HTMLElement {
     this.className = this._col;
     this.innerHTML = this._buildHTML();
     this._bindEvents();
+    this.querySelectorAll("input, select, textarea").forEach((el) => {
+      el.addEventListener("invalid", (e) => e.preventDefault());
+    });
     if (this._touched) this._updateError();
   }
 
@@ -83,12 +87,24 @@ class BaseField extends HTMLElement {
   get _hintType() {
     return this.getAttribute("hint-type") || "info";
   }
+  get _autocomplete() {
+    return this.getAttribute("autocomplete") || "";
+  }
 
   _buildHTML() {
     return "";
   }
   _bindEvents() {}
   _validate() {
+    return "";
+  }
+
+  _runCustomValidators() {
+    if (!this._customValidators.length) return "";
+    const val = this._value;
+    for (const { fn, msg } of this._customValidators) {
+      if (val && !fn(val)) return msg;
+    }
     return "";
   }
 
@@ -106,7 +122,10 @@ class BaseField extends HTMLElement {
       errEl.textContent = err;
       errEl.hidden = !err;
     }
-    if (input) input.classList.toggle("is-invalid", !!err);
+    if (input) {
+      input.classList.toggle("is-invalid", !!err);
+      if (typeof input.setCustomValidity === "function") input.setCustomValidity(err);
+    }
   }
 
   _labelHTML() {
@@ -144,7 +163,7 @@ class BaseField extends HTMLElement {
 /* TextField: <field-text> */
 class TextField extends BaseField {
   static get observedAttributes() {
-    return [...super.observedAttributes, "placeholder", "maxlength"];
+    return [...super.observedAttributes, "placeholder", "maxlength", "show-counter"];
   }
 
   get _placeholder() {
@@ -153,6 +172,12 @@ class TextField extends BaseField {
   get _maxlength() {
     return this.getAttribute("maxlength") || "";
   }
+  get _autocomplete() {
+    return this.getAttribute("autocomplete") || "off";
+  }
+  get _showCounter() {
+    return this.hasAttribute("show-counter");
+  }
 
   get _value() {
     return this.querySelector(".rp-input")?.value ?? (this.getAttribute("value") || "");
@@ -160,22 +185,46 @@ class TextField extends BaseField {
 
   _validate() {
     if (this._required && !this._value.trim()) return "This field is required.";
-    return "";
+    return this._runCustomValidators();
+  }
+
+  _counterHTML() {
+    if (!this._showCounter) return "";
+    const max = this._maxlength ? parseInt(this._maxlength, 10) : null;
+    const maxPart = max ? `<span class="rp-counter-max">/${max}</span>` : "";
+    return `<span class="rp-field-counter" data-rp-counter aria-live="polite"><span data-rp-counter-cur>0</span>${maxPart}</span>`;
+  }
+
+  _updateCounter() {
+    const cur = this.querySelector("[data-rp-counter-cur]");
+    const input = this.querySelector(".rp-input");
+    if (cur && input) cur.textContent = input.value.length;
+  }
+
+  _restoreValue(val) {
+    super._restoreValue(val);
+    if (this._showCounter) this._updateCounter();
   }
 
   _buildHTML() {
     const maxlen = this._maxlength ? ` maxlength="${this._esc(this._maxlength)}"` : "";
     const req = this._required ? " required" : "";
+    const autocomplete = this._autocomplete
+      ? ` autocomplete="${this._esc(this._autocomplete)}"`
+      : "";
+    const labelBlock = this._showCounter
+      ? `<div class="rp-field-label-row">${this._labelHTML()}${this._counterHTML()}</div>`
+      : this._labelHTML();
     return `
       <div class="rp-field">
-        ${this._labelHTML()}
+        ${labelBlock}
         <input
           class="rp-input"
           type="text"
           id="${this._esc(this._fieldId)}-input"
           name="${this._esc(this._name)}"
           placeholder="${this._esc(this._placeholder)}"
-          value="${this._esc(this._value)}"${maxlen}${req}
+          value="${this._esc(this._value)}"${maxlen}${req}${autocomplete}
         />
         ${this._errorHTML()}
         ${this._hintHTML()}
@@ -191,8 +240,10 @@ class TextField extends BaseField {
       this._updateError();
     });
     input.addEventListener("input", () => {
+      if (this._showCounter) this._updateCounter();
       if (this._touched) this._updateError();
     });
+    if (this._showCounter) this._updateCounter();
   }
 }
 
@@ -200,6 +251,10 @@ customElements.define("rp-field-text", TextField);
 
 /* FirstNameField: <field-first-name> */
 class FirstNameField extends TextField {
+  get _autocomplete() {
+    return this.getAttribute("autocomplete") || "given-name";
+  }
+
   connectedCallback() {
     if (!this.hasAttribute("label")) {
       this.setAttribute("label", "First name");
@@ -239,6 +294,10 @@ customElements.define("rp-field-first-name", FirstNameField);
 
 /* LastNameField: <field-last-name> */
 class LastNameField extends TextField {
+  get _autocomplete() {
+    return this.getAttribute("autocomplete") || "family-name";
+  }
+
   connectedCallback() {
     if (!this.hasAttribute("label")) {
       this.setAttribute("label", "Last name");
@@ -278,6 +337,10 @@ customElements.define("rp-field-last-name", LastNameField);
 
 /* EmailField: <field-email> */
 class EmailField extends TextField {
+  get _autocomplete() {
+    return this.getAttribute("autocomplete") || "email";
+  }
+
   connectedCallback() {
     if (!this.hasAttribute("label")) {
       this.setAttribute("label", "Email address");
@@ -323,6 +386,9 @@ class EmailField extends TextField {
   _buildHTML() {
     const maxlen = this._maxlength ? ` maxlength="${this._esc(this._maxlength)}"` : "";
     const req = this._required ? " required" : "";
+    const autocomplete = this._autocomplete
+      ? ` autocomplete="${this._esc(this._autocomplete)}"`
+      : "";
     const prefixIcon = this._showPrefixIcon ? `<i class="bi bi-envelope rp-prefix"></i>` : "";
 
     const inputClasses = ["rp-input"];
@@ -344,6 +410,7 @@ class EmailField extends TextField {
             value="${this._esc(this._value)}"
             ${maxlen}
             ${req}
+            ${autocomplete}
           />
         </div>
         ${this._errorHTML()}
@@ -357,6 +424,18 @@ customElements.define("rp-field-email", EmailField);
 
 /* WebsiteField: <field-website> */
 class WebsiteField extends TextField {
+  static get observedAttributes() {
+    return [...super.observedAttributes, "accept-trailing-slash"];
+  }
+
+  get _autocomplete() {
+    return this.getAttribute("autocomplete") || "url";
+  }
+
+  get _acceptTrailingSlash() {
+    return this.hasAttribute("accept-trailing-slash");
+  }
+
   connectedCallback() {
     if (this._initialSchemes === undefined) {
       this._initialSchemes = Array.from(this.querySelectorAll("scheme-list scheme"))
@@ -444,14 +523,11 @@ class WebsiteField extends TextField {
   }
 
   get _validUrl() {
-    if (!this._rawValue.trim()) {
-      return false;
-    }
-
+    if (!this._rawValue.trim()) return false;
     try {
-      new URL(this._fullUrl);
-
-      return true;
+      const url = new URL(this._fullUrl);
+      // Require the hostname to contain a dot so bare words like "notaurl" are rejected.
+      return url.hostname.includes(".");
     } catch {
       return false;
     }
@@ -493,6 +569,9 @@ class WebsiteField extends TextField {
   _buildHTML() {
     const maxlen = this._maxlength ? ` maxlength="${this._esc(this._maxlength)}"` : "";
     const req = this._required ? " required" : "";
+    const autocomplete = this._autocomplete
+      ? ` autocomplete="${this._esc(this._autocomplete)}"`
+      : "";
     const prefixIcon = this._showPrefixIcon ? `<i class="bi bi-globe2 rp-prefix"></i>` : "";
     const openButton = this._showOpenButton
       ? `<button
@@ -529,6 +608,7 @@ class WebsiteField extends TextField {
             value="${this._esc(this._rawValue)}"
             ${maxlen}
             ${req}
+            ${autocomplete}
           />
           ${openButton}
         </div>
@@ -557,6 +637,16 @@ class WebsiteField extends TextField {
     }
 
     if (input) {
+      if (!this._acceptTrailingSlash) {
+        input.addEventListener("blur", () => {
+          const stripped = input.value.replace(/\/+$/, "");
+          if (input.value !== stripped) {
+            input.value = stripped;
+            if (this._touched) this._updateError();
+          }
+        });
+      }
+
       input.addEventListener("input", () => {
         if (this._pasteError) {
           this._pasteError = "";
@@ -601,6 +691,10 @@ customElements.define("rp-field-website", WebsiteField);
 
 /* PasswordField: <field-password> */
 class PasswordField extends TextField {
+  get _autocomplete() {
+    return this.getAttribute("autocomplete") || "new-password";
+  }
+
   connectedCallback() {
     if (!this.hasAttribute("label")) this.setAttribute("label", "Password");
     if (!this.hasAttribute("placeholder")) this.setAttribute("placeholder", "Enter password");
@@ -647,6 +741,14 @@ class PasswordField extends TextField {
 
   _validate() {
     if (this._required && !this._value.trim()) return "Password is required.";
+    if (this._showStrength && this._value) {
+      const v = this._value;
+      if (v.length < 12) return "Password must be at least 12 characters.";
+      if (!/[A-Z]/.test(v)) return "Must contain at least one uppercase letter.";
+      if (!/[a-z]/.test(v)) return "Must contain at least one lowercase letter.";
+      if (!/\d/.test(v)) return "Must contain at least one number.";
+      if (!/[^A-Za-z0-9]/.test(v)) return "Must contain at least one symbol.";
+    }
     return "";
   }
 
@@ -678,6 +780,9 @@ class PasswordField extends TextField {
 
   _buildHTML() {
     const req = this._required ? " required" : "";
+    const autocomplete = this._autocomplete
+      ? ` autocomplete="${this._esc(this._autocomplete)}"`
+      : "";
     const prefixIcon = this._showPrefixIcon ? `<i class="bi bi-key rp-prefix"></i>` : "";
     const eyeButton = this._showEyeIcon
       ? `<button type="button" class="rp-suffix rp-toggle-password" title="Show password">
@@ -699,7 +804,7 @@ class PasswordField extends TextField {
             id="${this._esc(this._fieldId)}-input"
             name="${this._esc(this._name)}"
             placeholder="${this._esc(this._placeholder)}"
-            ${req}
+            ${req}${autocomplete}
           />
           ${eyeButton}
         </div>
@@ -749,6 +854,10 @@ customElements.define("rp-field-password", PasswordField);
 
 /* ConfirmPasswordField: <field-confirm-password> */
 class ConfirmPasswordField extends PasswordField {
+  get _autocomplete() {
+    return this.getAttribute("autocomplete") || "new-password";
+  }
+
   connectedCallback() {
     if (!this.hasAttribute("label")) this.setAttribute("label", "Confirm password");
     if (!this.hasAttribute("placeholder")) this.setAttribute("placeholder", "Confirm password");
@@ -776,25 +885,17 @@ class ConfirmPasswordField extends PasswordField {
 
   _validate() {
     if (this._required && !this._value.trim()) return "Please confirm your password.";
+    if (this._value && !this._matches) return "Passwords do not match.";
     return "";
   }
 
   _updateMatch() {
     const el = this.querySelector("[data-rp-match]");
     if (!el) return;
-    const val = this._value;
-    if (!val) {
-      el.hidden = true;
-      return;
-    }
     if (this._matches) {
       el.hidden = false;
       el.className = "rp-help";
       el.innerHTML = `<i class="bi bi-check2-circle" style="color: var(--rp-success-soft-text)"></i> Matches.`;
-    } else if (this._touched) {
-      el.hidden = false;
-      el.className = "rp-help is-error";
-      el.innerHTML = `<i class="bi bi-x-circle"></i> Passwords do not match.`;
     } else {
       el.hidden = true;
     }
@@ -816,6 +917,9 @@ class ConfirmPasswordField extends PasswordField {
 
   _buildHTML() {
     const req = this._required ? " required" : "";
+    const autocomplete = this._autocomplete
+      ? ` autocomplete="${this._esc(this._autocomplete)}"`
+      : "";
     const prefixIcon = this._showPrefixIcon ? `<i class="bi bi-key rp-prefix"></i>` : "";
     const eyeButton = this._showEyeIcon
       ? `<button type="button" class="rp-suffix rp-toggle-password" title="Show password">
@@ -837,7 +941,7 @@ class ConfirmPasswordField extends PasswordField {
             id="${this._esc(this._fieldId)}-input"
             name="${this._esc(this._name)}"
             placeholder="${this._esc(this._placeholder)}"
-            ${req}
+            ${req}${autocomplete}
           />
           ${eyeButton}
         </div>
@@ -893,6 +997,9 @@ class SecretField extends TextField {
 
   _buildHTML() {
     const req = this._required ? " required" : "";
+    const autocomplete = this._autocomplete
+      ? ` autocomplete="${this._esc(this._autocomplete)}"`
+      : "";
     const prefixIcon = this._showPrefixIcon ? `<i class="bi bi-shield-lock rp-prefix"></i>` : "";
     const eyeButton = this._showEyeIcon
       ? `<button type="button" class="rp-suffix rp-toggle-password" title="Show secret">
@@ -914,7 +1021,7 @@ class SecretField extends TextField {
             id="${this._esc(this._fieldId)}-input"
             name="${this._esc(this._name)}"
             placeholder="${this._esc(this._placeholder)}"
-            ${req}
+            ${req}${autocomplete}
           />
           ${eyeButton}
         </div>
@@ -958,6 +1065,9 @@ class DropdownField extends BaseField {
 
   get _placeholder() {
     return this.getAttribute("placeholder") || "";
+  }
+  get _autocomplete() {
+    return this.getAttribute("autocomplete") || "off";
   }
   get _value() {
     return this.querySelector(".rp-input")?.value ?? (this.getAttribute("value") || "");
@@ -1010,13 +1120,16 @@ class DropdownField extends BaseField {
 
   _buildHTML() {
     const req = this._required ? " required" : "";
+    const autocomplete = this._autocomplete
+      ? ` autocomplete="${this._esc(this._autocomplete)}"`
+      : "";
     return `
       <div class="rp-field">
         ${this._labelHTML()}
         <select
           class="rp-input rp-select"
           id="${this._esc(this._fieldId)}-input"
-          name="${this._esc(this._name)}"${req}
+          name="${this._esc(this._name)}"${req}${autocomplete}
         >
           ${this._buildOptions()}
         </select>
@@ -1051,6 +1164,9 @@ class NumberField extends BaseField {
   get _placeholder() {
     return this.getAttribute("placeholder") || "";
   }
+  get _autocomplete() {
+    return this.getAttribute("autocomplete") || "off";
+  }
   get _min() {
     return this.getAttribute("min") || "";
   }
@@ -1079,6 +1195,9 @@ class NumberField extends BaseField {
 
   _buildHTML() {
     const req = this._required ? " required" : "";
+    const autocomplete = this._autocomplete
+      ? ` autocomplete="${this._esc(this._autocomplete)}"`
+      : "";
     const min = this._min !== "" ? ` min="${this._esc(this._min)}"` : "";
     const max = this._max !== "" ? ` max="${this._esc(this._max)}"` : "";
     const step = ` step="${this._esc(this._step)}"`;
@@ -1091,7 +1210,7 @@ class NumberField extends BaseField {
           id="${this._esc(this._fieldId)}-input"
           name="${this._esc(this._name)}"
           placeholder="${this._esc(this._placeholder)}"
-          value="${this._esc(this._value)}"${min}${max}${step}${req}
+          value="${this._esc(this._value)}"${min}${max}${step}${req}${autocomplete}
         />
         ${this._errorHTML()}
         ${this._hintHTML()}
@@ -1456,3 +1575,156 @@ customElements.define("rp-field-hint", HintField);
 class OptionField extends HTMLElement {}
 
 customElements.define("rp-option", OptionField);
+
+/* OtpField: <rp-field-otp> — N-digit one-time-password input */
+class OtpField extends BaseField {
+  static get observedAttributes() {
+    return [...super.observedAttributes, "digits"];
+  }
+
+  get _digits() {
+    return parseInt(this.getAttribute("digits") || "6", 10);
+  }
+
+  get _value() {
+    return Array.from(this.querySelectorAll("[data-otp-digit]"))
+      .map((i) => i.value)
+      .join("");
+  }
+
+  // Explicitly re-declare the getter so the setter below does not shadow
+  // BaseField's get value() → without this, defining only set value() here
+  // would make otpEl.value return undefined on OtpField instances.
+  get value() {
+    return this._value;
+  }
+
+  set value(v) {
+    const inputs = Array.from(this.querySelectorAll("[data-otp-digit]"));
+    const chars = String(v || "")
+      .replace(/\D/g, "")
+      .slice(0, this._digits)
+      .split("");
+    inputs.forEach((inp, i) => {
+      inp.value = chars[i] || "";
+      inp.classList.toggle("is-filled", !!inp.value);
+    });
+    this._syncHidden();
+  }
+
+  _savedValue() {
+    return this._value;
+  }
+
+  _restoreValue(val) {
+    if (val === null) return;
+    this.value = val;
+  }
+
+  _syncHidden() {
+    const hidden = this.querySelector("[data-otp-hidden]");
+    if (hidden) hidden.value = this._value;
+  }
+
+  _buildHTML() {
+    const n = this._digits;
+    const baseId = this._fieldId;
+    const baseName = this._name;
+    let digitInputs = "";
+    for (let i = 0; i < n; i++) {
+      const pos = i + 1;
+      const digitId = baseId ? ` id="${this._esc(baseId)}-${pos}"` : "";
+      const digitName = baseName ? ` name="${this._esc(baseName)}_${pos}"` : "";
+      digitInputs += `<input
+        class="rp-otp-digit"
+        data-otp-digit
+        type="text"
+        inputmode="numeric"
+        maxlength="1"${digitId}${digitName}
+        ${i === 0 ? 'autocomplete="one-time-code"' : 'autocomplete="off"'}
+        aria-label="Digit ${pos} of ${n}"
+      />`;
+    }
+    return `
+      <div class="rp-field">
+        ${this._label ? this._labelHTML() : ""}
+        <div class="rp-otp-inputs" data-otp-container role="group" aria-label="One-time password">
+          ${digitInputs}
+          <input type="hidden" data-otp-hidden name="${this._esc(baseName)}" />
+        </div>
+        ${this._errorHTML()}
+        ${this._hintHTML()}
+      </div>
+    `;
+  }
+
+  _bindEvents() {
+    const container = this.querySelector("[data-otp-container]");
+    if (!container) return;
+    const inputs = Array.from(container.querySelectorAll("[data-otp-digit]"));
+
+    inputs.forEach((inp, idx) => {
+      inp.addEventListener("input", () => {
+        const val = inp.value.replace(/\D/g, "");
+        inp.value = val ? val[0] : "";
+        inp.classList.toggle("is-filled", !!inp.value);
+        this._syncHidden();
+        if (val && idx < inputs.length - 1) inputs[idx + 1].focus();
+        if (this._touched) this._updateError();
+      });
+
+      inp.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && !inp.value && idx > 0) {
+          inputs[idx - 1].focus();
+        }
+      });
+
+      inp.addEventListener("paste", (e) => {
+        e.preventDefault();
+        const pasted = (e.clipboardData || window.clipboardData).getData("text").replace(/\D/g, "");
+        const chars = pasted.slice(0, inputs.length - idx).split("");
+        chars.forEach((ch, i) => {
+          if (inputs[idx + i]) {
+            inputs[idx + i].value = ch;
+            inputs[idx + i].classList.toggle("is-filled", !!ch);
+          }
+        });
+        this._syncHidden();
+        const lastFilled = Math.min(idx + chars.length, inputs.length - 1);
+        inputs[lastFilled].focus();
+        if (this._touched) this._updateError();
+      });
+
+      inp.addEventListener("blur", () => {
+        this._touched = true;
+        this._updateError();
+      });
+    });
+  }
+
+  _validate() {
+    if (this._required && this._value.length < this._digits) {
+      return `Please enter the full ${this._digits}-digit code.`;
+    }
+    return "";
+  }
+
+  _updateError() {
+    const err = this._validate();
+    const errEl = this.querySelector("[data-rp-error]");
+    const hidden = this.querySelector("[data-otp-hidden]");
+
+    if (errEl) {
+      errEl.textContent = err;
+      errEl.hidden = !err;
+    }
+    if (hidden && typeof hidden.setCustomValidity === "function") {
+      hidden.setCustomValidity(err);
+    }
+    this.querySelectorAll("[data-otp-digit]").forEach((inp) => {
+      inp.classList.toggle("is-invalid", !!err);
+    });
+  }
+}
+
+customElements.define("rp-field-otp", OtpField);

@@ -8,6 +8,22 @@
   align-items: center;
   gap: 8px;
 }
+.rp-field-label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.rp-field-counter {
+  font-size: 11px;
+  color: var(--rp-text-subtle);
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+.rp-counter-max {
+  color: var(--rp-border-strong);
+}
 
 .rp-label {
   font-size: var(--rp-fs-13);
@@ -235,4 +251,64 @@ textarea.rp-input {
 .rp-hint-danger {
   background: var(--rp-danger-soft);
   color: var(--rp-danger-soft-text);
+}
+
+/* ── OTP digit input ─────────────────────────────────────────────────────── */
+
+.rp-otp-inputs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.rp-otp-digit {
+  /* Preferred 52 px; shrink proportionally so 6 boxes always fit the container */
+  flex: 1 1 52px;
+  min-width: 36px;
+  max-width: 52px;
+  height: 52px;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  font-family: var(--rp-font-mono);
+  padding: 0;
+  border-radius: var(--rp-r-6);
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease,
+    background 0.12s ease,
+    color 0.12s ease;
+}
+
+@media (max-width: 480px) {
+  .rp-otp-inputs {
+    gap: 6px;
+  }
+  .rp-otp-digit {
+    /* On small phones reduce gap and cap height to match narrower width */
+    height: 44px;
+    font-size: 18px;
+  }
+}
+
+.rp-otp-digit:focus {
+  outline: none;
+  border-color: var(--rp-accent);
+  box-shadow: var(--rp-shadow-focus);
+}
+
+.rp-otp-digit.is-filled {
+  background: var(--rp-accent-soft);
+  border-color: var(--rp-accent);
+  color: var(--rp-accent-soft-text);
+}
+
+.rp-otp-digit.is-invalid {
+  border-color: var(--rp-danger);
+  background: var(--rp-danger-soft, oklch(0.97 0.01 25));
+}
+
+.rp-otp-digit.is-invalid:focus {
+  box-shadow: 0 0 0 3px oklch(0.58 0.2 25 / 0.18);
 }

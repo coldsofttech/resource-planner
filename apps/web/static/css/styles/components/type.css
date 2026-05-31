@@ -17,3 +17,40 @@
   color: var(--rp-danger);
   margin-left: 2px;
 }
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.rp-h1,
+.rp-h2,
+.rp-h3 {
+  color: var(--rp-text);
+  font-family: var(--rp-font-sans);
+  letter-spacing: -0.01em;
+}
+.rp-h1 {
+  font-size: var(--rp-fs-32);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.rp-h2 {
+  font-size: var(--rp-fs-24);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.rp-h3 {
+  font-size: var(--rp-fs-18);
+  font-weight: 600;
+  line-height: 1.3;
+}
+.rp-eyebrow {
+  font-size: var(--rp-fs-12);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--rp-text-muted);
+}

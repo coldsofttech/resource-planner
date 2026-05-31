@@ -1,9 +1,10 @@
+import { getTheme, setTheme } from "../modules/utils/theme.js";
+
 /* ThemeToggle: <rp-theme-toggle> */
 class ThemeToggle extends HTMLElement {
   constructor() {
     super();
     this._theme = "light";
-    // Stored as a bound reference so disconnectedCallback can remove the exact listener
     this._onThemeChanged = (e) => {
       if (e.detail.theme !== this._theme) {
         this._theme = e.detail.theme;
@@ -13,10 +14,7 @@ class ThemeToggle extends HTMLElement {
   }
 
   connectedCallback() {
-    this._theme =
-      localStorage.getItem("rp-theme") ||
-      (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-
+    this._theme = getTheme();
     document.documentElement.setAttribute("data-theme", this._theme);
 
     this.innerHTML = `
@@ -36,9 +34,7 @@ class ThemeToggle extends HTMLElement {
 
   _toggle() {
     this._theme = this._theme === "dark" ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", this._theme);
-    localStorage.setItem("rp-theme", this._theme);
-    window.dispatchEvent(new CustomEvent("rp-theme-changed", { detail: { theme: this._theme } }));
+    setTheme(this._theme); // persists + dispatches rp-theme-changed
     this._updateIcon();
   }
 
