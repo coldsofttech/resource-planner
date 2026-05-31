@@ -302,3 +302,42 @@ class OAuthFlowServiceCompleteLoginTest(TestCase):
                 code="code",
                 redirect_uri="https://app.example.com/cb",
             )
+
+
+# ---------------------------------------------------------------------------
+# OAuthService / AdminOAuthService — deactivation of existing providers
+# ---------------------------------------------------------------------------
+
+
+class OAuthServiceDeactivationTest(TestCase):
+    @patch("apps.oauth.services.encrypt_value", side_effect=lambda v, _: v)
+    @patch("apps.oauth.services.Infra.get_secrets_prefix", return_value="")
+    def test_creating_provider_deactivates_existing_active_providers(
+        self, _prefix, _enc
+    ):
+        existing = make_provider(name="Old Active Provider")
+        self.assertTrue(existing.is_active)
+
+        svc = OAuthService()
+        svc.create(**PROVIDER_DEFAULTS)
+
+        existing.refresh_from_db()
+        self.assertFalse(existing.is_active)
+
+    @patch("apps.oauth.services.encrypt_value", side_effect=lambda v, _: v)
+    @patch("apps.oauth.services.Infra.get_secrets_prefix", return_value="")
+    def test_new_provider_is_active_after_creation(self, _prefix, _enc):
+        make_provider(name="Existing Provider")
+        svc = OAuthService()
+        new_provider = svc.create(**PROVIDER_DEFAULTS)
+        self.assertTrue(new_provider.is_active)
+
+    @patch("apps.oauth.services.encrypt_value", side_effect=lambda v, _: v)
+    @patch("apps.oauth.services.Infra.get_secrets_prefix", return_value="")
+    def test_only_one_active_provider_after_creation(self, _prefix, _enc):
+        make_provider(name="Old Provider A")
+        make_provider(name="Old Provider B")
+        svc = OAuthService()
+        svc.create(**PROVIDER_DEFAULTS)
+        active_count = OAuth.objects.filter(is_active=True).count()
+        self.assertEqual(active_count, 1)

@@ -310,3 +310,40 @@ class OAuthCallbackAPITest(TestCase):
             format="json",
         )
         self.assertIn(response.status_code, [400, 422])
+
+    @patch("apps.oauth.services.decrypt_value", side_effect=lambda v: v)
+    @patch(
+        "apps.oauth.services.fetch_userinfo",
+        return_value={"email": "session@example.com", "sub": "uid-sess-est"},
+    )
+    @patch(
+        "apps.oauth.services.exchange_code", return_value={"access_token": "tok-xyz"}
+    )
+    def test_callback_establishes_session_after_successful_login(
+        self, _exc, _fetch, _dec
+    ):
+        provider = make_provider(name="Session Establish Provider")
+        self._seed_session(provider, state="session-est-state")
+        self.client.post(
+            CALLBACK_URL,
+            {"code": "auth-code", "state": "session-est-state"},
+            format="json",
+        )
+        self.assertIn("_auth_user_id", self.client.session)
+
+    @patch("apps.oauth.services.decrypt_value", side_effect=lambda v: v)
+    @patch(
+        "apps.oauth.services.fetch_userinfo",
+        return_value={"email": "state1@example.com", "sub": "uid-state1"},
+    )
+    @patch(
+        "apps.oauth.services.exchange_code", return_value={"access_token": "tok-xyz"}
+    )
+    def test_state_tokens_are_unique_across_authorize_calls(self, _exc, _fetch, _dec):
+        provider = make_provider(name="State Unique Provider")
+        url = f"/api/v1/auth/oauth/{provider.code}/authorize/"
+        r1 = self.client.get(url, {"redirect_uri": "https://app.example.com/cb"})
+        r2 = self.client.get(url, {"redirect_uri": "https://app.example.com/cb"})
+        state1 = r1.data["data"]["state"]
+        state2 = r2.data["data"]["state"]
+        self.assertNotEqual(state1, state2)

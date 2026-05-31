@@ -180,6 +180,8 @@ body {
   font-size: 13px;
   color: var(--rp-text-muted);
   line-height: 1.7;
+  overflow-wrap: break-word;
+  word-break: break-all;
 }
 
 .rp-setup-info-list .rp-link {
