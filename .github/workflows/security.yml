@@ -23,7 +23,7 @@ jobs:
           pip install bandit pip-audit
 
       - name: Bandit
-        run: bandit -r apps packages
+        run: bandit -r apps packages --configfile pyproject.toml
 
       - name: pip-audit
         run: pip-audit

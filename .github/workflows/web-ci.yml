@@ -65,7 +65,7 @@ jobs:
           path: .pytest-reports/
 
       - name: Bandit
-        run: bandit -r apps/web packages
+        run: bandit -r apps/web packages --configfile pyproject.toml
 
       - name: pip-audit
         run: pip-audit

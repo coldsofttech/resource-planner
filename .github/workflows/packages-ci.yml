@@ -58,7 +58,7 @@ jobs:
           python -m build packages/otpcore
 
       - name: Bandit
-        run: bandit -r packages
+        run: bandit -r packages --configfile pyproject.toml
 
       - name: pip-audit
         run: pip-audit

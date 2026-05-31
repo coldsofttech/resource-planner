@@ -314,3 +314,112 @@ class SAMLFlowServiceExtractIdentityTest(TestCase):
         _, first_name, last_name, _ = self._svc()._extract_identity(self._root())
         self.assertEqual(first_name, "")
         self.assertEqual(last_name, "")
+
+
+# ---------------------------------------------------------------------------
+# SAMLFlowService._extract_identity — alternate IdP attribute names
+# ---------------------------------------------------------------------------
+
+
+class SAMLFlowServiceExtractIdentityAltNamesTest(TestCase):
+    def _svc(self):
+        return SAMLFlowService()
+
+    def _root(self):
+        return _ROOT_STUB
+
+    @patch(f"{_PATCHED}.get_name_id", return_value="uid-givenname")
+    @patch(
+        f"{_PATCHED}.get_attributes",
+        return_value={"givenName": "Bob", "email": "bob@example.com"},
+    )
+    def test_extracts_first_name_from_given_name_attribute(self, _attrs, _name_id):
+        _, first_name, _, _ = self._svc()._extract_identity(self._root())
+        self.assertEqual(first_name, "Bob")
+
+    @patch(f"{_PATCHED}.get_name_id", return_value="uid-sn")
+    @patch(
+        f"{_PATCHED}.get_attributes",
+        return_value={"sn": "Wilson", "email": "wilson@example.com"},
+    )
+    def test_extracts_last_name_from_sn_attribute(self, _attrs, _name_id):
+        _, _, last_name, _ = self._svc()._extract_identity(self._root())
+        self.assertEqual(last_name, "Wilson")
+
+    @patch(f"{_PATCHED}.get_name_id", return_value="uid-mail")
+    @patch(
+        f"{_PATCHED}.get_attributes",
+        return_value={"mail": "mail@example.com"},
+    )
+    def test_extracts_email_from_mail_attribute_when_name_id_not_email(
+        self, _attrs, _name_id
+    ):
+        email, _, _, _ = self._svc()._extract_identity(self._root())
+        self.assertEqual(email, "mail@example.com")
+
+    @patch(f"{_PATCHED}.get_name_id", return_value="uid-wsfed")
+    @patch(
+        f"{_PATCHED}.get_attributes",
+        return_value={
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname": "Carol",
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname": "Brown",
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress": (
+                "carol@example.com"
+            ),
+        },
+    )
+    def test_extracts_identity_using_ws_federation_claim_uris(self, _attrs, _name_id):
+        email, first_name, last_name, _ = self._svc()._extract_identity(self._root())
+        self.assertEqual(email, "carol@example.com")
+        self.assertEqual(first_name, "Carol")
+        self.assertEqual(last_name, "Brown")
+
+    @patch(f"{_PATCHED}.get_name_id", return_value="uid-lastname")
+    @patch(
+        f"{_PATCHED}.get_attributes",
+        return_value={"lastName": "Jones", "email": "jones@example.com"},
+    )
+    def test_extracts_last_name_from_last_name_attribute(self, _attrs, _name_id):
+        _, _, last_name, _ = self._svc()._extract_identity(self._root())
+        self.assertEqual(last_name, "Jones")
+
+
+# ---------------------------------------------------------------------------
+# SAMLService / AdminSAMLService — deactivation of existing providers
+# ---------------------------------------------------------------------------
+
+
+class SAMLServiceDeactivationTest(TestCase):
+    @patch("apps.saml.services.encrypt_value", side_effect=lambda v, _: v)
+    def test_creating_provider_deactivates_existing_active_providers(self, _enc):
+        from apps.saml.models import SAML
+
+        existing = SAML.objects.create(
+            name="Old SAML Provider", is_active=True, **PROVIDER_BASE
+        )
+        self.assertTrue(existing.is_active)
+
+        svc = SAMLService()
+        svc.create(**PROVIDER_DEFAULTS)
+
+        existing.refresh_from_db()
+        self.assertFalse(existing.is_active)
+
+    @patch("apps.saml.services.encrypt_value", side_effect=lambda v, _: v)
+    def test_new_provider_is_active_after_creation(self, _enc):
+        from apps.saml.models import SAML
+
+        SAML.objects.create(name="Old SAML Active", is_active=True, **PROVIDER_BASE)
+        svc = SAMLService()
+        new_provider = svc.create(**PROVIDER_DEFAULTS)
+        self.assertTrue(new_provider.is_active)
+
+    @patch("apps.saml.services.encrypt_value", side_effect=lambda v, _: v)
+    def test_only_one_active_provider_after_creation(self, _enc):
+        from apps.saml.models import SAML
+
+        SAML.objects.create(name="Old SAML A", is_active=True, **PROVIDER_BASE)
+        svc = SAMLService()
+        svc.create(**PROVIDER_DEFAULTS)
+        active_count = SAML.objects.filter(is_active=True).count()
+        self.assertEqual(active_count, 1)

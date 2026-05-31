@@ -1,4 +1,5 @@
 import base64
+import re
 import secrets
 import urllib.parse
 import xml.etree.ElementTree as ET  # nosec B405
@@ -14,6 +15,9 @@ from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 _SAML_NS = "urn:oasis:names:tc:SAML:2.0:assertion"
 _SAMLP_NS = "urn:oasis:names:tc:SAML:2.0:protocol"
 _DS_NS = "http://www.w3.org/2000/09/xmldsig#"
+_DS_PREFIX_RE = re.compile(
+    rb"""xmlns:(\w+)=['"]""" + re.escape(_DS_NS.encode()) + rb"""['"]"""
+)
 
 # Pre-register prefixes so ET serialisation preserves them.
 ET.register_namespace("saml", _SAML_NS)
@@ -116,13 +120,28 @@ def get_attributes(root: ET.Element) -> dict:
     return attrs
 
 
+def _ds_prefix(xml_bytes: bytes) -> str:
+    """
+    Return the namespace prefix used for the DS namespace in this document.
+
+    ET.tostring() serialises elements using the globally registered prefix ("ds").
+    If the document used a different prefix (e.g. "dsig"), the canonical bytes
+    would differ from what the IdP signed, making verification fail.  Scanning
+    the raw bytes with a regex avoids XML parsing and any associated XML-attack
+    surface while still extracting the correct prefix.
+    """
+    m = _DS_PREFIX_RE.search(xml_bytes)
+    return m.group(1).decode() if m else "ds"
+
+
 def verify_signature(xml_bytes: bytes, idp_cert_pem: str) -> bool:
     """
     Verify the XML-DSig enveloped signature on a SAMLResponse.
 
     Looks for a <ds:Signature> at the Response level first, then inside the
-    Assertion. Canonicalises <ds:SignedInfo> using Python's inclusive C14N and
-    verifies against the stored IdP x509 certificate.
+    Assertion. Canonicalises <ds:SignedInfo> using the same namespace prefix
+    that appears in the document, then verifies against the stored IdP
+    x509 certificate.
 
     Returns False (rather than raising) on any validation failure.
     """
@@ -150,13 +169,20 @@ def verify_signature(xml_bytes: bytes, idp_cert_pem: str) -> bool:
         return False
     sig_bytes = base64.b64decode(sig_value_b64)
 
-    # Canonicalise SignedInfo.
+    # Canonicalise SignedInfo, preserving the namespace prefix used in the
+    # original document.  C14N output includes the prefix (e.g. "dsig:" vs
+    # "ds:") so a mismatch produces different bytes and breaks verification
+    # even when the key is correct.  We temporarily register the document's
+    # prefix, serialise, then restore "ds" as the canonical default.
+    orig_prefix = _ds_prefix(xml_bytes)
+    ET.register_namespace(orig_prefix, _DS_NS)
     buf = StringIO()
     ET.canonicalize(
         ET.tostring(signed_info, encoding="unicode"),
         out=buf,
     )
     signed_info_c14n = buf.getvalue().encode("utf-8")
+    ET.register_namespace("ds", _DS_NS)
 
     # Resolve hash algorithm from SignatureMethod/@Algorithm.
     sig_method = signed_info.find(f"{{{_DS_NS}}}SignatureMethod")
