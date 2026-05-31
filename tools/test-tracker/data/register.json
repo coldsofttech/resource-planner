@@ -204,6 +204,75 @@
       ]
     },
     {
+      "id": "TC-RG-650",
+      "name": "SSO Auth Mode — Access Restrictions",
+      "test_cases": [
+        {
+          "id": "TC-RG-651",
+          "severity": "P0",
+          "scenario": "Register endpoint returns 403 when AUTH_MODE is oauth",
+          "steps": "Configure setup with OAuth authentication. Attempt to POST to /api/v1/auth/register/ with valid registration data.",
+          "expected": "403 error. Message indicates registration is not available."
+        },
+        {
+          "id": "TC-RG-652",
+          "severity": "P0",
+          "scenario": "Register endpoint returns 403 when AUTH_MODE is saml",
+          "steps": "Configure setup with SAML authentication. Attempt to POST to /api/v1/auth/register/ with valid registration data.",
+          "expected": "403 error. Message indicates registration is not available."
+        },
+        {
+          "id": "TC-RG-653",
+          "severity": "P1",
+          "scenario": "Register page at /register/ is still reachable when AUTH_MODE is oauth but returns 403 on submit",
+          "steps": "Configure setup with OAuth. Navigate to /register/. Fill in all valid registration fields. Click Register.",
+          "expected": "The page loads (no redirect). On form submit the API returns 403. An error message is displayed. No account is created."
+        },
+        {
+          "id": "TC-RG-654",
+          "severity": "P1",
+          "scenario": "Register page at /register/ is still reachable when AUTH_MODE is saml but returns 403 on submit",
+          "steps": "Configure setup with SAML. Navigate to /register/. Fill in all valid registration fields. Click Register.",
+          "expected": "The page loads. On submit the API returns 403. An error message is displayed. No account is created."
+        },
+        {
+          "id": "TC-RG-655",
+          "severity": "P1",
+          "scenario": "'Create account' link is hidden on login page when AUTH_MODE is oauth",
+          "steps": "Configure setup with OAuth. Navigate to /login/.",
+          "expected": "No 'Create account' or register link is shown on the login page."
+        },
+        {
+          "id": "TC-RG-656",
+          "severity": "P1",
+          "scenario": "'Create account' link is hidden on login page when AUTH_MODE is saml",
+          "steps": "Configure setup with SAML. Navigate to /login/.",
+          "expected": "No 'Create account' or register link is shown on the login page."
+        },
+        {
+          "id": "TC-RG-657",
+          "severity": "P1",
+          "scenario": "Register endpoint returns 403 when classic auth but ALLOW_REGISTRATION is false",
+          "steps": "Configure setup with Classic auth and ALLOW_REGISTRATION=false. Attempt to POST to /api/v1/auth/register/ with valid data.",
+          "expected": "403 error. Message indicates registration is not available."
+        },
+        {
+          "id": "TC-RG-658",
+          "severity": "P2",
+          "scenario": "Meta API returns allow_registration=false when AUTH_MODE is oauth",
+          "steps": "Configure setup with OAuth. Call GET /api/v1/meta/ without authentication.",
+          "expected": "Response contains allow_registration=false. The frontend uses this to hide the register link."
+        },
+        {
+          "id": "TC-RG-659",
+          "severity": "P2",
+          "scenario": "Meta API returns allow_registration=false when AUTH_MODE is saml",
+          "steps": "Configure setup with SAML. Call GET /api/v1/meta/ without authentication.",
+          "expected": "Response contains allow_registration=false. The frontend uses this to hide the register link."
+        }
+      ]
+    },
+    {
       "id": "TC-RG-700",
       "name": "Non-Functional",
       "test_cases": [

@@ -626,6 +626,41 @@
           "expected": "Self-registration checkbox not visible."
         },
         {
+          "id": "TC-S-550",
+          "severity": "P2",
+          "scenario": "Icon picker field is visible when SAML selected",
+          "steps": "Select SAML 2.0 as the authentication type. Observe the authentication section.",
+          "expected": "An icon picker field labelled 'Provider icon' appears above the provider display name field."
+        },
+        {
+          "id": "TC-S-551",
+          "severity": "P2",
+          "scenario": "Icon picker is optional — SAML setup advances without selecting an icon",
+          "steps": "Select SAML 2.0. Fill all required fields (provider name, IdP entity ID, IdP SSO URL, X.509 cert, ACS URL). Leave icon picker at its default (no icon). Click Next.",
+          "expected": "Step advances without error. No icon-related validation error shown."
+        },
+        {
+          "id": "TC-S-552",
+          "severity": "P2",
+          "scenario": "Selecting an icon from the picker populates the icon value",
+          "steps": "Select SAML 2.0. Click the icon picker. Choose any icon from the available list.",
+          "expected": "The selected icon is shown in the picker field. The value is retained when navigating back and forward."
+        },
+        {
+          "id": "TC-S-553",
+          "severity": "P3",
+          "scenario": "Selected SAML icon appears on the login page SSO button after setup completes",
+          "steps": "Complete setup with SAML auth and a chosen icon. Navigate to /login/.",
+          "expected": "The SSO button on the login page displays the chosen icon next to the provider name."
+        },
+        {
+          "id": "TC-S-554",
+          "severity": "P3",
+          "scenario": "No SAML icon selected — login page SSO button renders without icon",
+          "steps": "Complete setup with SAML auth and no icon selected. Navigate to /login/.",
+          "expected": "The SSO button renders without an icon. Provider name is still shown. No broken layout."
+        },
+        {
           "id": "TC-S-537",
           "severity": "P1",
           "scenario": "Test SAML Connection button is visible when SAML selected",
@@ -742,6 +777,41 @@
           "scenario": "Invalid Auth endpoint URL rejected",
           "steps": "Enter 'not-a-url' for Auth endpoint. Click Next.",
           "expected": "URL validation error shown."
+        },
+        {
+          "id": "TC-S-545",
+          "severity": "P2",
+          "scenario": "Icon picker field is visible when OAuth selected",
+          "steps": "Select OAuth / OpenID Connect as the authentication type. Observe the authentication section.",
+          "expected": "An icon picker field labelled 'Provider icon' appears above the provider display name field."
+        },
+        {
+          "id": "TC-S-546",
+          "severity": "P2",
+          "scenario": "Icon picker is optional — OAuth setup advances without selecting an icon",
+          "steps": "Select OAuth. Fill all required fields (provider name, client ID, client secret, auth endpoint, token endpoint, scope). Leave icon picker at its default. Click Next.",
+          "expected": "Step advances without error. No icon-related validation error shown."
+        },
+        {
+          "id": "TC-S-547",
+          "severity": "P2",
+          "scenario": "Selecting an icon from the picker populates the icon value for OAuth",
+          "steps": "Select OAuth. Click the icon picker. Choose any icon from the available list.",
+          "expected": "The selected icon is shown in the picker field. Value retained on back/forward navigation."
+        },
+        {
+          "id": "TC-S-548",
+          "severity": "P3",
+          "scenario": "Selected OAuth icon appears on the login page SSO button after setup completes",
+          "steps": "Complete setup with OAuth auth and a chosen icon. Navigate to /login/.",
+          "expected": "The SSO button on the login page displays the chosen icon next to the provider name."
+        },
+        {
+          "id": "TC-S-549",
+          "severity": "P3",
+          "scenario": "No OAuth icon selected — login page SSO button renders without icon",
+          "steps": "Complete setup with OAuth auth and no icon selected. Navigate to /login/.",
+          "expected": "The SSO button renders without an icon. Provider name is still shown. No broken layout."
         },
         {
           "id": "TC-S-541",

@@ -2,6 +2,7 @@ import collections
 import concurrent.futures
 import getpass
 import hashlib
+import json
 import os
 import re
 import shutil
@@ -196,6 +197,138 @@ _DOCKER_CONTAINER_KEYCLOAK = "resource-planner-dev-keycloak"
 _LOCALSTACK_ENDPOINT = "http://localhost:4566"
 _KEYCLOAK_REALM = "resource-planner"
 _KEYCLOAK_URL = "http://localhost:8080"
+_KEYCLOAK_REALM_EXPORT = ROOT / "scripts" / "dev" / "keycloak" / "realm-export.json"
+
+
+def _generate_realm_export(
+    lan_ip: str,
+    oauth_client_id: str = "resource-planner-oauth",
+    oauth_client_secret: str = "dev-oauth-secret",
+    sp_entity_id: str = "http://localhost:8000/sp",
+    sp_assertion_url: str = "http://localhost:8000/api/v1/auth/saml/acs/",
+) -> None:
+    """Regenerate realm-export.json with the current LAN IP and OAuth/SAML config."""
+    base_lan = f"http://{lan_ip}:8000"
+    realm = {
+        "realm": "resource-planner",
+        "displayName": "Resource Planner Dev",
+        "enabled": True,
+        "sslRequired": "external",
+        "loginWithEmailAllowed": True,
+        "duplicateEmailsAllowed": False,
+        "resetPasswordAllowed": True,
+        "bruteForceProtected": False,
+        "clients": [
+            {
+                "clientId": oauth_client_id,
+                "name": "Resource Planner OAuth",
+                "description": "OIDC / OAuth 2.0 client for local dev testing",
+                "enabled": True,
+                "protocol": "openid-connect",
+                "publicClient": False,
+                "secret": oauth_client_secret,
+                "standardFlowEnabled": True,
+                "directAccessGrantsEnabled": False,
+                "serviceAccountsEnabled": False,
+                "redirectUris": [
+                    "http://localhost:8000/*",
+                    "http://127.0.0.1:8000/*",
+                    "http://resourceplanner.test:8000/*",
+                    "http://resourceplanner.local:8000/*",
+                    "http://resourceplanner.home:8000/*",
+                    f"{base_lan}/*",
+                ],
+                "webOrigins": [
+                    "http://localhost:8000",
+                    "http://127.0.0.1:8000",
+                    "http://resourceplanner.test:8000",
+                    "http://resourceplanner.local:8000",
+                    "http://resourceplanner.home:8000",
+                    base_lan,
+                ],
+            },
+            {
+                "clientId": sp_entity_id,
+                "name": "Resource Planner SAML",
+                "description": "SAML 2.0 SP for local dev testing",
+                "enabled": True,
+                "protocol": "saml",
+                "fullScopeAllowed": True,
+                "attributes": {
+                    "saml.authnstatement": "true",
+                    "saml.server.signature": "true",
+                    "saml.assertion.signature": "true",
+                    "saml.encrypt": "false",
+                    "saml.client.signature": "false",
+                    "saml.force.post.binding": "false",
+                    "saml_assertion_consumer_url_post": sp_assertion_url,
+                    "saml_name_id_format": (
+                        "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+                    ),
+                    "saml_force_name_id_format": "true",
+                },
+                "protocolMappers": [
+                    {
+                        "name": "email",
+                        "protocol": "saml",
+                        "protocolMapper": "saml-user-property-mapper",
+                        "config": {
+                            "attribute.nameformat": "Basic",
+                            "user.attribute": "email",
+                            "friendly.name": "email",
+                            "attribute.name": "email",
+                        },
+                    },
+                    {
+                        "name": "first_name",
+                        "protocol": "saml",
+                        "protocolMapper": "saml-user-property-mapper",
+                        "config": {
+                            "attribute.nameformat": "Basic",
+                            "user.attribute": "firstName",
+                            "friendly.name": "first_name",
+                            "attribute.name": "first_name",
+                        },
+                    },
+                    {
+                        "name": "last_name",
+                        "protocol": "saml",
+                        "protocolMapper": "saml-user-property-mapper",
+                        "config": {
+                            "attribute.nameformat": "Basic",
+                            "user.attribute": "lastName",
+                            "friendly.name": "last_name",
+                            "attribute.name": "last_name",
+                        },
+                    },
+                ],
+                "redirectUris": [
+                    "http://localhost:8000/*",
+                    "http://127.0.0.1:8000/*",
+                    "http://resourceplanner.test:8000/*",
+                    "http://resourceplanner.local:8000/*",
+                    "http://resourceplanner.home:8000/*",
+                    f"{base_lan}/*",
+                ],
+            },
+        ],
+        "users": [
+            {
+                "username": "sso@example.com",
+                "email": "sso@example.com",
+                "firstName": "SSO",
+                "lastName": "User",
+                "enabled": True,
+                "emailVerified": True,
+                "credentials": [
+                    {"type": "password", "value": "Test1234!", "temporary": False}
+                ],
+            }
+        ],
+    }
+    _KEYCLOAK_REALM_EXPORT.parent.mkdir(parents=True, exist_ok=True)
+    _KEYCLOAK_REALM_EXPORT.write_text(json.dumps(realm, indent=2), encoding="utf-8")
+    print(f"  Realm export updated  →  LAN: {base_lan}  |  SP: {sp_entity_id}")
 
 
 # ---------------------------------------------------------------------------
@@ -933,7 +1066,10 @@ def _get_local_ip() -> str:
         s.close()
 
 
-def _fetch_keycloak_oauth_saml_config():
+def _fetch_keycloak_oauth_saml_config(
+    oauth_client_id: str = "resource-planner-oauth",
+    oauth_client_secret: str = "dev-oauth-secret",
+):
     """
     Return (oauth_config, saml_config) fetched from the running local Keycloak,
     or None on error.
@@ -985,8 +1121,8 @@ def _fetch_keycloak_oauth_saml_config():
 
     oauth_config = {
         "name": "Keycloak (Dev)",
-        "client_id": "resource-planner-oauth",
-        "client_secret": "dev-oauth-secret",
+        "client_id": oauth_client_id,
+        "client_secret": oauth_client_secret,
         "auth_endpoint": oidc.get("authorization_endpoint", ""),
         "token_endpoint": oidc.get("token_endpoint", ""),
         "userinfo_endpoint": oidc.get("userinfo_endpoint", ""),
@@ -1003,6 +1139,138 @@ def _fetch_keycloak_oauth_saml_config():
     }
 
     return oauth_config, saml_config
+
+
+def _sync_keycloak_providers_in_db(oauth_config: dict, saml_config: dict) -> None:
+    """
+    Update OAuth/SAML providers in DB whose endpoints point to the local
+    Keycloak realm.
+    """
+    env = _load_env_defaults()
+    try:
+        if "postgresql" in env.get("DB_ENGINE", "").lower():
+            _sync_keycloak_postgresql(env, oauth_config, saml_config)
+        else:
+            _sync_keycloak_sqlite(oauth_config, saml_config)
+    except Exception as exc:  # nosec B110
+        print(f"  {YELLOW}Could not auto-sync providers: {exc}{RESET}")
+        print(
+            "  Update idp_entity_id, idp_sso_url, idp_x509_cert and OAuth "
+            "endpoints manually."
+        )
+
+
+def _sync_keycloak_sqlite(oauth_config: dict, saml_config: dict) -> None:
+    import sqlite3
+
+    db_path = WEB_DIR / "db.sqlite3"
+    if not db_path.exists():
+        print(f"  {YELLOW}No SQLite DB found — skipping provider sync.{RESET}")
+        return
+    conn = sqlite3.connect(str(db_path))
+    try:
+        cur = conn.cursor()
+        cur.execute(  # nosec B608
+            "UPDATE oauth_oauth"
+            " SET auth_endpoint=?, token_endpoint=?, userinfo_endpoint=?"
+            " WHERE auth_endpoint LIKE ?",
+            (
+                oauth_config["auth_endpoint"],
+                oauth_config["token_endpoint"],
+                oauth_config["userinfo_endpoint"],
+                "%/realms/resource-planner%",
+            ),
+        )
+        oauth_count = cur.rowcount
+        saml_count = 0
+        if saml_config.get("idp_x509_cert"):
+            cur.execute(  # nosec B608
+                "UPDATE saml_saml"
+                " SET idp_entity_id=?, idp_sso_url=?, idp_x509_cert=?"
+                " WHERE idp_entity_id LIKE ?",
+                (
+                    saml_config["idp_entity_id"],
+                    saml_config["idp_sso_url"],
+                    saml_config["idp_x509_cert"],
+                    "%/realms/resource-planner%",
+                ),
+            )
+            saml_count = cur.rowcount
+        conn.commit()
+    finally:
+        conn.close()
+    _print_sync_result(oauth_count, saml_count)
+
+
+def _sync_keycloak_postgresql(env: dict, oauth_config: dict, saml_config: dict) -> None:
+    try:
+        import psycopg2
+    except ImportError:
+        print(f"  {YELLOW}psycopg2 not available — skipping provider sync.{RESET}")
+        return
+    conn = psycopg2.connect(
+        host=env.get("DB_HOST", "127.0.0.1"),
+        port=int(env.get("DB_PORT", "5432")),
+        dbname=env.get("DB_NAME", "resourceplanner"),
+        user=env.get("DB_USER", "postgres"),
+        password=env.get("DB_PASSWORD", ""),
+        connect_timeout=3,
+    )
+    try:
+        cur = conn.cursor()
+        cur.execute(  # nosec B608
+            "UPDATE oauth_oauth"
+            " SET auth_endpoint=%s, token_endpoint=%s, userinfo_endpoint=%s"
+            " WHERE auth_endpoint LIKE %s",
+            (
+                oauth_config["auth_endpoint"],
+                oauth_config["token_endpoint"],
+                oauth_config["userinfo_endpoint"],
+                "%/realms/resource-planner%",
+            ),
+        )
+        oauth_count = cur.rowcount
+        saml_count = 0
+        if saml_config.get("idp_x509_cert"):
+            cur.execute(  # nosec B608
+                "UPDATE saml_saml"
+                " SET idp_entity_id=%s, idp_sso_url=%s, idp_x509_cert=%s"
+                " WHERE idp_entity_id LIKE %s",
+                (
+                    saml_config["idp_entity_id"],
+                    saml_config["idp_sso_url"],
+                    saml_config["idp_x509_cert"],
+                    "%/realms/resource-planner%",
+                ),
+            )
+            saml_count = cur.rowcount
+        conn.commit()
+    finally:
+        conn.close()
+    _print_sync_result(oauth_count, saml_count)
+
+
+def _print_sync_result(oauth_count: int, saml_count: int) -> None:
+    if oauth_count:
+        print(
+            f"  {GREEN}Synced {oauth_count} OAuth provider(s) with updated "
+            f"Keycloak endpoints.{RESET}"
+        )
+    else:
+        print(
+            f"  {YELLOW}No OAuth provider found — update endpoints manually "
+            f"if needed.{RESET}"
+        )
+    if saml_count:
+        print(
+            f"  {GREEN}Synced {saml_count} SAML provider(s) with new Keycloak "
+            f"cert/endpoints.{RESET}"
+        )
+    else:
+        print(
+            f"  {YELLOW}No SAML provider found — update IDP fields manually "
+            f"if needed.{RESET}"
+        )
 
 
 def configure_keycloak():
@@ -1074,14 +1342,31 @@ def runserver():
         ROOT / "requirements" / "base.txt",
         ROOT / "requirements" / "dev.txt",
     ]
+    icons_script = ROOT / "scripts" / "build" / "generate_icons_json.py"
+    icons_json = (
+        ROOT / "apps" / "web" / "static" / "js" / "data" / "bootstrap-icons.json"
+    )
 
-    watch = {"postcss": css_paths, "build-js": js_paths, "requirements": req_paths}
+    watch = {
+        "postcss": css_paths,
+        "build-js": js_paths,
+        "requirements": req_paths,
+        "icons-json": [icons_script],
+    }
     task_cmds = {"postcss": "npm run build:css", "build-js": "npm run build:js"}
 
     tasks_to_run: dict = {}
     skipped: list[str] = []
 
-    for name in ("postcss", "build-js", "requirements"):
+    for name in ("postcss", "build-js", "requirements", "icons-json"):
+        if name == "icons-json":
+            # Regenerate only when the script itself changed or JSON is missing.
+            if not icons_json.exists() or _needs_run(name, watch[name]):
+                cmd = f'"{sys.executable}" "{icons_script}"'
+                tasks_to_run[name] = lambda buf, c=cmd: _run_cmd_buffered(c, buf)
+            else:
+                skipped.append(name)
+            continue
         if _needs_run(name, watch[name]):
             if name == "requirements":
                 tasks_to_run[name] = _install_requirements_buffered
@@ -1148,6 +1433,10 @@ def runserver():
 
     keycloak_config = _get_keycloak_docker_config()
     if keycloak_config is not None:
+        kc_lan_ip = _get_local_ip()
+        _generate_realm_export(lan_ip=kc_lan_ip)
+        _env_write("KEYCLOAK_HOSTNAME", kc_lan_ip)
+        docker_pre_env_keys["keycloak"] = ["KEYCLOAK_HOSTNAME"]
         pending_docker["keycloak"] = (
             "keycloak",
             _DOCKER_CONTAINER_KEYCLOAK,
@@ -1181,6 +1470,8 @@ def runserver():
                     env_keys = ["AWS_ENDPOINT"]
                 elif name == "mailpit":
                     env_keys = docker_pre_env_keys.get("mailpit", [])
+                elif name == "keycloak":
+                    env_keys = docker_pre_env_keys.get("keycloak", [])
                 started_services.append((profile, label, env_keys))
             elif rc != 0:
                 for key in docker_pre_env_keys.get(name, []):
@@ -1598,7 +1889,12 @@ def _docker_wait_and_cleanup(started_services: list) -> None:
                 _env_remove(key)
 
 
-def _wait_for_keycloak_ready(timeout: int = 120, interval: int = 5):
+def _wait_for_keycloak_ready(
+    timeout: int = 120,
+    interval: int = 5,
+    oauth_client_id: str = "resource-planner-oauth",
+    oauth_client_secret: str = "dev-oauth-secret",
+):
     """
     Poll until Keycloak's realm endpoint responds, then return OAuth+SAML
     config or None.
@@ -1613,7 +1909,10 @@ def _wait_for_keycloak_ready(timeout: int = 120, interval: int = 5):
             with urllib.request.urlopen(url, timeout=3):  # nosec B310
                 pass
             print(f" {GREEN}ready{RESET}")
-            return _fetch_keycloak_oauth_saml_config()
+            return _fetch_keycloak_oauth_saml_config(
+                oauth_client_id=oauth_client_id,
+                oauth_client_secret=oauth_client_secret,
+            )
         except Exception:
             print(".", end="", flush=True)
             time.sleep(interval)
@@ -1789,16 +2088,36 @@ def docker_keycloak_oauth() -> None:
         return
 
     provider_name = _prompt("Provider name", "Keycloak (Dev)")
+    oauth_client_id = _prompt("OAuth Client ID", "resource-planner-oauth")
+    oauth_client_secret = _prompt("OAuth Client Secret", "dev-oauth-secret")
+
+    lan_ip = _get_local_ip()
+    _generate_realm_export(
+        lan_ip=lan_ip,
+        oauth_client_id=oauth_client_id,
+        oauth_client_secret=oauth_client_secret,
+    )
+    _env_write("KEYCLOAK_HOSTNAME", lan_ip)
 
     print()
+    if _docker_container_status(_DOCKER_CONTAINER_KEYCLOAK) == "running":
+        _compose_down_profile("keycloak", "Keycloak")
+
     started, already_running = _keycloak_start()
 
     if started is None and not already_running:
         _env_remove("DEV_KEYCLOAK")
+        _env_remove("KEYCLOAK_HOSTNAME")
         pause()
         return
 
-    kc_result = _wait_for_keycloak_ready()
+    kc_result = _wait_for_keycloak_ready(
+        oauth_client_id=oauth_client_id,
+        oauth_client_secret=oauth_client_secret,
+    )
+
+    if kc_result:
+        _sync_keycloak_providers_in_db(*kc_result)
 
     sep = "─" * 62
     print(f"\n  {sep}")
@@ -1824,9 +2143,12 @@ def docker_keycloak_oauth() -> None:
 
     started_services = []
     if started:
-        started_services.append(("keycloak", "Keycloak", ["DEV_KEYCLOAK"]))
+        started_services.append(
+            ("keycloak", "Keycloak", ["DEV_KEYCLOAK", "KEYCLOAK_HOSTNAME"])
+        )
     else:
         _env_remove("DEV_KEYCLOAK")
+        _env_remove("KEYCLOAK_HOSTNAME")
         print(f"\n{YELLOW}  Container already running — not managed here.{RESET}")
 
     _docker_wait_and_cleanup(started_services)
@@ -1848,15 +2170,34 @@ def docker_keycloak_saml() -> None:
         "http://localhost:8000/api/v1/auth/saml/acs/",
     )
 
-    print()
-    started, already_running = _keycloak_start()
+    lan_ip = _get_local_ip()
+    _generate_realm_export(
+        lan_ip=lan_ip,
+        sp_entity_id=sp_entity_id,
+        sp_assertion_url=sp_assertion_url,
+    )
+    _env_write("KEYCLOAK_HOSTNAME", lan_ip)
 
-    if started is None and not already_running:
+    print()
+    # Always bring the container down before starting so Keycloak reimports
+    # realm-export.json on next boot. --import-realm is a no-op when the realm
+    # already exists in the container's embedded storage, meaning redirectUri
+    # and other realm changes are silently ignored without this step.
+    if _docker_container_status(_DOCKER_CONTAINER_KEYCLOAK) == "running":
+        _compose_down_profile("keycloak", "Keycloak")
+
+    _env_write("DEV_KEYCLOAK", "true")
+    started = _compose_up_profile("keycloak", _DOCKER_CONTAINER_KEYCLOAK, "Keycloak")
+
+    if started is None:
         _env_remove("DEV_KEYCLOAK")
         pause()
         return
 
     kc_result = _wait_for_keycloak_ready()
+
+    if kc_result:
+        _sync_keycloak_providers_in_db(*kc_result)
 
     sep = "─" * 62
     print(f"\n  {sep}")
@@ -1885,14 +2226,9 @@ def docker_keycloak_saml() -> None:
     print(f"  Admin Console : {_KEYCLOAK_URL}/admin  (admin / admin)")
     print("  Test User     : sso@example.com / Test1234!")
 
-    started_services = []
-    if started:
-        started_services.append(("keycloak", "Keycloak", ["DEV_KEYCLOAK"]))
-    else:
-        _env_remove("DEV_KEYCLOAK")
-        print(f"\n{YELLOW}  Container already running — not managed here.{RESET}")
-
-    _docker_wait_and_cleanup(started_services)
+    _docker_wait_and_cleanup(
+        [("keycloak", "Keycloak", ["DEV_KEYCLOAK", "KEYCLOAK_HOSTNAME"])]
+    )
 
 
 def docker_menu() -> None:
@@ -1947,8 +2283,10 @@ def _venv_ruff() -> str:
 
 
 def run_ruff_fix():
-    print("\nRunning ruff --fix...")
+    print("\nRunning ruff check --fix...")
     run(f'"{_venv_ruff()}" check . --fix')
+    print("\nRunning ruff format...")
+    run(f'"{_venv_ruff()}" format .')
     pause()
 
 

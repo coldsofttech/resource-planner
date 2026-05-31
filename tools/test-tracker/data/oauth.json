@@ -7,47 +7,6 @@
   },
   "suites": [
     {
-      "id": "TC-OA-100",
-      "name": "Login Page — OAuth Mode",
-      "test_cases": [
-        {
-          "id": "TC-OA-101",
-          "severity": "P0",
-          "scenario": "Login page shows OAuth sign-in button when AUTH_MODE is oauth",
-          "steps": "Configure AUTH_MODE=oauth in app settings. Navigate to /login/.",
-          "expected": "An OAuth sign-in button is visible. No classic email/password form is shown."
-        },
-        {
-          "id": "TC-OA-102",
-          "severity": "P1",
-          "scenario": "OAuth button displays the configured provider name",
-          "steps": "Configure an OAuth provider named 'Acme SSO'. Navigate to /login/.",
-          "expected": "Button label references the provider name (e.g. 'Sign in with Acme SSO' or similar)."
-        },
-        {
-          "id": "TC-OA-103",
-          "severity": "P1",
-          "scenario": "Classic email/password form is hidden in OAuth mode",
-          "steps": "Set AUTH_MODE=oauth. Navigate to /login/.",
-          "expected": "Email and password fields are not visible on the page."
-        },
-        {
-          "id": "TC-OA-104",
-          "severity": "P0",
-          "scenario": "Login page loads without errors in OAuth mode",
-          "steps": "Set AUTH_MODE=oauth. Navigate to /login/.",
-          "expected": "Page loads successfully. No JavaScript errors in the console. No blank or broken UI."
-        },
-        {
-          "id": "TC-OA-105",
-          "severity": "P2",
-          "scenario": "App name and branding render correctly on the OAuth login page",
-          "steps": "Navigate to /login/ with OAuth mode active.",
-          "expected": "App name and logo appear as configured. Theme (light/dark) is applied."
-        }
-      ]
-    },
-    {
       "id": "TC-OA-200",
       "name": "Initiating OAuth Login",
       "test_cases": [

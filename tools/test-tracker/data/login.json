@@ -184,29 +184,160 @@
       ]
     },
     {
-      "id": "TC-LG-600",
+      "id": "TC-LG-550",
       "name": "Security",
       "test_cases": [
         {
-          "id": "TC-LG-601",
+          "id": "TC-LG-551",
           "severity": "P0",
           "scenario": "Error messages do not reveal whether an email address exists",
           "steps": "Attempt login with a non-existent email. Attempt login with an existing email but wrong password. Compare the error messages.",
           "expected": "Both attempts return the same error message. User enumeration is not possible."
         },
         {
-          "id": "TC-LG-602",
+          "id": "TC-LG-552",
           "severity": "P1",
           "scenario": "Login API response does not expose sensitive user data",
           "steps": "Inspect the network response for a successful and a failed login attempt.",
           "expected": "No passwords, hashes, tokens, or internal IDs are returned in the API response body."
         },
         {
-          "id": "TC-LG-603",
+          "id": "TC-LG-553",
           "severity": "P1",
           "scenario": "CSRF protection is enforced on the login endpoint",
           "steps": "Attempt to POST to /api/v1/auth/login/ without a valid CSRF token (e.g. using curl).",
           "expected": "Request is rejected with a 403 Forbidden error."
+        }
+      ]
+    },
+    {
+      "id": "TC-LG-600",
+      "name": "SSO Login — OAuth Mode",
+      "test_cases": [
+        {
+          "id": "TC-LG-601",
+          "severity": "P0",
+          "scenario": "SSO button visible on login page when AUTH_MODE is oauth",
+          "steps": "Configure setup with OAuth authentication. Navigate to /login/.",
+          "expected": "An SSO button (e.g. 'Continue with SSO' or the provider name) is visible on the login page. The classic email/password form is also present."
+        },
+        {
+          "id": "TC-LG-602",
+          "severity": "P1",
+          "scenario": "SSO button displays the OAuth provider name",
+          "steps": "Configure setup with OAuth. Set provider display name to 'GitHub'. Navigate to /login/.",
+          "expected": "The SSO button label contains 'GitHub' or the equivalent configured provider name."
+        },
+        {
+          "id": "TC-LG-603",
+          "severity": "P1",
+          "scenario": "SSO button displays the OAuth provider icon when one was configured",
+          "steps": "Configure setup with OAuth and select an icon (e.g. a GitHub icon). Navigate to /login/.",
+          "expected": "The SSO button renders the chosen icon alongside the provider name."
+        },
+        {
+          "id": "TC-LG-604",
+          "severity": "P1",
+          "scenario": "SSO button absent when AUTH_MODE is classic",
+          "steps": "Configure setup with Classic auth. Navigate to /login/.",
+          "expected": "No SSO button is shown. Only the email/password form is visible."
+        },
+        {
+          "id": "TC-LG-605",
+          "severity": "P0",
+          "scenario": "Clicking the OAuth SSO button initiates the OAuth authorization flow",
+          "steps": "Configure setup with OAuth. Navigate to /login/. Click the SSO button.",
+          "expected": "Browser redirects to the configured OAuth provider's authorization URL. The URL includes client_id, redirect_uri, scope, state, and response_type=code parameters."
+        },
+        {
+          "id": "TC-LG-606",
+          "severity": "P1",
+          "scenario": "Classic email/password form still visible alongside OAuth SSO button",
+          "steps": "Configure setup with OAuth. Navigate to /login/.",
+          "expected": "Both the SSO button and the classic email/password form are visible. A divider ('or with email') separates them."
+        },
+        {
+          "id": "TC-LG-607",
+          "severity": "P1",
+          "scenario": "Register link hidden on login page when AUTH_MODE is oauth",
+          "steps": "Configure setup with OAuth. Navigate to /login/.",
+          "expected": "'Create account' or register link is not visible on the login page."
+        },
+        {
+          "id": "TC-LG-608",
+          "severity": "P0",
+          "scenario": "Superuser can still log in via classic form when AUTH_MODE is oauth",
+          "steps": "Configure setup with OAuth. Navigate to /login/. Enter the admin superuser email and password. Click Sign In.",
+          "expected": "Superuser is authenticated and redirected to the dashboard. No 403 error."
+        }
+      ]
+    },
+    {
+      "id": "TC-LG-650",
+      "name": "SSO Login — SAML Mode",
+      "test_cases": [
+        {
+          "id": "TC-LG-651",
+          "severity": "P0",
+          "scenario": "SSO button visible on login page when AUTH_MODE is saml",
+          "steps": "Configure setup with SAML authentication. Navigate to /login/.",
+          "expected": "An SSO button is visible on the login page. The classic email/password form is also present."
+        },
+        {
+          "id": "TC-LG-652",
+          "severity": "P1",
+          "scenario": "SSO button displays the SAML provider name",
+          "steps": "Configure setup with SAML. Set provider display name to 'Okta'. Navigate to /login/.",
+          "expected": "The SSO button label contains 'Okta' or the configured provider name."
+        },
+        {
+          "id": "TC-LG-653",
+          "severity": "P1",
+          "scenario": "SSO button displays the SAML provider icon when one was configured",
+          "steps": "Configure setup with SAML and select an icon. Navigate to /login/.",
+          "expected": "The SSO button renders the chosen icon alongside the provider name."
+        },
+        {
+          "id": "TC-LG-654",
+          "severity": "P0",
+          "scenario": "Clicking the SAML SSO button initiates the SAML authorization flow",
+          "steps": "Configure setup with SAML. Navigate to /login/. Click the SSO button.",
+          "expected": "Browser redirects to the configured IdP SSO URL. The URL includes a SAMLRequest query parameter (base64-encoded AuthnRequest)."
+        },
+        {
+          "id": "TC-LG-655",
+          "severity": "P1",
+          "scenario": "Classic email/password form still visible alongside SAML SSO button",
+          "steps": "Configure setup with SAML. Navigate to /login/.",
+          "expected": "Both the SSO button and the classic email/password form are visible with a separator between them."
+        },
+        {
+          "id": "TC-LG-656",
+          "severity": "P1",
+          "scenario": "Register link hidden on login page when AUTH_MODE is saml",
+          "steps": "Configure setup with SAML. Navigate to /login/.",
+          "expected": "'Create account' or register link is not visible on the login page."
+        },
+        {
+          "id": "TC-LG-657",
+          "severity": "P0",
+          "scenario": "Superuser can still log in via classic form when AUTH_MODE is saml",
+          "steps": "Configure setup with SAML. Navigate to /login/. Enter the admin superuser email and password. Click Sign In.",
+          "expected": "Superuser is authenticated and redirected to the dashboard. No 403 error."
+        },
+        {
+          "id": "TC-LG-658",
+          "severity": "P2",
+          "scenario": "Meta API returns saml_provider code, name, and icon when SAML is configured",
+          "steps": "Configure setup with SAML. Call GET /api/v1/meta/ without authentication.",
+          "expected": "Response contains auth_mode='saml' and saml_provider object with code, name, and icon fields. oauth_provider is null."
+        },
+        {
+          "id": "TC-LG-659",
+          "severity": "P2",
+          "scenario": "Meta API returns oauth_provider code, name, and icon when OAuth is configured",
+          "steps": "Configure setup with OAuth. Call GET /api/v1/meta/ without authentication.",
+          "expected": "Response contains auth_mode='oauth' and oauth_provider object with code, name, and icon fields. saml_provider is null."
         }
       ]
     },

@@ -7,47 +7,6 @@
   },
   "suites": [
     {
-      "id": "TC-SA-100",
-      "name": "Login Page — SAML Mode",
-      "test_cases": [
-        {
-          "id": "TC-SA-101",
-          "severity": "P0",
-          "scenario": "Login page shows SAML sign-in button when AUTH_MODE is saml",
-          "steps": "Configure AUTH_MODE=saml in app settings. Navigate to /login/.",
-          "expected": "A SAML sign-in button is visible. No classic email/password form is shown."
-        },
-        {
-          "id": "TC-SA-102",
-          "severity": "P1",
-          "scenario": "SAML button displays the configured provider name",
-          "steps": "Configure a SAML provider named 'Acme SSO'. Navigate to /login/.",
-          "expected": "Button label references the provider name (e.g. 'Sign in with Acme SSO' or similar)."
-        },
-        {
-          "id": "TC-SA-103",
-          "severity": "P1",
-          "scenario": "Classic email/password form is hidden in SAML mode",
-          "steps": "Set AUTH_MODE=saml. Navigate to /login/.",
-          "expected": "Email and password fields are not visible on the page."
-        },
-        {
-          "id": "TC-SA-104",
-          "severity": "P0",
-          "scenario": "Login page loads without errors in SAML mode",
-          "steps": "Set AUTH_MODE=saml. Navigate to /login/.",
-          "expected": "Page loads successfully. No JavaScript errors in the console. No blank or broken UI."
-        },
-        {
-          "id": "TC-SA-105",
-          "severity": "P2",
-          "scenario": "App name and branding render correctly on the SAML login page",
-          "steps": "Navigate to /login/ with SAML mode active.",
-          "expected": "App name and logo appear as configured. Theme is applied correctly."
-        }
-      ]
-    },
-    {
       "id": "TC-SA-200",
       "name": "Initiating SAML Login",
       "test_cases": [
