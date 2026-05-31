@@ -87,10 +87,19 @@ def _build_handlers() -> dict:
             }
 
         elif LOG_DESTINATION == "cloudwatch":
+            import boto3 as _boto3
+
+            _cw_kwargs: dict = {"region_name": AWS_REGION}
+            _endpoint = os.getenv("AWS_ENDPOINT", "")
+            if _endpoint:
+                _cw_kwargs["endpoint_url"] = _endpoint
+            if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
+                _cw_kwargs["aws_access_key_id"] = AWS_ACCESS_KEY_ID
+                _cw_kwargs["aws_secret_access_key"] = AWS_SECRET_ACCESS_KEY
             handlers["destination"] = {
                 "class": "watchtower.CloudWatchLogHandler",
                 "log_group_name": LOG_NAME,
-                "boto3_client": None,
+                "boto3_client": _boto3.client("logs", **_cw_kwargs),
                 "formatter": "verbose",
             }
     except OSError:

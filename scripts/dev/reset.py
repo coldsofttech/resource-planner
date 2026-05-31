@@ -10,28 +10,29 @@ RESET = "\033[0m" if _tty else ""
 
 ROOT = Path(__file__).resolve().parents[2]
 WEB_DIR = ROOT / "apps" / "web"
-sys.path.insert(0, str(WEB_DIR))
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
-# Force console-only logging so django.setup() never touches the log file.
-# DotEnv.load_environ() uses setdefault, so this value won't be overwritten by .env.
-os.environ["LOG_DESTINATION"] = ""
 
-import django  # noqa: E402
+def _bootstrap_django():
+    sys.path.insert(0, str(WEB_DIR))
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+    # Force console-only logging so django.setup() never touches the log file.
+    # DotEnv.load_environ() uses setdefault, so this value won't be overwritten by .env.
+    os.environ["LOG_DESTINATION"] = ""
 
-django.setup()
+    import django
 
-from django.conf import settings  # noqa: E402
-from django.contrib.auth import get_user_model  # noqa: E402
-from pycore import DotEnv  # noqa: E402
-
-from apps.configurations.models import Configuration  # noqa: E402
-from apps.users.models import UserProfile  # noqa: E402
-
-User = get_user_model()
+    django.setup()
 
 
 def main(full_clean: bool = False):
+    _bootstrap_django()
+
+    from django.conf import settings
+    from pycore import DotEnv
+
+    from apps.configurations.models import Configuration
+    from apps.users.models import User, UserProfile
+
     scope = (
         "admin user, user profile, setup configuration, OAuth, and SAML records"
         if full_clean

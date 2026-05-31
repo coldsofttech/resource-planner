@@ -1,0 +1,63 @@
+# Dev-only compose file. All services are profile-gated so nothing starts by default.
+#
+# Profiles:
+#   postgres   — PostgreSQL (when DB_ENGINE=postgresql)
+#   smtp       — Mailpit fake SMTP (when EMAIL_TYPE=smtp)
+#   aws        — LocalStack (when DEPLOYMENT_TYPE=aws)
+#   keycloak   — Keycloak IdP for OAuth 2.0 / SAML testing (when DEV_KEYCLOAK=true)
+#
+# scripts/dev/dev.py activates the relevant profiles automatically.
+# CI can activate them directly:
+#   docker compose --env-file apps/web/.env --profile postgres up -d
+
+services:
+  postgres:
+    image: postgres
+    container_name: resource-planner-dev-pg
+    ports:
+      - "${DB_PORT:-5432}:${DB_PORT:-5432}"
+    environment:
+      POSTGRES_USER: "${DB_USER:-postgres}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD:-}"
+      POSTGRES_DB: "${DB_NAME:-resourceplanner}"
+      PGPORT: "${DB_PORT:-5432}"
+    profiles:
+      - postgres
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: resource-planner-dev-mailpit
+    ports:
+      - "${EMAIL_SMTP_PORT:-1025}:${EMAIL_SMTP_PORT:-1025}"
+      - "8025:8025"
+    environment:
+      MP_SMTP_AUTH: "${MP_SMTP_AUTH:-}"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "${MP_SMTP_AUTH_ALLOW_INSECURE:-false}"
+      MP_SMTP_ADDR: "0.0.0.0:${EMAIL_SMTP_PORT:-1025}"
+    profiles:
+      - smtp
+
+  localstack:
+    image: localstack/localstack
+    container_name: resource-planner-dev-localstack
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: "secretsmanager,s3,logs"
+    profiles:
+      - aws
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: resource-planner-dev-keycloak
+    command: start-dev --import-realm
+    ports:
+      - "8080:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_LOG_LEVEL: WARN
+    volumes:
+      - ./scripts/dev/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+    profiles:
+      - keycloak

@@ -18,9 +18,13 @@ def _resolve_db_password() -> str:
             "AWS_DEFAULT_REGION", os.environ.get("AWS_REGION", "eu-west-1")
         )
         secret_key = os.environ.get("DB_SECRET_KEY", "password")
+        endpoint_url = os.environ.get("AWS_ENDPOINT", "")
 
         try:
-            client = boto3.client("secretsmanager", region_name=region)
+            client_kwargs: dict = {"region_name": region}
+            if endpoint_url:
+                client_kwargs["endpoint_url"] = endpoint_url
+            client = boto3.client("secretsmanager", **client_kwargs)
             response = client.get_secret_value(SecretId=secret_name)
             raw = response.get("SecretString", "")
 
@@ -59,6 +63,9 @@ def build_databases() -> dict:
                 "HOST": os.environ.get("DB_HOST", "localhost"),
                 "PORT": os.environ.get("DB_PORT", "5432"),
                 "OPTIONS": {"connect_timeout": 10},
+                "TEST": {
+                    "NAME": "test_resourceplanner",
+                },
             }
         }
 
@@ -66,6 +73,9 @@ def build_databases() -> dict:
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": str(BASE_DIR / "db.sqlite3"),
+            "TEST": {
+                "NAME": ":memory:",
+            },
         }
     }
 
