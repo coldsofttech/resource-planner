@@ -1,5 +1,5 @@
 import { applyMeta, getAppLogo } from "../main/meta.js";
-import { getCsrfToken, snapshotButton, setBusyButton, restoreButton } from "../utils/utils.js";
+import { apiFetch, snapshotButton, setBusyButton, restoreButton } from "../utils/utils.js";
 import { API_URLS, UI_URLS } from "../main/urls.js";
 import { showCookieBannerIfNeeded } from "../utils/cookie.js";
 
@@ -11,12 +11,20 @@ const FIELD_IDS = [
   "rp-register-confirm-password",
 ];
 
-function setFormError(message) {
-  const banner = document.getElementById("rp-register-error");
+function setBanner(id, message) {
+  const banner = document.getElementById(id);
   if (!banner) return;
   banner.setAttribute("subtitle", message || "");
   if (message) banner.setAttribute("open", "");
   else banner.removeAttribute("open");
+}
+
+function setFormError(message) {
+  setBanner("rp-register-error", message);
+}
+
+function setFormSuccess(message) {
+  setBanner("rp-register-success", message);
 }
 
 function initRegisterForm() {
@@ -52,23 +60,25 @@ function initRegisterForm() {
 
     try {
       const { href, method } = API_URLS.auth.register();
-      const res = await fetch(href, {
+      const json = await apiFetch(href, {
         method,
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": getCsrfToken(),
-        },
         body: JSON.stringify({ first_name, last_name, email, password, confirm_password }),
+        skipAuth401Redirect: true,
       });
-      const json = await res.json();
       if (json?.success) {
-        window.location.href = UI_URLS.auth.login();
+        setFormError("");
+        setFormSuccess(json.message ?? "Account created! Taking you to sign in…");
+        restoreButton(btn, snap, { label: "Account created", suffixIcon: "bi-check-circle-fill" });
+        setTimeout(() => {
+          window.location.href = UI_URLS.auth.login() + "?registered=1";
+        }, 1800);
       } else {
         setFormError(json?.message ?? "Registration failed. Please try again.");
         restoreButton(btn, snap);
       }
-    } catch {
-      setFormError("A network error occurred. Please try again.");
+    } catch (err) {
+      const msg = err?.data?.message ?? "Registration failed. Please try again.";
+      setFormError(msg);
       restoreButton(btn, snap);
     }
   });

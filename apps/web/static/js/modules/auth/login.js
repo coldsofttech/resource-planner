@@ -1,14 +1,31 @@
 import { applyMeta, clearMeta, getAppName, getAppLogo } from "../main/meta.js";
-import { getCsrfToken, snapshotButton, setBusyButton, restoreButton } from "../utils/utils.js";
+import { apiFetch, snapshotButton, setBusyButton, restoreButton } from "../utils/utils.js";
 import { API_URLS, UI_URLS } from "../main/urls.js";
 import { showCookieBannerIfNeeded } from "../utils/cookie.js";
 
-function setFormError(message) {
-  const banner = document.getElementById("rp-login-error");
+function setBanner(id, message) {
+  const banner = document.getElementById(id);
   if (!banner) return;
   banner.setAttribute("subtitle", message || "");
   if (message) banner.setAttribute("open", "");
   else banner.removeAttribute("open");
+}
+
+function setFormError(message) {
+  setBanner("rp-login-error", message);
+}
+
+function setFormSuccess(message) {
+  setBanner("rp-login-success", message);
+}
+
+function applySuccessParam() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("registered") === "1") {
+    setFormSuccess("Account created! Please sign in to continue.");
+  } else if (params.get("password_reset") === "1") {
+    setFormSuccess("Password updated! Please sign in with your new password.");
+  }
 }
 
 /** Trigger the web component's own built-in validation (marks is-invalid). */
@@ -52,23 +69,19 @@ function initLoginForm() {
 
     try {
       const { href, method } = API_URLS.auth.login();
-      const res = await fetch(href, {
+      const json = await apiFetch(href, {
         method,
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": getCsrfToken(),
-        },
         body: JSON.stringify({ email, password }),
+        skipAuth401Redirect: true,
       });
-      const json = await res.json();
       if (json?.success) {
         window.location.href = json.data?.redirect ?? "/";
       } else {
         setFormError(json?.message ?? "Sign in failed. Please try again.");
         restoreButton(submitEl, snap);
       }
-    } catch {
-      setFormError("A network error occurred. Please try again.");
+    } catch (err) {
+      setFormError(err?.data?.message ?? "Sign in failed. Please try again.");
       restoreButton(submitEl, snap);
     }
   });
@@ -79,31 +92,122 @@ function applyMetaToPage(meta) {
 
   const initials = getAppLogo(meta);
 
-  // App name (preserves HTML tags like <b>)
   const nameEl = document.getElementById("rp-app-name");
   if (nameEl) nameEl.innerHTML = meta.app_name ?? "";
 
-  // Logo initials — main bar
   const logoEl = document.getElementById("rp-app-logo");
   if (logoEl) logoEl.textContent = initials;
 
-  // Logo initials — onboarding side panel
   const onboardLogoEl = document.getElementById("rp-app-logo-onboarding");
   if (onboardLogoEl) onboardLogoEl.textContent = initials;
 
-  // Create-account link visibility
-  const regLink = document.getElementById("rp-create-account-link");
-  if (regLink) regLink.style.display = meta.allow_registration ? "" : "none";
-
-  // Footer app name
   const footNameEl = document.getElementById("rp-auth-foot-name");
   if (footNameEl) footNameEl.textContent = getAppName(meta);
+
+  const isClassic = meta.auth_mode === "classic";
+
+  // Create account link: only for classic + allow_registration
+  const regLink = document.getElementById("rp-create-account-link");
+  if (isClassic && meta.allow_registration) {
+    regLink?.removeAttribute("hidden");
+  }
+
+  // SSO button: shown for oauth (with active provider) or saml (with active provider)
+  const ssoProvider =
+    meta.auth_mode === "oauth"
+      ? meta.oauth_provider
+      : meta.auth_mode === "saml"
+        ? meta.saml_provider
+        : null;
+
+  if (ssoProvider) {
+    const { name, icon, code } = ssoProvider;
+    const ssoSection = document.getElementById("rp-sso-section");
+    const ssoBtn = document.getElementById("rp-sso-btn");
+
+    if (ssoBtn) {
+      ssoBtn.setAttribute("prefix-icon", `bi-${icon || "box-arrow-in-right"}`);
+      ssoBtn.setAttribute("label", `Continue with ${name}`);
+    }
+    ssoSection?.removeAttribute("hidden");
+
+    initSSOButton({ mode: meta.auth_mode, providerCode: code });
+  }
+}
+
+function initSSOButton({ mode, providerCode }) {
+  const btn = document.getElementById("rp-sso-btn");
+  if (!btn) return;
+
+  btn.addEventListener("click", async () => {
+    const snap = snapshotButton(btn);
+    setBusyButton(btn, "Redirecting…");
+
+    try {
+      let authUrl;
+
+      if (mode === "oauth") {
+        const redirectUri = `${window.location.origin}${UI_URLS.auth.login()}`;
+        const { href, method } = API_URLS.auth.oauth.authorize(providerCode);
+        const json = await apiFetch(`${href}?redirect_uri=${encodeURIComponent(redirectUri)}`, {
+          method,
+        });
+        authUrl = json?.data?.authorization_url;
+      } else if (mode === "saml") {
+        const { href, method } = API_URLS.auth.saml.authorize(providerCode);
+        const params = new URLSearchParams({ relay_state: "/dashboard/" });
+        const json = await apiFetch(`${href}?${params}`, { method });
+        authUrl = json?.data?.redirect_url;
+      }
+
+      if (authUrl) {
+        window.location.href = authUrl;
+      } else {
+        restoreButton(btn, snap);
+        setFormError("Failed to get authorization URL.");
+      }
+    } catch (err) {
+      restoreButton(btn, snap);
+      setFormError(err?.data?.message ?? "Could not initiate login.");
+    }
+  });
+}
+
+async function handleOAuthCallback(meta) {
+  if (meta?.auth_mode !== "oauth") return false;
+
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get("code");
+  const state = params.get("state");
+  if (!code || !state) return false;
+
+  // Remove OAuth params from the URL immediately to prevent reuse on refresh.
+  history.replaceState(null, "", window.location.pathname);
+
+  try {
+    const { href, method } = API_URLS.auth.oauth.callback();
+    const json = await apiFetch(href, {
+      method,
+      body: JSON.stringify({ code, state }),
+      skipAuth401Redirect: true,
+    });
+    if (json?.success) {
+      window.location.href = json.data?.redirect ?? "/";
+      return true;
+    }
+    setFormError(json?.message ?? "OAuth sign in failed.");
+  } catch (err) {
+    setFormError(err?.data?.message ?? "OAuth sign in failed. Please try again.");
+  }
+  return false;
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
   // Footer year — set immediately, independent of meta fetch
   const yearEl = document.getElementById("rp-auth-year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  applySuccessParam();
 
   clearMeta();
   const meta = await applyMeta();
@@ -121,6 +225,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     .getElementById("rp-login-forgot-link")
     ?.setAttribute("href", UI_URLS.auth.forgotPassword());
   document.getElementById("rp-create-account-link")?.setAttribute("href", UI_URLS.auth.register());
+
+  // Handle OAuth callback redirect (?code=&state= injected by IdP into this page).
+  const handledCallback = await handleOAuthCallback(meta);
+  if (handledCallback) return;
 
   initLoginForm();
   showCookieBannerIfNeeded();

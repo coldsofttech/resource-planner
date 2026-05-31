@@ -1,5 +1,5 @@
 import { applyMeta, getAppLogo } from "../main/meta.js";
-import { getCsrfToken, snapshotButton, setBusyButton, restoreButton } from "../utils/utils.js";
+import { apiFetch, snapshotButton, setBusyButton, restoreButton } from "../utils/utils.js";
 import { API_URLS, UI_URLS } from "../main/urls.js";
 import { showCookieBannerIfNeeded } from "../utils/cookie.js";
 
@@ -16,12 +16,20 @@ function showStep(n) {
   });
 }
 
-function setStepError(stepNum, message) {
-  const banner = document.getElementById(`rp-fp-error-${stepNum}`);
+function setStepBanner(id, message) {
+  const banner = document.getElementById(id);
   if (!banner) return;
   banner.setAttribute("subtitle", message || "");
   if (message) banner.setAttribute("open", "");
   else banner.removeAttribute("open");
+}
+
+function setStepError(stepNum, message) {
+  setStepBanner(`rp-fp-error-${stepNum}`, message);
+}
+
+function setStepSuccess(stepNum, message) {
+  setStepBanner(`rp-fp-success-${stepNum}`, message);
 }
 
 function clearErrors() {
@@ -30,15 +38,7 @@ function clearErrors() {
 
 async function apiPost(urlEntry, body) {
   const { href, method } = urlEntry();
-  const res = await fetch(href, {
-    method,
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRFToken": getCsrfToken(),
-    },
-    body: JSON.stringify(body),
-  });
-  return res.json();
+  return apiFetch(href, { method, body: JSON.stringify(body), skipAuth401Redirect: true });
 }
 
 function getOtpEl() {
@@ -113,8 +113,8 @@ function initStep1() {
         setStepError(1, json?.message ?? "Something went wrong. Please try again.");
         restoreButton(btn, snap);
       }
-    } catch {
-      setStepError(1, "A network error occurred. Please try again.");
+    } catch (err) {
+      setStepError(1, err?.data?.message ?? "A network error occurred. Please try again.");
       restoreButton(btn, snap);
     }
   });
@@ -149,8 +149,8 @@ function initStep2() {
         setStepError(2, json?.message ?? "Invalid code. Please try again.");
         restoreButton(btn, snap);
       }
-    } catch {
-      setStepError(2, "A network error occurred. Please try again.");
+    } catch (err) {
+      setStepError(2, err?.data?.message ?? "A network error occurred. Please try again.");
       restoreButton(btn, snap);
     }
   });
@@ -202,13 +202,18 @@ function initStep3() {
         confirm_password,
       });
       if (json?.success) {
-        window.location.href = UI_URLS.auth.login();
+        setStepError(3, "");
+        setStepSuccess(3, json.message ?? "Password updated! Taking you to sign in…");
+        restoreButton(btn, snap, { label: "Password updated", suffixIcon: "bi-check-circle-fill" });
+        setTimeout(() => {
+          window.location.href = UI_URLS.auth.login() + "?password_reset=1";
+        }, 1800);
       } else {
         setStepError(3, json?.message ?? "Failed to reset password. Please try again.");
         restoreButton(btn, snap);
       }
-    } catch {
-      setStepError(3, "A network error occurred. Please try again.");
+    } catch (err) {
+      setStepError(3, err?.data?.message ?? "A network error occurred. Please try again.");
       restoreButton(btn, snap);
     }
   });

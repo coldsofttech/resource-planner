@@ -1,3 +1,4 @@
+import { apiFetch } from "../utils/utils.js";
 import { API_URLS } from "./urls.js";
 
 const META_KEY = "rp-meta";
@@ -35,9 +36,7 @@ export async function getMeta() {
   }
   try {
     const { href } = API_URLS.meta.get();
-    const res = await fetch(href);
-    if (!res.ok) return null;
-    const json = await res.json();
+    const json = await apiFetch(href);
     if (json?.success && json?.data) {
       // Only persist the cache once setup is complete; pre-setup data must
       // always be fetched fresh so the redirect logic stays correct.

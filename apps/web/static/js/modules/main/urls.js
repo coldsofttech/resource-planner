@@ -27,6 +27,18 @@ export const API_URLS = {
     },
     oauth: {
       create: () => ({ method: "POST", href: `${API_BASE}auth/oauth/` }),
+      authorize: (providerCode) => ({
+        method: "GET",
+        href: `${API_BASE}auth/oauth/${providerCode}/authorize/`,
+      }),
+      callback: () => ({ method: "POST", href: `${API_BASE}auth/oauth/callback/` }),
+    },
+    saml: {
+      create: () => ({ method: "POST", href: `${API_BASE}auth/saml/` }),
+      authorize: (providerCode) => ({
+        method: "GET",
+        href: `${API_BASE}auth/saml/${providerCode}/authorize/`,
+      }),
     },
   },
   setup: {

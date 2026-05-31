@@ -72,6 +72,7 @@ export function getCsrfToken() {
 }
 
 export async function apiFetch(url, options = {}) {
+  const { skipAuth401Redirect = false, ...rest } = options;
   const defaults = {
     headers: {
       "Content-Type": "application/json",
@@ -80,22 +81,21 @@ export async function apiFetch(url, options = {}) {
   };
   const config = {
     ...defaults,
-    ...options,
+    ...rest,
     headers: {
       ...defaults.headers,
-      ...(options.headers || {}),
+      ...(rest.headers || {}),
     },
   };
   const res = await fetch(url, config);
 
   if (!res.ok) {
-    if (res.status === 401) {
+    if (res.status === 401 && !skipAuth401Redirect) {
       window.location.href = "/login/?next=" + encodeURIComponent(window.location.pathname);
       return;
     }
 
     const body = await res.json().catch(() => ({}));
-
     throw { status: res.status, data: body };
   }
 

@@ -34,7 +34,9 @@
           </div>
           <div class="ms-auto d-flex align-items-center gap-2">
             <rp-theme-toggle></rp-theme-toggle>
-            <a class="rp-link rp-auth-register-link" href="/register/" id="rp-create-account-link">Create account</a>
+            <a class="rp-link rp-auth-register-link" href="/register/" id="rp-create-account-link" hidden
+              >Create account</a
+            >
           </div>
         </div>
 
@@ -43,6 +45,8 @@
             <h1 class="rp-h1 mb-1">Welcome back</h1>
             <p class="rp-muted mb-3">Sign in to plan, allocate and track resources across your projects.</p>
 
+            <rp-flash-banner id="rp-login-success" type="success" title="" subtitle="" class="mb-3"></rp-flash-banner>
+
             <rp-flash-banner
               id="rp-login-error"
               type="error"
@@ -50,6 +54,18 @@
               subtitle=""
               class="mb-3"
             ></rp-flash-banner>
+
+            <div id="rp-sso-section" hidden>
+              <div class="rp-stack-16">
+                <rp-button-secondary
+                  id="rp-sso-btn"
+                  label="Continue with SSO"
+                  prefix-icon="bi-box-arrow-in-right"
+                  class="w-100"
+                ></rp-button-secondary>
+              </div>
+              <div class="my-4 rp-divider-or">or with email</div>
+            </div>
 
             <form id="rp-login-form" class="rp-stack-16" novalidate>
               {% csrf_token %}
@@ -74,7 +90,7 @@
                 ></rp-field-password>
               </div>
 
-              <div class="d-flex justify-content-end rp-auth-forgot">
+              <div class="d-flex justify-content-end rp-auth-forgot" id="rp-login-forgot-row">
                 <a href="/forgot-password/" id="rp-login-forgot-link" class="rp-link rp-auth-link-sm"
                   >Forgot password?</a
                 >

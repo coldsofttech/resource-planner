@@ -51,6 +51,15 @@ class ButtonPrimary extends HTMLElement {
 
 customElements.define("rp-button-primary", ButtonPrimary);
 
+/* ButtonSecondary: <rp-button-secondary> */
+class ButtonSecondary extends ButtonPrimary {
+  get _variant() {
+    return "rp-btn-secondary";
+  }
+}
+
+customElements.define("rp-button-secondary", ButtonSecondary);
+
 /* ButtonMuted: <rp-button-muted> */
 class ButtonMuted extends ButtonPrimary {
   get _variant() {

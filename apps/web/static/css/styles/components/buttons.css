@@ -190,3 +190,17 @@
   font-family: var(--rp-font-sans);
   line-height: 1;
 }
+
+.rp-sso-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+rp-button-primary.w-100 > button,
+rp-button-secondary.w-100 > button,
+rp-button-muted.w-100 > button,
+rp-button-engine.w-100 > button {
+  width: 100%;
+}
