@@ -8,3 +8,4 @@ drf_spectacular~=0.29.0
 -e ./packages/pycore
 -e ./packages/awscore
 -e ./packages/emailcore
+-e ./packages/otpcore

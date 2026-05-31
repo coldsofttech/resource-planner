@@ -16,21 +16,46 @@ jobs:
         with:
           python-version: "3.14"
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
-          pip install pytest ruff mypy bandit pip-audit build
+          pip install -r requirements/base.txt
+          pip install -r requirements/dev.txt
+          pip install build
+
+      - name: Install packages
+        run: |
+          pip install -e packages/awscore
+          pip install -e packages/pycore
+          pip install -e packages/emailcore
+          pip install -e packages/otpcore
 
       - name: Ruff
         run: ruff check packages
+
+      - name: Ruff Format
+        run: ruff format --check packages
 
       - name: mypy
         run: mypy packages
 
       - name: pytest
-        run: pytest packages
+        run: |
+          mkdir -p .pytest-reports
+          pytest -n auto --dist=loadfile -p no:django --override-ini=addopts= --import-mode=importlib --junit-xml=.pytest-reports/junit.xml packages/awscore/tests/ packages/emailcore/tests/ packages/pycore/tests/ packages/otpcore/tests/
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-test-report
+          path: .pytest-reports/
 
       - name: Build Validation
-        run: python -m build
+        run: |
+          python -m build packages/awscore
+          python -m build packages/pycore
+          python -m build packages/emailcore
+          python -m build packages/otpcore
 
       - name: Bandit
         run: bandit -r packages

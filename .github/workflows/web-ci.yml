@@ -24,9 +24,8 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install -r apps/web/requirements/base.txt
-          pip install -r apps/web/requirements/dev.txt
-          pip install ruff mypy pytest bandit pip-audit
+          pip install -r requirements/base.txt
+          pip install -r requirements/dev.txt
 
       - name: Install Node dependencies
         run: npm ci
@@ -54,7 +53,16 @@ jobs:
         run: mypy apps/web
 
       - name: pytest
-        run: pytest
+        run: |
+          mkdir -p .pytest-reports
+          pytest -n auto --dist=loadfile --junit-xml=.pytest-reports/junit.xml
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: .pytest-reports/
 
       - name: Bandit
         run: bandit -r apps/web packages
