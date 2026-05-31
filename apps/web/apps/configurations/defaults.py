@@ -1,13 +1,16 @@
-CONFIGURATION_DEFAULTS = {
+_SETUP_DEFAULTS = {
     "SETUP_COMPLETE": {
         "label": "Initial Setup Complete",
         "value": "false",
         "description": "Marks whether the initial setup wizard has been completed.",
         "data_type": "boolean",
-        "is_secret": False,
+        "is_secret": False,  # nosec B105
         "is_admin": True,
         "module": "setup",
     },
+}
+
+_GENERAL_DEFAULTS = {
     "APP_NAME": {
         "label": "Application Name",
         "value": "Resource<b>Planner</b>",
@@ -16,7 +19,7 @@ CONFIGURATION_DEFAULTS = {
             "HTML tags are supported for custom styling (e.g. bold, colour, icon)."
         ),
         "data_type": "string",
-        "is_secret": False,
+        "is_secret": False,  # nosec B105
         "is_admin": False,
         "module": "general",
     },
@@ -28,10 +31,13 @@ CONFIGURATION_DEFAULTS = {
             "Used to generate SSO redirect URIs and email links. No trailing slash."
         ),
         "data_type": "string",
-        "is_secret": False,
+        "is_secret": False,  # nosec B105
         "is_admin": False,
         "module": "general",
     },
+}
+
+_AUTH_DEFAULTS = {
     "AUTH_MODE": {
         "label": "Authentication Mode",
         "value": "classic",
@@ -39,7 +45,7 @@ CONFIGURATION_DEFAULTS = {
             "Controls how users authenticate. Supported are: classic, saml, oauth."
         ),
         "data_type": "string",
-        "is_secret": False,
+        "is_secret": False,  # nosec B105
         "is_admin": False,
         "module": "auth",
     },
@@ -52,10 +58,13 @@ CONFIGURATION_DEFAULTS = {
             "accounts only."
         ),
         "data_type": "boolean",
-        "is_secret": False,
+        "is_secret": False,  # nosec B105
         "is_admin": False,
         "module": "auth",
     },
+}
+
+_INFRA_DEFAULTS = {
     "DEPLOYMENT_TYPE": {
         "label": "Deployment Type",
         "value": "local",
@@ -64,7 +73,7 @@ CONFIGURATION_DEFAULTS = {
             "database. 'aws' stores secrets in AWS Secrets Manager."
         ),
         "data_type": "string",
-        "is_secret": False,
+        "is_secret": False,  # nosec B105
         "is_admin": True,
         "module": "infra",
     },
@@ -76,7 +85,7 @@ CONFIGURATION_DEFAULTS = {
             "are stored locally in the database using Fernet encryption."
         ),
         "data_type": "string",
-        "is_secret": False,
+        "is_secret": False,  # nosec B105
         "is_admin": False,
         "module": "infra",
     },
@@ -89,7 +98,7 @@ CONFIGURATION_DEFAULTS = {
             "Amazon S3 bucket."
         ),
         "data_type": "string",
-        "is_secret": False,
+        "is_secret": False,  # nosec B105
         "is_admin": True,
         "module": "infra",
     },
@@ -101,10 +110,13 @@ CONFIGURATION_DEFAULTS = {
             "In case of 's3', S3 bucket arn."
         ),
         "data_type": "string",
-        "is_secret": False,
+        "is_secret": False,  # nosec B105
         "is_admin": True,
         "module": "infra",
     },
+}
+
+_EMAIL_DEFAULTS = {
     "EMAIL_TYPE": {
         "label": "Email Type",
         "value": "console",
@@ -113,7 +125,7 @@ CONFIGURATION_DEFAULTS = {
             "developments). 'smtp' to trigger actual email with encryption support."
         ),
         "data_type": "string",
-        "is_secret": False,
+        "is_secret": False,  # nosec B105
         "is_admin": False,
         "module": "email",
     },
@@ -125,7 +137,7 @@ CONFIGURATION_DEFAULTS = {
             "notifications, etc.)."
         ),
         "data_type": "string",
-        "is_secret": False,
+        "is_secret": False,  # nosec B105
         "is_admin": False,
         "module": "email",
     },
@@ -137,7 +149,7 @@ CONFIGURATION_DEFAULTS = {
             "resets, notifications, etc.)."
         ),
         "data_type": "string",
-        "is_secret": False,
+        "is_secret": False,  # nosec B105
         "is_admin": False,
         "module": "email",
     },
@@ -146,7 +158,7 @@ CONFIGURATION_DEFAULTS = {
         "value": "",
         "description": "Hostname or IP address of the outbound SMTP server.",
         "data_type": "string",
-        "is_secret": False,
+        "is_secret": False,  # nosec B105
         "is_admin": False,
         "module": "email",
     },
@@ -157,7 +169,7 @@ CONFIGURATION_DEFAULTS = {
             "TCP port for the SMTP server (25 = plain, 587 = STARTTLS, 465 = SSL/TLS)."
         ),
         "data_type": "integer",
-        "is_secret": False,
+        "is_secret": False,  # nosec B105
         "is_admin": False,
         "module": "email",
     },
@@ -169,7 +181,7 @@ CONFIGURATION_DEFAULTS = {
             "'ssl' = SSL/TLS."
         ),
         "data_type": "string",
-        "is_secret": False,
+        "is_secret": False,  # nosec B105
         "is_admin": False,
         "module": "email",
     },
@@ -180,7 +192,7 @@ CONFIGURATION_DEFAULTS = {
             "Whether the SMTP server requires username/password authentication."
         ),
         "data_type": "boolean",
-        "is_secret": False,
+        "is_secret": False,  # nosec B105
         "is_admin": False,
         "module": "email",
     },
@@ -191,7 +203,7 @@ CONFIGURATION_DEFAULTS = {
             "Username for SMTP authentication (only used when auth is enabled)."
         ),
         "data_type": "string",
-        "is_secret": False,
+        "is_secret": False,  # nosec B105
         "is_admin": False,
         "module": "email",
     },
@@ -204,4 +216,13 @@ CONFIGURATION_DEFAULTS = {
         "is_admin": False,
         "module": "email",
     },
+}
+
+
+CONFIGURATION_DEFAULTS = {
+    **_SETUP_DEFAULTS,
+    **_GENERAL_DEFAULTS,
+    **_AUTH_DEFAULTS,
+    **_INFRA_DEFAULTS,
+    **_EMAIL_DEFAULTS,
 }

@@ -6,13 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Setup - Resource Planner</title>
 
-    <script>
-      (function () {
-        var t = localStorage.getItem("rp-theme");
-        if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-        document.documentElement.setAttribute("data-theme", t);
-      })();
-    </script>
+    <script src="{% static 'js/dist/theme-init.min.js' %}"></script>
 
     <script type="module" src="{% static 'js/dist/components.min.js' %}"></script>
     <script type="module" src="{% static 'js/dist/setup.min.js' %}"></script>
@@ -25,12 +19,6 @@
     />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="{% static 'css/dist/styles.min.css' %}" />
-
-    <style>
-      body {
-        min-height: 100vh;
-      }
-    </style>
   </head>
   <body data-screen-label="Setup Wizard">
     <header class="rp-setup-bar">
@@ -38,10 +26,8 @@
         <i class="bi bi-diagram-3-fill"></i>
       </div>
       <div>
-        <div style="font-weight: 700; line-height: 1">Resource Planner</div>
-        <div class="rp-subtle" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em">
-          Initial Setup
-        </div>
+        <div class="rp-setup-bar-title">Resource<b>Planner</b></div>
+        <div class="rp-subtle rp-setup-bar-subtitle">Initial Setup</div>
       </div>
       <div class="ms-auto d-flex align-items-center gap-2">
         <span class="rp-setup-pill">
@@ -132,9 +118,11 @@
                 label="Application name"
                 id="rp-setup-app-name"
                 name="app-name"
-                placeholder="Resource<b>Planner</b>"
-                value="Resource<b>Planner</b>"
-                hint="HTML is accepted. Shown in the top navigation bar."
+                placeholder="Resource&lt;b&gt;Planner&lt;/b&gt;"
+                value="Resource&lt;b&gt;Planner&lt;/b&gt;"
+                maxlength="50"
+                show-counter
+                hint="HTML formatting accepted: &lt;b&gt; &lt;strong&gt; &lt;i&gt; &lt;em&gt; &lt;u&gt; &lt;sup&gt; &lt;sub&gt;. Shown in the top navigation bar."
                 required
               ></rp-field-text>
               <rp-field-website
@@ -143,7 +131,7 @@
                 prefix-icon
                 id="rp-setup-app-base-url"
                 name="base-url"
-                placeholder="localhost:8000"
+                placeholder="resourceplanner.example.com"
                 hint="Used to build SSO redirect URIs and email links. No trailing slash."
                 required
               >
@@ -222,6 +210,7 @@
                     id="rp-setup-infra-secrets-prefix"
                     name="secrets-prefix"
                     placeholder="/resourceplanner"
+                    value="/"
                     required
                   >
                     <field-hint
@@ -325,7 +314,7 @@
                     label="Host name"
                     id="rp-setup-db-host-name"
                     name="host-name"
-                    placeholder="localhost"
+                    placeholder="db.resourceplanner.example.com"
                     required
                   ></rp-field-text>
                   <rp-field-number
@@ -351,6 +340,7 @@
                     label="User name"
                     id="rp-setup-db-user-name"
                     name="user-name"
+                    placeholder="rp_user"
                     required
                   ></rp-field-text>
                   <rp-field-password
@@ -425,7 +415,7 @@
                     title="Service Provider (SP) Configuration - register with your IdP"
                   >
                     <panel-body>
-                      <ul class="mt-2" style="font-size: 13px; color: var(--rp-text-muted); line-height: 1.7">
+                      <ul class="mt-2 rp-setup-info-list">
                         <li>
                           <span class="rp-mono">
                             SP Entity ID -
@@ -434,9 +424,8 @@
                               target="_blank"
                               id="rp-setup-auth-saml-info-entity-id"
                               rel="noopener noreferrer"
-                              href="http://localhost:8000"
-                              style="font-size: 13px"
-                              >http://localhost:8000</a
+                              href="https://resourceplanner.example.com"
+                              >https://resourceplanner.example.com</a
                             >
                           </span>
                         </li>
@@ -448,9 +437,8 @@
                               target="_blank"
                               id="rp-setup-auth-saml-info-acs-url"
                               rel="noopener noreferrer"
-                              href="http://localhost:8000/saml/acs/"
-                              style="font-size: 13px"
-                              >http://localhost:8000/saml/acs/</a
+                              href="https://resourceplanner.example.com/saml/acs/"
+                              >https://resourceplanner.example.com/saml/acs/</a
                             >
                           </span>
                         </li>
@@ -462,9 +450,8 @@
                               target="_blank"
                               id="rp-setup-auth-saml-info-sp-metadata-url"
                               rel="noopener noreferrer"
-                              href="http://localhost:8000/saml2/metadata/"
-                              style="font-size: 13px"
-                              >http://localhost:8000/saml2/metadata/</a
+                              href="https://resourceplanner.example.com/saml2/metadata/"
+                              >https://resourceplanner.example.com/saml2/metadata/</a
                             >
                           </span>
                         </li>
@@ -542,7 +529,7 @@
                     id="rp-setup-auth-saml-sp-entity-id"
                     name="saml-sp-entity-id"
                     hint="This app's entity ID registered with the IdP — usually your base URL."
-                    placeholder="localhost:8000"
+                    placeholder="resourceplanner.example.com"
                     prefix-icon
                   >
                     <scheme-list>
@@ -555,7 +542,7 @@
                     label="Assertion consumer service URL"
                     id="rp-setup-auth-saml-service-url"
                     name="saml-service-url"
-                    placeholder="localhost:8000/saml/acs/"
+                    placeholder="resourceplanner.example.com/saml/acs/"
                     prefix-icon
                     required
                   >
@@ -568,6 +555,13 @@
                       <scheme>http://</scheme>
                     </scheme-list>
                   </rp-field-website>
+                  <div class="col-12 d-flex justify-content-end">
+                    <rp-button-engine
+                      id="rp-setup-auth-saml-test-btn"
+                      label="Test Connection"
+                      prefix-icon="bi-plug"
+                    ></rp-button-engine>
+                  </div>
                 </div>
               </div>
 
@@ -580,19 +574,18 @@
                     title="Register this in your Identity Provider"
                   >
                     <panel-body>
-                      <ul class="mt-2" style="font-size: 13px; color: var(--rp-text-muted); line-height: 1.7">
+                      <ul class="mt-2 rp-setup-info-list">
                         <li>
                           <span class="rp-mono">
                             Callback/Redirect URL:
                             <a
                               class="rp-link"
-                              href="http://localhost:8000/sso/oauth/callback"
+                              href="https://resourceplanner.example.com/sso/oauth/callback"
                               target="_blank"
                               id="rp-setup-auth-oauth-info-callback-url"
                               rel="noopener noreferrer"
-                              style="font-size: 13px"
                             >
-                              http://localhost:8000/sso/oauth/callback
+                              https://resourceplanner.example.com/sso/oauth/callback
                             </a>
                           </span>
                         </li>
@@ -643,7 +636,7 @@
                     id="rp-setup-auth-oauth-auth-endpoint"
                     name="oauth-auth-endpoint"
                     hint="The IdP URL users are redirected to for authentication."
-                    placeholder="localhost:8000"
+                    placeholder="idp.example.com/oauth/authorize"
                     prefix-icon
                     required
                   >
@@ -658,7 +651,7 @@
                     id="rp-setup-auth-oauth-token-endpoint"
                     name="oauth-token-endpoint"
                     hint="URL to exchange the authorisation code for tokens."
-                    placeholder="localhost:8000"
+                    placeholder="idp.example.com/oauth/token"
                     prefix-icon
                     required
                   >
@@ -673,7 +666,7 @@
                     id="rp-setup-auth-oauth-uinfo-endpoint"
                     name="oauth-uinfo-endpoint"
                     hint="URL to fetch the user's profile. Leave blank if claims are in the ID token."
-                    placeholder="localhost:8000"
+                    placeholder="idp.example.com/oauth/userinfo"
                     prefix-icon
                   >
                     <scheme-list>
@@ -692,6 +685,13 @@
                   >
                     <field-hint>Space-separated OAuth2 scopes. Typical: <code>openid email profile</code></field-hint>
                   </rp-field-text>
+                  <div class="col-12 d-flex justify-content-end">
+                    <rp-button-engine
+                      id="rp-setup-auth-oauth-test-btn"
+                      label="Test Connection"
+                      prefix-icon="bi-plug"
+                    ></rp-button-engine>
+                  </div>
                 </div>
               </div>
             </wizard-step-body>
@@ -737,7 +737,7 @@
                     id="rp-setup-storage-file-dir"
                     label="Path"
                     name="file-path"
-                    placeholder="/var/rp/media/"
+                    placeholder="/var/resourceplanner/media/"
                     required
                   ></rp-field-text>
                 </div>
@@ -754,7 +754,7 @@
                     id="rp-setup-storage-s3-bucket"
                     label="S3 bucket ARN"
                     name="s3-bucket-arn"
-                    placeholder="arn:aws:s3:::my-bucket"
+                    placeholder="arn:aws:s3:::resourceplanner-media"
                     required
                   ></rp-field-text>
                 </div>
@@ -783,8 +783,9 @@
                 id="rp-setup-email-from"
                 name="email-from"
                 label="From email address"
-                placeholder="noreply@example.com"
+                placeholder="noreply@resourceplanner.example.com"
                 hint="The 'From' address used for all outbound system emails."
+                autocomplete="off"
                 required
               ></rp-field-email>
               <rp-field-text
@@ -812,7 +813,7 @@
                     label="SMTP host"
                     id="rp-setup-email-smtp-host"
                     name="smtp-host"
-                    placeholder="smtp.example.com"
+                    placeholder="smtp.resourceplanner.example.com"
                     hint="Hostname or IP address of the outbound SMTP server."
                     required
                   ></rp-field-text>
@@ -856,6 +857,7 @@
                         label="Username"
                         id="rp-setup-email-user-name"
                         name="user-name"
+                        placeholder="smtp@resourceplanner.example.com"
                         required
                       ></rp-field-text>
                       <rp-field-password
@@ -947,7 +949,7 @@
                     label="S3 bucket ARN"
                     id="rp-setup-log-s3-bucket"
                     name="log-s3-bucket"
-                    placeholder="arn:aws:s3:::my-log-bucket"
+                    placeholder="arn:aws:s3:::resourceplanner-logs"
                     required
                   ></rp-field-text>
                 </div>

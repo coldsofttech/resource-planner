@@ -2,7 +2,13 @@ from django.shortcuts import redirect
 
 _BYPASS_PREFIXES = (
     "/setup/",
+    "/login/",
+    "/forgot-password/",
+    "/register/",
+    "/onboarding/",
+    "/api/v1/meta/",
     "/api/v1/setup/",
+    "/api/v1/auth/",
     "/static/",
     "/favicon",
     "/media/",

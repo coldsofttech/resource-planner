@@ -1,7 +1,16 @@
 import { apiFetch, snapshotButton, setBusyButton, restoreButton, setLink } from "../utils/utils.js";
 import { rpToast } from "../utils/toast.js";
 import { rpStatusModal } from "../utils/modal.js";
-import { API_URLS } from "../main/urls.js";
+import { API_URLS, UI_URLS } from "../main/urls.js";
+import {
+  isAwsAccessKeyId,
+  isAwsSecretAccessKey,
+  isAwsRegion,
+  isFernetKey,
+  isX509Cert,
+  isS3Arn,
+  isValidAppNameHtml,
+} from "../utils/validators.js";
 
 const wizard = document.querySelector("rp-wizard");
 
@@ -48,7 +57,7 @@ async function handleFinish() {
     primaryBtn: {
       label: "Go to Login",
       icon: "bi-box-arrow-right",
-      href: "/login/",
+      href: UI_URLS.auth.login(),
       disabled: true,
     },
   });
@@ -104,7 +113,7 @@ async function handleFinish() {
       primaryBtn: {
         label: "Go to Login",
         icon: "bi-box-arrow-right",
-        href: "/login/",
+        href: UI_URLS.auth.login(),
         disabled: false,
       },
     });
@@ -164,7 +173,7 @@ function getAuthApiBody() {
 
   if (auth.auth_type === "classic") {
     Object.assign(auth, {
-      self_register: document.getElementById("rp-setup-auth-self-regt")?.checked === "true",
+      self_register: !!document.getElementById("rp-setup-auth-self-regt")?.checked,
     });
   } else if (auth.auth_type === "saml") {
     Object.assign(auth, {
@@ -309,6 +318,7 @@ function getLoggingApiBody() {
 setTimeout(() => {
   setupInfraToggle();
   setupGenKeyButton();
+  setupSecretsPrefixSlash();
   setupSecretsPreviewSync();
   setupDbEngineToggle();
   setupDbTestButton();
@@ -320,10 +330,65 @@ setTimeout(() => {
   setupSmtpPortSync();
   setupSmtpAuthToggle();
   setupEmailTestButton();
+  setupSAMLTestButton();
+  setupOAuthTestButton();
   setupLoggingToggle();
   setupLoggingAwsFilter();
+  setupCustomFieldValidators();
   loadDefaults();
 }, 0);
+
+function setupCustomFieldValidators() {
+  const fieldValidators = [
+    {
+      id: "rp-setup-app-name",
+      fn: isValidAppNameHtml,
+      msg: "Only <b>, <strong>, <i>, <em>, <u>, <sup>, <sub> are allowed and all tags must be closed.",
+    },
+    {
+      id: "rp-setup-infra-fernet-key",
+      fn: isFernetKey,
+      msg: "Invalid Fernet key — must be a 44-character URL-safe base64 string.",
+    },
+    {
+      id: "rp-setup-infra-aws-region",
+      fn: isAwsRegion,
+      msg: "Invalid AWS region format — expected e.g. eu-west-1.",
+    },
+    {
+      id: "rp-setup-infra-aws-access-key",
+      fn: isAwsAccessKeyId,
+      msg: "AWS Access Key ID must be exactly 20 uppercase alphanumeric characters.",
+    },
+    {
+      id: "rp-setup-infra-aws-secret-key",
+      fn: isAwsSecretAccessKey,
+      msg: "AWS Secret Access Key must be exactly 40 base64 characters.",
+    },
+    {
+      id: "rp-setup-auth-saml-x509-cert",
+      fn: isX509Cert,
+      msg: "Enter the PEM base64 certificate body without -----BEGIN/END CERTIFICATE----- headers.",
+    },
+    {
+      id: "rp-setup-storage-s3-bucket",
+      fn: isS3Arn,
+      msg: "Enter a valid S3 bucket ARN (e.g. arn:aws:s3:::my-bucket).",
+    },
+    {
+      id: "rp-setup-log-s3-bucket",
+      fn: isS3Arn,
+      msg: "Enter a valid S3 bucket ARN (e.g. arn:aws:s3:::my-bucket).",
+    },
+  ];
+
+  fieldValidators.forEach(({ id, fn, msg }) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el._customValidators = el._customValidators || [];
+    el._customValidators.push({ fn, msg });
+  });
+}
 
 function setupInfraToggle() {
   const infraType = document.getElementById("rp-setup-infra-type");
@@ -350,6 +415,21 @@ function setupInfraToggle() {
 
   authMode.addEventListener("change", syncAuth);
   syncAuth();
+}
+
+function setupSecretsPrefixSlash() {
+  const el = document.getElementById("rp-setup-infra-secrets-prefix");
+  if (!el) return;
+  const input = el.querySelector(".rp-input") ?? el;
+
+  function ensureLeadingSlash() {
+    if (input.value && !input.value.startsWith("/")) {
+      input.value = "/" + input.value;
+    }
+  }
+
+  input.addEventListener("blur", ensureLeadingSlash);
+  input.addEventListener("change", ensureLeadingSlash);
 }
 
 function setupSecretsPreviewSync() {
@@ -527,13 +607,13 @@ function setupBaseUrlSync() {
     const rawHost = baseInput.rawValue.trim().replace(/\/$/, "");
     const base = rawHost ? scheme + rawHost : "";
 
-    if (spInput && !spLocked) spInput.value = base;
-    if (acsInput && !acsLocked) acsInput.value = rawHost ? base + "/saml/acs/" : "";
+    if (spInput && !spLocked) spInput.value = base + "/sp";
+    if (acsInput && !acsLocked) acsInput.value = rawHost ? base + "/api/v1/saml/acs/" : "";
 
     setLink(infoEntityId, base);
-    setLink(infoAcsUrl, base ? base + "/saml/acs/" : "");
-    setLink(infoMetaUrl, base ? base + "/saml/metadata/" : "");
-    setLink(oauthCallback, base ? base + "/sso/oauth/callback" : "");
+    setLink(infoAcsUrl, base ? base + "/api/v1/saml/acs/" : "");
+    setLink(infoMetaUrl, base ? base + "/api/v1/saml/metadata/" : "");
+    setLink(oauthCallback, base ? base + "/api/v1/oauth/callback" : "");
   }
 
   baseInput.addEventListener("input", populate);
@@ -659,6 +739,104 @@ async function handleEmailTest() {
   }
 }
 
+function setupSAMLTestButton() {
+  const btn = document.getElementById("rp-setup-auth-saml-test-btn");
+  if (!btn) return;
+  btn.addEventListener("click", handleSAMLTest);
+}
+
+async function handleSAMLTest() {
+  const btn = document.getElementById("rp-setup-auth-saml-test-btn");
+  if (!btn || btn.hasAttribute("disabled")) return;
+
+  const snapshot = snapshotButton(btn);
+  setBusyButton(btn, "Testing…");
+
+  const { method, href } = API_URLS.setup.samlTest();
+
+  try {
+    await apiFetch(href, {
+      method,
+      body: JSON.stringify({
+        idp_sso_url: document.getElementById("rp-setup-auth-saml-sso-url")?.value?.trim() ?? "",
+        idp_x509_cert: document.getElementById("rp-setup-auth-saml-x509-cert")?.value?.trim() ?? "",
+      }),
+    });
+
+    restoreButton(btn, snapshot, {
+      label: "Connected",
+      prefixIcon: null,
+      suffixIcon: "bi-check-circle-fill",
+    });
+    setTimeout(() => restoreButton(btn, snapshot), 3000);
+    rpToast({
+      type: "success",
+      title: "Connection successful",
+      message: "SAML IdP is reachable and the certificate is valid.",
+    });
+  } catch (err) {
+    restoreButton(btn, snapshot);
+    rpToast({
+      type: "error",
+      title: "Connection failed",
+      message: err?.data?.message ?? "Check your IdP SSO URL and certificate and try again.",
+    });
+  }
+}
+
+function setupOAuthTestButton() {
+  const btn = document.getElementById("rp-setup-auth-oauth-test-btn");
+  if (!btn) return;
+  btn.addEventListener("click", handleOAuthTest);
+}
+
+async function handleOAuthTest() {
+  const btn = document.getElementById("rp-setup-auth-oauth-test-btn");
+  if (!btn || btn.hasAttribute("disabled")) return;
+
+  const snapshot = snapshotButton(btn);
+  setBusyButton(btn, "Testing…");
+
+  const { method, href } = API_URLS.setup.oauthTest();
+
+  try {
+    await apiFetch(href, {
+      method,
+      body: JSON.stringify({
+        client_id: document.getElementById("rp-setup-auth-oauth-client-id")?.value?.trim() ?? "",
+        client_secret:
+          document.getElementById("rp-setup-auth-oauth-client-secret")?.value?.trim() ?? "",
+        auth_endpoint:
+          document.getElementById("rp-setup-auth-oauth-auth-endpoint")?.value?.trim() ?? "",
+        token_endpoint:
+          document.getElementById("rp-setup-auth-oauth-token-endpoint")?.value?.trim() ?? "",
+        userinfo_endpoint:
+          document.getElementById("rp-setup-auth-oauth-uinfo-endpoint")?.value?.trim() ?? "",
+        scope: document.getElementById("rp-setup-auth-oauth-scope")?.value?.trim() ?? "",
+      }),
+    });
+
+    restoreButton(btn, snapshot, {
+      label: "Connected",
+      prefixIcon: null,
+      suffixIcon: "bi-check-circle-fill",
+    });
+    setTimeout(() => restoreButton(btn, snapshot), 3000);
+    rpToast({
+      type: "success",
+      title: "Connection successful",
+      message: "OAuth endpoints are reachable.",
+    });
+  } catch (err) {
+    restoreButton(btn, snapshot);
+    rpToast({
+      type: "error",
+      title: "Connection failed",
+      message: err?.data?.message ?? "Check your endpoints and client credentials and try again.",
+    });
+  }
+}
+
 function setupStorageAwsFilter() {
   const infraType = document.getElementById("rp-setup-infra-type");
   const storageSelect = document.getElementById("rp-setup-storage-type");
@@ -687,7 +865,12 @@ async function loadDefaults() {
   const { method, href } = API_URLS.setup.defaults();
   try {
     const result = await apiFetch(href, { method });
-    applyDefaults(result?.data ?? {});
+    const data = result?.data ?? {};
+    if (data.setup_complete) {
+      window.location.href = UI_URLS.auth.login();
+      return;
+    }
+    applyDefaults(data.defaults ?? {});
   } catch {
     // best-effort: skip silently if the endpoint is unavailable
   }
