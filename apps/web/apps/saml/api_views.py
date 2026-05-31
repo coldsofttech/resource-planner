@@ -1,4 +1,5 @@
 from django.contrib.auth import login
+from django.http import HttpResponseRedirect
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
@@ -83,11 +84,12 @@ class SAMLViewSet(BaseViewSet):
         description=(
             "Receives the SAMLResponse form-posted by the IdP (HTTP-POST binding), "
             "validates the XML-DSig signature against the stored IdP certificate, "
-            "extracts user attributes, and establishes a local session."
+            "extracts user attributes, establishes a local session, and redirects "
+            "the browser to RelayState (if a safe local path) or /dashboard/."
         ),
         responses={
-            200: OpenApiResponse(
-                description="Login successful. Returns basic user info."
+            302: OpenApiResponse(
+                description="Login successful. Redirects to dashboard or RelayState."
             ),
             400: OpenApiResponse(
                 description=(
@@ -116,20 +118,7 @@ class SAMLViewSet(BaseViewSet):
         user.backend = "django.contrib.auth.backends.ModelBackend"
         login(request, user)
 
-        return self.response(
-            data={
-                "user": {
-                    "id": user.pk,
-                    "email": user.email,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name,
-                    "is_superuser": user.is_superuser,
-                },
-                "relay_state": relay_state,
-            },
-            message="Login successful.",
-            status_code=status.HTTP_200_OK,
-        )
+        return HttpResponseRedirect(self._safe_redirect(relay_state))
 
     def _extract_acs_params(self, request: Request) -> tuple[str, str]:
         saml_response_b64 = (request.data.get("SAMLResponse") or "").strip()
@@ -137,3 +126,14 @@ class SAMLViewSet(BaseViewSet):
         if not saml_response_b64:
             raise ValidationException("SAMLResponse is required.")
         return saml_response_b64, relay_state
+
+    @staticmethod
+    def _safe_redirect(relay_state: str) -> str:
+        """Return relay_state if it is a safe local path, otherwise /dashboard/."""
+        if (
+            relay_state
+            and relay_state.startswith("/")
+            and not relay_state.startswith("//")
+        ):
+            return relay_state
+        return "/dashboard/"

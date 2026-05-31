@@ -168,44 +168,31 @@ class SAMLACSAPITest(TestCase):
         self.assertIn(response.status_code, [400, 422])
 
     @patch("apps.saml.api_views.SAMLFlowService.complete_login")
-    def test_acs_returns_200_on_successful_login(self, mock_login):
+    def test_acs_redirects_to_dashboard_on_successful_login(self, mock_login):
         mock_login.return_value = make_user()
         response = self._post_acs()
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], "/dashboard/")
 
     @patch("apps.saml.api_views.SAMLFlowService.complete_login")
-    def test_acs_response_contains_user_email(self, mock_login):
-        mock_login.return_value = make_user(email="saml@example.com")
-        response = self._post_acs()
-        self.assertEqual(response.data["data"]["user"]["email"], "saml@example.com")
-
-    @patch("apps.saml.api_views.SAMLFlowService.complete_login")
-    def test_acs_response_user_has_expected_fields(self, mock_login):
-        mock_login.return_value = make_user()
-        response = self._post_acs()
-        user_data = response.data["data"]["user"]
-        for field in ["id", "email", "first_name", "last_name", "is_superuser"]:
-            self.assertIn(field, user_data)
-
-    @patch("apps.saml.api_views.SAMLFlowService.complete_login")
-    def test_acs_response_echoes_relay_state(self, mock_login):
+    def test_acs_redirects_to_safe_relay_state(self, mock_login):
         mock_login.return_value = make_user()
         response = self.client.post(
             ACS_URL,
-            {
-                "SAMLResponse": "dGVzdA==",
-                "RelayState": "https://app.example.com/dashboard",
-            },
+            {"SAMLResponse": "dGVzdA==", "RelayState": "/dashboard/"},
         )
-        self.assertEqual(
-            response.data["data"]["relay_state"], "https://app.example.com/dashboard"
-        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], "/dashboard/")
 
     @patch("apps.saml.api_views.SAMLFlowService.complete_login")
-    def test_acs_response_success_flag_is_true(self, mock_login):
+    def test_acs_ignores_external_relay_state(self, mock_login):
         mock_login.return_value = make_user()
-        response = self._post_acs()
-        self.assertTrue(response.data["success"])
+        response = self.client.post(
+            ACS_URL,
+            {"SAMLResponse": "dGVzdA==", "RelayState": "https://evil.example.com"},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], "/dashboard/")
 
     @patch(
         "apps.saml.api_views.SAMLFlowService.complete_login",
@@ -236,3 +223,23 @@ class SAMLACSAPITest(TestCase):
         mock_login.return_value = make_user()
         self._post_acs()
         self.assertIn("_auth_user_id", self.client.session)
+
+    @patch("apps.saml.api_views.SAMLFlowService.complete_login")
+    def test_acs_ignores_double_slash_relay_state(self, mock_login):
+        mock_login.return_value = make_user()
+        response = self.client.post(
+            ACS_URL,
+            {"SAMLResponse": "dGVzdA==", "RelayState": "//evil.example.com"},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], "/dashboard/")
+
+    @patch("apps.saml.api_views.SAMLFlowService.complete_login")
+    def test_acs_uses_safe_local_path_relay_state(self, mock_login):
+        mock_login.return_value = make_user()
+        response = self.client.post(
+            ACS_URL,
+            {"SAMLResponse": "dGVzdA==", "RelayState": "/projects/"},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], "/projects/")
