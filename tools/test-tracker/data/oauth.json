@@ -1,0 +1,291 @@
+{
+  "module": {
+    "slug": "oauth",
+    "name": "OAuth 2.0",
+    "sort_order": 3,
+    "parent": { "slug": "auth", "name": "Auth", "sort_order": 1 }
+  },
+  "suites": [
+    {
+      "id": "TC-OA-100",
+      "name": "Login Page — OAuth Mode",
+      "test_cases": [
+        {
+          "id": "TC-OA-101",
+          "severity": "P0",
+          "scenario": "Login page shows OAuth sign-in button when AUTH_MODE is oauth",
+          "steps": "Configure AUTH_MODE=oauth in app settings. Navigate to /login/.",
+          "expected": "An OAuth sign-in button is visible. No classic email/password form is shown."
+        },
+        {
+          "id": "TC-OA-102",
+          "severity": "P1",
+          "scenario": "OAuth button displays the configured provider name",
+          "steps": "Configure an OAuth provider named 'Acme SSO'. Navigate to /login/.",
+          "expected": "Button label references the provider name (e.g. 'Sign in with Acme SSO' or similar)."
+        },
+        {
+          "id": "TC-OA-103",
+          "severity": "P1",
+          "scenario": "Classic email/password form is hidden in OAuth mode",
+          "steps": "Set AUTH_MODE=oauth. Navigate to /login/.",
+          "expected": "Email and password fields are not visible on the page."
+        },
+        {
+          "id": "TC-OA-104",
+          "severity": "P0",
+          "scenario": "Login page loads without errors in OAuth mode",
+          "steps": "Set AUTH_MODE=oauth. Navigate to /login/.",
+          "expected": "Page loads successfully. No JavaScript errors in the console. No blank or broken UI."
+        },
+        {
+          "id": "TC-OA-105",
+          "severity": "P2",
+          "scenario": "App name and branding render correctly on the OAuth login page",
+          "steps": "Navigate to /login/ with OAuth mode active.",
+          "expected": "App name and logo appear as configured. Theme (light/dark) is applied."
+        }
+      ]
+    },
+    {
+      "id": "TC-OA-200",
+      "name": "Initiating OAuth Login",
+      "test_cases": [
+        {
+          "id": "TC-OA-201",
+          "severity": "P0",
+          "scenario": "Clicking the OAuth sign-in button redirects the browser to the IdP",
+          "steps": "Navigate to /login/. Click the OAuth sign-in button.",
+          "expected": "Browser is redirected to the configured IdP authorization URL (e.g. Keycloak, Google, Azure)."
+        },
+        {
+          "id": "TC-OA-202",
+          "severity": "P0",
+          "scenario": "IdP redirect URL contains the correct redirect_uri back to the app",
+          "steps": "Click the OAuth sign-in button. Observe the redirect URL in the browser address bar.",
+          "expected": "The redirect_uri parameter points back to the app's OAuth callback URL."
+        },
+        {
+          "id": "TC-OA-203",
+          "severity": "P0",
+          "scenario": "IdP redirect URL contains a state parameter",
+          "steps": "Click the OAuth sign-in button. Inspect the IdP redirect URL.",
+          "expected": "A state parameter is present and non-empty in the authorization URL query string."
+        },
+        {
+          "id": "TC-OA-204",
+          "severity": "P1",
+          "scenario": "Button shows a loading or disabled state while redirect is being prepared",
+          "steps": "Click the OAuth sign-in button. Observe the button immediately after clicking.",
+          "expected": "Button is disabled or shows a loading indicator to prevent double-clicks."
+        },
+        {
+          "id": "TC-OA-205",
+          "severity": "P1",
+          "scenario": "Redirect URL contains the expected OAuth scopes",
+          "steps": "Click the sign-in button. Inspect the IdP redirect URL.",
+          "expected": "Scope parameter is present (e.g. openid, email, profile)."
+        }
+      ]
+    },
+    {
+      "id": "TC-OA-300",
+      "name": "Callback & Session Establishment",
+      "test_cases": [
+        {
+          "id": "TC-OA-301",
+          "severity": "P0",
+          "scenario": "Returning from the IdP with a valid code and state logs the user in",
+          "steps": "Complete OAuth login at the IdP. Return to the app callback URL with a valid code and matching state.",
+          "expected": "User is authenticated. Browser is redirected to the main application (e.g. dashboard or home page)."
+        },
+        {
+          "id": "TC-OA-302",
+          "severity": "P0",
+          "scenario": "User is redirected to the application after successful OAuth login",
+          "steps": "Complete the full OAuth flow at the IdP.",
+          "expected": "Browser lands on the main app page. No login page is shown again."
+        },
+        {
+          "id": "TC-OA-303",
+          "severity": "P0",
+          "scenario": "Session is active after successful OAuth login",
+          "steps": "Complete OAuth login. Navigate to a protected route.",
+          "expected": "Protected route loads. User is not redirected back to /login/."
+        },
+        {
+          "id": "TC-OA-304",
+          "severity": "P1",
+          "scenario": "User's email address from the IdP is reflected in the active session",
+          "steps": "Complete OAuth login with SSO user email 'sso@example.com'. Check the logged-in user's email in the app.",
+          "expected": "App displays or stores 'sso@example.com' as the authenticated user's email."
+        },
+        {
+          "id": "TC-OA-305",
+          "severity": "P1",
+          "scenario": "User's name from the IdP is stored on the account",
+          "steps": "Complete OAuth login with a provider that returns given_name and family_name. Inspect the user's profile.",
+          "expected": "First name and last name are populated from the IdP response."
+        }
+      ]
+    },
+    {
+      "id": "TC-OA-400",
+      "name": "Error Scenarios",
+      "test_cases": [
+        {
+          "id": "TC-OA-401",
+          "severity": "P0",
+          "scenario": "Tampered or mismatched state parameter shows an error to the user",
+          "steps": "Manually modify the state parameter in the callback URL and navigate to it.",
+          "expected": "App displays an error message. User is not logged in. No session is established."
+        },
+        {
+          "id": "TC-OA-402",
+          "severity": "P0",
+          "scenario": "Callback URL with no code parameter shows an error",
+          "steps": "Navigate to the callback URL without a code query parameter.",
+          "expected": "App shows an error message. User is not logged in."
+        },
+        {
+          "id": "TC-OA-403",
+          "severity": "P0",
+          "scenario": "Callback URL with no state parameter shows an error",
+          "steps": "Navigate to the callback URL without a state query parameter.",
+          "expected": "App shows an error message. User is not logged in."
+        },
+        {
+          "id": "TC-OA-404",
+          "severity": "P1",
+          "scenario": "User denying consent at the IdP results in a friendly error message",
+          "steps": "Start OAuth flow. At the IdP authorization screen, deny/cancel consent.",
+          "expected": "IdP redirects back to the app. App shows a clear error or message. No crash or blank page."
+        },
+        {
+          "id": "TC-OA-405",
+          "severity": "P1",
+          "scenario": "Using a callback URL with a replayed (already used) state shows an error",
+          "steps": "Complete a successful OAuth login. Re-use the same callback URL with the same state.",
+          "expected": "App rejects the replay. Error is shown. User is not logged in again via the stale state."
+        },
+        {
+          "id": "TC-OA-406",
+          "severity": "P1",
+          "scenario": "Error message is user-friendly and does not expose internal details",
+          "steps": "Trigger an OAuth error (e.g. bad state). Inspect the error message shown to the user.",
+          "expected": "Message is readable and descriptive. No stack traces, internal exceptions, or raw server errors are shown."
+        },
+        {
+          "id": "TC-OA-407",
+          "severity": "P1",
+          "scenario": "Error page provides a way to retry the login",
+          "steps": "Encounter an OAuth error. Observe the error page.",
+          "expected": "A 'Try again' link or button is available, returning the user to /login/."
+        },
+        {
+          "id": "TC-OA-408",
+          "severity": "P2",
+          "scenario": "Navigating directly to the callback URL with no prior session shows an error",
+          "steps": "Without starting an OAuth flow, navigate directly to the callback URL with arbitrary code and state.",
+          "expected": "App detects no session state and shows an error. User is not logged in."
+        }
+      ]
+    },
+    {
+      "id": "TC-OA-500",
+      "name": "User Account Behaviour",
+      "test_cases": [
+        {
+          "id": "TC-OA-501",
+          "severity": "P0",
+          "scenario": "First-time OAuth login creates a new user account",
+          "steps": "Complete OAuth login with an email address that has no existing account in the app.",
+          "expected": "A new user account is created. User lands on the app. Account email matches the IdP email."
+        },
+        {
+          "id": "TC-OA-502",
+          "severity": "P0",
+          "scenario": "Returning OAuth user is not duplicated on subsequent logins",
+          "steps": "Complete OAuth login twice with the same IdP account.",
+          "expected": "Same user account is used both times. Only one account exists for that email."
+        },
+        {
+          "id": "TC-OA-503",
+          "severity": "P1",
+          "scenario": "OAuth user cannot log in using classic email/password credentials",
+          "steps": "Create an account via OAuth login. Navigate to /login/ in classic mode. Attempt to log in with the same email and any password.",
+          "expected": "Login fails. No password is set on OAuth-created accounts."
+        },
+        {
+          "id": "TC-OA-504",
+          "severity": "P2",
+          "scenario": "User profile reflects name information received from the IdP",
+          "steps": "Complete OAuth login with an IdP that returns first and last name. Visit the user profile page.",
+          "expected": "First and last name fields are populated from the IdP data."
+        }
+      ]
+    },
+    {
+      "id": "TC-OA-600",
+      "name": "Non-Functional",
+      "test_cases": [
+        {
+          "id": "TC-OA-601",
+          "severity": "P1",
+          "scenario": "OAuth login button is reachable and activatable via keyboard",
+          "steps": "Navigate to /login/ in OAuth mode. Press Tab to focus the sign-in button. Press Enter.",
+          "expected": "Focus lands on the button. Pressing Enter initiates the OAuth redirect."
+        },
+        {
+          "id": "TC-OA-602",
+          "severity": "P2",
+          "scenario": "OAuth login button has a visible focus ring",
+          "steps": "Tab to the OAuth sign-in button on /login/.",
+          "expected": "A visible focus indicator (outline or highlight) appears on the button."
+        },
+        {
+          "id": "TC-OA-603",
+          "severity": "P2",
+          "scenario": "Login page with OAuth mode is usable on mobile (375px)",
+          "steps": "Open /login/ at 375px viewport width with AUTH_MODE=oauth.",
+          "expected": "OAuth button is fully visible and tappable. No horizontal scroll. No content overflow."
+        },
+        {
+          "id": "TC-OA-604",
+          "severity": "P2",
+          "scenario": "Login page with OAuth mode is usable on tablet (768px)",
+          "steps": "Open /login/ at 768px viewport with OAuth mode.",
+          "expected": "Layout adapts correctly. Button and branding remain usable."
+        },
+        {
+          "id": "TC-OA-605",
+          "severity": "P0",
+          "scenario": "OAuth state token is not visible in the page source or DOM",
+          "steps": "Start an OAuth flow. Before the IdP redirect, inspect the page source and DOM.",
+          "expected": "The generated state token is not embedded in the HTML source or any visible DOM attribute."
+        },
+        {
+          "id": "TC-OA-606",
+          "severity": "P1",
+          "scenario": "Client secret is never present in any frontend payload or URL",
+          "steps": "Start an OAuth flow. Monitor all network requests from the browser.",
+          "expected": "No client secret appears in any request URL, request body, or response body visible to the browser."
+        },
+        {
+          "id": "TC-OA-607",
+          "severity": "P2",
+          "scenario": "Dark mode applies correctly to the OAuth login page",
+          "steps": "Toggle to dark mode. Navigate to /login/ with OAuth mode.",
+          "expected": "All elements use the dark theme. No light-mode remnants visible."
+        },
+        {
+          "id": "TC-OA-608",
+          "severity": "P3",
+          "scenario": "OAuth login page loads within 2 seconds on local dev",
+          "steps": "Open DevTools Network tab. Navigate to /login/ with OAuth mode.",
+          "expected": "DOM interactive within 2 seconds on local network."
+        }
+      ]
+    }
+  ]
+}

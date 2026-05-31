@@ -1,0 +1,1386 @@
+{
+  "module": {
+    "slug": "setup",
+    "name": "Setup Wizard",
+    "sort_order": 0,
+    "parent": { "slug": "setup", "name": "Setup", "sort_order": 0 }
+  },
+  "suites": [
+    {
+      "id": "TC-S-000",
+      "name": "Page Load & Access Control",
+      "test_cases": [
+        {
+          "id": "TC-S-001",
+          "severity": "P0",
+          "scenario": "Wizard loads for first-time setup",
+          "steps": "Navigate to /setup/ with setup not yet completed.",
+          "expected": "Page loads. Wizard renders with Step 1 active. Sidebar shows all 8 steps."
+        },
+        {
+          "id": "TC-S-002",
+          "severity": "P0",
+          "scenario": "Unauthenticated visit to a protected route redirects to setup",
+          "steps": "Navigate to /projects/ (or any private route) before setup completes.",
+          "expected": "Middleware redirects to /setup/."
+        },
+        {
+          "id": "TC-S-003",
+          "severity": "P1",
+          "scenario": "Setup route is accessible without authentication",
+          "steps": "Navigate to /setup/ when not logged in.",
+          "expected": "Page loads without requiring login."
+        },
+        {
+          "id": "TC-S-004",
+          "severity": "P0",
+          "scenario": "Setup redirects to login if already complete",
+          "steps": "Complete setup once, then navigate to /setup/ again.",
+          "expected": "Redirected to /login/."
+        },
+        {
+          "id": "TC-S-005",
+          "severity": "P3",
+          "scenario": "Page title and branding render correctly",
+          "steps": "Load /setup/.",
+          "expected": "Browser tab shows correct title. Logo and app name appear in header. Theme toggle is visible."
+        }
+      ]
+    },
+    {
+      "id": "TC-S-100",
+      "name": "Step 1: Admin Account",
+      "test_cases": [
+        {
+          "id": "TC-S-101",
+          "severity": "P0",
+          "scenario": "Valid admin account advances to step 2",
+          "steps": "Enter valid first name, last name, email, matching strong password. Click Next.",
+          "expected": "Step 2 becomes active. No errors shown."
+        },
+        {
+          "id": "TC-S-102",
+          "severity": "P2",
+          "scenario": "Fields accept maximum allowed lengths",
+          "steps": "Enter 100-char first name, 100-char last name, valid email, valid password. Click Next.",
+          "expected": "Advances without error."
+        },
+        {
+          "id": "TC-S-103",
+          "severity": "P0",
+          "scenario": "Empty first name blocked",
+          "steps": "Leave first name blank. Click Next.",
+          "expected": "Error shown on first name field. Navigation blocked."
+        },
+        {
+          "id": "TC-S-104",
+          "severity": "P0",
+          "scenario": "Empty last name blocked",
+          "steps": "Leave last name blank. Click Next.",
+          "expected": "Error shown on last name field. Navigation blocked."
+        },
+        {
+          "id": "TC-S-105",
+          "severity": "P0",
+          "scenario": "Empty email blocked",
+          "steps": "Leave email blank. Click Next.",
+          "expected": "Error shown on email field. Navigation blocked."
+        },
+        {
+          "id": "TC-S-106",
+          "severity": "P0",
+          "scenario": "Empty password blocked",
+          "steps": "Leave password blank. Click Next.",
+          "expected": "Error shown on password field. Navigation blocked."
+        },
+        {
+          "id": "TC-S-107",
+          "severity": "P0",
+          "scenario": "Empty confirm password blocked",
+          "steps": "Fill password, leave confirm blank. Click Next.",
+          "expected": "Error shown on confirm password field. Navigation blocked."
+        },
+        {
+          "id": "TC-S-108",
+          "severity": "P1",
+          "scenario": "Invalid email format rejected",
+          "steps": "Enter 'notanemail' in email field. Click Next.",
+          "expected": "Email validation error shown. Navigation blocked."
+        },
+        {
+          "id": "TC-S-109",
+          "severity": "P0",
+          "scenario": "Mismatched passwords blocked",
+          "steps": "Enter 'Password1!' in password, 'Different1!' in confirm. Click Next.",
+          "expected": "Error shown indicating passwords do not match. Navigation blocked."
+        },
+        {
+          "id": "TC-S-110",
+          "severity": "P1",
+          "scenario": "Weak password rejected",
+          "steps": "Enter '12345' as password. Click Next.",
+          "expected": "Password strength error shown. Navigation blocked."
+        },
+        {
+          "id": "TC-S-111",
+          "severity": "P2",
+          "scenario": "Password toggle shows/hides value",
+          "steps": "Click eye icon on password field.",
+          "expected": "Password text becomes visible. Click again — text is masked."
+        },
+        {
+          "id": "TC-S-112",
+          "severity": "P1",
+          "scenario": "All fields cleared retain errors simultaneously",
+          "steps": "Click Next with all fields empty.",
+          "expected": "All five fields show error state simultaneously."
+        }
+      ]
+    },
+    {
+      "id": "TC-S-200",
+      "name": "Step 2: Application",
+      "test_cases": [
+        {
+          "id": "TC-S-201",
+          "severity": "P0",
+          "scenario": "Valid app name and URL advance to step 3",
+          "steps": "Enter app name 'MyPlanner', base URL 'https://planner.example.com'. Click Next.",
+          "expected": "Step 3 becomes active."
+        },
+        {
+          "id": "TC-S-202",
+          "severity": "P2",
+          "scenario": "App name accepts HTML formatting",
+          "steps": "Enter 'Resource<b>Planner</b>' as app name. Click Next.",
+          "expected": "Advances without error."
+        },
+        {
+          "id": "TC-S-203",
+          "severity": "P2",
+          "scenario": "App name default is pre-populated",
+          "steps": "Load step 2 without changing anything.",
+          "expected": "App name field is pre-filled with default value (Resource<b>Planner</b>)."
+        },
+        {
+          "id": "TC-S-204",
+          "severity": "P0",
+          "scenario": "Empty app name blocked",
+          "steps": "Clear app name. Click Next.",
+          "expected": "Error on app name field. Navigation blocked."
+        },
+        {
+          "id": "TC-S-205",
+          "severity": "P0",
+          "scenario": "Empty base URL blocked",
+          "steps": "Clear base URL. Click Next.",
+          "expected": "Error on base URL field. Navigation blocked."
+        },
+        {
+          "id": "TC-S-206",
+          "severity": "P1",
+          "scenario": "Invalid URL format rejected",
+          "steps": "Enter 'not-a-url' as base URL. Click Next.",
+          "expected": "URL validation error shown. Navigation blocked."
+        },
+        {
+          "id": "TC-S-207",
+          "severity": "P1",
+          "scenario": "URL with trailing slash rejected",
+          "steps": "Enter 'https://example.com/' (trailing slash). Click Next.",
+          "expected": "Validation error about trailing slash shown. Navigation blocked."
+        },
+        {
+          "id": "TC-S-208",
+          "severity": "P2",
+          "scenario": "App name exceeding 50 chars blocked",
+          "steps": "Enter 51-character app name. Click Next.",
+          "expected": "Max-length error shown or input capped at 50 chars."
+        },
+        {
+          "id": "TC-S-209",
+          "severity": "P2",
+          "scenario": "Character counter updates as user types in app name",
+          "steps": "Click into the app name field and type characters one by one.",
+          "expected": "Counter below the field increments with each character typed and decrements on delete. Reflects remaining or used character count accurately."
+        },
+        {
+          "id": "TC-S-210",
+          "severity": "P1",
+          "scenario": "Unsupported HTML tag in app name is rejected",
+          "steps": "Enter an app name containing an unsupported tag such as '<div>Planner</div>' or '<script>x</script>'. Click Next.",
+          "expected": "Validation error shown indicating the tag is not permitted. Navigation blocked."
+        },
+        {
+          "id": "TC-S-211",
+          "severity": "P1",
+          "scenario": "HTML opening tag without matching closing tag is rejected",
+          "steps": "Enter 'Resource<b>Planner' (opening <b> tag with no closing </b>). Click Next.",
+          "expected": "Validation error shown indicating the tag must have a matching closing tag. Navigation blocked."
+        }
+      ]
+    },
+    {
+      "id": "TC-S-300",
+      "name": "Step 3: Infrastructure (Local)",
+      "test_cases": [
+        {
+          "id": "TC-S-301",
+          "severity": "P1",
+          "scenario": "Local deployment shows Fernet key field only",
+          "steps": "Select LOCAL.",
+          "expected": "Only the Fernet key field is visible. AWS fields are hidden."
+        },
+        {
+          "id": "TC-S-302",
+          "severity": "P0",
+          "scenario": "Generate Key button produces a valid key",
+          "steps": "Click 'Generate Key'.",
+          "expected": "Fernet key field is populated with a base64-encoded key. No error."
+        },
+        {
+          "id": "TC-S-303",
+          "severity": "P0",
+          "scenario": "Manually entered valid Fernet key accepted",
+          "steps": "Enter a valid Fernet key manually. Click Next.",
+          "expected": "Advances to step 4."
+        },
+        {
+          "id": "TC-S-304",
+          "severity": "P0",
+          "scenario": "Generated key allows advancing",
+          "steps": "Click 'Generate Key' then click Next.",
+          "expected": "Advances to step 4."
+        },
+        {
+          "id": "TC-S-305",
+          "severity": "P0",
+          "scenario": "Empty Fernet key blocked",
+          "steps": "Leave key field empty. Click Next.",
+          "expected": "Error shown. Navigation blocked."
+        },
+        {
+          "id": "TC-S-306",
+          "severity": "P1",
+          "scenario": "Invalid Fernet key string rejected",
+          "steps": "Enter 'notavalidkey' as Fernet key. Click Next.",
+          "expected": "Validation error shown. Navigation blocked."
+        },
+        {
+          "id": "TC-S-307",
+          "severity": "P1",
+          "scenario": "Switching from AWS back to LOCAL hides AWS fields",
+          "steps": "Select AWS, then switch back to LOCAL.",
+          "expected": "AWS fields collapse and become hidden. Local fields shown."
+        },
+        {
+          "id": "TC-S-308",
+          "severity": "P2",
+          "scenario": "Generate Key button shows loading state during request",
+          "steps": "Click 'Generate Key'.",
+          "expected": "Button becomes disabled/shows spinner while request in flight. Re-enables on completion."
+        }
+      ]
+    },
+    {
+      "id": "TC-S-310",
+      "name": "Step 3: Infrastructure (AWS)",
+      "test_cases": [
+        {
+          "id": "TC-S-311",
+          "severity": "P1",
+          "scenario": "AWS deployment shows region and prefix fields",
+          "steps": "Select AWS.",
+          "expected": "AWS region, secrets prefix, DB secret name fields are visible. Fernet key field is hidden."
+        },
+        {
+          "id": "TC-S-312",
+          "severity": "P1",
+          "scenario": "DB secret name auto-derives from secrets prefix",
+          "steps": "Enter '/resourceplanner' as prefix.",
+          "expected": "DB secret name auto-fills to '/resourceplanner/db'."
+        },
+        {
+          "id": "TC-S-313",
+          "severity": "P1",
+          "scenario": "IAM Role mode hides access key fields",
+          "steps": "Select AWS, choose 'IAM Role'.",
+          "expected": "Access Key ID and Secret Access Key fields are hidden."
+        },
+        {
+          "id": "TC-S-314",
+          "severity": "P1",
+          "scenario": "Access Key mode shows credential fields and warning",
+          "steps": "Select AWS, choose 'Access Key / Secret Key'.",
+          "expected": "Access Key ID and Secret Access Key fields appear. Warning about plaintext storage shown."
+        },
+        {
+          "id": "TC-S-315",
+          "severity": "P0",
+          "scenario": "Valid AWS config with IAM role advances",
+          "steps": "Enter valid region and prefix, select IAM Role. Click Next.",
+          "expected": "Advances to step 4."
+        },
+        {
+          "id": "TC-S-316",
+          "severity": "P0",
+          "scenario": "Valid AWS config with access keys advances",
+          "steps": "Enter valid region, prefix, access key ID (20 chars), secret key (40 chars). Click Next.",
+          "expected": "Advances to step 4."
+        },
+        {
+          "id": "TC-S-317",
+          "severity": "P0",
+          "scenario": "Empty region blocked",
+          "steps": "Leave region blank. Click Next.",
+          "expected": "Error on region field. Navigation blocked."
+        },
+        {
+          "id": "TC-S-318",
+          "severity": "P1",
+          "scenario": "Invalid region format rejected",
+          "steps": "Enter 'us-east' (invalid format). Click Next.",
+          "expected": "Region format error shown (must match xx-xxxx-#). Navigation blocked."
+        },
+        {
+          "id": "TC-S-319",
+          "severity": "P0",
+          "scenario": "Empty secrets prefix blocked",
+          "steps": "Leave prefix blank. Click Next.",
+          "expected": "Error on prefix field. Navigation blocked."
+        },
+        {
+          "id": "TC-S-320",
+          "severity": "P1",
+          "scenario": "Access key ID invalid length rejected",
+          "steps": "Enter 10-char access key ID. Click Next.",
+          "expected": "Validation error shown (must be 20 uppercase alphanumeric chars). Navigation blocked."
+        },
+        {
+          "id": "TC-S-321",
+          "severity": "P1",
+          "scenario": "Access key ID lowercase rejected",
+          "steps": "Enter lowercase 20-char value. Click Next.",
+          "expected": "Validation error shown. Navigation blocked."
+        },
+        {
+          "id": "TC-S-322",
+          "severity": "P1",
+          "scenario": "Secret access key invalid length rejected",
+          "steps": "Enter 30-char secret key. Click Next.",
+          "expected": "Validation error shown (must be 40 chars). Navigation blocked."
+        }
+      ]
+    },
+    {
+      "id": "TC-S-400",
+      "name": "Step 4: Database (SQLite)",
+      "test_cases": [
+        {
+          "id": "TC-S-401",
+          "severity": "P1",
+          "scenario": "SQLite selected shows no extra fields",
+          "steps": "Select SQLite.",
+          "expected": "No host/port/credentials fields shown. Info message about dev-only usage displayed."
+        },
+        {
+          "id": "TC-S-402",
+          "severity": "P0",
+          "scenario": "SQLite selection advances without any extra input",
+          "steps": "Select SQLite. Click Next.",
+          "expected": "Advances to step 5."
+        },
+        {
+          "id": "TC-S-403",
+          "severity": "P1",
+          "scenario": "Switching from PostgreSQL to SQLite hides PG fields",
+          "steps": "Select PostgreSQL, fill fields, then switch to SQLite.",
+          "expected": "PostgreSQL fields collapse. SQLite info message shown. Test Connection button hidden."
+        }
+      ]
+    },
+    {
+      "id": "TC-S-410",
+      "name": "Step 4: Database (PostgreSQL)",
+      "test_cases": [
+        {
+          "id": "TC-S-411",
+          "severity": "P1",
+          "scenario": "PostgreSQL shows all required fields",
+          "steps": "Select PostgreSQL.",
+          "expected": "Host, port, database name, username, password, confirm password and Test Connection button all visible."
+        },
+        {
+          "id": "TC-S-412",
+          "severity": "P2",
+          "scenario": "Port defaults to 5432",
+          "steps": "Select PostgreSQL.",
+          "expected": "Port field pre-populated with 5432."
+        },
+        {
+          "id": "TC-S-413",
+          "severity": "P0",
+          "scenario": "Successful DB connection test shows success toast",
+          "steps": "Enter valid PG credentials. Click 'Test Connection'.",
+          "expected": "Toast message 'Connection successful' appears."
+        },
+        {
+          "id": "TC-S-414",
+          "severity": "P0",
+          "scenario": "Valid PostgreSQL config advances after successful test",
+          "steps": "Complete all fields. Click Next.",
+          "expected": "Advances to step 5."
+        },
+        {
+          "id": "TC-S-415",
+          "severity": "P2",
+          "scenario": "Password field has eye-icon toggle",
+          "steps": "Check password field.",
+          "expected": "Eye icon present. Clicking reveals/masks password."
+        },
+        {
+          "id": "TC-S-416",
+          "severity": "P0",
+          "scenario": "Empty host blocked",
+          "steps": "Leave host blank. Click Next.",
+          "expected": "Error on host field. Navigation blocked."
+        },
+        {
+          "id": "TC-S-417",
+          "severity": "P0",
+          "scenario": "Empty database name blocked",
+          "steps": "Leave database name blank. Click Next.",
+          "expected": "Error on database name. Navigation blocked."
+        },
+        {
+          "id": "TC-S-418",
+          "severity": "P0",
+          "scenario": "Empty username blocked",
+          "steps": "Leave username blank. Click Next.",
+          "expected": "Error on username. Navigation blocked."
+        },
+        {
+          "id": "TC-S-419",
+          "severity": "P0",
+          "scenario": "Empty password blocked",
+          "steps": "Leave password blank. Click Next.",
+          "expected": "Error on password. Navigation blocked."
+        },
+        {
+          "id": "TC-S-420",
+          "severity": "P0",
+          "scenario": "Mismatched passwords blocked",
+          "steps": "Enter different values in password and confirm. Click Next.",
+          "expected": "Error indicating mismatch. Navigation blocked."
+        },
+        {
+          "id": "TC-S-421",
+          "severity": "P1",
+          "scenario": "Port outside 1-65535 rejected",
+          "steps": "Enter 0 as port. Click Next.",
+          "expected": "Validation error on port."
+        },
+        {
+          "id": "TC-S-422",
+          "severity": "P1",
+          "scenario": "Failed DB connection shows error message",
+          "steps": "Enter incorrect credentials. Click 'Test Connection'.",
+          "expected": "Error message shown with failure detail. Toast or inline error indicates connection failure."
+        }
+      ]
+    },
+    {
+      "id": "TC-S-500",
+      "name": "Step 5: Authentication (Classic)",
+      "test_cases": [
+        {
+          "id": "TC-S-501",
+          "severity": "P1",
+          "scenario": "Classic auth shows only self-registration toggle",
+          "steps": "Select Classic.",
+          "expected": "Only self-registration checkbox visible. No SAML or OAuth fields shown."
+        },
+        {
+          "id": "TC-S-502",
+          "severity": "P2",
+          "scenario": "Self-registration enabled by default",
+          "steps": "Select Classic and observe checkbox.",
+          "expected": "Checkbox is checked by default."
+        },
+        {
+          "id": "TC-S-503",
+          "severity": "P0",
+          "scenario": "Disabling self-registration advances",
+          "steps": "Uncheck self-registration. Click Next.",
+          "expected": "Advances to step 6."
+        },
+        {
+          "id": "TC-S-504",
+          "severity": "P0",
+          "scenario": "Classic auth with self-registration advances",
+          "steps": "Leave checkbox checked. Click Next.",
+          "expected": "Advances to step 6."
+        }
+      ]
+    },
+    {
+      "id": "TC-S-510",
+      "name": "Step 5: Authentication (SAML)",
+      "test_cases": [
+        {
+          "id": "TC-S-511",
+          "severity": "P1",
+          "scenario": "SAML fields appear when SAML selected",
+          "steps": "Select SAML 2.0.",
+          "expected": "Provider name, IdP Entity ID, IdP SSO URL, X.509 cert, SP Entity ID, ACS URL fields shown."
+        },
+        {
+          "id": "TC-S-512",
+          "severity": "P1",
+          "scenario": "SP entity ID auto-populated from base URL",
+          "steps": "Observe SP Entity ID field after selecting SAML.",
+          "expected": "Field is pre-filled with base URL entered in Step 2."
+        },
+        {
+          "id": "TC-S-513",
+          "severity": "P2",
+          "scenario": "Info panel shows auto-generated SP URLs",
+          "steps": "Observe info panel after selecting SAML.",
+          "expected": "SP Entity ID, ACS URL, and SP Metadata URL displayed using base URL."
+        },
+        {
+          "id": "TC-S-514",
+          "severity": "P1",
+          "scenario": "ACS URL auto-generated as {base_url}/saml/acs/",
+          "steps": "Observe ACS URL field.",
+          "expected": "Field pre-filled as {base_url}/saml/acs/."
+        },
+        {
+          "id": "TC-S-515",
+          "severity": "P0",
+          "scenario": "Valid SAML config advances",
+          "steps": "Fill all required fields with valid values. Click Next.",
+          "expected": "Advances to step 6."
+        },
+        {
+          "id": "TC-S-516",
+          "severity": "P0",
+          "scenario": "Empty provider name blocked",
+          "steps": "Leave provider name blank. Click Next.",
+          "expected": "Error on provider name. Navigation blocked."
+        },
+        {
+          "id": "TC-S-517",
+          "severity": "P0",
+          "scenario": "Empty IdP Entity ID blocked",
+          "steps": "Leave IdP Entity ID blank. Click Next.",
+          "expected": "Error shown. Navigation blocked."
+        },
+        {
+          "id": "TC-S-518",
+          "severity": "P0",
+          "scenario": "Empty IdP SSO URL blocked",
+          "steps": "Leave IdP SSO URL blank. Click Next.",
+          "expected": "Error shown. Navigation blocked."
+        },
+        {
+          "id": "TC-S-519",
+          "severity": "P0",
+          "scenario": "Empty X.509 certificate blocked",
+          "steps": "Leave certificate blank. Click Next.",
+          "expected": "Error shown. Navigation blocked."
+        },
+        {
+          "id": "TC-S-520",
+          "severity": "P1",
+          "scenario": "Invalid IdP SSO URL rejected",
+          "steps": "Enter 'not-a-url' for IdP SSO URL. Click Next.",
+          "expected": "URL validation error shown."
+        },
+        {
+          "id": "TC-S-521",
+          "severity": "P1",
+          "scenario": "X.509 cert with BEGIN/END markers rejected",
+          "steps": "Paste a cert with '-----BEGIN CERTIFICATE-----' header.",
+          "expected": "Validation error asking for base64 body only."
+        },
+        {
+          "id": "TC-S-522",
+          "severity": "P1",
+          "scenario": "Invalid base64 in X.509 cert rejected",
+          "steps": "Enter '!!!invalid!!!' as certificate. Click Next.",
+          "expected": "Validation error shown."
+        },
+        {
+          "id": "TC-S-523",
+          "severity": "P2",
+          "scenario": "SP Entity ID can be manually overridden",
+          "steps": "Edit the SP Entity ID field.",
+          "expected": "Field accepts manual input (unlocks from auto-populate)."
+        },
+        {
+          "id": "TC-S-524",
+          "severity": "P1",
+          "scenario": "Classic fields hidden when SAML selected",
+          "steps": "Select SAML after previously viewing Classic.",
+          "expected": "Self-registration checkbox not visible."
+        },
+        {
+          "id": "TC-S-537",
+          "severity": "P1",
+          "scenario": "Test SAML Connection button is visible when SAML selected",
+          "steps": "Select SAML 2.0 as the authentication type.",
+          "expected": "A 'Test Connection' button is visible below the SAML configuration fields."
+        },
+        {
+          "id": "TC-S-538",
+          "severity": "P0",
+          "scenario": "Successful SAML connection test shows success toast",
+          "steps": "Fill in a reachable IdP SSO URL and a valid non-expired X.509 certificate. Click 'Test Connection'.",
+          "expected": "Success toast message appears confirming the IdP is reachable and the certificate is valid."
+        },
+        {
+          "id": "TC-S-539",
+          "severity": "P0",
+          "scenario": "SAML test fails with error when IdP SSO URL is unreachable",
+          "steps": "Enter an unreachable URL (e.g. 'https://does-not-exist.example.com/sso') as IdP SSO URL. Click 'Test Connection'.",
+          "expected": "Error message shown indicating the IdP SSO URL could not be reached. No success toast."
+        },
+        {
+          "id": "TC-S-540",
+          "severity": "P1",
+          "scenario": "SAML test fails with expiry error when X.509 certificate is expired",
+          "steps": "Enter a reachable IdP SSO URL and paste an expired X.509 certificate (DER base64, no headers). Click 'Test Connection'.",
+          "expected": "Error message shown indicating the certificate has expired, including the expiry date. Navigation not blocked — user can correct and retry."
+        }
+      ]
+    },
+    {
+      "id": "TC-S-520",
+      "name": "Step 5: Authentication (OAuth)",
+      "test_cases": [
+        {
+          "id": "TC-S-525",
+          "severity": "P1",
+          "scenario": "OAuth fields appear when OAuth selected",
+          "steps": "Select OAuth / OpenID Connect.",
+          "expected": "Provider name, Client ID, Client Secret, Auth endpoint, Token endpoint, Userinfo endpoint, Scope fields shown."
+        },
+        {
+          "id": "TC-S-526",
+          "severity": "P1",
+          "scenario": "Callback URL info panel auto-populated",
+          "steps": "Observe info panel after selecting OAuth.",
+          "expected": "Callback URL shown as {base_url}/sso/oauth/callback."
+        },
+        {
+          "id": "TC-S-527",
+          "severity": "P2",
+          "scenario": "Scope field defaults to 'openid email profile'",
+          "steps": "Observe scope field.",
+          "expected": "Field pre-filled with 'openid email profile'."
+        },
+        {
+          "id": "TC-S-528",
+          "severity": "P2",
+          "scenario": "Client ID and Secret fields have eye-icon toggle",
+          "steps": "Check Client ID and Secret fields.",
+          "expected": "Eye icons present. Clicking reveals/masks values."
+        },
+        {
+          "id": "TC-S-529",
+          "severity": "P1",
+          "scenario": "Userinfo endpoint can be left blank",
+          "steps": "Fill all required fields, leave userinfo endpoint blank. Click Next.",
+          "expected": "Advances to step 6."
+        },
+        {
+          "id": "TC-S-530",
+          "severity": "P0",
+          "scenario": "Valid OAuth config advances",
+          "steps": "Fill all required fields. Click Next.",
+          "expected": "Advances to step 6."
+        },
+        {
+          "id": "TC-S-531",
+          "severity": "P0",
+          "scenario": "Empty provider name blocked",
+          "steps": "Leave provider name blank. Click Next.",
+          "expected": "Error shown. Navigation blocked."
+        },
+        {
+          "id": "TC-S-532",
+          "severity": "P0",
+          "scenario": "Empty Client ID blocked",
+          "steps": "Leave Client ID blank. Click Next.",
+          "expected": "Error shown. Navigation blocked."
+        },
+        {
+          "id": "TC-S-533",
+          "severity": "P0",
+          "scenario": "Empty Client Secret blocked",
+          "steps": "Leave Client Secret blank. Click Next.",
+          "expected": "Error shown. Navigation blocked."
+        },
+        {
+          "id": "TC-S-534",
+          "severity": "P0",
+          "scenario": "Empty Auth endpoint blocked",
+          "steps": "Leave Auth endpoint blank. Click Next.",
+          "expected": "Error shown. Navigation blocked."
+        },
+        {
+          "id": "TC-S-535",
+          "severity": "P0",
+          "scenario": "Empty Token endpoint blocked",
+          "steps": "Leave Token endpoint blank. Click Next.",
+          "expected": "Error shown. Navigation blocked."
+        },
+        {
+          "id": "TC-S-536",
+          "severity": "P1",
+          "scenario": "Invalid Auth endpoint URL rejected",
+          "steps": "Enter 'not-a-url' for Auth endpoint. Click Next.",
+          "expected": "URL validation error shown."
+        },
+        {
+          "id": "TC-S-541",
+          "severity": "P1",
+          "scenario": "Test OAuth Connection button is visible when OAuth selected",
+          "steps": "Select OAuth / OpenID Connect as the authentication type.",
+          "expected": "A 'Test Connection' button is visible below the OAuth configuration fields."
+        },
+        {
+          "id": "TC-S-542",
+          "severity": "P0",
+          "scenario": "Successful OAuth connection test shows success toast",
+          "steps": "Fill in valid Client ID, Client Secret, reachable Auth endpoint and Token endpoint. Click 'Test Connection'.",
+          "expected": "Success toast message appears confirming the OAuth endpoints are reachable."
+        },
+        {
+          "id": "TC-S-543",
+          "severity": "P0",
+          "scenario": "OAuth test fails with specific error when client credentials are invalid",
+          "steps": "Fill in an incorrect Client ID and Client Secret against a real reachable token endpoint. Click 'Test Connection'.",
+          "expected": "Error message shown indicating the client credentials were rejected. Distinct from a network error."
+        },
+        {
+          "id": "TC-S-544",
+          "severity": "P1",
+          "scenario": "OAuth test fails with error when token endpoint is unreachable",
+          "steps": "Enter an unreachable URL (e.g. 'https://does-not-exist.example.com/token') as the Token endpoint. Click 'Test Connection'.",
+          "expected": "Error message shown indicating the token endpoint could not be reached. No success toast."
+        }
+      ]
+    },
+    {
+      "id": "TC-S-600",
+      "name": "Step 6: Storage",
+      "test_cases": [
+        {
+          "id": "TC-S-601",
+          "severity": "P1",
+          "scenario": "Database storage shows no extra fields",
+          "steps": "Select Database.",
+          "expected": "Info message shown. No path or ARN fields visible."
+        },
+        {
+          "id": "TC-S-602",
+          "severity": "P0",
+          "scenario": "Database storage advances without extra input",
+          "steps": "Select Database. Click Next.",
+          "expected": "Advances to step 7."
+        },
+        {
+          "id": "TC-S-603",
+          "severity": "P1",
+          "scenario": "Local filesystem shows path field",
+          "steps": "Select Local Filesystem.",
+          "expected": "Storage path field visible."
+        },
+        {
+          "id": "TC-S-604",
+          "severity": "P0",
+          "scenario": "Valid local filesystem path advances",
+          "steps": "Select Local Filesystem. Enter '/var/resourceplanner/media/'. Click Next.",
+          "expected": "Advances to step 7."
+        },
+        {
+          "id": "TC-S-605",
+          "severity": "P1",
+          "scenario": "S3 option only visible when AWS infra selected",
+          "steps": "Set infrastructure to LOCAL in step 3, then view step 6.",
+          "expected": "S3 storage option is not shown."
+        },
+        {
+          "id": "TC-S-606",
+          "severity": "P1",
+          "scenario": "S3 shows bucket ARN field",
+          "steps": "Set infrastructure to AWS. Navigate to step 6. Select Amazon S3.",
+          "expected": "S3 bucket ARN field visible."
+        },
+        {
+          "id": "TC-S-607",
+          "severity": "P0",
+          "scenario": "Valid S3 ARN advances",
+          "steps": "Enter 'arn:aws:s3:::my-bucket'. Click Next.",
+          "expected": "Advances to step 7."
+        },
+        {
+          "id": "TC-S-608",
+          "severity": "P0",
+          "scenario": "Empty local filesystem path blocked",
+          "steps": "Select Local Filesystem, leave path blank. Click Next.",
+          "expected": "Error on path field. Navigation blocked."
+        },
+        {
+          "id": "TC-S-609",
+          "severity": "P1",
+          "scenario": "Invalid S3 ARN format rejected",
+          "steps": "Select Amazon S3. Enter 'invalid-arn'. Click Next.",
+          "expected": "ARN format validation error shown."
+        },
+        {
+          "id": "TC-S-610",
+          "severity": "P0",
+          "scenario": "Empty S3 ARN blocked",
+          "steps": "Select Amazon S3, leave ARN blank. Click Next.",
+          "expected": "Error shown. Navigation blocked."
+        }
+      ]
+    },
+    {
+      "id": "TC-S-700",
+      "name": "Step 7: Email (Console)",
+      "test_cases": [
+        {
+          "id": "TC-S-701",
+          "severity": "P1",
+          "scenario": "Console email shows info message only",
+          "steps": "Select Console.",
+          "expected": "Only From Email and From Name fields plus info message visible. No SMTP fields shown."
+        },
+        {
+          "id": "TC-S-702",
+          "severity": "P0",
+          "scenario": "Console email advances with from address and name",
+          "steps": "Select Console. Enter from email and from name. Click Next.",
+          "expected": "Advances to step 8."
+        },
+        {
+          "id": "TC-S-703",
+          "severity": "P0",
+          "scenario": "From email required even for console",
+          "steps": "Select Console. Clear from email. Click Next.",
+          "expected": "Error on from email. Navigation blocked."
+        },
+        {
+          "id": "TC-S-704",
+          "severity": "P0",
+          "scenario": "From name required even for console",
+          "steps": "Select Console. Clear from name. Click Next.",
+          "expected": "Error on from name. Navigation blocked."
+        }
+      ]
+    },
+    {
+      "id": "TC-S-710",
+      "name": "Step 7: Email (SMTP)",
+      "test_cases": [
+        {
+          "id": "TC-S-711",
+          "severity": "P1",
+          "scenario": "SMTP fields appear when SMTP selected",
+          "steps": "Select SMTP.",
+          "expected": "Host, encryption, port, SMTP auth toggle fields shown. Test Email button visible."
+        },
+        {
+          "id": "TC-S-712",
+          "severity": "P2",
+          "scenario": "Encryption STARTTLS auto-sets port to 587",
+          "steps": "Select STARTTLS encryption.",
+          "expected": "Port field auto-fills to 587."
+        },
+        {
+          "id": "TC-S-713",
+          "severity": "P2",
+          "scenario": "Encryption SSL/TLS auto-sets port to 465",
+          "steps": "Select SSL/TLS encryption.",
+          "expected": "Port field auto-fills to 465."
+        },
+        {
+          "id": "TC-S-714",
+          "severity": "P2",
+          "scenario": "Encryption none auto-sets port to 25",
+          "steps": "Select None encryption.",
+          "expected": "Port field auto-fills to 25."
+        },
+        {
+          "id": "TC-S-715",
+          "severity": "P2",
+          "scenario": "Manually editing port prevents auto-adjustment",
+          "steps": "Select STARTTLS (port becomes 587). Edit port to 2525. Switch encryption to SSL/TLS.",
+          "expected": "Port remains 2525 — auto-adjust disabled after manual edit."
+        },
+        {
+          "id": "TC-S-716",
+          "severity": "P1",
+          "scenario": "SMTP auth toggle shows credential fields",
+          "steps": "Enable SMTP authentication toggle.",
+          "expected": "Username, password, confirm password fields appear."
+        },
+        {
+          "id": "TC-S-717",
+          "severity": "P1",
+          "scenario": "SMTP auth disabled hides credential fields",
+          "steps": "Disable SMTP authentication toggle.",
+          "expected": "Username, password, confirm password fields hidden."
+        },
+        {
+          "id": "TC-S-718",
+          "severity": "P0",
+          "scenario": "Successful test email shows success toast",
+          "steps": "Enter valid SMTP config with reachable server. Click 'Send Test Email'.",
+          "expected": "Toast 'Test email sent successfully' shown."
+        },
+        {
+          "id": "TC-S-719",
+          "severity": "P0",
+          "scenario": "Valid SMTP config advances",
+          "steps": "Fill all required fields. Click Next.",
+          "expected": "Advances to step 8."
+        },
+        {
+          "id": "TC-S-720",
+          "severity": "P0",
+          "scenario": "Empty SMTP host blocked",
+          "steps": "Leave host blank. Click Next.",
+          "expected": "Error on host field. Navigation blocked."
+        },
+        {
+          "id": "TC-S-721",
+          "severity": "P1",
+          "scenario": "Port outside 1-65535 rejected",
+          "steps": "Enter 0 as port. Click Next.",
+          "expected": "Validation error on port."
+        },
+        {
+          "id": "TC-S-722",
+          "severity": "P0",
+          "scenario": "SMTP auth passwords must match",
+          "steps": "Enable auth. Enter different password and confirm. Click Next.",
+          "expected": "Password mismatch error shown. Navigation blocked."
+        },
+        {
+          "id": "TC-S-723",
+          "severity": "P1",
+          "scenario": "Invalid from email format rejected",
+          "steps": "Enter 'notanemail' in from email. Click Next.",
+          "expected": "Email format error shown."
+        },
+        {
+          "id": "TC-S-724",
+          "severity": "P1",
+          "scenario": "Failed test email shows error message",
+          "steps": "Enter unreachable SMTP server. Click 'Send Test Email'.",
+          "expected": "Error message shown with failure detail."
+        },
+        {
+          "id": "TC-S-725",
+          "severity": "P2",
+          "scenario": "Test Email button shows loading state during request",
+          "steps": "Click 'Send Test Email'.",
+          "expected": "Button becomes disabled/shows spinner. Re-enables when request completes."
+        },
+        {
+          "id": "TC-S-726",
+          "severity": "P0",
+          "scenario": "SMTP auth empty username blocked",
+          "steps": "Enable auth. Leave username blank. Click Next.",
+          "expected": "Error on username. Navigation blocked."
+        }
+      ]
+    },
+    {
+      "id": "TC-S-800",
+      "name": "Step 8: Logging",
+      "test_cases": [
+        {
+          "id": "TC-S-801",
+          "severity": "P2",
+          "scenario": "Log name field defaults to 'application'",
+          "steps": "Observe log name field on step 8.",
+          "expected": "Pre-filled with 'application'."
+        },
+        {
+          "id": "TC-S-802",
+          "severity": "P1",
+          "scenario": "Local log destination shows path field",
+          "steps": "Select Local.",
+          "expected": "Log directory path field visible."
+        },
+        {
+          "id": "TC-S-803",
+          "severity": "P1",
+          "scenario": "S3 log destination only shown for AWS infra",
+          "steps": "Set infrastructure to LOCAL, navigate to step 8.",
+          "expected": "S3 log destination not shown as an option."
+        },
+        {
+          "id": "TC-S-804",
+          "severity": "P1",
+          "scenario": "S3 log destination shows bucket ARN field",
+          "steps": "Set infrastructure to AWS. Select Amazon S3 as log destination.",
+          "expected": "S3 bucket ARN field visible."
+        },
+        {
+          "id": "TC-S-805",
+          "severity": "P1",
+          "scenario": "CloudWatch option only shown for AWS infra",
+          "steps": "Set infrastructure to LOCAL, navigate to step 8.",
+          "expected": "CloudWatch log destination not shown."
+        },
+        {
+          "id": "TC-S-806",
+          "severity": "P1",
+          "scenario": "CloudWatch log destination shows no extra fields",
+          "steps": "Set infrastructure to AWS. Select CloudWatch.",
+          "expected": "Info message shown. No extra fields. AWS creds inherited note shown."
+        },
+        {
+          "id": "TC-S-807",
+          "severity": "P2",
+          "scenario": "Log rotation none hides cleanup options",
+          "steps": "Select None for rotation.",
+          "expected": "Keep files count and days fields not shown."
+        },
+        {
+          "id": "TC-S-808",
+          "severity": "P2",
+          "scenario": "Log rotation daily shows cleanup options",
+          "steps": "Select Daily rotation.",
+          "expected": "Keep files (count) and keep files (days) fields appear."
+        },
+        {
+          "id": "TC-S-809",
+          "severity": "P2",
+          "scenario": "Log rotation size shows max size field",
+          "steps": "Select Size rotation.",
+          "expected": "Max size (MB) field appears. Keep files fields also appear."
+        },
+        {
+          "id": "TC-S-810",
+          "severity": "P0",
+          "scenario": "Valid local logging config submits wizard",
+          "steps": "Fill all required fields with valid local config. Click Finish.",
+          "expected": "Submission triggers. Progress modal appears."
+        },
+        {
+          "id": "TC-S-811",
+          "severity": "P0",
+          "scenario": "Empty log name blocked",
+          "steps": "Clear log name. Click Finish.",
+          "expected": "Error on log name field. Submission blocked."
+        },
+        {
+          "id": "TC-S-812",
+          "severity": "P0",
+          "scenario": "Empty log directory path blocked (local)",
+          "steps": "Select Local, leave path blank. Click Finish.",
+          "expected": "Error on path field. Submission blocked."
+        },
+        {
+          "id": "TC-S-813",
+          "severity": "P0",
+          "scenario": "Empty S3 ARN blocked",
+          "steps": "Select Amazon S3, leave ARN blank. Click Finish.",
+          "expected": "Error shown. Submission blocked."
+        },
+        {
+          "id": "TC-S-814",
+          "severity": "P1",
+          "scenario": "Invalid S3 ARN format rejected",
+          "steps": "Enter 'invalid-arn' for S3 bucket. Click Finish.",
+          "expected": "ARN format error shown."
+        },
+        {
+          "id": "TC-S-815",
+          "severity": "P0",
+          "scenario": "Size rotation empty max size blocked",
+          "steps": "Select Size rotation, leave max size blank. Click Finish.",
+          "expected": "Error on max size field."
+        },
+        {
+          "id": "TC-S-816",
+          "severity": "P1",
+          "scenario": "Size rotation zero or negative max size rejected",
+          "steps": "Enter 0 as max size. Click Finish.",
+          "expected": "Validation error (must be >= 1)."
+        }
+      ]
+    },
+    {
+      "id": "TC-S-900",
+      "name": "Wizard Navigation",
+      "test_cases": [
+        {
+          "id": "TC-S-901",
+          "severity": "P2",
+          "scenario": "Sidebar shows all 8 steps",
+          "steps": "Load wizard.",
+          "expected": "Sidebar navigation lists all 8 step names."
+        },
+        {
+          "id": "TC-S-902",
+          "severity": "P2",
+          "scenario": "Active step is highlighted in sidebar",
+          "steps": "Complete step 1 and advance.",
+          "expected": "Step 2 is highlighted as active in sidebar. Step 1 shows as completed."
+        },
+        {
+          "id": "TC-S-903",
+          "severity": "P2",
+          "scenario": "Finish button shown on last step instead of Next",
+          "steps": "Navigate to step 8.",
+          "expected": "Finish button shown. Next button not present."
+        },
+        {
+          "id": "TC-S-904",
+          "severity": "P1",
+          "scenario": "Back button returns to previous step with values retained",
+          "steps": "Advance to step 3. Click Back.",
+          "expected": "Step 2 becomes active. Previously entered values retained."
+        },
+        {
+          "id": "TC-S-905",
+          "severity": "P3",
+          "scenario": "Back button absent on step 1",
+          "steps": "View step 1.",
+          "expected": "No Back button visible."
+        },
+        {
+          "id": "TC-S-906",
+          "severity": "P1",
+          "scenario": "Cannot skip ahead by clicking future step in sidebar",
+          "steps": "On step 2, click step 5 in sidebar.",
+          "expected": "Navigation blocked. Cannot jump to step 5."
+        },
+        {
+          "id": "TC-S-907",
+          "severity": "P1",
+          "scenario": "Completed steps can be revisited from sidebar",
+          "steps": "Complete steps 1-4. Click step 2 in sidebar.",
+          "expected": "Step 2 becomes active. Values retained."
+        },
+        {
+          "id": "TC-S-908",
+          "severity": "P0",
+          "scenario": "Validation runs before advancing on any step",
+          "steps": "On any step, leave required fields empty and click Next.",
+          "expected": "Errors shown on all empty required fields. Step does not advance."
+        },
+        {
+          "id": "TC-S-909",
+          "severity": "P3",
+          "scenario": "Theme toggle works on wizard page",
+          "steps": "Click the theme toggle in header.",
+          "expected": "Theme switches between light and dark. Preference persists on page refresh."
+        },
+        {
+          "id": "TC-S-910",
+          "severity": "P2",
+          "scenario": "Responsive layout stacks on mobile",
+          "steps": "Resize browser to < 900px width.",
+          "expected": "Sidebar collapses or stacks above the step content. Wizard remains usable."
+        }
+      ]
+    },
+    {
+      "id": "TC-S-950",
+      "name": "Submission & Progress Modal",
+      "test_cases": [
+        {
+          "id": "TC-S-951",
+          "severity": "P0",
+          "scenario": "Clicking Finish triggers progress modal",
+          "steps": "Complete all steps. Click Finish.",
+          "expected": "Progress modal appears with 'Setting up Resource Planner...' message. Finish button becomes disabled."
+        },
+        {
+          "id": "TC-S-952",
+          "severity": "P1",
+          "scenario": "Progress modal shows step-by-step indicators",
+          "steps": "Observe modal during setup.",
+          "expected": "Each backend step (infra, database, logging, etc.) appears in modal and updates as it completes."
+        },
+        {
+          "id": "TC-S-953",
+          "severity": "P2",
+          "scenario": "Progress modal polls status until complete",
+          "steps": "Observe modal during setup.",
+          "expected": "Modal polling increments step status approximately every 600ms."
+        },
+        {
+          "id": "TC-S-954",
+          "severity": "P0",
+          "scenario": "Successful setup shows completion state",
+          "steps": "Setup completes successfully.",
+          "expected": "Modal shows 'Setup complete!' message. 'Go to Login' button appears."
+        },
+        {
+          "id": "TC-S-955",
+          "severity": "P0",
+          "scenario": "'Go to Login' redirects to login page",
+          "steps": "Click 'Go to Login' in modal.",
+          "expected": "Redirected to /login/."
+        },
+        {
+          "id": "TC-S-956",
+          "severity": "P0",
+          "scenario": "All configurations persisted — verify on login",
+          "steps": "Complete setup, login as admin.",
+          "expected": "Admin account works. App name configured correctly."
+        },
+        {
+          "id": "TC-S-957",
+          "severity": "P0",
+          "scenario": "Setup failure shows error state in modal",
+          "steps": "Cause a backend failure. Click Finish.",
+          "expected": "Modal shows 'Setup failed' with error message."
+        },
+        {
+          "id": "TC-S-958",
+          "severity": "P1",
+          "scenario": "Finish button re-enabled after failure",
+          "steps": "Observe Finish button after setup failure.",
+          "expected": "Finish button becomes enabled again, allowing retry."
+        },
+        {
+          "id": "TC-S-959",
+          "severity": "P1",
+          "scenario": "Setup can be retried after failure",
+          "steps": "Encounter failure. Correct the data. Click Finish again.",
+          "expected": "Setup re-runs. If successful, completes normally."
+        },
+        {
+          "id": "TC-S-960",
+          "severity": "P1",
+          "scenario": "Submitting twice simultaneously not possible",
+          "steps": "Click Finish. Immediately click Finish again.",
+          "expected": "Second click has no effect. Only one setup request in flight."
+        },
+        {
+          "id": "TC-S-961",
+          "severity": "P1",
+          "scenario": "Setup already complete returns conflict",
+          "steps": "Manually call POST /api/v1/setup/ after setup is complete.",
+          "expected": "API returns 409 Conflict. Frontend handles gracefully."
+        },
+        {
+          "id": "TC-S-962",
+          "severity": "P2",
+          "scenario": "Status endpoint returns correct phase names",
+          "steps": "Monitor network during submission.",
+          "expected": "GET /api/v1/setup/status/ returns phase keys: infra, database, logging, admin, app, auth, storage, email, complete."
+        }
+      ]
+    },
+    {
+      "id": "TC-S-990",
+      "name": "Non-functional",
+      "test_cases": [
+        {
+          "id": "TC-S-991",
+          "severity": "P2",
+          "scenario": "Wizard is usable at 1440px (desktop)",
+          "steps": "Open at 1440px width.",
+          "expected": "Two-column layout: sidebar left, step content right. All fields visible."
+        },
+        {
+          "id": "TC-S-992",
+          "severity": "P2",
+          "scenario": "Wizard is usable at 768px (tablet)",
+          "steps": "Resize to 768px.",
+          "expected": "Layout adapts. No content overflow. Navigation accessible."
+        },
+        {
+          "id": "TC-S-993",
+          "severity": "P2",
+          "scenario": "Wizard is usable at 375px (mobile)",
+          "steps": "Resize to 375px.",
+          "expected": "Single column. Step content stacks below navigation. Inputs are full-width. No horizontal scroll."
+        },
+        {
+          "id": "TC-S-994",
+          "severity": "P1",
+          "scenario": "All form fields have visible labels",
+          "steps": "Inspect each step.",
+          "expected": "Every input has a visible label. No inputs rely on placeholder text as the only label."
+        },
+        {
+          "id": "TC-S-995",
+          "severity": "P2",
+          "scenario": "Tab key navigates all interactive elements",
+          "steps": "On any step, press Tab repeatedly.",
+          "expected": "Focus moves through all fields, buttons, and links in logical order."
+        },
+        {
+          "id": "TC-S-996",
+          "severity": "P2",
+          "scenario": "Error messages are associated with their fields",
+          "steps": "Trigger validation errors. Inspect markup.",
+          "expected": "Error text is linked to the corresponding field (aria-describedby or similar)."
+        },
+        {
+          "id": "TC-S-997",
+          "severity": "P0",
+          "scenario": "Password fields do not expose values in page source",
+          "steps": "Inspect DOM with browser devtools on step 1.",
+          "expected": "Password input type='password'. Value not in page source or data attributes."
+        },
+        {
+          "id": "TC-S-998",
+          "severity": "P1",
+          "scenario": "Secret fields (Client Secret, Access Key) masked by default",
+          "steps": "Inspect step 3 and step 5 OAuth fields.",
+          "expected": "Fields are type password by default. Eye icon required to reveal."
+        },
+        {
+          "id": "TC-S-999",
+          "severity": "P1",
+          "scenario": "AWS Access Key warning shown when credentials entered",
+          "steps": "Select AWS, choose Access Key mode.",
+          "expected": "Warning text about plaintext .env storage is visible."
+        },
+        {
+          "id": "TC-S-9A0",
+          "severity": "P3",
+          "scenario": "Dark mode applies consistently to wizard",
+          "steps": "Toggle to dark mode. Navigate through all 8 steps.",
+          "expected": "All step content, fields, panels, sidebar use dark theme. No light-mode remnants."
+        },
+        {
+          "id": "TC-S-9A1",
+          "severity": "P3",
+          "scenario": "Theme preference persists across page refresh",
+          "steps": "Toggle to dark mode. Refresh the page.",
+          "expected": "Dark mode remains active."
+        },
+        {
+          "id": "TC-S-9A2",
+          "severity": "P3",
+          "scenario": "Wizard loads within 2 seconds on local dev",
+          "steps": "Open DevTools Network tab. Load /setup/.",
+          "expected": "DOM interactive within 2 seconds on local network."
+        },
+        {
+          "id": "TC-S-9A3",
+          "severity": "P2",
+          "scenario": "Test connection button completes within 5 seconds",
+          "steps": "Click 'Test Connection' with a reachable server.",
+          "expected": "Response received and feedback shown within 5 seconds."
+        }
+      ]
+    }
+  ]
+}

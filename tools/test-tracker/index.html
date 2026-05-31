@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Tracker — Resource Planner</title>
+    <link rel="stylesheet" href="/static/app.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="hdr">
+        <div class="hdr-brand">
+          <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle modules">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+          <svg class="hdr-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path
+              d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"
+            />
+          </svg>
+          <span class="hdr-title">Test Tracker</span>
+          <span class="hdr-pill">Resource Planner QA</span>
+        </div>
+        <div class="hdr-meta" id="hdr-meta"></div>
+      </header>
+
+      <div class="sidebar-overlay" id="sidebar-overlay"></div>
+      <div class="layout">
+        <aside class="sidebar" id="sidebar">
+          <div class="sidebar-lbl">Modules</div>
+          <div id="module-list">
+            <div class="spinner-wrap"><div class="spinner"></div></div>
+          </div>
+        </aside>
+
+        <main class="main" id="main">
+          <div class="welcome">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="8" y="8" width="48" height="48" rx="6" />
+              <path d="M20 26h24M20 32h16M20 38h20" />
+              <circle cx="46" cy="42" r="10" fill="var(--bg)" stroke="var(--accent)" />
+              <path d="M42 42l2.5 2.5L50 38" stroke="var(--pass)" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <h2>Select a module</h2>
+            <p>Pick a module from the sidebar to view and track test cases.</p>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- History drawer -->
+    <div class="drawer-overlay" id="drawer-overlay"></div>
+    <div class="drawer" id="history-drawer">
+      <div class="drawer-hdr">
+        <span class="drawer-title" id="drawer-tc-id"></span>
+        <button class="drawer-close" id="drawer-close">✕</button>
+      </div>
+      <div class="drawer-body" id="drawer-body"></div>
+    </div>
+
+    <!-- Add Custom Test Case modal -->
+    <div class="modal-overlay" id="modal-overlay">
+      <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-hdr">
+          <h2 class="modal-title" id="modal-title">Add Custom Test Case</h2>
+          <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-lbl" for="nc-id">ID <span class="form-opt">(optional — e.g. TC-CUSTOM-01)</span></label>
+            <input class="form-input" type="text" id="nc-id" placeholder="Leave blank if unknown" maxlength="60" />
+          </div>
+          <div class="form-group">
+            <label class="form-lbl" for="nc-scenario">Scenario <span class="form-req">*</span></label>
+            <textarea
+              class="form-textarea"
+              id="nc-scenario"
+              placeholder="Describe the test scenario you discovered…"
+              rows="3"
+              maxlength="1000"
+            ></textarea>
+            <span class="form-err" id="nc-scenario-err" hidden>Scenario is required.</span>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-lbl" for="nc-sev">Severity <span class="form-opt">(optional)</span></label>
+              <select class="form-select" id="nc-sev">
+                <option value="">— None —</option>
+                <option value="P0">P0 — Critical</option>
+                <option value="P1">P1 — High</option>
+                <option value="P2">P2 — Medium</option>
+                <option value="P3">P3 — Low</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-lbl" for="nc-status">Run Status <span class="form-opt">(optional)</span></label>
+              <select class="form-select" id="nc-status">
+                <option value="">Not Run</option>
+                <option value="pass">Pass</option>
+                <option value="fail">Fail</option>
+                <option value="blocked">Blocked</option>
+                <option value="skip">Skip</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-lbl" for="nc-notes">Notes <span class="form-opt">(optional)</span></label>
+            <textarea
+              class="form-textarea"
+              id="nc-notes"
+              placeholder="Any observations, steps, or context…"
+              rows="2"
+              maxlength="2000"
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn-modal-cancel" id="modal-cancel">Cancel</button>
+          <button class="btn-modal-submit" id="modal-submit">Add Test Case</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

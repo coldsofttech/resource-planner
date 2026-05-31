@@ -1,0 +1,241 @@
+{
+  "module": {
+    "slug": "login",
+    "name": "Login",
+    "sort_order": 0,
+    "parent": { "slug": "auth", "name": "Auth", "sort_order": 1 }
+  },
+  "suites": [
+    {
+      "id": "TC-LG-100",
+      "name": "Page Load & Access Control",
+      "test_cases": [
+        {
+          "id": "TC-LG-101",
+          "severity": "P0",
+          "scenario": "Login page loads for unauthenticated user",
+          "steps": "Ensure setup is complete. Log out if logged in. Navigate to /login/.",
+          "expected": "Page loads. Login form is visible. No errors in the browser console."
+        },
+        {
+          "id": "TC-LG-102",
+          "severity": "P0",
+          "scenario": "CSRF cookie is set on page load",
+          "steps": "Navigate to GET /login/. Open browser DevTools > Application > Cookies.",
+          "expected": "A csrftoken cookie is present after the page loads."
+        },
+        {
+          "id": "TC-LG-103",
+          "severity": "P1",
+          "scenario": "Authenticated user is redirected away from the login page",
+          "steps": "Log in successfully. Then navigate directly to /login/.",
+          "expected": "User is immediately redirected to /dashboard/. The login form is not shown."
+        },
+        {
+          "id": "TC-LG-104",
+          "severity": "P2",
+          "scenario": "App branding and name render correctly on the login page",
+          "steps": "Navigate to /login/ after setup with a custom app name.",
+          "expected": "The configured app name and branding appear correctly. Theme is applied."
+        }
+      ]
+    },
+    {
+      "id": "TC-LG-200",
+      "name": "Form Rendering",
+      "test_cases": [
+        {
+          "id": "TC-LG-201",
+          "severity": "P0",
+          "scenario": "Classic login form is visible when AUTH_MODE is classic",
+          "steps": "Configure AUTH_MODE=classic in setup. Navigate to /login/.",
+          "expected": "Email and password input fields and a Sign In button are visible."
+        },
+        {
+          "id": "TC-LG-202",
+          "severity": "P1",
+          "scenario": "Password field is masked by default",
+          "steps": "Navigate to /login/. Observe the password input field.",
+          "expected": "Password characters are obscured (input type=password)."
+        },
+        {
+          "id": "TC-LG-203",
+          "severity": "P1",
+          "scenario": "Forgot password link is present on the login page",
+          "steps": "Navigate to /login/.",
+          "expected": "A 'Forgot password?' or equivalent link is visible and navigates to /forgot-password/."
+        },
+        {
+          "id": "TC-LG-204",
+          "severity": "P2",
+          "scenario": "Register link is visible when self-registration is enabled",
+          "steps": "Configure AUTH_MODE=classic and ALLOW_REGISTRATION=true. Navigate to /login/.",
+          "expected": "A link to register (e.g. 'Create account') is visible on the login page."
+        }
+      ]
+    },
+    {
+      "id": "TC-LG-300",
+      "name": "Successful Login",
+      "test_cases": [
+        {
+          "id": "TC-LG-301",
+          "severity": "P0",
+          "scenario": "Valid credentials establish a session and redirect to the dashboard",
+          "steps": "Navigate to /login/. Enter the admin email and correct password. Click Sign In.",
+          "expected": "User is redirected to /dashboard/. Session cookie is set. User is authenticated."
+        },
+        {
+          "id": "TC-LG-302",
+          "severity": "P0",
+          "scenario": "Superuser can log in via classic login regardless of AUTH_MODE",
+          "steps": "Set AUTH_MODE to non-classic (e.g. oauth). Navigate to /login/ as the superuser created during setup. Enter correct credentials.",
+          "expected": "Superuser is authenticated and redirected successfully. No 403 error."
+        },
+        {
+          "id": "TC-LG-303",
+          "severity": "P1",
+          "scenario": "Session cookie is present after successful login",
+          "steps": "Complete a successful login. Open browser DevTools > Application > Cookies.",
+          "expected": "A session cookie (sessionid) is set for the domain."
+        },
+        {
+          "id": "TC-LG-304",
+          "severity": "P1",
+          "scenario": "Submit button shows loading state during request",
+          "steps": "Enter valid credentials. Click Sign In. Observe the button immediately after clicking.",
+          "expected": "Button is disabled and shows a loading indicator while the request is in-flight."
+        }
+      ]
+    },
+    {
+      "id": "TC-LG-400",
+      "name": "Failed Login States",
+      "test_cases": [
+        {
+          "id": "TC-LG-401",
+          "severity": "P0",
+          "scenario": "Invalid password returns an error",
+          "steps": "Navigate to /login/. Enter a valid email but wrong password. Click Sign In.",
+          "expected": "401 error. An error message is shown (e.g. 'Invalid email or password'). No session established."
+        },
+        {
+          "id": "TC-LG-402",
+          "severity": "P0",
+          "scenario": "Non-existent email returns the same generic error as wrong password",
+          "steps": "Navigate to /login/. Enter an email that does not exist in the system. Click Sign In.",
+          "expected": "Same error message as an invalid password (e.g. 'Invalid email or password'). No user enumeration."
+        },
+        {
+          "id": "TC-LG-403",
+          "severity": "P0",
+          "scenario": "Deactivated user account returns a 403 error",
+          "steps": "Deactivate a user account. Navigate to /login/. Enter that user's credentials. Click Sign In.",
+          "expected": "403 error. Message indicates the account has been deactivated. No session established."
+        },
+        {
+          "id": "TC-LG-404",
+          "severity": "P1",
+          "scenario": "Classic login is blocked for non-superusers when AUTH_MODE is not classic",
+          "steps": "Set AUTH_MODE=oauth. Navigate to /login/ as a regular (non-superuser) user. Enter correct credentials.",
+          "expected": "403 error. Message indicates classic login is not enabled."
+        },
+        {
+          "id": "TC-LG-405",
+          "severity": "P2",
+          "scenario": "Error message is displayed inline without a full page reload",
+          "steps": "Enter invalid credentials. Click Sign In.",
+          "expected": "Error is shown inline on the form. The URL does not change. The form is still usable."
+        }
+      ]
+    },
+    {
+      "id": "TC-LG-500",
+      "name": "Input Validation",
+      "test_cases": [
+        {
+          "id": "TC-LG-501",
+          "severity": "P0",
+          "scenario": "Empty email field shows a validation error",
+          "steps": "Navigate to /login/. Leave email empty. Enter a password. Click Sign In.",
+          "expected": "Validation error for the email field. Form is not submitted."
+        },
+        {
+          "id": "TC-LG-502",
+          "severity": "P0",
+          "scenario": "Invalid email format shows a validation error",
+          "steps": "Navigate to /login/. Enter 'notanemail' in the email field. Click Sign In.",
+          "expected": "Validation error indicating invalid email format."
+        },
+        {
+          "id": "TC-LG-503",
+          "severity": "P0",
+          "scenario": "Empty password field shows a validation error",
+          "steps": "Navigate to /login/. Enter a valid email. Leave password empty. Click Sign In.",
+          "expected": "Validation error for the password field. Form is not submitted."
+        },
+        {
+          "id": "TC-LG-504",
+          "severity": "P1",
+          "scenario": "Both fields empty shows validation errors for both",
+          "steps": "Navigate to /login/. Leave all fields empty. Click Sign In.",
+          "expected": "Both email and password fields show validation errors."
+        }
+      ]
+    },
+    {
+      "id": "TC-LG-600",
+      "name": "Security",
+      "test_cases": [
+        {
+          "id": "TC-LG-601",
+          "severity": "P0",
+          "scenario": "Error messages do not reveal whether an email address exists",
+          "steps": "Attempt login with a non-existent email. Attempt login with an existing email but wrong password. Compare the error messages.",
+          "expected": "Both attempts return the same error message. User enumeration is not possible."
+        },
+        {
+          "id": "TC-LG-602",
+          "severity": "P1",
+          "scenario": "Login API response does not expose sensitive user data",
+          "steps": "Inspect the network response for a successful and a failed login attempt.",
+          "expected": "No passwords, hashes, tokens, or internal IDs are returned in the API response body."
+        },
+        {
+          "id": "TC-LG-603",
+          "severity": "P1",
+          "scenario": "CSRF protection is enforced on the login endpoint",
+          "steps": "Attempt to POST to /api/v1/auth/login/ without a valid CSRF token (e.g. using curl).",
+          "expected": "Request is rejected with a 403 Forbidden error."
+        }
+      ]
+    },
+    {
+      "id": "TC-LG-700",
+      "name": "Non-Functional",
+      "test_cases": [
+        {
+          "id": "TC-LG-701",
+          "severity": "P2",
+          "scenario": "Login page renders correctly on mobile screen sizes",
+          "steps": "Open /login/ in a browser. Resize window to 375×812px (or use mobile emulation). Observe layout.",
+          "expected": "Form is fully visible and usable. No overflow or broken layout."
+        },
+        {
+          "id": "TC-LG-702",
+          "severity": "P2",
+          "scenario": "Login form is accessible via keyboard navigation",
+          "steps": "Navigate to /login/. Use Tab key to move through fields and Enter to submit.",
+          "expected": "All form fields, the Sign In button, and the forgot password link are reachable via keyboard."
+        },
+        {
+          "id": "TC-LG-703",
+          "severity": "P2",
+          "scenario": "Form fields have accessible labels",
+          "steps": "Inspect the login form HTML. Check that email and password inputs have associated labels or aria-label attributes.",
+          "expected": "Each input field has a visible or accessible label. No unlabelled form controls."
+        }
+      ]
+    }
+  ]
+}

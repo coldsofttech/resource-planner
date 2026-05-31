@@ -1,0 +1,291 @@
+{
+  "module": {
+    "slug": "saml",
+    "name": "SAML 2.0",
+    "sort_order": 4,
+    "parent": { "slug": "auth", "name": "Auth", "sort_order": 1 }
+  },
+  "suites": [
+    {
+      "id": "TC-SA-100",
+      "name": "Login Page — SAML Mode",
+      "test_cases": [
+        {
+          "id": "TC-SA-101",
+          "severity": "P0",
+          "scenario": "Login page shows SAML sign-in button when AUTH_MODE is saml",
+          "steps": "Configure AUTH_MODE=saml in app settings. Navigate to /login/.",
+          "expected": "A SAML sign-in button is visible. No classic email/password form is shown."
+        },
+        {
+          "id": "TC-SA-102",
+          "severity": "P1",
+          "scenario": "SAML button displays the configured provider name",
+          "steps": "Configure a SAML provider named 'Acme SSO'. Navigate to /login/.",
+          "expected": "Button label references the provider name (e.g. 'Sign in with Acme SSO' or similar)."
+        },
+        {
+          "id": "TC-SA-103",
+          "severity": "P1",
+          "scenario": "Classic email/password form is hidden in SAML mode",
+          "steps": "Set AUTH_MODE=saml. Navigate to /login/.",
+          "expected": "Email and password fields are not visible on the page."
+        },
+        {
+          "id": "TC-SA-104",
+          "severity": "P0",
+          "scenario": "Login page loads without errors in SAML mode",
+          "steps": "Set AUTH_MODE=saml. Navigate to /login/.",
+          "expected": "Page loads successfully. No JavaScript errors in the console. No blank or broken UI."
+        },
+        {
+          "id": "TC-SA-105",
+          "severity": "P2",
+          "scenario": "App name and branding render correctly on the SAML login page",
+          "steps": "Navigate to /login/ with SAML mode active.",
+          "expected": "App name and logo appear as configured. Theme is applied correctly."
+        }
+      ]
+    },
+    {
+      "id": "TC-SA-200",
+      "name": "Initiating SAML Login",
+      "test_cases": [
+        {
+          "id": "TC-SA-201",
+          "severity": "P0",
+          "scenario": "Clicking the SAML sign-in button redirects the browser to the IdP SSO URL",
+          "steps": "Navigate to /login/. Click the SAML sign-in button.",
+          "expected": "Browser is redirected to the configured IdP SSO URL (HTTP-Redirect binding)."
+        },
+        {
+          "id": "TC-SA-202",
+          "severity": "P0",
+          "scenario": "Redirect URL contains a SAMLRequest parameter",
+          "steps": "Click the SAML sign-in button. Observe the IdP redirect URL.",
+          "expected": "A SAMLRequest query parameter is present in the redirect URL."
+        },
+        {
+          "id": "TC-SA-203",
+          "severity": "P1",
+          "scenario": "Button shows a loading or disabled state while the redirect is being prepared",
+          "steps": "Click the SAML sign-in button. Observe the button immediately after clicking.",
+          "expected": "Button is disabled or shows a loading indicator to prevent double-clicks."
+        },
+        {
+          "id": "TC-SA-204",
+          "severity": "P2",
+          "scenario": "Relay state is forwarded to the IdP when a post-login redirect target is set",
+          "steps": "Navigate to a protected page (e.g. /dashboard/) while unauthenticated. Be redirected to /login/. Click SAML sign-in.",
+          "expected": "The relay state containing the originally requested URL is included in the redirect to the IdP."
+        }
+      ]
+    },
+    {
+      "id": "TC-SA-300",
+      "name": "Assertion & Session Establishment",
+      "test_cases": [
+        {
+          "id": "TC-SA-301",
+          "severity": "P0",
+          "scenario": "Completing SAML login at the IdP logs the user into the app",
+          "steps": "Navigate to /login/. Click the SAML sign-in button. Authenticate at the IdP.",
+          "expected": "User is authenticated. Browser returns to the app with a valid session."
+        },
+        {
+          "id": "TC-SA-302",
+          "severity": "P0",
+          "scenario": "User is redirected to the application after successful SAML login",
+          "steps": "Complete the full SAML authentication flow at the IdP.",
+          "expected": "Browser lands on the main app page (e.g. dashboard). No login page is shown again."
+        },
+        {
+          "id": "TC-SA-303",
+          "severity": "P0",
+          "scenario": "Session is active after successful SAML login",
+          "steps": "Complete SAML login. Navigate to a protected route.",
+          "expected": "Protected route loads correctly. User is not redirected back to /login/."
+        },
+        {
+          "id": "TC-SA-304",
+          "severity": "P1",
+          "scenario": "User's email from the SAML assertion is stored on the account",
+          "steps": "Complete SAML login with a user whose IdP email is 'saml@example.com'. Check the logged-in user's profile.",
+          "expected": "App stores and displays 'saml@example.com' as the authenticated user's email."
+        },
+        {
+          "id": "TC-SA-305",
+          "severity": "P1",
+          "scenario": "User's first and last name from SAML attributes are applied to the account",
+          "steps": "Complete SAML login with an IdP that returns first_name and last_name attributes. Check the user profile.",
+          "expected": "First name and last name in the app reflect the values from the SAML assertion."
+        },
+        {
+          "id": "TC-SA-306",
+          "severity": "P1",
+          "scenario": "Relay state is honoured — user lands on the originally requested page after login",
+          "steps": "Attempt to access /dashboard/ while unauthenticated. Log in via SAML.",
+          "expected": "After successful login, browser lands on /dashboard/ (not the generic home page)."
+        }
+      ]
+    },
+    {
+      "id": "TC-SA-400",
+      "name": "Error Scenarios",
+      "test_cases": [
+        {
+          "id": "TC-SA-401",
+          "severity": "P0",
+          "scenario": "Missing SAMLResponse in the ACS POST shows an error to the user",
+          "steps": "Navigate to the ACS URL directly without a SAMLResponse parameter.",
+          "expected": "App displays an error message. User is not logged in."
+        },
+        {
+          "id": "TC-SA-402",
+          "severity": "P0",
+          "scenario": "Tampered or invalid SAMLResponse signature shows an error",
+          "steps": "Intercept the SAMLResponse from the IdP. Modify its content before it reaches the ACS. Submit the tampered response.",
+          "expected": "App rejects the assertion. An error is shown to the user. No session is created."
+        },
+        {
+          "id": "TC-SA-403",
+          "severity": "P0",
+          "scenario": "SAML authentication failure status from the IdP shows an error",
+          "steps": "Trigger an IdP-side authentication failure (e.g. wrong credentials). IdP posts a failure SAMLResponse to ACS.",
+          "expected": "App shows a clear error message. User is not logged in."
+        },
+        {
+          "id": "TC-SA-404",
+          "severity": "P1",
+          "scenario": "SAMLResponse from an unknown IdP entity ID shows an error",
+          "steps": "Submit a SAMLResponse whose Issuer does not match any configured SAML provider.",
+          "expected": "App displays an error. No session is created."
+        },
+        {
+          "id": "TC-SA-405",
+          "severity": "P1",
+          "scenario": "SAMLResponse with a missing NameID shows an error",
+          "steps": "Submit a SAMLResponse that contains no NameID element in the Assertion.",
+          "expected": "App displays an error. User is not logged in."
+        },
+        {
+          "id": "TC-SA-406",
+          "severity": "P1",
+          "scenario": "Error message is user-friendly and does not expose internal details",
+          "steps": "Trigger a SAML error (e.g. invalid signature). Inspect the error message shown.",
+          "expected": "Message is readable. No stack traces, raw XML, or internal exception messages are visible."
+        },
+        {
+          "id": "TC-SA-407",
+          "severity": "P1",
+          "scenario": "Error page provides a way to return to the login page and retry",
+          "steps": "Encounter a SAML error. Observe the error page.",
+          "expected": "A link or button to return to /login/ is available."
+        },
+        {
+          "id": "TC-SA-408",
+          "severity": "P2",
+          "scenario": "Replaying a SAMLResponse that has already been used shows an error or starts a fresh session",
+          "steps": "Capture a valid SAMLResponse from a successful login. Resubmit the same SAMLResponse to the ACS URL.",
+          "expected": "App either rejects the replay (preferred) or creates a fresh valid session. No silent privilege escalation."
+        }
+      ]
+    },
+    {
+      "id": "TC-SA-500",
+      "name": "User Account Behaviour",
+      "test_cases": [
+        {
+          "id": "TC-SA-501",
+          "severity": "P0",
+          "scenario": "First-time SAML login creates a new user account",
+          "steps": "Complete SAML login with an email address that has no existing account in the app.",
+          "expected": "A new user account is created. User lands on the app. Account email matches the SAML NameID."
+        },
+        {
+          "id": "TC-SA-502",
+          "severity": "P0",
+          "scenario": "Returning SAML user is not duplicated on subsequent logins",
+          "steps": "Complete SAML login twice with the same IdP account.",
+          "expected": "Same user account is used both times. Only one account exists for that email."
+        },
+        {
+          "id": "TC-SA-503",
+          "severity": "P1",
+          "scenario": "SAML user cannot log in using classic email/password credentials",
+          "steps": "Create an account via SAML login. Switch AUTH_MODE to classic. Attempt to log in with the same email and any password.",
+          "expected": "Login fails. No password is set on SAML-created accounts."
+        },
+        {
+          "id": "TC-SA-504",
+          "severity": "P2",
+          "scenario": "User profile reflects name attributes received from the IdP",
+          "steps": "Complete SAML login with an IdP returning first_name='Alice', last_name='Smith'. Visit the user profile.",
+          "expected": "Profile shows first name 'Alice' and last name 'Smith'."
+        }
+      ]
+    },
+    {
+      "id": "TC-SA-600",
+      "name": "Non-Functional",
+      "test_cases": [
+        {
+          "id": "TC-SA-601",
+          "severity": "P1",
+          "scenario": "SAML login button is reachable and activatable via keyboard",
+          "steps": "Navigate to /login/ in SAML mode. Press Tab to focus the sign-in button. Press Enter.",
+          "expected": "Focus lands on the button. Pressing Enter initiates the SAML redirect."
+        },
+        {
+          "id": "TC-SA-602",
+          "severity": "P2",
+          "scenario": "SAML login button has a visible focus ring",
+          "steps": "Tab to the SAML sign-in button on /login/.",
+          "expected": "A visible focus indicator (outline or highlight) is present on the button."
+        },
+        {
+          "id": "TC-SA-603",
+          "severity": "P2",
+          "scenario": "Login page with SAML mode is usable on mobile (375px)",
+          "steps": "Open /login/ at 375px viewport width with AUTH_MODE=saml.",
+          "expected": "SAML button is fully visible and tappable. No horizontal scroll. No content overflow."
+        },
+        {
+          "id": "TC-SA-604",
+          "severity": "P2",
+          "scenario": "Login page with SAML mode is usable on tablet (768px)",
+          "steps": "Open /login/ at 768px viewport with SAML mode.",
+          "expected": "Layout adapts correctly. Button and branding remain usable."
+        },
+        {
+          "id": "TC-SA-605",
+          "severity": "P0",
+          "scenario": "SAMLResponse content is never exposed in any frontend page or URL",
+          "steps": "Complete a SAML login flow. Inspect all browser URLs, page source, and network responses visible to the frontend.",
+          "expected": "The raw SAMLResponse XML or base64 content is only ever in the ACS POST body — never rendered in the page or URL bar."
+        },
+        {
+          "id": "TC-SA-606",
+          "severity": "P0",
+          "scenario": "IdP X.509 certificate is not exposed in any frontend response",
+          "steps": "Navigate to /login/ and initiate SAML. Inspect all network responses from the app.",
+          "expected": "The stored IdP certificate does not appear in any page source or API response visible to the browser."
+        },
+        {
+          "id": "TC-SA-607",
+          "severity": "P2",
+          "scenario": "Dark mode applies correctly to the SAML login page",
+          "steps": "Toggle to dark mode. Navigate to /login/ with SAML mode.",
+          "expected": "All elements use the dark theme. No light-mode remnants visible."
+        },
+        {
+          "id": "TC-SA-608",
+          "severity": "P3",
+          "scenario": "SAML login page loads within 2 seconds on local dev",
+          "steps": "Open DevTools Network tab. Navigate to /login/ with SAML mode.",
+          "expected": "DOM interactive within 2 seconds on local network."
+        }
+      ]
+    }
+  ]
+}
