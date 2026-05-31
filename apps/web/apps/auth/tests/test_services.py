@@ -329,3 +329,49 @@ class RegisterServiceTest(TestCase):
                 email="samluser@example.com",
                 password="StrongPass123!",
             )
+
+
+# ---------------------------------------------------------------------------
+# ForgotPasswordService — SSO users cannot request password reset
+# ---------------------------------------------------------------------------
+
+
+class ForgotPasswordServiceSSOUserTest(TestCase):
+    def setUp(self):
+        from django.contrib.contenttypes.models import ContentType
+
+        from apps.oauth.models import OAuth
+        from apps.users.models import UserProfile
+
+        self.svc = ForgotPasswordService(user=None, request=None)
+        self.user = make_user(email="sso@example.com")
+
+        provider = OAuth.objects.create(
+            name="SSO Test Provider",
+            client_id="cid",
+            client_secret="csecret",
+            auth_endpoint="https://idp.example.com/auth",
+            token_endpoint="https://idp.example.com/token",
+            userinfo_endpoint="https://idp.example.com/userinfo",
+            scope="openid email",
+        )
+        ct = ContentType.objects.get_for_model(provider)
+        UserProfile.objects.create(
+            user=self.user,
+            sso_provider_content_type=ct,
+            sso_provider_object_id=provider.pk,
+            sso_uid="sso-uid-123",
+        )
+
+    def test_raises_validation_for_sso_user(self):
+        with self.assertRaises(ValidationException):
+            self.svc.request_password_reset(email="sso@example.com")
+
+    def test_sso_user_no_reset_token_created(self):
+        try:
+            self.svc.request_password_reset(email="sso@example.com")
+        except ValidationException:
+            pass
+        from apps.auth.models import PasswordResetToken
+
+        self.assertFalse(PasswordResetToken.objects.filter(user=self.user).exists())

@@ -114,6 +114,13 @@ class ForgotPasswordService(ContextService):
         if user is None or not user.is_active:
             raise ValidationException("No account found for that email address.")
 
+        profile = getattr(user, "profile", None)
+        if profile is not None and profile.sso_uid:
+            raise ValidationException(
+                "Password reset is not available for SSO accounts. "
+                "Please sign in through your identity provider."
+            )
+
         # Token creation must succeed — any DB error surfaces as a 500 so it is
         # immediately visible rather than swallowed silently.
         code, _token = self._generate_token(user)

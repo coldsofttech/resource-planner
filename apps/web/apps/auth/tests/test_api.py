@@ -484,3 +484,79 @@ class RegisterAPITest(TestCase):
     def test_error_response_success_flag_is_false(self):
         response = self.client.post(REGISTER_URL, {}, format="json")
         self.assertFalse(response.data["success"])
+
+
+# ---------------------------------------------------------------------------
+# POST /api/v1/auth/forgot-password/ — SSO user cannot reset password
+# ---------------------------------------------------------------------------
+
+
+class ForgotPasswordSSOUserAPITest(TestCase):
+    def setUp(self):
+        from django.contrib.contenttypes.models import ContentType
+
+        from apps.oauth.models import OAuth
+        from apps.users.models import UserProfile
+
+        self.client = APIClient()
+        self.user = make_user(email="sso@example.com")
+
+        provider = OAuth.objects.create(
+            name="SSO API Provider",
+            client_id="cid",
+            client_secret="csecret",
+            auth_endpoint="https://idp.example.com/auth",
+            token_endpoint="https://idp.example.com/token",
+            userinfo_endpoint="https://idp.example.com/userinfo",
+            scope="openid email",
+        )
+        ct = ContentType.objects.get_for_model(provider)
+        UserProfile.objects.create(
+            user=self.user,
+            sso_provider_content_type=ct,
+            sso_provider_object_id=provider.pk,
+            sso_uid="sso-uid-api",
+        )
+
+    def test_sso_user_password_reset_request_returns_422(self):
+        response = self.client.post(
+            FP_REQUEST_URL, {"email": "sso@example.com"}, format="json"
+        )
+        self.assertEqual(response.status_code, 422)
+
+    def test_sso_user_password_reset_response_success_is_false(self):
+        response = self.client.post(
+            FP_REQUEST_URL, {"email": "sso@example.com"}, format="json"
+        )
+        self.assertFalse(response.data["success"])
+
+
+# ---------------------------------------------------------------------------
+# POST /api/v1/auth/register/ — non-classic auth mode blocks registration
+# ---------------------------------------------------------------------------
+
+
+class RegisterNonClassicAuthModeAPITest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_registration_blocked_when_auth_mode_is_saml(self):
+        from apps.configurations.models import Configuration
+
+        Configuration.objects.filter(config_code="AUTH_MODE").update(value="saml")
+        response = self.client.post(REGISTER_URL, VALID_REGISTER_PAYLOAD, format="json")
+        self.assertEqual(response.status_code, 403)
+
+    def test_registration_blocked_when_auth_mode_is_oauth(self):
+        from apps.configurations.models import Configuration
+
+        Configuration.objects.filter(config_code="AUTH_MODE").update(value="oauth")
+        response = self.client.post(REGISTER_URL, VALID_REGISTER_PAYLOAD, format="json")
+        self.assertEqual(response.status_code, 403)
+
+    def test_registration_blocked_response_success_is_false(self):
+        from apps.configurations.models import Configuration
+
+        Configuration.objects.filter(config_code="AUTH_MODE").update(value="saml")
+        response = self.client.post(REGISTER_URL, VALID_REGISTER_PAYLOAD, format="json")
+        self.assertFalse(response.data["success"])
