@@ -143,6 +143,8 @@ class EmailSender:
         cc: "list | None" = None,
         bcc: "list | None" = None,
     ) -> None:
+        import sys
+
         sep = "-" * 60
         print(f"\n{sep}")
         print("  EMAIL  (console backend)")
@@ -158,6 +160,7 @@ class EmailSender:
         for line in body.splitlines():
             print(f"  {line}")
         print(f"{sep}\n")
+        sys.stdout.flush()
 
     def _send_smtp(self, msg: MIMEMultipart, recipients: list) -> None:
         ctx = ssl.create_default_context()

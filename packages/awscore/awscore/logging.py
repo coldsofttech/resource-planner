@@ -1,6 +1,7 @@
 import datetime
 import io
 import logging
+import os
 
 import boto3
 from botocore.exceptions import ClientError
@@ -22,6 +23,8 @@ class S3LogHandler(logging.Handler):
         flush_count: int = 100,
     ):  # nosec B107
         super().__init__()
+        if not endpoint_url:
+            endpoint_url = os.environ.get("AWS_ENDPOINT", "")
         kwargs: dict = {"region_name": region}
         if access_key and secret_key:
             kwargs["aws_access_key_id"] = access_key
@@ -41,20 +44,20 @@ class S3LogHandler(logging.Handler):
             self._pending += 1
             if self._pending >= self._flush_count:
                 self.flush()
-        except Exception:  # nosec B110
+        except Exception:
             self.handleError(record)
 
     def flush(self) -> None:
         content = self._buffer.getvalue()
         if not content:
             return
-        ts = datetime.datetime.utcnow().strftime("%Y/%m/%d/%H%M%S")
+        ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y/%m/%d/%H%M%S")
         key = f"{self._key_prefix}/{ts}.log"
         try:
             self._client.put_object(
                 Bucket=self._bucket, Key=key, Body=content.encode("utf-8")
             )
-        except ClientError:
+        except ClientError:  # nosec B110
             pass  # best-effort; don't raise from a log flush
         self._buffer = io.StringIO()
         self._pending = 0

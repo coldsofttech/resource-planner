@@ -1,4 +1,5 @@
 import logging
+import os
 
 import boto3
 from botocore.exceptions import ClientError
@@ -16,6 +17,8 @@ class SecretsManager:
         secret_key: str = "",
         endpoint_url: str = "",
     ):  # nosec B107
+        if not endpoint_url:
+            endpoint_url = os.environ.get("AWS_ENDPOINT", "")
         kwargs: dict = {"region_name": region}
         if access_key and secret_key:
             kwargs["aws_access_key_id"] = access_key
