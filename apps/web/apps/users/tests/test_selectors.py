@@ -1,7 +1,15 @@
+from django.contrib.auth.models import Group
 from django.test import TestCase
 
 from apps.users.models import User
-from apps.users.selectors import get_user, is_superuser, superuser_exists, user_exists
+from apps.users.selectors import (
+    get_administrators_group,
+    get_guests_group,
+    get_user,
+    is_superuser,
+    superuser_exists,
+    user_exists,
+)
 
 
 def make_user(email="user@example.com", **kwargs):
@@ -135,3 +143,49 @@ class GetUserTest(TestCase):
         user = make_user("temp@example.com")
         user.delete()
         self.assertIsNone(get_user("temp@example.com"))
+
+
+# ---------------------------------------------------------------------------
+# get_administrators_group
+# ---------------------------------------------------------------------------
+
+
+class GetAdministratorsGroupTest(TestCase):
+    def test_returns_group_when_administrators_exists(self):
+        group, _ = Group.objects.get_or_create(name="Administrators")
+        result = get_administrators_group()
+        self.assertEqual(result, group)
+
+    def test_returns_none_when_administrators_group_absent(self):
+        Group.objects.filter(name="Administrators").delete()
+        result = get_administrators_group()
+        self.assertIsNone(result)
+
+    def test_does_not_return_unrelated_group(self):
+        Group.objects.create(name="Other Group")
+        Group.objects.filter(name="Administrators").delete()
+        result = get_administrators_group()
+        self.assertIsNone(result)
+
+
+# ---------------------------------------------------------------------------
+# get_guests_group
+# ---------------------------------------------------------------------------
+
+
+class GetGuestsGroupTest(TestCase):
+    def test_returns_group_when_guests_exists(self):
+        group, _ = Group.objects.get_or_create(name="Guests")
+        result = get_guests_group()
+        self.assertEqual(result, group)
+
+    def test_returns_none_when_guests_group_absent(self):
+        Group.objects.filter(name="Guests").delete()
+        result = get_guests_group()
+        self.assertIsNone(result)
+
+    def test_does_not_return_unrelated_group(self):
+        Group.objects.create(name="Other Group")
+        Group.objects.filter(name="Guests").delete()
+        result = get_guests_group()
+        self.assertIsNone(result)

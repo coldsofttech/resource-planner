@@ -8,6 +8,9 @@ from apps.core.models import AuditableModel, CodeModel
 
 User = get_user_model()
 
+GROUP_ADMINISTRATORS = "Administrators"
+GROUP_GUESTS = "Guests"
+
 
 class UserProfile(AuditableModel, CodeModel):
     MODEL_CODE = "USER"
@@ -38,3 +41,22 @@ class UserProfile(AuditableModel, CodeModel):
 
     class Meta:
         ordering = ["user"]
+
+
+class GroupProfile(AuditableModel, CodeModel):
+    MODEL_CODE = "USRGRP"
+
+    group = models.OneToOneField(
+        "auth.Group",
+        on_delete=models.CASCADE,
+        related_name="profile",
+    )
+    description = models.CharField(blank=True)
+    is_admin_group = models.BooleanField(default=False, db_index=True)
+    is_system = models.BooleanField(default=False, db_index=True)
+
+    class Meta:
+        ordering = ["group"]
+
+    def __str__(self):
+        return self.group.name

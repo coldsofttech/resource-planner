@@ -1,13 +1,33 @@
+import logging
+
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 
 from apps.core.exceptions import AlreadyExistsException, ConflictException
 from apps.core.services import ContextService
 from apps.users.models import User, UserProfile
-from apps.users.selectors import superuser_exists, user_exists
+from apps.users.selectors import (
+    get_administrators_group,
+    get_guests_group,
+    superuser_exists,
+    user_exists,
+)
+
+logger = logging.getLogger(__name__)
 
 
 class BaseUserService:
+    def _assign_default_group(self, user: User, *, is_admin: bool = False) -> None:
+        group = get_administrators_group() if is_admin else get_guests_group()
+        if group is not None:
+            user.groups.add(group)
+        else:
+            logger.warning(
+                "System group '%s' not found; skipping group assignment for user '%s'.",
+                "Administrators" if is_admin else "Guests",
+                user.email,
+            )
+
     def _create_user(
         self,
         *,
@@ -37,6 +57,7 @@ class BaseUserService:
         if is_superuser:
             user = User.objects.create_superuser(**user_data, password=password)
             UserProfile.objects.create(user=user, created_by=created_by)
+            self._assign_default_group(user, is_admin=True)
             return user
 
         auth_mode = Auth.get_auth_mode()
@@ -49,6 +70,7 @@ class BaseUserService:
             user.save()
             UserProfile.objects.create(user=user, created_by=created_by)
 
+        self._assign_default_group(user, is_admin=False)
         return user
 
     def _create_sso_user(
@@ -84,6 +106,7 @@ class BaseUserService:
                 sso_uid=sso_uid,
                 created_by=created_by,
             )
+            self._assign_default_group(user, is_admin=False)
 
         return user
 

@@ -1,7 +1,8 @@
+from django.contrib.auth.models import Group
 from django.db import IntegrityError
 from django.test import TestCase
 
-from apps.users.models import User, UserProfile
+from apps.users.models import GroupProfile, User, UserProfile
 
 
 def make_user(email="user@example.com", **kwargs):
@@ -131,3 +132,112 @@ class UserProfileUserRelationshipTest(TestCase):
         p1 = make_profile(user=u1)
         p2 = make_profile(user=u2)
         self.assertNotEqual(p1.pk, p2.pk)
+
+
+# ---------------------------------------------------------------------------
+# GroupProfile — auto-generated code
+# ---------------------------------------------------------------------------
+
+
+def make_group(name="Test Group"):
+    return Group.objects.create(name=name)
+
+
+def make_group_profile(name="Test Group", **kwargs):
+    group = make_group(name)
+    return GroupProfile.objects.create(group=group, **kwargs)
+
+
+class GroupProfileCodeTest(TestCase):
+    def test_code_auto_generated_with_usrgrp_prefix(self):
+        gp = make_group_profile("Code Group")
+        self.assertTrue(gp.code.startswith("USRGRP-"))
+
+    def test_code_contains_primary_key(self):
+        gp = make_group_profile("PK Group")
+        self.assertEqual(gp.code, f"USRGRP-{gp.pk}")
+
+    def test_each_profile_gets_unique_code(self):
+        gp1 = make_group_profile("Group A")
+        gp2 = make_group_profile("Group B")
+        self.assertNotEqual(gp1.code, gp2.code)
+
+
+# ---------------------------------------------------------------------------
+# GroupProfile — field defaults
+# ---------------------------------------------------------------------------
+
+
+class GroupProfileFieldDefaultsTest(TestCase):
+    def test_description_defaults_to_empty_string(self):
+        gp = make_group_profile("Desc Default Group")
+        self.assertEqual(gp.description, "")
+
+    def test_is_admin_group_defaults_to_false(self):
+        gp = make_group_profile("Admin Default Group")
+        self.assertFalse(gp.is_admin_group)
+
+    def test_is_system_defaults_to_false(self):
+        gp = make_group_profile("System Default Group")
+        self.assertFalse(gp.is_system)
+
+    def test_created_at_is_set_on_creation(self):
+        gp = make_group_profile("Timestamp Group")
+        self.assertIsNotNone(gp.created_at)
+
+    def test_updated_at_is_set_on_creation(self):
+        gp = make_group_profile("Updated Group")
+        self.assertIsNotNone(gp.updated_at)
+
+
+# ---------------------------------------------------------------------------
+# GroupProfile — field assignment
+# ---------------------------------------------------------------------------
+
+
+class GroupProfileFieldAssignmentTest(TestCase):
+    def test_description_can_be_set(self):
+        gp = make_group_profile("Desc Set Group", description="Admin users only")
+        self.assertEqual(gp.description, "Admin users only")
+
+    def test_is_admin_group_can_be_set_true(self):
+        gp = make_group_profile("Admin Group", is_admin_group=True)
+        self.assertTrue(gp.is_admin_group)
+
+    def test_is_system_can_be_set_true(self):
+        gp = make_group_profile("System Group", is_system=True)
+        self.assertTrue(gp.is_system)
+
+
+# ---------------------------------------------------------------------------
+# GroupProfile — relationship to auth.Group
+# ---------------------------------------------------------------------------
+
+
+class GroupProfileGroupRelationshipTest(TestCase):
+    def test_str_returns_group_name(self):
+        gp = make_group_profile("Named Group")
+        self.assertEqual(str(gp), "Named Group")
+
+    def test_profile_is_linked_to_group(self):
+        group = make_group("Linked Group")
+        gp = GroupProfile.objects.create(group=group)
+        self.assertEqual(gp.group, group)
+
+    def test_group_reverse_accessor_returns_profile(self):
+        group = make_group("Reverse Group")
+        gp = GroupProfile.objects.create(group=group)
+        self.assertEqual(group.profile, gp)
+
+    def test_deleting_group_cascades_to_profile(self):
+        group = make_group("Delete Cascade Group")
+        gp = GroupProfile.objects.create(group=group)
+        pk = gp.pk
+        group.delete()
+        self.assertFalse(GroupProfile.objects.filter(pk=pk).exists())
+
+    def test_one_group_cannot_have_two_profiles(self):
+        group = make_group("Unique Profile Group")
+        GroupProfile.objects.create(group=group)
+        with self.assertRaises(IntegrityError):
+            GroupProfile.objects.create(group=group)

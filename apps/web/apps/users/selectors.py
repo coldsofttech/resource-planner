@@ -1,4 +1,4 @@
-from apps.users.models import User
+from apps.users.models import GROUP_ADMINISTRATORS, GROUP_GUESTS, User
 
 
 def user_exists(email: str):
@@ -18,3 +18,20 @@ def get_user(email: str):
         return User.objects.get(email=email)
     except User.DoesNotExist:
         return None
+
+
+def get_system_group(name: str):
+    from django.contrib.auth.models import Group
+
+    try:
+        return Group.objects.get(name=name)
+    except Group.DoesNotExist:
+        return None
+
+
+def get_administrators_group():
+    return get_system_group(GROUP_ADMINISTRATORS)
+
+
+def get_guests_group():
+    return get_system_group(GROUP_GUESTS)

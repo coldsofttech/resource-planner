@@ -495,3 +495,77 @@ class SSOUserServiceProviderIsolationTest(TestCase):
             sso_uid="uid-only-a",
         )
         self.assertEqual(user_a.pk, returning.pk)
+
+
+# ---------------------------------------------------------------------------
+# BaseUserService._assign_default_group — missing group
+# ---------------------------------------------------------------------------
+
+
+class BaseUserServiceGroupNotFoundTest(TestCase):
+    def setUp(self):
+        self.svc = BaseUserService()
+
+    def test_user_created_even_when_guests_group_does_not_exist(self):
+        from django.contrib.auth.models import Group
+
+        Group.objects.filter(name="Guests").delete()
+        user = self.svc._create_user(**USER_BASE)
+        self.assertIsInstance(user, User)
+
+    def test_user_is_persisted_when_guests_group_absent(self):
+        from django.contrib.auth.models import Group
+
+        Group.objects.filter(name="Guests").delete()
+        user = self.svc._create_user(**USER_BASE)
+        self.assertTrue(User.objects.filter(pk=user.pk).exists())
+
+    def test_user_has_no_groups_when_guests_group_absent(self):
+        from django.contrib.auth.models import Group
+
+        Group.objects.filter(name="Guests").delete()
+        user = self.svc._create_user(**USER_BASE)
+        self.assertEqual(user.groups.count(), 0)
+
+
+# ---------------------------------------------------------------------------
+# SSOUserService — empty / None name fields
+# ---------------------------------------------------------------------------
+
+
+class SSOUserServiceEmptyNamesTest(TestCase):
+    def setUp(self):
+        self.svc = SSOUserService()
+        self.provider = make_provider("Empty Names Provider")
+
+    def test_sso_user_created_with_empty_first_and_last_name(self):
+        user, _ = self.svc.get_or_create(
+            email="noname@example.com",
+            first_name="",
+            last_name="",
+            sso_provider=self.provider,
+            sso_uid="uid-noname",
+        )
+        self.assertEqual(user.first_name, "")
+        self.assertEqual(user.last_name, "")
+
+    def test_sso_user_created_with_none_names_does_not_raise(self):
+        user, _ = self.svc.get_or_create(
+            email="nonename@example.com",
+            first_name=None,
+            last_name=None,
+            sso_provider=self.provider,
+            sso_uid="uid-none-names",
+        )
+        self.assertIsNotNone(user)
+        self.assertTrue(User.objects.filter(pk=user.pk).exists())
+
+    def test_sso_user_profile_created_with_empty_names(self):
+        user, _ = self.svc.get_or_create(
+            email="profileempty@example.com",
+            first_name="",
+            last_name="",
+            sso_provider=self.provider,
+            sso_uid="uid-profile-empty",
+        )
+        self.assertTrue(UserProfile.objects.filter(user=user).exists())
