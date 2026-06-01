@@ -12,15 +12,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.14"
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: "24"
 
       - name: Install Python dependencies
         run: |
@@ -59,7 +59,7 @@ jobs:
 
       - name: Upload test report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-report
           path: .pytest-reports/
@@ -68,7 +68,7 @@ jobs:
         run: bandit -r apps/web packages --configfile pyproject.toml
 
       - name: pip-audit
-        run: pip-audit
+        run: pip-audit --skip-editable
 
       - name: Django Security Checks
         run: |
