@@ -1,5 +1,4 @@
 from drf_spectacular.utils import OpenApiResponse, extend_schema
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import AllowAny
 
 from apps.core.viewsets import BaseViewSet
@@ -8,7 +7,6 @@ from apps.meta.services import MetaService
 
 
 class MetaViewSet(BaseViewSet):
-    authentication_classes = [SessionAuthentication]
     permission_classes = [AllowAny]
 
     @extend_schema(

@@ -5,7 +5,12 @@ from django.test import TestCase
 from django.utils import timezone
 
 from apps.auth.models import PasswordResetToken
-from apps.auth.services import AuthService, ForgotPasswordService, RegisterService
+from apps.auth.services import (
+    AuthService,
+    ForgotPasswordService,
+    RegisterService,
+    UserTokenService,
+)
 from apps.core.exceptions import (
     AlreadyExistsException,
     AuthFailedException,
@@ -95,6 +100,87 @@ class AuthServiceClassicLoginTest(TestCase):
         svc = AuthService(user=None, request=None)
         result = svc.classic_login(email="super@example.com", password="StrongPass123!")
         self.assertEqual(result.pk, superuser.pk)
+
+
+# ---------------------------------------------------------------------------
+# UserTokenService — create_token / revoke_current_token
+# ---------------------------------------------------------------------------
+
+
+class UserTokenServiceCreateTest(TestCase):
+    def setUp(self):
+        self.user = make_user()
+
+    def test_create_token_returns_user_token(self):
+        from apps.auth.models import UserToken
+
+        svc = UserTokenService(user=None, request=None)
+        token = svc.create_token(self.user)
+        self.assertIsInstance(token, UserToken)
+
+    def test_create_token_is_active(self):
+        svc = UserTokenService(user=None, request=None)
+        token = svc.create_token(self.user)
+        self.assertTrue(token.is_active)
+
+    def test_create_token_linked_to_user(self):
+        svc = UserTokenService(user=None, request=None)
+        token = svc.create_token(self.user)
+        self.assertEqual(token.user, self.user)
+
+    def test_create_token_generates_unique_keys(self):
+        svc = UserTokenService(user=None, request=None)
+        t1 = svc.create_token(self.user)
+        t2 = svc.create_token(self.user)
+        self.assertNotEqual(t1.key, t2.key)
+
+    def test_create_token_key_is_64_chars(self):
+        svc = UserTokenService(user=None, request=None)
+        token = svc.create_token(self.user)
+        self.assertEqual(len(token.key), 64)
+
+
+class UserTokenServiceRevokeTest(TestCase):
+    def setUp(self):
+        self.user = make_user()
+
+    def _make_mock_request(self, key=None):
+        request = MagicMock()
+        if key:
+            request.META = {"HTTP_AUTHORIZATION": f"Bearer {key}"}
+        else:
+            request.META = {}
+        return request
+
+    def test_revoke_deactivates_matching_token(self):
+        svc_create = UserTokenService(user=None, request=None)
+        token = svc_create.create_token(self.user)
+
+        request = self._make_mock_request(key=token.key)
+        svc_revoke = UserTokenService(user=None, request=request)
+        svc_revoke.revoke_current_token()
+
+        token.refresh_from_db()
+        self.assertFalse(token.is_active)
+
+    def test_revoke_no_op_when_no_authorization_header(self):
+        svc_create = UserTokenService(user=None, request=None)
+        token = svc_create.create_token(self.user)
+
+        request = self._make_mock_request()
+        svc_revoke = UserTokenService(user=None, request=request)
+        svc_revoke.revoke_current_token()
+
+        token.refresh_from_db()
+        self.assertTrue(token.is_active)
+
+    def test_revoke_no_op_for_unknown_key(self):
+        from apps.auth.models import UserToken
+
+        request = self._make_mock_request(key="nonexistentkey" * 5)
+        svc = UserTokenService(user=None, request=request)
+        svc.revoke_current_token()
+        self.assertEqual(UserToken.objects.filter(is_active=False).count(), 0)
 
 
 # ---------------------------------------------------------------------------

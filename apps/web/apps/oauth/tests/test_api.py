@@ -4,6 +4,7 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 
 from apps.oauth.models import OAuth
+from apps.users.models import User
 
 CREATE_URL = "/api/v1/auth/oauth/"
 CALLBACK_URL = "/api/v1/auth/oauth/callback/"
@@ -34,9 +35,14 @@ def make_provider(name="Test Provider", is_active=True, **overrides):
     )
 
 
+def make_user(email="admin@example.com"):
+    return User.objects.create_superuser(username=email, email=email, password="pass")
+
+
 class OAuthCreateAPITest(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.client.force_authenticate(user=make_user())
 
     @patch("apps.oauth.services.encrypt_value", side_effect=lambda v, _: v)
     @patch("apps.oauth.services.Infra.get_secrets_prefix", return_value="")

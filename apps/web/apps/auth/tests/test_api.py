@@ -68,6 +68,16 @@ class AuthLoginSuccessTest(TestCase):
         self.client.post(LOGIN_URL, VALID_CREDENTIALS, format="json")
         self.assertIn("_auth_user_id", self.client.session)
 
+    def test_response_data_contains_token(self):
+        response = self.client.post(LOGIN_URL, VALID_CREDENTIALS, format="json")
+        self.assertIn("token", response.data["data"])
+
+    def test_token_is_non_empty_string(self):
+        response = self.client.post(LOGIN_URL, VALID_CREDENTIALS, format="json")
+        token = response.data["data"]["token"]
+        self.assertIsInstance(token, str)
+        self.assertTrue(len(token) > 0)
+
 
 # ---------------------------------------------------------------------------
 # POST /api/v1/auth/login/ — validation errors (400)

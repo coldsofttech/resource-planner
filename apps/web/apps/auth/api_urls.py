@@ -28,4 +28,9 @@ urlpatterns = [
         ForgotPasswordViewSet.as_view({"post": "reset_password"}),
         name="auth-fp-reset",
     ),
+    path(
+        "auth/logout/",
+        AuthViewSet.as_view({"post": "logout"}),
+        name="auth-logout",
+    ),
 ]

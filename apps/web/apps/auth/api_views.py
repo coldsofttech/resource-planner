@@ -1,5 +1,6 @@
 import logging
 
+from django.contrib.auth import logout as auth_logout
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
@@ -13,7 +14,12 @@ from apps.auth.serializers import (
     LoginSerializer,
     RegisterSerializer,
 )
-from apps.auth.services import AuthService, ForgotPasswordService, RegisterService
+from apps.auth.services import (
+    AuthService,
+    ForgotPasswordService,
+    RegisterService,
+    UserTokenService,
+)
 from apps.core.exceptions import ValidationException
 from apps.core.viewsets import BaseViewSet
 
@@ -26,6 +32,9 @@ class AuthViewSet(BaseViewSet):
 
     def _auth_service(self):
         return AuthService(user=self.request.user, request=self.request)
+
+    def _token_service(self):
+        return UserTokenService(user=self.request.user, request=self.request)
 
     @extend_schema(
         summary="Classic login",
@@ -55,13 +64,34 @@ class AuthViewSet(BaseViewSet):
         )
         serializer.is_valid(raise_exception=True)
 
-        self._auth_service().classic_login(
+        user = self._auth_service().classic_login(
             email=serializer.validated_data["email"],
             password=serializer.validated_data["password"],
         )
+        token = self._token_service().create_token(user)
         return self.response(
-            data={"redirect": "/dashboard/"},
+            data={"redirect": "/dashboard/", "token": token.key},
             message="Sign in successful.",
+            status_code=status.HTTP_200_OK,
+        )
+
+    @extend_schema(
+        summary="Sign out",
+        description=(
+            "Terminates the current session and revokes the Bearer token if one "
+            "is present in the Authorization header."
+        ),
+        responses={
+            200: OpenApiResponse(description="Signed out successfully."),
+        },
+    )
+    @action(detail=False, methods=["post"], url_path="logout", url_name="logout")
+    def logout(self, request: Request):
+        """POST /auth/logout/"""
+        self._token_service().revoke_current_token()
+        auth_logout(request)
+        return self.response(
+            message="Signed out successfully.",
             status_code=status.HTTP_200_OK,
         )
 

@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "apps.oauth.apps.OAuthConfig",
     "apps.saml.apps.SAMLConfig",
     "apps.users.apps.UserConfig",
+    "apps.permissions.apps.PermissionConfig",
     "apps.meta.apps.MetaConfig",
     "apps.dashboard.apps.DashboardConfig",
 ]
@@ -103,6 +104,11 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database — see config/database.py for engine selection and connection details.
 DATABASES = database.DATABASES
 
+
+AUTHENTICATION_BACKENDS = [
+    "apps.permissions.backends.PermissionCategoryBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -153,4 +159,11 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 25,
     "EXCEPTION_HANDLER": "apps.core.exceptions.custom_exception_handler",
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "apps.auth.authentication.BearerTokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
 }

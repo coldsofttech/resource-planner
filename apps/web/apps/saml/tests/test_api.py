@@ -33,7 +33,11 @@ def make_provider(name="Test Provider", is_active=True, **overrides):
     )
 
 
-def make_user(email="user@example.com"):
+def make_user(email="user@example.com", superuser=False):
+    if superuser:
+        return User.objects.create_superuser(
+            username=email, email=email, password="pass"
+        )
     return User.objects.create_user(username=email, email=email, password="pass")
 
 
@@ -45,6 +49,7 @@ def make_user(email="user@example.com"):
 class SAMLCreateAPITest(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.client.force_authenticate(user=make_user(superuser=True))
 
     @patch("apps.saml.services.encrypt_value", side_effect=lambda v, _: v)
     def test_create_response_contains_idp_x509_cert(self, _enc):

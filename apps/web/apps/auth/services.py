@@ -59,6 +59,20 @@ class AuthService(ContextService):
         return user
 
 
+class UserTokenService(ContextService):
+    def create_token(self, user):
+        from apps.auth.models import UserToken
+
+        return UserToken.objects.create(user=user, key=UserToken.generate_key())
+
+    def revoke_current_token(self) -> None:
+        from apps.auth.models import UserToken
+
+        auth = self.request.META.get("HTTP_AUTHORIZATION", "").split()
+        if len(auth) == 2 and auth[0].lower() == "bearer":
+            UserToken.objects.filter(key=auth[1]).update(is_active=False)
+
+
 class RegisterService(ContextService):
     def register(self, *, first_name: str, last_name: str, email: str, password: str):
         from apps.configurations.selectors import Auth

@@ -4,6 +4,7 @@ from django.contrib.auth import login
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 
 from apps.core.exceptions import NotFoundException, ValidationException
@@ -22,6 +23,20 @@ _SESSION_REDIRECT = "oauth_redirect_uri"
 
 class OAuthViewSet(BaseViewSet):
     service_class = OAuthService
+
+    _PUBLIC_ACTIONS = {"authorize", "callback"}
+
+    def get_permissions(self):
+        if self.action in self._PUBLIC_ACTIONS:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+    def get_authenticators(self):
+        # get_authenticators() is called during initialize_request(), before
+        # DRF sets self.action. Use getattr to avoid AttributeError there.
+        if getattr(self, "action", None) in self._PUBLIC_ACTIONS:
+            return []
+        return super().get_authenticators()
 
     def get_retrieve_serializer_class(self):
         return OAuthSerializer

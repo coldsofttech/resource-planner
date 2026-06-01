@@ -4,6 +4,7 @@ from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 
 from apps.core.exceptions import NotFoundException, ValidationException
@@ -15,6 +16,20 @@ from apps.saml.services import SAMLFlowService, SAMLService
 
 class SAMLViewSet(BaseViewSet):
     service_class = SAMLService
+
+    _PUBLIC_ACTIONS = {"authorize", "acs"}
+
+    def get_permissions(self):
+        if self.action in self._PUBLIC_ACTIONS:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+    def get_authenticators(self):
+        # get_authenticators() is called during initialize_request(), before
+        # DRF sets self.action. Use getattr to avoid AttributeError there.
+        if getattr(self, "action", None) in self._PUBLIC_ACTIONS:
+            return []
+        return super().get_authenticators()
 
     def get_retrieve_serializer_class(self):
         return SAMLSerializer

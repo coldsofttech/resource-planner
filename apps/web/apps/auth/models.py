@@ -1,3 +1,5 @@
+import secrets
+
 from django.conf import settings
 from django.db import models
 
@@ -19,3 +21,21 @@ class PasswordResetToken(TimeStampedModel):
 
     class Meta:
         ordering = ["-created_at"]
+
+
+class UserToken(TimeStampedModel):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="auth_tokens",
+    )
+    key = models.CharField(max_length=64, unique=True, db_index=True)
+    is_active = models.BooleanField(default=True, db_index=True)
+    last_used_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    @classmethod
+    def generate_key(cls) -> str:
+        return secrets.token_urlsafe(48)

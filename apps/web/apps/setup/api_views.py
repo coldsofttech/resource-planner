@@ -3,6 +3,7 @@ import logging
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny
 
 from apps.core.viewsets import BaseViewSet
 from apps.setup.serializers import (
@@ -21,6 +22,8 @@ logger = logging.getLogger(__name__)
 
 
 class SetupViewSet(BaseViewSet):
+    authentication_classes: list[type] = []
+    permission_classes = [AllowAny]
     service_class = SetupService
 
     def _test_service(self):

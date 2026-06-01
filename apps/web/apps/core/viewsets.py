@@ -19,7 +19,6 @@ class BaseViewSet(ViewSet):
     DEFAULT_PAGE_SIZE = 25
     MAX_PAGE_SIZE = 100
 
-    permission_classes: list[type] = []
     service_class: type | None = None
 
     @property
