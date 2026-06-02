@@ -1,4 +1,3 @@
-from django.contrib.auth.models import Group
 from django.test import TestCase
 from rest_framework.test import APIClient
 
@@ -9,7 +8,7 @@ from apps.permissions.models import (
     PermissionCategory,
     UserPermissionCategory,
 )
-from apps.users.models import GroupProfile, User, UserProfile
+from apps.users.models import Group, GroupProfile, User, UserProfile
 
 
 def mark_setup_complete():

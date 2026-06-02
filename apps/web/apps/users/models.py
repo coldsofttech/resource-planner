@@ -1,5 +1,5 @@
-from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -15,9 +15,7 @@ GROUP_GUESTS = "Guests"
 class UserProfile(AuditableModel, CodeModel):
     MODEL_CODE = "USER"
 
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile"
-    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
 
     # SSO provider — points to either an OAuth or SAML instance.
     sso_provider_content_type = models.ForeignKey(
@@ -47,9 +45,7 @@ class GroupProfile(AuditableModel, CodeModel):
     MODEL_CODE = "USRGRP"
 
     group = models.OneToOneField(
-        "auth.Group",
-        on_delete=models.CASCADE,
-        related_name="profile",
+        Group, on_delete=models.CASCADE, related_name="profile"
     )
     description = models.CharField(blank=True)
     is_admin_group = models.BooleanField(default=False, db_index=True)

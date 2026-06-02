@@ -1,7 +1,6 @@
-from django.contrib.auth.models import Group
 from django.test import TestCase
 
-from apps.users.models import User
+from apps.users.models import Group, User
 from apps.users.selectors import (
     get_administrators_group,
     get_guests_group,

@@ -30,6 +30,18 @@ Primary action button styled with `rp-btn-primary`.
 
 ---
 
+## `<rp-button-secondary>`
+
+Secondary action button styled with `rp-btn-secondary`. Used for secondary actions that need more visual weight than muted but are not the primary call-to-action.
+
+**Example:**
+
+```html
+<rp-button-secondary label="Cancel" type="button"></rp-button-secondary>
+```
+
+---
+
 ## `<rp-button-muted>`
 
 Secondary / muted button styled with `rp-btn-muted`. Used for non-destructive secondary actions such as Back.
@@ -56,6 +68,6 @@ Engine-styled button (`rp-btn-engine`). Used for prominent utility actions.
 
 ## Notes
 
-- All three variants are used by `<rp-wizard>` internally for its Back/Next/Finish navigation.
+- All four variants are used by `<rp-wizard>` internally for its Back/Next/Finish navigation.
 - The `disabled` attribute is reflected directly onto the inner `<button>`, so standard CSS `:disabled` and `button.disabled` selectors both work.
 - Icons-only buttons (no `label`) are valid — set only `prefix-icon` or `suffix-icon`.

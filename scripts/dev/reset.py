@@ -27,10 +27,11 @@ def _bootstrap_django():
 def main(full_clean: bool = False):
     _bootstrap_django()
 
-    from apps.configurations.models import Configuration
-    from apps.users.models import User, UserProfile
     from django.conf import settings
     from pycore import DotEnv
+
+    from apps.configurations.models import Configuration
+    from apps.users.models import User, UserProfile
 
     scope = (
         "admin user, user profile, setup configuration, OAuth, and SAML records"

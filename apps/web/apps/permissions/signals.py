@@ -1,12 +1,12 @@
 import logging
 
-from django.contrib.auth.models import Permission
 from django.db.models.signals import post_delete, post_migrate, post_save
 from django.dispatch import receiver
 
 from apps.permissions.defaults import PERMISSION_CATEGORIES
 from apps.permissions.models import (
     GroupPermissionCategory,
+    Permission,
     PermissionCategory,
     UserPermissionCategory,
 )

@@ -1,13 +1,13 @@
-from django.contrib.auth.models import Group
 from django.db.models import Q, QuerySet
 
 from apps.permissions.constants import PermissionScope
 from apps.permissions.models import (
     GroupPermissionCategory,
+    Permission,
     PermissionCategory,
     UserPermissionCategory,
 )
-from apps.users.models import GroupProfile, User, UserProfile
+from apps.users.models import Group, GroupProfile, User, UserProfile
 
 
 def get_all_categories(*, module: str | None = None) -> QuerySet[PermissionCategory]:
@@ -103,8 +103,6 @@ def get_user_permissions(user: User) -> set[str]:
     Traverses both group and direct category assignments.
     Used by the custom auth backend for has_perm() checks.
     """
-    from django.contrib.auth.models import Permission
-
     perms = (
         Permission.objects.filter(
             Q(categories__group_assignments__group__user=user)

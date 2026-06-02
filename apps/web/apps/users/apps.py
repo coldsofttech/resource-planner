@@ -9,10 +9,14 @@ logger = logging.getLogger(__name__)
 
 def seed_system_groups(sender, **kwargs):
     """Seeds the Administrators and Guests system groups."""
-    from django.contrib.auth.models import Group
     from django.db import transaction
 
-    from apps.users.models import GROUP_ADMINISTRATORS, GROUP_GUESTS, GroupProfile
+    from apps.users.models import (
+        GROUP_ADMINISTRATORS,
+        GROUP_GUESTS,
+        Group,
+        GroupProfile,
+    )
 
     system_groups = [
         {

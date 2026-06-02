@@ -1,8 +1,7 @@
-from django.contrib.auth.models import Group
 from django.db import IntegrityError
 from django.test import TestCase
 
-from apps.users.models import GroupProfile, User, UserProfile
+from apps.users.models import Group, GroupProfile, User, UserProfile
 
 
 def make_user(email="user@example.com", **kwargs):

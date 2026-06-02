@@ -1,14 +1,14 @@
-from django.contrib.auth.models import Group, Permission
 from django.test import TestCase
 
 from apps.permissions import selectors
 from apps.permissions.constants import PermissionScope
 from apps.permissions.models import (
     GroupPermissionCategory,
+    Permission,
     PermissionCategory,
     UserPermissionCategory,
 )
-from apps.users.models import GroupProfile, User, UserProfile
+from apps.users.models import Group, GroupProfile, User, UserProfile
 
 
 def make_user(email="user@example.com"):

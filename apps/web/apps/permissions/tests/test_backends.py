@@ -1,16 +1,16 @@
 from unittest.mock import MagicMock
 
-from django.contrib.auth.models import Group, Permission
 from django.test import TestCase
 
 from apps.permissions.backends import PermissionCategoryBackend
 from apps.permissions.constants import PermissionScope
 from apps.permissions.models import (
     GroupPermissionCategory,
+    Permission,
     PermissionCategory,
     UserPermissionCategory,
 )
-from apps.users.models import User
+from apps.users.models import Group, User
 
 
 def make_user(email="user@example.com", is_active=True, is_superuser=False):

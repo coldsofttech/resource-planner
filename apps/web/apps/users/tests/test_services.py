@@ -507,21 +507,21 @@ class BaseUserServiceGroupNotFoundTest(TestCase):
         self.svc = BaseUserService()
 
     def test_user_created_even_when_guests_group_does_not_exist(self):
-        from django.contrib.auth.models import Group
+        from apps.users.models import Group
 
         Group.objects.filter(name="Guests").delete()
         user = self.svc._create_user(**USER_BASE)
         self.assertIsInstance(user, User)
 
     def test_user_is_persisted_when_guests_group_absent(self):
-        from django.contrib.auth.models import Group
+        from apps.users.models import Group
 
         Group.objects.filter(name="Guests").delete()
         user = self.svc._create_user(**USER_BASE)
         self.assertTrue(User.objects.filter(pk=user.pk).exists())
 
     def test_user_has_no_groups_when_guests_group_absent(self):
-        from django.contrib.auth.models import Group
+        from apps.users.models import Group
 
         Group.objects.filter(name="Guests").delete()
         user = self.svc._create_user(**USER_BASE)

@@ -1,9 +1,9 @@
-from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.db import models
 
 from apps.core.models import CodeModel, unique_constraint
 from apps.permissions.constants import PermissionScope
+from apps.users.models import Group, User
 
 
 class PermissionCategory(CodeModel):
@@ -38,7 +38,7 @@ class GroupPermissionCategory(CodeModel):
     MODEL_CODE = "GRPPERM"
 
     group = models.ForeignKey(
-        "auth.Group",
+        Group,
         on_delete=models.CASCADE,
         related_name="permission_categories",
     )
@@ -72,7 +72,7 @@ class UserPermissionCategory(CodeModel):
     MODEL_CODE = "USRPERM"
 
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        User,
         on_delete=models.CASCADE,
         related_name="permission_categories",
     )

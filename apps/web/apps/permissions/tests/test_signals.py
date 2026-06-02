@@ -1,8 +1,8 @@
-from django.contrib.auth.models import Group, Permission
 from django.test import TestCase
 
 from apps.permissions.models import (
     GroupPermissionCategory,
+    Permission,
     PermissionCategory,
     UserPermissionCategory,
 )
@@ -13,7 +13,7 @@ from apps.permissions.signals import (
     invalidate_group_permission_cache,
     invalidate_user_permission_cache,
 )
-from apps.users.models import User
+from apps.users.models import Group, User
 
 
 def make_user(email="user@example.com"):

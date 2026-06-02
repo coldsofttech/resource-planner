@@ -1,4 +1,3 @@
-from django.contrib.auth.models import Group
 from django.test import TestCase
 
 from apps.core.exceptions import AlreadyExistsException, NotFoundException
@@ -14,7 +13,7 @@ from apps.permissions.services import (
     PermissionCategoryService,
     UserPermissionCategoryService,
 )
-from apps.users.models import GroupProfile, User, UserProfile
+from apps.users.models import Group, GroupProfile, User, UserProfile
 
 
 def make_user(email="user@example.com"):

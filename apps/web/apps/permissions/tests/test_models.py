@@ -1,4 +1,3 @@
-from django.contrib.auth.models import Group
 from django.db import IntegrityError
 from django.test import TestCase
 
@@ -8,7 +7,7 @@ from apps.permissions.models import (
     PermissionCategory,
     UserPermissionCategory,
 )
-from apps.users.models import User
+from apps.users.models import Group, User
 
 
 def make_user(email="user@example.com"):

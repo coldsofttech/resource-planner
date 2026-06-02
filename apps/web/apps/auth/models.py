@@ -1,16 +1,16 @@
 import secrets
 
-from django.conf import settings
 from django.db import models
 
 from apps.core.models import TimeStampedModel
+from apps.users.models import User
 
 RESET_CODE_EXPIRY_MINUTES = 10
 
 
 class PasswordResetToken(TimeStampedModel):
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        User,
         on_delete=models.CASCADE,
         related_name="password_reset_tokens",
     )
@@ -25,7 +25,7 @@ class PasswordResetToken(TimeStampedModel):
 
 class UserToken(TimeStampedModel):
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        User,
         on_delete=models.CASCADE,
         related_name="auth_tokens",
     )
