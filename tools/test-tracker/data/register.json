@@ -1,0 +1,303 @@
+{
+  "module": {
+    "slug": "register",
+    "name": "Register",
+    "sort_order": 1,
+    "parent": { "slug": "auth", "name": "Auth", "sort_order": 1 }
+  },
+  "suites": [
+    {
+      "id": "TC-RG-100",
+      "name": "Page Load & Access Control",
+      "test_cases": [
+        {
+          "id": "TC-RG-101",
+          "severity": "P0",
+          "scenario": "Register page loads when AUTH_MODE=classic and self-registration is enabled",
+          "steps": "Configure AUTH_MODE=classic and ALLOW_REGISTRATION=true. Navigate to /register/.",
+          "expected": "Registration form renders. All fields are visible. No errors in the console."
+        },
+        {
+          "id": "TC-RG-102",
+          "severity": "P1",
+          "scenario": "Authenticated user is redirected away from the register page",
+          "steps": "Log in. Then navigate directly to /register/.",
+          "expected": "User is immediately redirected to /dashboard/. The register form is not shown."
+        },
+        {
+          "id": "TC-RG-103",
+          "severity": "P1",
+          "scenario": "CSRF cookie is set on register page load",
+          "steps": "Navigate to GET /register/. Open browser DevTools > Application > Cookies.",
+          "expected": "A csrftoken cookie is present after the page loads."
+        },
+        {
+          "id": "TC-RG-104",
+          "severity": "P2",
+          "scenario": "Register page includes a link to the login page",
+          "steps": "Navigate to /register/.",
+          "expected": "A 'Sign in' or equivalent link is visible and navigates to /login/."
+        }
+      ]
+    },
+    {
+      "id": "TC-RG-200",
+      "name": "Form Rendering",
+      "test_cases": [
+        {
+          "id": "TC-RG-201",
+          "severity": "P0",
+          "scenario": "All required fields are present on the registration form",
+          "steps": "Navigate to /register/.",
+          "expected": "First name, last name, email, password, and confirm password fields are all visible."
+        },
+        {
+          "id": "TC-RG-202",
+          "severity": "P1",
+          "scenario": "Password fields are masked by default",
+          "steps": "Navigate to /register/. Observe the password and confirm password inputs.",
+          "expected": "Both password fields obscure characters (input type=password)."
+        },
+        {
+          "id": "TC-RG-203",
+          "severity": "P2",
+          "scenario": "App branding renders correctly on the register page",
+          "steps": "Navigate to /register/ after setting a custom app name.",
+          "expected": "Configured app name and branding appear correctly."
+        }
+      ]
+    },
+    {
+      "id": "TC-RG-300",
+      "name": "Successful Registration",
+      "test_cases": [
+        {
+          "id": "TC-RG-301",
+          "severity": "P0",
+          "scenario": "Valid registration data creates an account and shows a success message",
+          "steps": "Navigate to /register/. Fill in: first name, last name, valid email, strong password (12+ chars, mixed case, digit, symbol), matching confirm password. Click Register.",
+          "expected": "201 response. Success message shown (e.g. 'Account created. Please sign in.'). No session established automatically."
+        },
+        {
+          "id": "TC-RG-302",
+          "severity": "P0",
+          "scenario": "Newly registered user can log in immediately after registration",
+          "steps": "Complete a valid registration. Navigate to /login/. Enter the registered email and password.",
+          "expected": "Login succeeds. User is authenticated and redirected to /dashboard/."
+        },
+        {
+          "id": "TC-RG-303",
+          "severity": "P2",
+          "scenario": "Submit button shows loading state during registration",
+          "steps": "Fill in valid registration data. Click Register. Observe the button immediately after clicking.",
+          "expected": "Button is disabled and shows a loading indicator while the request is in-flight."
+        }
+      ]
+    },
+    {
+      "id": "TC-RG-400",
+      "name": "Error States",
+      "test_cases": [
+        {
+          "id": "TC-RG-401",
+          "severity": "P0",
+          "scenario": "Duplicate email address returns a 409 conflict error",
+          "steps": "Register with a valid email. Attempt to register again with the same email.",
+          "expected": "409 error. Message indicates an account with that email already exists."
+        },
+        {
+          "id": "TC-RG-402",
+          "severity": "P0",
+          "scenario": "Self-registration disabled returns a 403 error",
+          "steps": "Configure ALLOW_REGISTRATION=false. Navigate to /register/ and attempt to submit the form.",
+          "expected": "403 error. Message indicates registration is not available."
+        },
+        {
+          "id": "TC-RG-403",
+          "severity": "P1",
+          "scenario": "Weak password returns a 422 error with a descriptive message",
+          "steps": "Fill in the form with a password that is too simple (e.g. 'password123'). Submit.",
+          "expected": "422 error. Message describes the specific password weakness (e.g. 'too common', 'missing special character')."
+        }
+      ]
+    },
+    {
+      "id": "TC-RG-500",
+      "name": "Input Validation",
+      "test_cases": [
+        {
+          "id": "TC-RG-501",
+          "severity": "P0",
+          "scenario": "Empty first name shows a validation error",
+          "steps": "Leave first name blank. Fill in all other fields. Submit.",
+          "expected": "Validation error for first name field."
+        },
+        {
+          "id": "TC-RG-502",
+          "severity": "P0",
+          "scenario": "Empty last name shows a validation error",
+          "steps": "Leave last name blank. Fill in all other fields. Submit.",
+          "expected": "Validation error for last name field."
+        },
+        {
+          "id": "TC-RG-503",
+          "severity": "P0",
+          "scenario": "Empty email shows a validation error",
+          "steps": "Leave email blank. Fill in all other fields. Submit.",
+          "expected": "Validation error for email field."
+        },
+        {
+          "id": "TC-RG-504",
+          "severity": "P0",
+          "scenario": "Invalid email format shows a validation error",
+          "steps": "Enter 'notanemail' in the email field. Fill in all other fields. Submit.",
+          "expected": "Validation error indicating invalid email format."
+        },
+        {
+          "id": "TC-RG-505",
+          "severity": "P0",
+          "scenario": "Password shorter than 12 characters shows a validation error",
+          "steps": "Enter a password of 11 characters. Fill in all other fields. Submit.",
+          "expected": "Validation error indicating the password is too short (minimum 12 characters)."
+        },
+        {
+          "id": "TC-RG-506",
+          "severity": "P0",
+          "scenario": "Mismatched passwords show a validation error",
+          "steps": "Enter a valid password. Enter a different value in confirm password. Submit.",
+          "expected": "Validation error on confirm password: 'Passwords do not match.'"
+        },
+        {
+          "id": "TC-RG-507",
+          "severity": "P1",
+          "scenario": "All fields empty shows validation errors for all required fields",
+          "steps": "Navigate to /register/. Leave all fields empty. Click Register.",
+          "expected": "Validation errors shown for: first name, last name, email, password, confirm password."
+        },
+        {
+          "id": "TC-RG-508",
+          "severity": "P2",
+          "scenario": "First name or last name exceeding 150 characters is rejected",
+          "steps": "Enter 151 characters in the first name field. Fill in all other fields. Submit.",
+          "expected": "Validation error indicating the field exceeds the maximum length."
+        }
+      ]
+    },
+    {
+      "id": "TC-RG-600",
+      "name": "Security",
+      "test_cases": [
+        {
+          "id": "TC-RG-601",
+          "severity": "P1",
+          "scenario": "CSRF protection is enforced on the register endpoint",
+          "steps": "Attempt to POST to /api/v1/auth/register/ without a valid CSRF token (e.g. using curl).",
+          "expected": "Request is rejected with a 403 Forbidden error."
+        },
+        {
+          "id": "TC-RG-602",
+          "severity": "P1",
+          "scenario": "Password is not returned in the registration response",
+          "steps": "Submit a valid registration form. Inspect the API response body.",
+          "expected": "No password, hash, or token is included in the success response."
+        }
+      ]
+    },
+    {
+      "id": "TC-RG-650",
+      "name": "SSO Auth Mode — Access Restrictions",
+      "test_cases": [
+        {
+          "id": "TC-RG-651",
+          "severity": "P0",
+          "scenario": "Register endpoint returns 403 when AUTH_MODE is oauth",
+          "steps": "Configure setup with OAuth authentication. Attempt to POST to /api/v1/auth/register/ with valid registration data.",
+          "expected": "403 error. Message indicates registration is not available."
+        },
+        {
+          "id": "TC-RG-652",
+          "severity": "P0",
+          "scenario": "Register endpoint returns 403 when AUTH_MODE is saml",
+          "steps": "Configure setup with SAML authentication. Attempt to POST to /api/v1/auth/register/ with valid registration data.",
+          "expected": "403 error. Message indicates registration is not available."
+        },
+        {
+          "id": "TC-RG-653",
+          "severity": "P1",
+          "scenario": "Register page at /register/ is still reachable when AUTH_MODE is oauth but returns 403 on submit",
+          "steps": "Configure setup with OAuth. Navigate to /register/. Fill in all valid registration fields. Click Register.",
+          "expected": "The page loads (no redirect). On form submit the API returns 403. An error message is displayed. No account is created."
+        },
+        {
+          "id": "TC-RG-654",
+          "severity": "P1",
+          "scenario": "Register page at /register/ is still reachable when AUTH_MODE is saml but returns 403 on submit",
+          "steps": "Configure setup with SAML. Navigate to /register/. Fill in all valid registration fields. Click Register.",
+          "expected": "The page loads. On submit the API returns 403. An error message is displayed. No account is created."
+        },
+        {
+          "id": "TC-RG-655",
+          "severity": "P1",
+          "scenario": "'Create account' link is hidden on login page when AUTH_MODE is oauth",
+          "steps": "Configure setup with OAuth. Navigate to /login/.",
+          "expected": "No 'Create account' or register link is shown on the login page."
+        },
+        {
+          "id": "TC-RG-656",
+          "severity": "P1",
+          "scenario": "'Create account' link is hidden on login page when AUTH_MODE is saml",
+          "steps": "Configure setup with SAML. Navigate to /login/.",
+          "expected": "No 'Create account' or register link is shown on the login page."
+        },
+        {
+          "id": "TC-RG-657",
+          "severity": "P1",
+          "scenario": "Register endpoint returns 403 when classic auth but ALLOW_REGISTRATION is false",
+          "steps": "Configure setup with Classic auth and ALLOW_REGISTRATION=false. Attempt to POST to /api/v1/auth/register/ with valid data.",
+          "expected": "403 error. Message indicates registration is not available."
+        },
+        {
+          "id": "TC-RG-658",
+          "severity": "P2",
+          "scenario": "Meta API returns allow_registration=false when AUTH_MODE is oauth",
+          "steps": "Configure setup with OAuth. Call GET /api/v1/meta/ without authentication.",
+          "expected": "Response contains allow_registration=false. The frontend uses this to hide the register link."
+        },
+        {
+          "id": "TC-RG-659",
+          "severity": "P2",
+          "scenario": "Meta API returns allow_registration=false when AUTH_MODE is saml",
+          "steps": "Configure setup with SAML. Call GET /api/v1/meta/ without authentication.",
+          "expected": "Response contains allow_registration=false. The frontend uses this to hide the register link."
+        }
+      ]
+    },
+    {
+      "id": "TC-RG-700",
+      "name": "Non-Functional",
+      "test_cases": [
+        {
+          "id": "TC-RG-701",
+          "severity": "P2",
+          "scenario": "Registration page renders correctly on mobile screen sizes",
+          "steps": "Open /register/ in a browser. Resize window to 375×812px (or use mobile emulation).",
+          "expected": "Form is fully visible and usable. No overflow or broken layout."
+        },
+        {
+          "id": "TC-RG-702",
+          "severity": "P2",
+          "scenario": "Registration form is accessible via keyboard navigation",
+          "steps": "Navigate to /register/. Use Tab key to move through all fields and Enter to submit.",
+          "expected": "All fields and the submit button are reachable via keyboard in a logical order."
+        },
+        {
+          "id": "TC-RG-703",
+          "severity": "P2",
+          "scenario": "All form fields have accessible labels",
+          "steps": "Inspect the form HTML. Check each input for a label or aria-label.",
+          "expected": "Every input field has an associated accessible label."
+        }
+      ]
+    }
+  ]
+}

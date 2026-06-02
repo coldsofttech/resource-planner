@@ -1,0 +1,32 @@
+.rp-divider-x {
+  border: 0;
+  height: 1px;
+  background: var(--rp-divider);
+  margin: 12px 0;
+}
+.rp-stack-8 > * + * {
+  margin-top: 8px;
+}
+.rp-stack-12 > * + * {
+  margin-top: 12px;
+}
+.rp-stack-16 > * + * {
+  margin-top: 16px;
+}
+.rp-stack-24 > * + * {
+  margin-top: 24px;
+}
+
+.rp-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, oklch(0.65 0.16 280), oklch(0.65 0.16 200));
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}

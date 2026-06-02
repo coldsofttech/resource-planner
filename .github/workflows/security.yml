@@ -1,0 +1,29 @@
+name: Security Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: |
+          pip install bandit pip-audit
+
+      - name: Bandit
+        run: bandit -r apps packages --configfile pyproject.toml
+
+      - name: pip-audit
+        run: pip-audit

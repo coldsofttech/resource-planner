@@ -1,0 +1,65 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.14
+    hooks:
+      - id: ruff
+        args: [--fix]
+
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v2.1.0
+    hooks:
+      - id: mypy
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.9.4
+    hooks:
+      - id: bandit
+        args: ["-r", "apps", "packages", "--skip", "B101,B105,B106,B107"]
+        pass_filenames: false
+
+  - repo: local
+    hooks:
+      - id: prettier
+        name: prettier
+        entry: npx prettier --write
+        language: system
+        types_or:
+          - javascript
+          - jsx
+          - ts
+          - tsx
+          - css
+          - scss
+          - html
+          - yaml
+          - json
+          - markdown
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: detect-private-key
+
+  - repo: local
+    hooks:
+      - id: build-css
+        name: Build CSS (PostCSS)
+        entry: npm run build:css
+        language: system
+        pass_filenames: false
+        files: ^apps/web/static/css/
+
+  - repo: local
+    hooks:
+      - id: build-js
+        name: Build JS (esbuild)
+        entry: npm run build:js
+        language: system
+        pass_filenames: false
+        files: ^apps/web/static/js/

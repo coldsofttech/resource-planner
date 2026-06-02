@@ -1,1 +1,1 @@
-# resource_planner
+# resource-planner

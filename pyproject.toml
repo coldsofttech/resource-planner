@@ -1,0 +1,39 @@
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "I",
+    "B",
+]
+
+ignore = []
+
+[tool.ruff.lint.isort]
+known-first-party = ["apps"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.13"
+ignore_missing_imports = true
+mypy_path = "apps/web"
+explicit_package_bases = true
+
+[tool.bandit]
+exclude_dirs = ["tests"]
+skips = ["B101", "B105", "B106", "B107"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+pythonpath = ["apps/web"]
+testpaths = ["apps/web"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-n auto --dist=loadfile --html=.pytest-reports/test-report.html --self-contained-html"

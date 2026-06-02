@@ -1,0 +1,201 @@
+.rp-wiz,
+.rp-wiz-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 24px;
+}
+.rp-wiz-side {
+  background: var(--rp-surface);
+  border: 1px solid var(--rp-border);
+  border-radius: var(--rp-r-8);
+  padding: 12px;
+  align-self: flex-start;
+  position: sticky;
+  top: 120px;
+}
+.rp-wiz-side .label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--rp-text-subtle);
+  padding: 8px 10px 4px;
+}
+.rp-wiz-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--rp-r-6);
+  font-size: 13px;
+  color: var(--rp-text-muted);
+  cursor: pointer;
+  position: relative;
+  background: none;
+  border: 0;
+  width: 100%;
+  text-align: left;
+}
+.rp-wiz-step:hover {
+  background: var(--rp-surface-hover);
+  color: var(--rp-text);
+}
+.rp-wiz-step .num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--rp-bg-sunken);
+  color: var(--rp-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  border: 1.5px solid var(--rp-border-strong);
+  z-index: 2;
+  position: relative;
+}
+.rp-wiz-step .meta {
+  line-height: 1.25;
+}
+.rp-wiz-step .meta small {
+  display: block;
+  font-size: 11px;
+  color: var(--rp-text-subtle);
+  font-weight: 400;
+}
+.rp-wiz-step.is-done {
+  color: var(--rp-text);
+}
+.rp-wiz-step.is-done .num {
+  background: var(--rp-success);
+  color: #052914;
+  border-color: var(--rp-success);
+}
+.rp-wiz-step.is-active {
+  background: var(--rp-accent-soft);
+  color: var(--rp-accent-soft-text);
+  font-weight: 600;
+}
+.rp-wiz-step.is-active .num {
+  background: var(--rp-accent);
+  color: #fff;
+  border-color: var(--rp-accent);
+  box-shadow: 0 0 0 4px var(--rp-accent-soft);
+}
+.rp-wiz-step + .rp-wiz-step::before {
+  content: "";
+  position: absolute;
+  left: 25px;
+  top: -6px;
+  width: 1.5px;
+  height: 12px;
+  background: var(--rp-border-strong);
+  z-index: 1;
+}
+.rp-wiz-step.is-done + .rp-wiz-step::before {
+  background: var(--rp-success);
+}
+
+.rp-wiz-side-foot {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rp-divider);
+}
+.rp-wiz-side-foot .rp-progress {
+  margin: 6px 0;
+}
+
+.rp-wiz-main {
+  background: var(--rp-surface);
+  border: 1px solid var(--rp-border);
+  border-radius: var(--rp-r-8);
+}
+.rp-wiz-head {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--rp-divider);
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.rp-wiz-head .rp-step-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--rp-r-12);
+  display: grid;
+  place-items: center;
+  background: var(--rp-accent-soft);
+  color: var(--rp-accent-soft-text);
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.rp-wiz-head .step-of {
+  font-size: 11px;
+  color: var(--rp-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+.rp-wiz-head h3 {
+  font-size: 20px;
+  margin: 6px 0 2px;
+}
+.rp-wiz-head .rp-wiz-sub {
+  color: var(--rp-text-muted);
+  font-size: 13px;
+}
+.rp-wiz-body {
+  padding: 24px;
+}
+.rp-wiz-foot {
+  padding: 14px 24px;
+  border-top: 1px solid var(--rp-divider);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--rp-bg-sunken);
+  border-radius: 0 0 var(--rp-r-8) var(--rp-r-8);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.rp-wiz-panel {
+  display: none;
+}
+.rp-wiz-panel.is-active {
+  display: block;
+}
+
+.rp-wiz-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--rp-text-muted);
+}
+.rp-wiz-progress .rp-progress {
+  width: 180px;
+}
+
+.rp-wiz-horizontal {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+  flex-wrap: wrap;
+}
+.rp-wiz-horizontal .rp-wiz-step {
+  padding: 8px 12px;
+  flex: 0 0 auto;
+}
+.rp-wiz-horizontal .rp-wiz-step + .rp-wiz-step::before {
+  display: none;
+}
+.rp-wiz-horizontal .rp-wiz-sep {
+  flex: 1;
+  min-width: 16px;
+  height: 1.5px;
+  background: var(--rp-border-strong);
+}
+.rp-wiz-horizontal .rp-wiz-sep.done {
+  background: var(--rp-success);
+}

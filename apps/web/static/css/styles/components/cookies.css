@@ -1,0 +1,43 @@
+.rp-cookie {
+  position: fixed;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  background: var(--rp-bg-elev);
+  border: 1px solid var(--rp-border-strong);
+  border-radius: var(--rp-r-12);
+  box-shadow: var(--rp-shadow-lg);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 50;
+}
+.rp-cookie {
+  flex-direction: column;
+  align-items: stretch;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  padding: 14px;
+}
+.rp-cookie > i {
+  align-self: flex-start;
+}
+.rp-cookie .ms-auto {
+  width: 100%;
+}
+.rp-cookie .d-flex.gap-2 {
+  width: 100%;
+}
+.rp-cookie .d-flex.gap-2 > .rp-btn {
+  flex: 1;
+}
+
+@media (min-width: 900px) {
+  .rp-cookie {
+    left: auto;
+    right: 24px;
+    width: 520px;
+  }
+}

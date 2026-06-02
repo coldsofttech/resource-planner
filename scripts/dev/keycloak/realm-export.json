@@ -1,0 +1,113 @@
+{
+  "realm": "resource-planner",
+  "displayName": "Resource Planner Dev",
+  "enabled": true,
+  "sslRequired": "external",
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "bruteForceProtected": false,
+  "clients": [
+    {
+      "clientId": "resource-planner-oauth",
+      "name": "Resource Planner OAuth",
+      "description": "OIDC / OAuth 2.0 client for local dev testing",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "dev-oauth-secret",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:8000/*",
+        "http://127.0.0.1:8000/*",
+        "http://resourceplanner.test:8000/*",
+        "http://192.168.1.176:8000/*"
+      ],
+      "webOrigins": [
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+        "http://resourceplanner.test:8000",
+        "http://192.168.1.176:8000"
+      ]
+    },
+    {
+      "clientId": "http://localhost:8000/sp",
+      "name": "Resource Planner SAML",
+      "description": "SAML 2.0 SP for local dev testing",
+      "enabled": true,
+      "protocol": "saml",
+      "fullScopeAllowed": true,
+      "attributes": {
+        "saml.authnstatement": "true",
+        "saml.server.signature": "true",
+        "saml.assertion.signature": "true",
+        "saml.encrypt": "false",
+        "saml.client.signature": "false",
+        "saml.force.post.binding": "false",
+        "saml_assertion_consumer_url_post": "http://localhost:8000/api/v1/auth/saml/acs/",
+        "saml_name_id_format": "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+        "saml_force_name_id_format": "true"
+      },
+      "protocolMappers": [
+        {
+          "name": "email",
+          "protocol": "saml",
+          "protocolMapper": "saml-user-property-mapper",
+          "config": {
+            "attribute.nameformat": "Basic",
+            "user.attribute": "email",
+            "friendly.name": "email",
+            "attribute.name": "email"
+          }
+        },
+        {
+          "name": "first_name",
+          "protocol": "saml",
+          "protocolMapper": "saml-user-property-mapper",
+          "config": {
+            "attribute.nameformat": "Basic",
+            "user.attribute": "firstName",
+            "friendly.name": "first_name",
+            "attribute.name": "first_name"
+          }
+        },
+        {
+          "name": "last_name",
+          "protocol": "saml",
+          "protocolMapper": "saml-user-property-mapper",
+          "config": {
+            "attribute.nameformat": "Basic",
+            "user.attribute": "lastName",
+            "friendly.name": "last_name",
+            "attribute.name": "last_name"
+          }
+        }
+      ],
+      "redirectUris": [
+        "http://localhost:8000/*",
+        "http://127.0.0.1:8000/*",
+        "http://resourceplanner.test:8000/*",
+        "http://192.168.1.176:8000/*"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "sso@example.com",
+      "email": "sso@example.com",
+      "firstName": "SSO",
+      "lastName": "User",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Test1234!",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}

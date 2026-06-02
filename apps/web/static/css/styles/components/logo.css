@@ -1,0 +1,13 @@
+.rp-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--rp-accent), oklch(0.55 0.18 305));
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: -0.04em;
+  flex-shrink: 0;
+}

@@ -1,0 +1,51 @@
+.rp-card {
+  background: var(--rp-surface);
+  border: 1px solid var(--rp-border);
+  border-radius: var(--rp-r-8);
+  box-shadow: var(--rp-shadow-sm);
+}
+.rp-card-head {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--rp-divider);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.rp-card-title {
+  font-size: var(--rp-fs-15);
+  font-weight: 600;
+  margin: 0;
+}
+.rp-card-body {
+  padding: 20px;
+}
+.rp-card-foot {
+  padding: 12px 20px;
+  border-top: 1px solid var(--rp-divider);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.rp-card-sunken {
+  background: var(--rp-bg-sunken);
+  box-shadow: none;
+}
+.rp-card-sunken .rp-card-head {
+  padding: 9px 14px;
+  font-size: var(--rp-fs-12);
+  font-weight: 700;
+  color: var(--rp-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.rp-card-sunken .rp-card-head strong {
+  font-weight: inherit;
+  color: inherit;
+}
+.rp-card-head-icon {
+  font-size: 13px;
+  color: var(--rp-text-subtle);
+  flex-shrink: 0;
+}

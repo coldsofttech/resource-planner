@@ -1,0 +1,76 @@
+name: Web CI
+
+on:
+  pull_request:
+    paths:
+      - "apps/web/**"
+      - "packages/**"
+      - ".github/workflows/web-ci.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements/base.txt
+          pip install -r requirements/dev.txt
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build frontend assets (CSS + JS)
+        run: |
+          npm run build:css
+          npm run build:js
+
+      - name: Verify frontend build outputs
+        run: |
+          test -f apps/web/static/css/dist/styles.min.css
+          test -f apps/web/static/js/dist/main.min.js
+          test -f apps/web/static/js/dist/utils.min.js
+          test -f apps/web/static/js/dist/components.min.js
+          test -f apps/web/static/js/dist/setup.min.js
+
+      - name: Ruff
+        run: ruff check .
+
+      - name: Ruff Format
+        run: ruff format --check .
+
+      - name: mypy
+        run: mypy apps/web
+
+      - name: pytest
+        run: |
+          mkdir -p .pytest-reports
+          pytest --override-ini=addopts= -n auto --dist=loadfile --junit-xml=.pytest-reports/junit.xml --html=.pytest-reports/test-report.html --self-contained-html
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-report
+          path: .pytest-reports/
+
+      - name: Bandit
+        run: bandit -r apps/web packages --configfile pyproject.toml
+
+      - name: pip-audit
+        run: pip-audit --skip-editable
+
+      - name: Django Security Checks
+        run: |
+          cd apps/web
+          python manage.py check --deploy

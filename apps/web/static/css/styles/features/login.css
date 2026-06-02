@@ -1,0 +1,283 @@
+.rp-auth-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--rp-bg);
+}
+
+@media (max-width: 900px) {
+  .rp-auth-shell {
+    grid-template-columns: 1fr;
+  }
+  .rp-auth-side {
+    display: none;
+  }
+}
+
+.rp-auth-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.rp-auth-bar {
+  display: flex;
+  align-items: center;
+  padding: 18px 32px;
+  gap: 12px;
+}
+
+.rp-auth-bar-name {
+  font-weight: 400;
+  line-height: 1;
+}
+
+.rp-auth-bar-sub {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.rp-auth-register-link {
+  font-size: 13px;
+}
+
+.rp-auth-body {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+}
+
+.rp-auth-card {
+  width: 100%;
+  max-width: 420px;
+}
+
+/* Submit button — full width inside auth card */
+.rp-auth-submit {
+  display: block;
+  margin-top: 4px;
+}
+.rp-auth-submit button {
+  width: 100%;
+}
+
+.rp-auth-forgot {
+  margin-top: 4px;
+}
+
+.rp-auth-link-sm {
+  font-size: 13px;
+}
+
+.rp-auth-terms {
+  font-size: 13px;
+}
+
+.rp-divider-or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--rp-text-muted);
+  font-size: 12px;
+}
+.rp-divider-or::before,
+.rp-divider-or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--rp-divider);
+}
+
+.rp-auth-foot {
+  padding: 16px 32px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--rp-text-muted);
+}
+
+.rp-auth-foot-link {
+  text-decoration: none;
+}
+
+.rp-auth-side {
+  background:
+    radial-gradient(800px 400px at 70% 20%, oklch(0.55 0.18 305 / 0.3), transparent 60%),
+    radial-gradient(800px 500px at 20% 80%, oklch(0.55 0.18 270 / 0.3), transparent 60%),
+    linear-gradient(135deg, oklch(0.3 0.1 270), oklch(0.25 0.1 290));
+  color: #fff;
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.rp-auth-side::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    135deg,
+    transparent 0 80px,
+    rgba(255, 255, 255, 0.02) 80px 81px
+  );
+  pointer-events: none;
+}
+
+.rp-auth-side-logo {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.rp-auth-side-body {
+  position: relative;
+}
+
+.rp-auth-quote {
+  font-size: 22px;
+  line-height: 1.35;
+  font-weight: 600;
+  max-width: 480px;
+  letter-spacing: -0.01em;
+}
+
+.rp-auth-quote-highlight {
+  background: linear-gradient(180deg, transparent 60%, rgba(255, 255, 255, 0.18) 60%);
+  padding: 0 4px;
+}
+
+.rp-auth-side-desc {
+  margin-top: 20px;
+  font-size: 14px;
+  line-height: 1.65;
+  opacity: 0.85;
+}
+
+.rp-auth-side-desc p {
+  margin: 0 0 14px;
+}
+
+.rp-auth-onboard-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  transition: background 0.12s;
+}
+
+.rp-auth-onboard-cta:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.rp-auth-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  max-width: 480px;
+  position: relative;
+}
+
+.rp-auth-stat {
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  backdrop-filter: blur(6px);
+}
+
+.rp-auth-stat .v {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-family: var(--rp-font-mono);
+}
+
+.rp-auth-stat .l {
+  font-size: 11px;
+  opacity: 0.75;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.rp-fp-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--rp-bg);
+}
+
+/* Forgot-password bar uses the same .rp-auth-bar styles but lives outside
+   .rp-auth-shell, so we scope responsive padding adjustments here. */
+.rp-fp-page .rp-auth-bar {
+  flex-shrink: 0;
+}
+
+.rp-fp-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  /* Ensures the body itself can scroll on very small screens when the card
+     is taller than the available viewport space. */
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.rp-fp-card {
+  width: 100%;
+  max-width: 440px;
+}
+
+@media (max-width: 600px) {
+  .rp-fp-page .rp-auth-bar {
+    padding: 12px 16px;
+    gap: 8px;
+  }
+
+  .rp-fp-body {
+    /* On mobile align to top so content can scroll naturally */
+    justify-content: flex-start;
+    padding: 16px;
+  }
+}
+
+.rp-fp-step-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.rp-fp-step-icon--accent {
+  background: var(--rp-accent-soft);
+  color: var(--rp-accent-soft-text);
+}
+
+.rp-fp-step-icon--success {
+  background: var(--rp-success-soft);
+  color: var(--rp-success-soft-text);
+}
+
+.rp-fp-step-icon i {
+  font-size: 22px;
+}
+
+.rp-fp-note {
+  font-size: 13px;
+}
