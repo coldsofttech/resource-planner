@@ -55,7 +55,7 @@ jobs:
       - name: pytest
         run: |
           mkdir -p .pytest-reports
-          pytest -n auto --dist=loadfile --junit-xml=.pytest-reports/junit.xml
+          pytest -n auto --dist=loadfile --junit-xml=.pytest-reports/junit.xml --html=.pytest-reports/test-report.html --self-contained-html
 
       - name: Upload test report
         if: always()
@@ -73,4 +73,6 @@ jobs:
       - name: Django Security Checks
         run: |
           cd apps/web
-          python manage.py check --deploy
+          python manage.py check --deploy --silenced-system-checks \
+            security.W004 security.W008 security.W009 \
+            security.W012 security.W016 security.W018

@@ -41,7 +41,7 @@ jobs:
       - name: pytest
         run: |
           mkdir -p .pytest-reports
-          pytest -n auto --dist=loadfile -p no:django --override-ini=addopts= --import-mode=importlib --junit-xml=.pytest-reports/junit.xml packages/awscore/tests/ packages/emailcore/tests/ packages/pycore/tests/ packages/otpcore/tests/
+          pytest -n auto --dist=loadfile -p no:django --override-ini=addopts= --import-mode=importlib --junit-xml=.pytest-reports/junit.xml --html=.pytest-reports/test-report.html --self-contained-html packages/awscore/tests/ packages/emailcore/tests/ packages/pycore/tests/ packages/otpcore/tests/
 
       - name: Upload test report
         if: always()
