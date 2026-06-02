@@ -174,3 +174,12 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
+
+SILENCED_SYSTEM_CHECKS = [
+    "security.W004",
+    "security.W008",
+    "security.W009",
+    "security.W012",
+    "security.W016",
+    "security.W018",
+]
