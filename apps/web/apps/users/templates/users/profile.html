@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Profile
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/users.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Account
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Profile
+  <span id="rp-profile-sso-badge"
+        hidden
+        class="rp-badge rp-badge-soft ms-2"
+        style="font-size: 0.7rem;
+               vertical-align: middle"></span>
+{% endblock page_title %}
+{% block page_sub %}
+  Manage your personal information and account settings.
+{% endblock
+page_sub %}
+{% block content %}
+  <div class="row g-4 align-items-lg-start" id="rp-profile-root">
+    <!-- Left column: Avatar → Account info → Groups → More info -->
+    <!-- mobile: order-1 (shows after right col); desktop: order-lg-0 (left col) -->
+    <div class="col-12 col-lg-4 order-1 order-lg-0 d-flex flex-column gap-4">
+      <section-panel>
+        <panel-body>
+        <div class="d-flex flex-column align-items-center gap-3 py-2">
+          <user-avatar-profile id="rp-profile-avatar" seed=""></user-avatar-profile>
+          <div class="text-center">
+            <div class="fw-semibold"
+                 id="rp-profile-display-name"
+                 style="font-size: 1.05rem">&nbsp;</div>
+            <div class="rp-text-muted small" id="rp-profile-email">&nbsp;</div>
+          </div>
+        </div>
+        </panel-body>
+      </section-panel>
+      <section-panel>
+        <panel-title>Account info</panel-title>
+        <panel-body>
+        <view-field id="rp-profile-last-login" label="Last login" meta></view-field>
+        <view-field id="rp-profile-pw-changed" label="Password last changed" meta></view-field>
+        </panel-body>
+      </section-panel>
+      <section-panel>
+        <panel-title>Groups</panel-title>
+        <panel-body>
+        <div id="rp-profile-groups" class="d-flex flex-wrap gap-2 py-1">
+          <span class="rp-text-muted small">Loading…</span>
+        </div>
+        </panel-body>
+      </section-panel>
+      <section-panel>
+        <panel-title>More info</panel-title>
+        <panel-body>
+        <view-field id="rp-profile-location" label="Location"></view-field>
+        <view-field id="rp-profile-emp-type" label="Employment type"></view-field>
+        <view-field id="rp-profile-role" label="Role"></view-field>
+        </panel-body>
+      </section-panel>
+    </div>
+    <!-- Right column: Account details → Preferences → Security -->
+    <!-- mobile: order-0 (shows first); desktop: order-lg-1 (right col) -->
+    <div class="col-12 col-lg-8 order-0 order-lg-1 d-flex flex-column gap-4">
+      <section-panel>
+        <panel-title>Account details</panel-title>
+        <panel-body>
+        <div class="row g-3">
+          <first-name-field id="rp-profile-first-name" col="col-md-6" required></first-name-field>
+          <last-name-field id="rp-profile-last-name" col="col-md-6" required></last-name-field>
+          <text-field id="rp-profile-display-name-field" col="col-12" label="Display name" placeholder="e.g. Smith, John" hint="Shown in reports and resource plans." maxlength="150"></text-field>
+          <email-field id="rp-profile-email-field" col="col-12" prefix-icon readonly hint="Email address cannot be changed." value=""></email-field>
+        </div>
+        <div class="d-flex justify-content-end mt-3">
+          <primary-button id="rp-profile-save-details-btn" label="Save changes" prefix-icon="bi-check2"></primary-button>
+        </div>
+        </panel-body>
+      </section-panel>
+      <section-panel>
+        <panel-title>Preferences</panel-title>
+        <panel-body>
+        <div class="row g-3">
+          <timezone-field id="rp-profile-timezone" col="col-12" show-label></timezone-field>
+          <skills-field id="rp-profile-skills" col="col-12" show-label></skills-field>
+        </div>
+        <div class="d-flex justify-content-end mt-3">
+          <primary-button id="rp-profile-save-prefs-btn" label="Save preferences" prefix-icon="bi-check2"></primary-button>
+        </div>
+        </panel-body>
+      </section-panel>
+      <!-- shown only for classic/superuser accounts -->
+      <div id="rp-profile-security-panel" hidden>
+        <section-panel>
+          <panel-title>Security</panel-title>
+          <panel-body>
+          <div class="row g-3">
+            <password-field id="rp-profile-current-pw" col="col-12" label="Current password" required prefix-icon eye-icon></password-field>
+            <password-field id="rp-profile-new-pw" col="col-md-6" label="New password" required prefix-icon eye-icon hint="Minimum 12 characters, mixed case, number and symbol."></password-field>
+            <confirm-password-field id="rp-profile-confirm-pw" col="col-md-6" label="Confirm password" required prefix-icon eye-icon password-field-id="rp-profile-new-pw"></confirm-password-field>
+          </div>
+          <div class="d-flex justify-content-end mt-3">
+            <primary-button id="rp-profile-change-pw-btn" label="Update password" prefix-icon="bi-shield-lock"></primary-button>
+          </div>
+          </panel-body>
+        </section-panel>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

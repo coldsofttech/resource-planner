@@ -1,4 +1,12 @@
-from apps.users.models import GROUP_ADMINISTRATORS, GROUP_GUESTS, Group, User
+from django.db.models import QuerySet
+
+from apps.users.models import (
+    GROUP_ADMINISTRATORS,
+    GROUP_GUESTS,
+    Group,
+    User,
+    UserProfile,
+)
 
 
 def user_exists(email: str):
@@ -33,3 +41,36 @@ def get_administrators_group():
 
 def get_guests_group():
     return get_system_group(GROUP_GUESTS)
+
+
+def get_all_members() -> QuerySet[UserProfile]:
+    return (
+        UserProfile.objects.select_related(
+            "user",
+            "location",
+            "employment_type",
+            "role",
+            "created_by",
+            "updated_by",
+        )
+        .prefetch_related("skills", "user__avatars")
+        .order_by("user__last_name", "user__first_name")
+    )
+
+
+def get_member_by_code(code: str) -> UserProfile | None:
+    try:
+        return (
+            UserProfile.objects.select_related(
+                "user",
+                "location",
+                "employment_type",
+                "role",
+                "created_by",
+                "updated_by",
+            )
+            .prefetch_related("user__avatars")
+            .get(code=code)
+        )
+    except UserProfile.DoesNotExist:
+        return None

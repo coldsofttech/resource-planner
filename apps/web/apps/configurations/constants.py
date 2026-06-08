@@ -14,3 +14,4 @@ class Module(models.TextChoices):
     AUTHENTICATION = "auth", "Authentication"
     INFRA = "infra", "Infrastructure"
     EMAIL = "email", "Email"
+    HOLIDAYS = "holidays", "Holidays"

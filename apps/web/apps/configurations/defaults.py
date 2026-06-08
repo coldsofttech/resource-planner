@@ -219,10 +219,28 @@ _EMAIL_DEFAULTS = {
 }
 
 
+_HOLIDAYS_DEFAULTS = {
+    "DEFAULT_HOLIDAYS": {
+        "label": "Default Holidays",
+        "value": "20",
+        "description": (
+            "Number of holiday days allocated to each team member per financial year. "
+            "Used as the baseline when calculating available capacity in sprint "
+            "planning."
+        ),
+        "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "holidays",
+    },
+}
+
+
 CONFIGURATION_DEFAULTS = {
     **_SETUP_DEFAULTS,
     **_GENERAL_DEFAULTS,
     **_AUTH_DEFAULTS,
     **_INFRA_DEFAULTS,
     **_EMAIL_DEFAULTS,
+    **_HOLIDAYS_DEFAULTS,
 }
