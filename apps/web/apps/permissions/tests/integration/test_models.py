@@ -7,28 +7,8 @@ from apps.permissions.models import (
     PermissionCategory,
     UserPermissionCategory,
 )
-from apps.users.models import Group, User
-
-
-def make_user(email="user@example.com"):
-    return User.objects.create_user(
-        username=email, email=email, password="TestPass123!"
-    )
-
-
-def make_group(name="Test Group"):
-    return Group.objects.create(name=name)
-
-
-def make_permission_category(module="projects", codename="view", name="View", order=1):
-    return PermissionCategory.objects.create(
-        module=module,
-        codename=codename,
-        name=name,
-        label=f"{name} {module.title()}",
-        order=order,
-    )
-
+from apps.permissions.tests.factories import make_permission_category
+from apps.users.tests.factories import make_group, make_user
 
 # ── PermissionCategory ────────────────────────────────────────────────────────
 

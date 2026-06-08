@@ -5,43 +5,15 @@ from apps.permissions.constants import PermissionScope
 from apps.permissions.models import (
     GroupPermissionCategory,
     Permission,
-    PermissionCategory,
     UserPermissionCategory,
 )
-from apps.users.models import Group, GroupProfile, User, UserProfile
-
-
-def make_user(email="user@example.com"):
-    return User.objects.create_user(
-        username=email, email=email, password="TestPass123!"
-    )
-
-
-def make_user_with_profile(email="user@example.com"):
-    user = make_user(email)
-    profile = UserProfile.objects.create(user=user)
-    return user, profile
-
-
-def make_group(name="Test Group"):
-    return Group.objects.create(name=name)
-
-
-def make_group_with_profile(name="Test Group"):
-    group = Group.objects.create(name=name)
-    profile = GroupProfile.objects.create(group=group)
-    return group, profile
-
-
-def make_permission_category(module="projects", codename="view", name="View", order=1):
-    return PermissionCategory.objects.create(
-        module=module,
-        codename=codename,
-        name=name,
-        label=f"{name} {module.title()}",
-        order=order,
-    )
-
+from apps.permissions.tests.factories import make_permission_category
+from apps.users.tests.factories import (
+    make_group,
+    make_group_with_profile,
+    make_user,
+    make_user_with_profile,
+)
 
 # ── get_all_categories ────────────────────────────────────────────────────────
 

@@ -100,9 +100,16 @@ def get_effective_user_assignments(user: User) -> list[dict]:
 def get_user_permissions(user: User) -> set[str]:
     """
     Returns the flat set of resolved permission strings for a user.
-    Traverses both group and direct category assignments.
+    Superusers receive every registered permission. For regular users,
+    traverses both group and direct category assignments.
     Used by the custom auth backend for has_perm() checks.
     """
+    if user.is_superuser:
+        perms = Permission.objects.values_list(
+            "content_type__app_label", "codename"
+        ).distinct()
+        return {f"{app}.{code}" for app, code in perms}
+
     perms = (
         Permission.objects.filter(
             Q(categories__group_assignments__group__user=user)

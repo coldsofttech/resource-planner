@@ -154,3 +154,13 @@ class ConfigurationAuditTest(TestCase):
     def test_updated_by_defaults_to_none(self):
         config = make_config()
         self.assertIsNone(config.updated_by)
+
+    def test_updated_by_can_be_set(self):
+        user = User.objects.create_user(
+            username="editor@example.com", email="editor@example.com", password="pass"
+        )
+        config = make_config()
+        config.updated_by = user
+        config.save(update_fields=["updated_by"])
+        config.refresh_from_db()
+        self.assertEqual(config.updated_by, user)

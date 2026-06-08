@@ -59,9 +59,16 @@ def prune_system_permissions(sender, **kwargs):
         logger.debug("Pruned %d system permission(s).", total)
 
 
+_SEED_APP_NAMES: frozenset[str] = frozenset(
+    f"apps.{d['module']}" for d in PERMISSION_CATEGORIES
+)
+
+
 @receiver(post_migrate)
 def seed_permission_categories(sender, **kwargs):
-    if sender.name != "apps.permissions":
+    # Re-seed after any app that owns permissions in PERMISSION_CATEGORIES migrates.
+    # This ensures cross-app permissions (e.g. teams.view_team) exist before linking.
+    if sender.name not in _SEED_APP_NAMES:
         return
 
     for module_def in PERMISSION_CATEGORIES:

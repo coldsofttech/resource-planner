@@ -5,7 +5,6 @@ from apps.core.types import ListParams
 from apps.permissions.constants import PermissionScope
 from apps.permissions.models import (
     GroupPermissionCategory,
-    PermissionCategory,
     UserPermissionCategory,
 )
 from apps.permissions.services import (
@@ -13,40 +12,12 @@ from apps.permissions.services import (
     PermissionCategoryService,
     UserPermissionCategoryService,
 )
-from apps.users.models import Group, GroupProfile, User, UserProfile
-
-
-def make_user(email="user@example.com"):
-    return User.objects.create_user(
-        username=email, email=email, password="TestPass123!"
-    )
-
-
-def make_user_with_profile(email="user@example.com"):
-    user = make_user(email)
-    profile = UserProfile.objects.create(user=user)
-    return user, profile
-
-
-def make_group(name="Test Group"):
-    return Group.objects.create(name=name)
-
-
-def make_group_with_profile(name="Test Group"):
-    group = Group.objects.create(name=name)
-    profile = GroupProfile.objects.create(group=group)
-    return group, profile
-
-
-def make_permission_category(module="projects", codename="view", name="View", order=1):
-    return PermissionCategory.objects.create(
-        module=module,
-        codename=codename,
-        name=name,
-        label=f"{name} {module.title()}",
-        order=order,
-    )
-
+from apps.permissions.tests.factories import make_permission_category
+from apps.users.tests.factories import (
+    make_group,
+    make_group_with_profile,
+    make_user_with_profile,
+)
 
 DEFAULT_LIST_PARAMS = ListParams()
 
@@ -340,6 +311,14 @@ class UserPermissionCategoryServiceUpdateScopeTest(TestCase):
                 scope=PermissionScope.ALL,
             )
 
+    def test_raises_not_found_for_unknown_assignment(self):
+        with self.assertRaises(NotFoundException):
+            self.svc.update_scope(
+                user_code=self.profile.code,
+                code="USRPERM-9999",
+                scope=PermissionScope.ALL,
+            )
+
 
 class UserPermissionCategoryServiceRemoveTest(TestCase):
     def setUp(self):
@@ -359,6 +338,10 @@ class UserPermissionCategoryServiceRemoveTest(TestCase):
         other_user, other_profile = make_user_with_profile("other@example.com")
         with self.assertRaises(NotFoundException):
             self.svc.remove(user_code=other_profile.code, code=self.assignment.code)
+
+    def test_raises_not_found_for_unknown_assignment(self):
+        with self.assertRaises(NotFoundException):
+            self.svc.remove(user_code=self.profile.code, code="USRPERM-9999")
 
 
 class UserPermissionCategoryServiceEffectiveTest(TestCase):
@@ -383,6 +366,37 @@ class UserPermissionCategoryServiceEffectiveTest(TestCase):
         )
         result = self.svc.effective(user_code=self.profile.code)
         self.assertEqual(len(result), 2)
+
+    def test_via_group_when_only_group_assignment(self):
+        group = make_group()
+        group.user_set.add(self.user)
+        GroupPermissionCategory.objects.create(
+            group=group, category=self.cat, scope=PermissionScope.TEAM
+        )
+        result = self.svc.effective(user_code=self.profile.code)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["via"], "group")
+
+    def test_via_direct_when_only_direct_assignment(self):
+        UserPermissionCategory.objects.create(
+            user=self.user, category=self.cat, scope=PermissionScope.SELF
+        )
+        result = self.svc.effective(user_code=self.profile.code)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["via"], "direct")
+
+    def test_via_both_when_group_and_direct_assignment_for_same_category(self):
+        group = make_group()
+        group.user_set.add(self.user)
+        GroupPermissionCategory.objects.create(
+            group=group, category=self.cat, scope=PermissionScope.SELF
+        )
+        UserPermissionCategory.objects.create(
+            user=self.user, category=self.cat, scope=PermissionScope.ALL
+        )
+        result = self.svc.effective(user_code=self.profile.code)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["via"], "both")
 
     def test_raises_not_found_for_unknown_user(self):
         with self.assertRaises(NotFoundException):

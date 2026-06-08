@@ -1,5 +1,5 @@
 import os
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from django.test import TestCase
 
@@ -84,6 +84,22 @@ class GetConfigValueTest(TestCase):
         mock_decrypt.assert_not_called()
         self.assertEqual(result, "enc:ciphertext")
 
+    def test_retrieves_aws_prefixed_secret(self):
+        mock_sm_instance = MagicMock()
+        mock_sm_instance.get.return_value = "aws-secret"
+        mock_awscore = MagicMock()
+        mock_awscore.SecretsManager.return_value = mock_sm_instance
+
+        Configuration.objects.filter(config_code="EMAIL_SMTP_PASSWORD").update(
+            value="aws:myapp/EMAIL_SMTP_PASSWORD", is_secret=True
+        )
+        with patch.dict("sys.modules", {"awscore": mock_awscore}):
+            result = get_config_value("EMAIL_SMTP_PASSWORD")
+
+        mock_awscore.SecretsManager.assert_called_once()
+        mock_sm_instance.get.assert_called_once_with("myapp/EMAIL_SMTP_PASSWORD")
+        self.assertEqual(result, "aws-secret")
+
 
 class GeneralSelectorTest(TestCase):
     def test_get_app_name_returns_value_from_db(self):
@@ -99,6 +115,10 @@ class GeneralSelectorTest(TestCase):
             value="https://example.com"
         )
         self.assertEqual(General.get_app_url(), "https://example.com")
+
+    def test_get_app_url_falls_back_to_default(self):
+        Configuration.objects.filter(config_code="APP_URL").delete()
+        self.assertEqual(General.get_app_url(), "")
 
 
 class SetupSelectorTest(TestCase):
@@ -268,3 +288,13 @@ class EmailSelectorTest(TestCase):
             value="smtpuser"
         )
         self.assertEqual(Email.get_smtp_username(), "smtpuser")
+
+    def test_get_smtp_password_returns_empty_by_default(self):
+        # Seeded default value is "" (secret field, empty means no password set).
+        self.assertEqual(Email.get_smtp_password(), "")
+
+    def test_get_smtp_password_returns_plain_value(self):
+        Configuration.objects.filter(config_code="EMAIL_SMTP_PASSWORD").update(
+            value="mypassword", is_secret=True
+        )
+        self.assertEqual(Email.get_smtp_password(), "mypassword")

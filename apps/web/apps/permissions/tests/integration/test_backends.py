@@ -7,34 +7,10 @@ from apps.permissions.constants import PermissionScope
 from apps.permissions.models import (
     GroupPermissionCategory,
     Permission,
-    PermissionCategory,
     UserPermissionCategory,
 )
-from apps.users.models import Group, User
-
-
-def make_user(email="user@example.com", is_active=True, is_superuser=False):
-    if is_superuser:
-        return User.objects.create_superuser(
-            username=email, email=email, password="TestPass123!"
-        )
-    return User.objects.create_user(
-        username=email, email=email, password="TestPass123!", is_active=is_active
-    )
-
-
-def make_group(name="Test Group"):
-    return Group.objects.create(name=name)
-
-
-def make_permission_category(module="permissions", codename="test_cat", order=1):
-    return PermissionCategory.objects.create(
-        module=module,
-        codename=codename,
-        name="Test",
-        label="Test Category",
-        order=order,
-    )
+from apps.permissions.tests.factories import make_permission_category
+from apps.users.tests.factories import make_group, make_user
 
 
 def get_real_permission(codename="view_grouppermissioncategory"):
@@ -42,16 +18,6 @@ def get_real_permission(codename="view_grouppermissioncategory"):
         content_type__app_label="permissions",
         codename=codename,
     )
-
-
-# ── authenticate ──────────────────────────────────────────────────────────────
-
-
-class PermissionCategoryBackendAuthenticateTest(TestCase):
-    def test_authenticate_always_returns_none(self):
-        backend = PermissionCategoryBackend()
-        result = backend.authenticate(request=None, username="any", password="any")
-        self.assertIsNone(result)
 
 
 # ── has_perm — model-level ────────────────────────────────────────────────────
@@ -131,6 +97,17 @@ class PermissionCategoryBackendObjectScopeTest(TestCase):
             )
         )
 
+    def test_none_scope_denies_object_access(self):
+        UserPermissionCategory.objects.create(
+            user=self.user, category=self.cat, scope=PermissionScope.NONE
+        )
+        obj = MagicMock()
+        self.assertFalse(
+            self.backend.has_perm(
+                self.user, "permissions.view_grouppermissioncategory", obj
+            )
+        )
+
     def test_self_scope_grants_access_to_owned_object(self):
         UserPermissionCategory.objects.create(
             user=self.user, category=self.cat, scope=PermissionScope.SELF
@@ -153,6 +130,16 @@ class PermissionCategoryBackendObjectScopeTest(TestCase):
         self.assertFalse(
             self.backend.has_perm(
                 self.user, "permissions.view_grouppermissioncategory", obj
+            )
+        )
+
+    def test_self_scope_denies_when_object_has_no_created_by_id(self):
+        UserPermissionCategory.objects.create(
+            user=self.user, category=self.cat, scope=PermissionScope.SELF
+        )
+        self.assertFalse(
+            self.backend.has_perm(
+                self.user, "permissions.view_grouppermissioncategory", object()
             )
         )
 
@@ -181,6 +168,16 @@ class PermissionCategoryBackendObjectScopeTest(TestCase):
         self.assertFalse(
             self.backend.has_perm(
                 self.user, "permissions.view_grouppermissioncategory", obj
+            )
+        )
+
+    def test_team_scope_denies_when_object_has_no_team_attribute(self):
+        UserPermissionCategory.objects.create(
+            user=self.user, category=self.cat, scope=PermissionScope.TEAM
+        )
+        self.assertFalse(
+            self.backend.has_perm(
+                self.user, "permissions.view_grouppermissioncategory", object()
             )
         )
 

@@ -1,22 +1,19 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
 
-from apps.configurations.models import Configuration
+from apps.configurations.tests.factories import mark_setup_complete
 from apps.permissions.constants import PermissionScope
 from apps.permissions.models import (
     GroupPermissionCategory,
     PermissionCategory,
     UserPermissionCategory,
 )
-from apps.users.models import Group, GroupProfile, User, UserProfile
-
-
-def mark_setup_complete():
-    Configuration.objects.update_or_create(
-        config_code="SETUP_COMPLETE",
-        defaults={"value": "true", "label": "Setup Complete"},
-    )
-
+from apps.permissions.tests.factories import make_permission_category
+from apps.users.tests.factories import (
+    make_group_with_profile,
+    make_user,
+    make_user_with_profile,
+)
 
 CATEGORIES_LIST_URL = "/api/v1/permissions/categories/"
 CATEGORIES_DETAIL_URL = "/api/v1/permissions/categories/{}/"
@@ -25,38 +22,6 @@ GROUPS_DETAIL_URL = "/api/v1/permissions/groups/{}/{}/"
 USERS_LIST_URL = "/api/v1/permissions/users/{}/"
 USERS_DETAIL_URL = "/api/v1/permissions/users/{}/{}/"
 USERS_EFFECTIVE_URL = "/api/v1/permissions/users/{}/effective/"
-
-
-def make_user(email="user@example.com", is_superuser=False):
-    if is_superuser:
-        return User.objects.create_superuser(
-            username=email, email=email, password="TestPass123!"
-        )
-    return User.objects.create_user(
-        username=email, email=email, password="TestPass123!"
-    )
-
-
-def make_user_with_profile(email="user@example.com"):
-    user = make_user(email)
-    profile = UserProfile.objects.create(user=user)
-    return user, profile
-
-
-def make_group_with_profile(name="Test Group"):
-    group = Group.objects.create(name=name)
-    profile = GroupProfile.objects.create(group=group)
-    return group, profile
-
-
-def make_permission_category(module="projects", codename="view", name="View", order=1):
-    return PermissionCategory.objects.create(
-        module=module,
-        codename=codename,
-        name=name,
-        label=f"{name} {module.title()}",
-        order=order,
-    )
 
 
 def get_seeded_category(codename):
@@ -348,6 +313,14 @@ class GroupPermissionsRemoveAPITest(TestCase):
             GroupPermissionCategory.objects.filter(pk=self.assignment.pk).exists()
         )
 
+    def test_wrong_group_returns_404(self):
+        assign_manage_groups_to(self.user)
+        self.client.force_authenticate(user=self.user)
+        _, other_profile = make_group_with_profile("Other Group")
+        url = GROUPS_DETAIL_URL.format(other_profile.code, self.assignment.code)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 404)
+
 
 # ── GET /permissions/users/<user_code>/ ───────────────────────────────────────
 
@@ -432,6 +405,26 @@ class UserPermissionsAssignAPITest(TestCase):
         )
         self.assertEqual(response.status_code, 409)
 
+    def test_invalid_scope_returns_400(self):
+        assign_manage_users_to(self.user)
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(
+            USERS_LIST_URL.format(self.uprofile.code),
+            {"category_code": self.cat.code, "scope": 99},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_unknown_category_returns_404(self):
+        assign_manage_users_to(self.user)
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(
+            USERS_LIST_URL.format(self.uprofile.code),
+            {"category_code": "PERM-9999", "scope": PermissionScope.ALL},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 404)
+
 
 # ── PATCH /permissions/users/<user_code>/<code>/ ──────────────────────────────
 
@@ -466,6 +459,14 @@ class UserPermissionsUpdateScopeAPITest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["data"]["scope"], PermissionScope.ALL)
 
+    def test_wrong_user_returns_404(self):
+        assign_manage_users_to(self.user)
+        self.client.force_authenticate(user=self.user)
+        _, other_profile = make_user_with_profile("other@example.com")
+        url = USERS_DETAIL_URL.format(other_profile.code, self.assignment.code)
+        response = self.client.patch(url, {"scope": PermissionScope.ALL}, format="json")
+        self.assertEqual(response.status_code, 404)
+
 
 # ── DELETE /permissions/users/<user_code>/<code>/ ─────────────────────────────
 
@@ -485,6 +486,12 @@ class UserPermissionsRemoveAPITest(TestCase):
         url = USERS_DETAIL_URL.format(self.uprofile.code, self.assignment.code)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 401)
+
+    def test_user_without_permission_returns_403(self):
+        self.client.force_authenticate(user=self.user)
+        url = USERS_DETAIL_URL.format(self.uprofile.code, self.assignment.code)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 403)
 
     def test_removes_assignment_and_returns_204(self):
         assign_manage_users_to(self.user)

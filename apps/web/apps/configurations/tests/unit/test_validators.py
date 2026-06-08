@@ -44,6 +44,18 @@ class ConfigCodeValidatorTest(SimpleTestCase):
         with self.assertRaises(ValidationError):
             CONFIG_CODE_VALIDATOR("")
 
+    def test_rejects_digit_only(self):
+        with self.assertRaises(ValidationError):
+            CONFIG_CODE_VALIDATOR("9")
+
+    def test_rejects_underscore_start(self):
+        with self.assertRaises(ValidationError):
+            CONFIG_CODE_VALIDATOR("_APP")
+
+    def test_rejects_dot_separator(self):
+        with self.assertRaises(ValidationError):
+            CONFIG_CODE_VALIDATOR("APP.NAME")
+
     def test_error_code_is_invalid_config_code(self):
         try:
             CONFIG_CODE_VALIDATOR("invalid_code")

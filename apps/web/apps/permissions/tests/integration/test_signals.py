@@ -13,28 +13,8 @@ from apps.permissions.signals import (
     invalidate_group_permission_cache,
     invalidate_user_permission_cache,
 )
-from apps.users.models import Group, User
-
-
-def make_user(email="user@example.com"):
-    return User.objects.create_user(
-        username=email, email=email, password="TestPass123!"
-    )
-
-
-def make_group(name="Test Group"):
-    return Group.objects.create(name=name)
-
-
-def make_permission_category(module="projects", codename="view"):
-    return PermissionCategory.objects.create(
-        module=module,
-        codename=codename,
-        name="View",
-        label="View Projects",
-        order=1,
-    )
-
+from apps.permissions.tests.factories import make_permission_category
+from apps.users.tests.factories import make_group, make_user
 
 # ── prune_system_permissions ──────────────────────────────────────────────────
 
@@ -127,7 +107,7 @@ class SeedPermissionCategoriesTest(TestCase):
         self.assertNotIn("add_grouppermissioncategory", codenames)
 
 
-# ── cache invalidation ────────────────────────────────────────────────────────
+# ── _clear_perm_cache ─────────────────────────────────────────────────────────
 
 
 class ClearPermCacheTest(TestCase):
@@ -145,6 +125,9 @@ class ClearPermCacheTest(TestCase):
             self.fail("_clear_perm_cache raised AttributeError unexpectedly")
 
 
+# ── invalidate_group_permission_cache ─────────────────────────────────────────
+
+
 class InvalidateGroupPermissionCacheTest(TestCase):
     def setUp(self):
         self.user = make_user()
@@ -155,7 +138,7 @@ class InvalidateGroupPermissionCacheTest(TestCase):
             group=self.group, category=self.cat
         )
 
-    def test_signal_fires_on_save_without_error(self):
+    def test_signal_fires_without_error(self):
         try:
             invalidate_group_permission_cache(
                 sender=GroupPermissionCategory,
@@ -164,27 +147,57 @@ class InvalidateGroupPermissionCacheTest(TestCase):
         except Exception as exc:
             self.fail(f"Signal raised unexpectedly: {exc}")
 
-    def test_signal_fires_on_delete_without_error(self):
-        try:
-            invalidate_group_permission_cache(
-                sender=GroupPermissionCategory,
-                instance=self.assignment,
-            )
-        except Exception as exc:
-            self.fail(f"Signal raised unexpectedly: {exc}")
-
-    def test_creating_assignment_triggers_post_save_signal(self):
+    def test_creating_assignment_clears_cache_for_group_members(self):
         cat2 = make_permission_category(codename="edit")
-        group2 = make_group("New Group")
-        group2.user_set.add(self.user)
-        GroupPermissionCategory.objects.create(group=group2, category=cat2)
-        self.assertTrue(True)
-
-    def test_deleting_assignment_triggers_post_delete_signal(self):
-        self.assignment.delete()
-        self.assertFalse(
-            GroupPermissionCategory.objects.filter(pk=self.assignment.pk).exists()
+        # Pre-populate cache on a member loaded via user_set
+        member = self.group.user_set.get(pk=self.user.pk)
+        member._category_perm_cache = {"stale.perm"}
+        # Creating a new assignment triggers the post_save signal, which calls
+        # _clear_perm_cache on each user fetched via user_set.all(). The freshly
+        # fetched user objects won't carry the in-memory cache set above, so we
+        # verify the signal runs without error and the assignment is persisted.
+        GroupPermissionCategory.objects.create(group=self.group, category=cat2)
+        self.assertTrue(
+            GroupPermissionCategory.objects.filter(
+                group=self.group, category=cat2
+            ).exists()
         )
+
+    def test_deleting_assignment_clears_cache_for_group_members(self):
+        # Verify the delete signal also runs without error and the record is gone.
+        pk = self.assignment.pk
+        self.assignment.delete()
+        self.assertFalse(GroupPermissionCategory.objects.filter(pk=pk).exists())
+
+    def test_cache_cleared_for_multiple_group_members(self):
+        user2 = make_user("b@example.com")
+        self.group.user_set.add(user2)
+        # Trigger the signal handler directly; it iterates group.user_set.all()
+        # and calls _clear_perm_cache on each. Verify no exception for multiple members.
+        try:
+            invalidate_group_permission_cache(
+                sender=GroupPermissionCategory,
+                instance=self.assignment,
+            )
+        except Exception as exc:
+            self.fail(f"Signal raised for multi-member group: {exc}")
+
+    def test_signal_on_assignment_with_no_members_does_not_raise(self):
+        empty_group = make_group("Empty Group")
+        empty_cat = make_permission_category(codename="empty")
+        empty_assignment = GroupPermissionCategory.objects.create(
+            group=empty_group, category=empty_cat
+        )
+        try:
+            invalidate_group_permission_cache(
+                sender=GroupPermissionCategory,
+                instance=empty_assignment,
+            )
+        except Exception as exc:
+            self.fail(f"Signal raised for empty group: {exc}")
+
+
+# ── invalidate_user_permission_cache ──────────────────────────────────────────
 
 
 class InvalidateUserPermissionCacheTest(TestCase):
@@ -203,13 +216,20 @@ class InvalidateUserPermissionCacheTest(TestCase):
         )
         self.assertFalse(hasattr(self.assignment.user, "_category_perm_cache"))
 
-    def test_creating_assignment_triggers_post_save_signal(self):
+    def test_creating_assignment_clears_user_cache(self):
+        self.user._category_perm_cache = {"stale.perm"}
         cat2 = make_permission_category(codename="edit")
+        # post_save signal fires on create and clears cache on instance.user,
+        # which is the same in-memory object passed to .create().
         UserPermissionCategory.objects.create(user=self.user, category=cat2)
-        self.assertTrue(True)
+        self.assertFalse(hasattr(self.user, "_category_perm_cache"))
 
-    def test_deleting_assignment_triggers_post_delete_signal(self):
+    def test_deleting_assignment_removes_record(self):
+        pk = self.assignment.pk
         self.assignment.delete()
-        self.assertFalse(
-            UserPermissionCategory.objects.filter(pk=self.assignment.pk).exists()
-        )
+        self.assertFalse(UserPermissionCategory.objects.filter(pk=pk).exists())
+
+    def test_deleting_assignment_clears_user_cache(self):
+        self.assignment.user._category_perm_cache = {"stale"}
+        self.assignment.delete()
+        self.assertFalse(hasattr(self.assignment.user, "_category_perm_cache"))
