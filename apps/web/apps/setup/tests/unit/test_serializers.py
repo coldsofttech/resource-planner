@@ -1,5 +1,3 @@
-import pytest
-
 from apps.setup.serializers import (
     AdminInputSerializer,
     AppInputSerializer,
@@ -13,9 +11,6 @@ from apps.setup.serializers import (
     SetupInputSerializer,
     StorageInputSerializer,
 )
-
-pytestmark = pytest.mark.django_db
-
 
 # ---------------------------------------------------------------------------
 # Helpers

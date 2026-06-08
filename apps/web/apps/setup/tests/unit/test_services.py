@@ -1,3 +1,5 @@
+"""Unit tests for apps.setup services — all DB calls are mocked."""
+
 import io
 import os
 from unittest.mock import MagicMock, patch
@@ -5,13 +7,11 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from apps.core.exceptions import ConflictException, ValidationException
+from apps.setup.constants import DeploymentType
 from apps.setup.services import SetupService
 from apps.setup.services import (
     TestService as SetupTestService,  # alias avoids pytest collection
 )
-
-pytestmark = pytest.mark.django_db
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -23,10 +23,7 @@ def _make_service(cls):
 
 
 def _sqlite_local_payload():
-    """
-    Minimal valid setup payload — sqlite + local deployment + classic auth +
-    console email.
-    """
+    """Minimal valid setup payload — sqlite + local deployment + classic auth."""
     from cryptography.fernet import Fernet
 
     return {
@@ -132,10 +129,6 @@ class TestDbConnectionService:
 
 # ---------------------------------------------------------------------------
 # SetupTestService — test_email_connection
-#
-# EmailSender is a local import inside the method:
-#   from emailcore import EmailSender
-# Patch target is the source location: emailcore.EmailSender
 # ---------------------------------------------------------------------------
 
 
@@ -175,12 +168,7 @@ class TestEmailConnectionService:
 
 
 # ---------------------------------------------------------------------------
-# SetupService — create
-#
-# Local imports inside create():
-#   from apps.configurations.selectors import Setup   → patch at source
-#   from apps.setup import status as _status          → patch functions on
-#                                                       apps.setup.status
+# SetupService — create (orchestration)
 # ---------------------------------------------------------------------------
 
 
@@ -226,6 +214,7 @@ class TestSetupServiceCreate:
             patch("apps.setup.status.advance"),
             patch("apps.setup.status.complete") as mock_complete,
             patch("apps.setup.status.fail") as mock_fail,
+            patch("apps.setup.services.transaction.atomic"),
             patch.object(svc, "_write_infra_env"),
             patch.object(svc, "_create_db_configs"),
             patch.object(svc, "_create_logging_configs"),
@@ -261,6 +250,7 @@ class TestSetupServiceCreate:
             patch("apps.setup.status.start"),
             patch("apps.setup.status.advance"),
             patch("apps.setup.status.complete"),
+            patch("apps.setup.services.transaction.atomic"),
             patch.object(
                 svc, "_write_infra_env", side_effect=_recorder("write_infra_env")
             ),
@@ -317,15 +307,12 @@ class TestSetupServiceCreate:
 
 
 # ---------------------------------------------------------------------------
-# Helpers — shared across new test classes
+# Shared helpers for cert-based tests
 # ---------------------------------------------------------------------------
 
 
 def _generate_test_cert_b64():
-    """
-    Return a real self-signed DER cert as base64 (no PEM headers) with a
-    far-future expiry.
-    """
+    """Return a real self-signed DER cert as base64 (no PEM headers)."""
     import base64
     import datetime
 
@@ -347,11 +334,6 @@ def _generate_test_cert_b64():
         .sign(key, hashes.SHA256())
     )
     return base64.b64encode(cert.public_bytes(serialization.Encoding.DER)).decode()
-
-
-def _token_http_error(body_bytes):
-    """Build a urllib HTTPError whose .read() returns body_bytes."""
-    return urllib_http_error(400, body_bytes)
 
 
 def urllib_http_error(code, body_bytes):
@@ -518,6 +500,22 @@ class TestSAMLConnectionService:
                 idp_x509_cert=cert_b64,
             )
 
+    def test_raises_validation_exception_on_generic_error(self):
+        """Non-URL exceptions from urlopen are wrapped in ValidationException."""
+        svc = _make_service(SetupTestService)
+        cert_b64 = _generate_test_cert_b64()
+        with (
+            patch(
+                "urllib.request.urlopen",
+                side_effect=ConnectionError("unexpected error"),
+            ),
+            pytest.raises(ValidationException, match="unexpected error"),
+        ):
+            svc.test_saml_connection(
+                idp_sso_url="https://idp.example.com/sso",
+                idp_x509_cert=cert_b64,
+            )
+
 
 # ---------------------------------------------------------------------------
 # SetupTestService — test_oauth_connection
@@ -591,3 +589,478 @@ class TestOAuthConnectionService:
                 auth_endpoint="https://idp.example.com/auth",
                 token_endpoint="https://idp.example.com/token",
             )
+
+    def test_raises_validation_exception_on_generic_token_error(self):
+        """
+        Non-URL exceptions on the token request are wrapped in ValidationException.
+        """
+        svc = _make_service(SetupTestService)
+        with (
+            patch(
+                "urllib.request.urlopen",
+                side_effect=ConnectionError("network unreachable"),
+            ),
+            pytest.raises(ValidationException, match="network unreachable"),
+        ):
+            svc.test_oauth_connection(
+                client_id="cid",
+                client_secret="csecret",
+                auth_endpoint="https://idp.example.com/auth",
+                token_endpoint="https://idp.example.com/token",
+            )
+
+
+# ---------------------------------------------------------------------------
+# SetupService — _write_infra_env (local deployment)
+# ---------------------------------------------------------------------------
+
+
+class TestWriteInfraEnvLocal:
+    def test_writes_fernet_key_to_dotenv(self):
+        svc = _make_service(SetupService)
+        mock_env = MagicMock()
+        with patch("pycore.DotEnv", return_value=mock_env):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._write_infra_env(
+                    deployment_type=DeploymentType.LOCAL,
+                    fernet_key="test-fernet-key",
+                )
+        mock_env.write.assert_any_call("FERNET_KEY", "test-fernet-key")
+
+    def test_writes_fernet_key_to_os_environ(self):
+        svc = _make_service(SetupService)
+        with patch("pycore.DotEnv", return_value=MagicMock()):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._write_infra_env(
+                    deployment_type=DeploymentType.LOCAL,
+                    fernet_key="test-fernet-key",
+                )
+                assert os.environ["FERNET_KEY"] == "test-fernet-key"
+
+    def test_writes_empty_secrets_prefix_to_os_environ(self):
+        svc = _make_service(SetupService)
+        with patch("pycore.DotEnv", return_value=MagicMock()):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._write_infra_env(
+                    deployment_type=DeploymentType.LOCAL,
+                    fernet_key="key",
+                )
+                assert os.environ["SECRETS_PREFIX"] == ""
+
+    def test_writes_db_password_source_env_to_os_environ(self):
+        svc = _make_service(SetupService)
+        with patch("pycore.DotEnv", return_value=MagicMock()):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._write_infra_env(
+                    deployment_type=DeploymentType.LOCAL,
+                    fernet_key="key",
+                )
+                assert os.environ["DB_PASSWORD_SOURCE"] == "env"
+
+    def test_pops_db_secret_name_from_os_environ(self):
+        svc = _make_service(SetupService)
+        with patch("pycore.DotEnv", return_value=MagicMock()):
+            with patch.dict(os.environ, {"DB_SECRET_NAME": "old-value"}, clear=False):
+                svc._write_infra_env(
+                    deployment_type=DeploymentType.LOCAL,
+                    fernet_key="key",
+                )
+                assert "DB_SECRET_NAME" not in os.environ
+
+    def test_does_not_write_aws_region_for_local(self):
+        svc = _make_service(SetupService)
+        mock_env = MagicMock()
+        with patch("pycore.DotEnv", return_value=mock_env):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._write_infra_env(
+                    deployment_type=DeploymentType.LOCAL,
+                    fernet_key="key",
+                )
+        written_keys = [call.args[0] for call in mock_env.write.call_args_list]
+        assert "AWS_REGION" not in written_keys
+
+
+# ---------------------------------------------------------------------------
+# SetupService — _write_infra_env (AWS deployment)
+# ---------------------------------------------------------------------------
+
+
+class TestWriteInfraEnvAws:
+    def test_strips_trailing_slash_from_secrets_prefix(self):
+        svc = _make_service(SetupService)
+        mock_env = MagicMock()
+        with patch("pycore.DotEnv", return_value=mock_env):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._write_infra_env(
+                    deployment_type=DeploymentType.AWS,
+                    aws_region="eu-west-1",
+                    secrets_prefix="prod/",
+                    aws_auth_mode="role",
+                )
+        mock_env.write.assert_any_call("SECRETS_PREFIX", "prod")
+
+    def test_writes_db_secret_name_derived_from_prefix(self):
+        svc = _make_service(SetupService)
+        with patch("pycore.DotEnv", return_value=MagicMock()):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._write_infra_env(
+                    deployment_type=DeploymentType.AWS,
+                    aws_region="eu-west-1",
+                    secrets_prefix="myapp/prod",
+                    aws_auth_mode="role",
+                )
+                assert os.environ["DB_SECRET_NAME"] == "myapp/prod/db"
+
+    def test_writes_aws_region_to_os_environ(self):
+        svc = _make_service(SetupService)
+        with patch("pycore.DotEnv", return_value=MagicMock()):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._write_infra_env(
+                    deployment_type=DeploymentType.AWS,
+                    aws_region="us-east-1",
+                    secrets_prefix="prefix",
+                    aws_auth_mode="role",
+                )
+                assert os.environ["AWS_REGION"] == "us-east-1"
+                assert os.environ["AWS_DEFAULT_REGION"] == "us-east-1"
+
+    def test_writes_db_password_source_aws(self):
+        svc = _make_service(SetupService)
+        with patch("pycore.DotEnv", return_value=MagicMock()):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._write_infra_env(
+                    deployment_type=DeploymentType.AWS,
+                    aws_region="eu-west-1",
+                    secrets_prefix="prefix",
+                    aws_auth_mode="role",
+                )
+                assert os.environ["DB_PASSWORD_SOURCE"] == "aws"
+
+    def test_role_auth_does_not_write_access_key_to_dotenv(self):
+        svc = _make_service(SetupService)
+        mock_env = MagicMock()
+        with patch("pycore.DotEnv", return_value=mock_env):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._write_infra_env(
+                    deployment_type=DeploymentType.AWS,
+                    aws_region="eu-west-1",
+                    secrets_prefix="prefix",
+                    aws_auth_mode="role",
+                )
+        written_keys = [call.args[0] for call in mock_env.write.call_args_list]
+        assert "AWS_ACCESS_KEY_ID" not in written_keys
+
+    def test_user_auth_writes_access_key_to_dotenv(self):
+        svc = _make_service(SetupService)
+        mock_env = MagicMock()
+        with patch("pycore.DotEnv", return_value=mock_env):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._write_infra_env(
+                    deployment_type=DeploymentType.AWS,
+                    aws_region="eu-west-1",
+                    secrets_prefix="prefix",
+                    aws_auth_mode="user",
+                    aws_access_key_id="AKIAIOSFODNN7EXAMPLE",
+                    aws_secret_access_key="secret",
+                )
+        mock_env.write.assert_any_call("AWS_ACCESS_KEY_ID", "AKIAIOSFODNN7EXAMPLE")
+
+    def test_user_auth_writes_access_key_to_os_environ(self):
+        svc = _make_service(SetupService)
+        with patch("pycore.DotEnv", return_value=MagicMock()):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._write_infra_env(
+                    deployment_type=DeploymentType.AWS,
+                    aws_region="eu-west-1",
+                    secrets_prefix="prefix",
+                    aws_auth_mode="user",
+                    aws_access_key_id="AKIAIOSFODNN7EXAMPLE",
+                    aws_secret_access_key="secret",
+                )
+                assert os.environ["AWS_ACCESS_KEY_ID"] == "AKIAIOSFODNN7EXAMPLE"
+
+    def test_user_auth_writes_secret_access_key_to_os_environ(self):
+        svc = _make_service(SetupService)
+        with patch("pycore.DotEnv", return_value=MagicMock()):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._write_infra_env(
+                    deployment_type=DeploymentType.AWS,
+                    aws_region="eu-west-1",
+                    secrets_prefix="prefix",
+                    aws_auth_mode="user",
+                    aws_access_key_id="AKIAIOSFODNN7EXAMPLE",
+                    aws_secret_access_key="wJalrXUtnFEMI/K7MDENG",
+                )
+                assert os.environ["AWS_SECRET_ACCESS_KEY"] == "wJalrXUtnFEMI/K7MDENG"
+
+
+# ---------------------------------------------------------------------------
+# SetupService — _create_logging_configs
+# ---------------------------------------------------------------------------
+
+
+class TestCreateLoggingConfigs:
+    def test_writes_log_destination_to_dotenv(self):
+        svc = _make_service(SetupService)
+        mock_env = MagicMock()
+        with patch("pycore.DotEnv", return_value=mock_env):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._create_logging_configs(
+                    log_destination="local",
+                    log_name="app",
+                    log_path="/tmp/logs",  # nosec B108
+                )
+        mock_env.write.assert_any_call("LOG_DESTINATION", "local")
+
+    def test_writes_log_destination_to_os_environ(self):
+        svc = _make_service(SetupService)
+        with patch("pycore.DotEnv", return_value=MagicMock()):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._create_logging_configs(
+                    log_destination="cloudwatch",
+                    log_name="app",
+                )
+                assert os.environ["LOG_DESTINATION"] == "cloudwatch"
+
+    def test_writes_log_name_to_os_environ(self):
+        svc = _make_service(SetupService)
+        with patch("pycore.DotEnv", return_value=MagicMock()):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._create_logging_configs(
+                    log_destination="local",
+                    log_name="my-app",
+                    log_path="/tmp/logs",  # nosec B108
+                )
+                assert os.environ["LOG_NAME"] == "my-app"
+
+    def test_writes_log_path_to_os_environ(self):
+        svc = _make_service(SetupService)
+        with patch("pycore.DotEnv", return_value=MagicMock()):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._create_logging_configs(
+                    log_destination="local",
+                    log_name="app",
+                    log_path="/var/log/app",
+                )
+                assert os.environ["LOG_PATH"] == "/var/log/app"
+
+    def test_writes_empty_log_path_when_none(self):
+        svc = _make_service(SetupService)
+        with patch("pycore.DotEnv", return_value=MagicMock()):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._create_logging_configs(
+                    log_destination="cloudwatch",
+                    log_name="app",
+                    log_path=None,
+                )
+                assert os.environ["LOG_PATH"] == ""
+
+    def test_writes_log_rotation_to_os_environ(self):
+        svc = _make_service(SetupService)
+        with patch("pycore.DotEnv", return_value=MagicMock()):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._create_logging_configs(
+                    log_destination="local",
+                    log_name="app",
+                    log_path="/tmp/logs",  # nosec B108
+                    log_rotation="size",
+                )
+                assert os.environ["LOG_ROTATION"] == "size"
+
+    def test_writes_default_rotation_size_mb_when_none(self):
+        svc = _make_service(SetupService)
+        with patch("pycore.DotEnv", return_value=MagicMock()):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._create_logging_configs(
+                    log_destination="local",
+                    log_name="app",
+                    log_path="/tmp/logs",  # nosec B108
+                    log_rotation_size_mb=None,
+                )
+                assert os.environ["LOG_ROTATION_SIZE_MB"] == "10"
+
+    def test_writes_empty_s3_bucket_when_none(self):
+        svc = _make_service(SetupService)
+        with patch("pycore.DotEnv", return_value=MagicMock()):
+            with patch.dict(os.environ, {}, clear=False):
+                svc._create_logging_configs(
+                    log_destination="local",
+                    log_name="app",
+                    log_path="/tmp/logs",  # nosec B108
+                    log_s3_bucket=None,
+                )
+                assert os.environ["LOG_S3_BUCKET"] == ""
+
+
+# ---------------------------------------------------------------------------
+# SetupService — _save_email_configs
+# ---------------------------------------------------------------------------
+
+
+class TestSaveEmailConfigs:
+    def test_console_saves_email_type(self):
+        svc = _make_service(SetupService)
+        mock_cfg = MagicMock()
+        with patch.object(svc, "_config_service", return_value=mock_cfg):
+            svc._save_email_configs(
+                email_data={
+                    "email_type": "console",
+                    "from_address": "noreply@example.com",
+                    "from_name": "Test",
+                }
+            )
+        mock_cfg.set_config.assert_any_call(config_code="EMAIL_TYPE", value="console")
+
+    def test_console_saves_from_address(self):
+        svc = _make_service(SetupService)
+        mock_cfg = MagicMock()
+        with patch.object(svc, "_config_service", return_value=mock_cfg):
+            svc._save_email_configs(
+                email_data={
+                    "email_type": "console",
+                    "from_address": "sender@example.com",
+                    "from_name": "Test",
+                }
+            )
+        mock_cfg.set_config.assert_any_call(
+            config_code="EMAIL_FROM_ADDRESS", value="sender@example.com"
+        )
+
+    def test_console_saves_from_name(self):
+        svc = _make_service(SetupService)
+        mock_cfg = MagicMock()
+        with patch.object(svc, "_config_service", return_value=mock_cfg):
+            svc._save_email_configs(
+                email_data={
+                    "email_type": "console",
+                    "from_address": "noreply@example.com",
+                    "from_name": "MyApp",
+                }
+            )
+        mock_cfg.set_config.assert_any_call(
+            config_code="EMAIL_FROM_NAME", value="MyApp"
+        )
+
+    def test_console_does_not_call_test_email_connection(self):
+        svc = _make_service(SetupService)
+        mock_test = MagicMock()
+        with (
+            patch.object(svc, "_config_service", return_value=MagicMock()),
+            patch.object(svc, "_test_service", return_value=mock_test),
+        ):
+            svc._save_email_configs(
+                email_data={
+                    "email_type": "console",
+                    "from_address": "noreply@example.com",
+                    "from_name": "Test",
+                }
+            )
+        mock_test.test_email_connection.assert_not_called()
+
+    def test_smtp_calls_test_email_connection(self):
+        svc = _make_service(SetupService)
+        mock_test = MagicMock()
+        with (
+            patch.object(svc, "_config_service", return_value=MagicMock()),
+            patch.object(svc, "_test_service", return_value=mock_test),
+        ):
+            svc._save_email_configs(
+                email_data={
+                    "email_type": "smtp",
+                    "from_address": "noreply@example.com",
+                    "from_name": "Test",
+                    "smtp_host": "smtp.example.com",
+                    "smtp_port": 587,
+                    "smtp_enc_type": "starttls",
+                }
+            )
+        mock_test.test_email_connection.assert_called_once()
+
+    def test_smtp_saves_smtp_host(self):
+        svc = _make_service(SetupService)
+        mock_cfg = MagicMock()
+        with (
+            patch.object(svc, "_config_service", return_value=mock_cfg),
+            patch.object(svc, "_test_service", return_value=MagicMock()),
+        ):
+            svc._save_email_configs(
+                email_data={
+                    "email_type": "smtp",
+                    "from_address": "noreply@example.com",
+                    "from_name": "Test",
+                    "smtp_host": "smtp.example.com",
+                    "smtp_port": 587,
+                    "smtp_enc_type": "starttls",
+                }
+            )
+        mock_cfg.set_config.assert_any_call(
+            config_code="EMAIL_SMTP_HOST", value="smtp.example.com"
+        )
+
+    def test_smtp_saves_smtp_port(self):
+        svc = _make_service(SetupService)
+        mock_cfg = MagicMock()
+        with (
+            patch.object(svc, "_config_service", return_value=mock_cfg),
+            patch.object(svc, "_test_service", return_value=MagicMock()),
+        ):
+            svc._save_email_configs(
+                email_data={
+                    "email_type": "smtp",
+                    "from_address": "noreply@example.com",
+                    "from_name": "Test",
+                    "smtp_host": "smtp.example.com",
+                    "smtp_port": 465,
+                    "smtp_enc_type": "ssl",
+                }
+            )
+        mock_cfg.set_config.assert_any_call(config_code="EMAIL_SMTP_PORT", value=465)
+
+    def test_smtp_with_auth_saves_username(self):
+        svc = _make_service(SetupService)
+        mock_cfg = MagicMock()
+        with (
+            patch.object(svc, "_config_service", return_value=mock_cfg),
+            patch.object(svc, "_test_service", return_value=MagicMock()),
+        ):
+            svc._save_email_configs(
+                email_data={
+                    "email_type": "smtp",
+                    "from_address": "noreply@example.com",
+                    "from_name": "Test",
+                    "smtp_host": "smtp.example.com",
+                    "smtp_port": 587,
+                    "smtp_enc_type": "starttls",
+                    "smtp_auth_enabled": True,
+                    "smtp_username": "smtpuser",
+                    "smtp_password": "smtppass",
+                }
+            )
+        mock_cfg.set_config.assert_any_call(
+            config_code="EMAIL_SMTP_USERNAME", value="smtpuser"
+        )
+
+    def test_smtp_without_auth_does_not_save_credentials(self):
+        svc = _make_service(SetupService)
+        mock_cfg = MagicMock()
+        with (
+            patch.object(svc, "_config_service", return_value=mock_cfg),
+            patch.object(svc, "_test_service", return_value=MagicMock()),
+        ):
+            svc._save_email_configs(
+                email_data={
+                    "email_type": "smtp",
+                    "from_address": "noreply@example.com",
+                    "from_name": "Test",
+                    "smtp_host": "smtp.example.com",
+                    "smtp_port": 587,
+                    "smtp_enc_type": "starttls",
+                    "smtp_auth_enabled": False,
+                }
+            )
+        saved_codes = [
+            call.kwargs.get("config_code")
+            for call in mock_cfg.set_config.call_args_list
+        ]
+        assert "EMAIL_SMTP_USERNAME" not in saved_codes
+        assert "EMAIL_SMTP_PASSWORD" not in saved_codes

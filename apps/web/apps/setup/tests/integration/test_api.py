@@ -1,3 +1,5 @@
+"""Integration tests for apps.setup API endpoints."""
+
 from unittest.mock import patch
 
 import pytest
@@ -211,6 +213,18 @@ class TestSetupCreateEndpoint:
                 response = client.post("/api/v1/setup/", payload, format="json")
 
         assert response.data["success"] is True
+
+    def test_returns_400_for_weak_password(self):
+        client = _client()
+        payload = _valid_setup_payload()
+        payload["admin"]["password"] = "123"
+
+        with patch(
+            "apps.configurations.selectors.Setup.get_setup_complete", return_value=False
+        ):
+            response = client.post("/api/v1/setup/", payload, format="json")
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 # ---------------------------------------------------------------------------
@@ -539,6 +553,39 @@ class TestSetupStatusEndpoint:
         assert "current_step" in data
         assert "steps" in data
         assert "error" in data
+
+    def test_status_shows_running_when_in_progress(self):
+        from apps.setup import status as _status
+
+        _status._state["status"] = "running"
+        _status._state["current_step"] = "database"
+        _status._state["steps"] = []
+        _status._state["error"] = None
+
+        try:
+            client = _client()
+            response = client.get("/api/v1/setup/status/")
+            assert response.data["data"]["status"] == "running"
+        finally:
+            _status._state["status"] = "idle"
+            _status._state["current_step"] = None
+
+    def test_status_shows_error_when_failed(self):
+        from apps.setup import status as _status
+
+        _status._state["status"] = "error"
+        _status._state["current_step"] = None
+        _status._state["steps"] = []
+        _status._state["error"] = "Something went wrong"
+
+        try:
+            client = _client()
+            response = client.get("/api/v1/setup/status/")
+            assert response.data["data"]["status"] == "error"
+            assert response.data["data"]["error"] == "Something went wrong"
+        finally:
+            _status._state["status"] = "idle"
+            _status._state["error"] = None
 
 
 # ---------------------------------------------------------------------------
