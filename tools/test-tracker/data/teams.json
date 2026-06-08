@@ -1,0 +1,942 @@
+{
+  "module": {
+    "slug": "teams",
+    "name": "Teams",
+    "sort_order": 10,
+    "parent": { "slug": "organisation", "name": "Organisation", "sort_order": 1 }
+  },
+  "suites": [
+    {
+      "id": "TC-TM-100",
+      "name": "Page Load & Access Control",
+      "test_cases": [
+        {
+          "id": "TC-TM-101",
+          "severity": "P0",
+          "scenario": "Teams page loads for authenticated user with view permission",
+          "steps": "Log in as a user with teams.view_team permission. Navigate to /teams/.",
+          "expected": "Page loads successfully. Team list table is visible. No errors in browser console."
+        },
+        {
+          "id": "TC-TM-102",
+          "severity": "P0",
+          "scenario": "Unauthenticated user is redirected to login",
+          "steps": "Log out. Navigate directly to /teams/.",
+          "expected": "User is redirected to /login/. Teams page is not accessible."
+        },
+        {
+          "id": "TC-TM-103",
+          "severity": "P1",
+          "scenario": "Add button is visible only for user with add_team permission",
+          "steps": "Log in as user with teams.add_team permission. Navigate to /teams/.",
+          "expected": "Add Team button is visible in the page header."
+        },
+        {
+          "id": "TC-TM-104",
+          "severity": "P1",
+          "scenario": "Add button is hidden for user without add_team permission",
+          "steps": "Log in as user without teams.add_team permission. Navigate to /teams/.",
+          "expected": "Add Team button is not visible on the page."
+        },
+        {
+          "id": "TC-TM-105",
+          "severity": "P1",
+          "scenario": "Import button is visible only for user with import_team permission",
+          "steps": "Log in as user with teams.import_team permission. Navigate to /teams/.",
+          "expected": "Import button is visible on the page."
+        },
+        {
+          "id": "TC-TM-106",
+          "severity": "P1",
+          "scenario": "Export button is visible only for user with export_team permission",
+          "steps": "Log in as user with teams.export_team permission. Navigate to /teams/.",
+          "expected": "Export button is visible on the page."
+        },
+        {
+          "id": "TC-TM-107",
+          "severity": "P1",
+          "scenario": "Edit and delete actions are hidden for user without change/delete permission",
+          "steps": "Log in as user with only teams.view_team permission. Navigate to /teams/. Inspect table row actions.",
+          "expected": "No edit or delete action buttons are visible on team rows."
+        }
+      ]
+    },
+    {
+      "id": "TC-TM-200",
+      "name": "List Teams — GET /api/v1/teams/",
+      "test_cases": [
+        {
+          "id": "TC-TM-201",
+          "severity": "P0",
+          "scenario": "Unauthenticated request returns 401",
+          "steps": "Send GET /api/v1/teams/ with no Authorization header.",
+          "expected": "HTTP 401 is returned. Response body contains a structured error."
+        },
+        {
+          "id": "TC-TM-202",
+          "severity": "P0",
+          "scenario": "Authenticated user without view_team returns 403",
+          "steps": "Send GET /api/v1/teams/ with a valid Bearer token for a user who does not have teams.view_team permission.",
+          "expected": "HTTP 403 is returned."
+        },
+        {
+          "id": "TC-TM-203",
+          "severity": "P0",
+          "scenario": "Default list returns only active teams",
+          "steps": "Ensure both active and inactive teams exist. Send GET /api/v1/teams/ with a valid Bearer token and view_team permission.",
+          "expected": "Response contains only active teams (is_active=true). Inactive teams are not included."
+        },
+        {
+          "id": "TC-TM-204",
+          "severity": "P0",
+          "scenario": "Response includes standard pagination envelope",
+          "steps": "Send GET /api/v1/teams/ with a valid token.",
+          "expected": "Response body contains: success, message, data.results (array), data.pagination with total_count, total_pages, current_page, page_size, has_next, has_previous."
+        },
+        {
+          "id": "TC-TM-205",
+          "severity": "P1",
+          "scenario": "Search by name returns matching teams only",
+          "steps": "Send GET /api/v1/teams/?search=Engineering with a valid token. At least one team with 'Engineering' in its name exists.",
+          "expected": "Only teams whose name contains 'Engineering' (case-insensitive) are returned."
+        },
+        {
+          "id": "TC-TM-206",
+          "severity": "P1",
+          "scenario": "Search with no matches returns empty results",
+          "steps": "Send GET /api/v1/teams/?search=ZZZNOMATCH with a valid token.",
+          "expected": "results is an empty array. pagination.total_count is 0."
+        },
+        {
+          "id": "TC-TM-207",
+          "severity": "P1",
+          "scenario": "is_active=false filter returns inactive teams",
+          "steps": "Ensure at least one inactive team exists. Send GET /api/v1/teams/?is_active=false with a valid token.",
+          "expected": "Response contains only inactive teams (is_active=false)."
+        },
+        {
+          "id": "TC-TM-208",
+          "severity": "P1",
+          "scenario": "Sort by name ascending",
+          "steps": "Send GET /api/v1/teams/?sort=name&order_by=ASC with a valid token.",
+          "expected": "Teams are returned in alphabetical order A→Z by name."
+        },
+        {
+          "id": "TC-TM-209",
+          "severity": "P1",
+          "scenario": "Sort by name descending",
+          "steps": "Send GET /api/v1/teams/?sort=name&order_by=DESC with a valid token.",
+          "expected": "Teams are returned in reverse alphabetical order Z→A by name."
+        },
+        {
+          "id": "TC-TM-210",
+          "severity": "P1",
+          "scenario": "Sort by created_at",
+          "steps": "Send GET /api/v1/teams/?sort=created_at&order_by=ASC with a valid token.",
+          "expected": "Teams are returned ordered oldest-first by creation date."
+        },
+        {
+          "id": "TC-TM-211",
+          "severity": "P1",
+          "scenario": "Pagination: page and page_size params work",
+          "steps": "Ensure more than 5 teams exist. Send GET /api/v1/teams/?page=1&page_size=2 with a valid token.",
+          "expected": "Exactly 2 teams are returned. pagination.page_size is 2. pagination.has_next is true if more teams exist."
+        },
+        {
+          "id": "TC-TM-212",
+          "severity": "P2",
+          "scenario": "page_size is capped at 100",
+          "steps": "Send GET /api/v1/teams/?page_size=999 with a valid token.",
+          "expected": "At most 100 results are returned. No error is raised."
+        },
+        {
+          "id": "TC-TM-213",
+          "severity": "P2",
+          "scenario": "Empty list returns valid paginated response",
+          "steps": "Ensure no active teams exist. Send GET /api/v1/teams/ with a valid token.",
+          "expected": "results is an empty array. pagination.total_count is 0. HTTP 200."
+        },
+        {
+          "id": "TC-TM-214",
+          "severity": "P2",
+          "scenario": "Response fields match list serializer schema",
+          "steps": "Send GET /api/v1/teams/ with a valid token.",
+          "expected": "Each team object in results contains: code, name, description, is_active, created_at, created_by, updated_at, updated_by."
+        },
+        {
+          "id": "TC-TM-215",
+          "severity": "P2",
+          "scenario": "Default ordering is alphabetical by name",
+          "steps": "Send GET /api/v1/teams/ with no sort param.",
+          "expected": "Teams are returned in ascending alphabetical order by name."
+        }
+      ]
+    },
+    {
+      "id": "TC-TM-300",
+      "name": "Get Team — GET /api/v1/teams/<code>/",
+      "test_cases": [
+        {
+          "id": "TC-TM-301",
+          "severity": "P0",
+          "scenario": "Unauthenticated request returns 401",
+          "steps": "Send GET /api/v1/teams/TEAM-0001/ with no Authorization header.",
+          "expected": "HTTP 401 is returned."
+        },
+        {
+          "id": "TC-TM-302",
+          "severity": "P0",
+          "scenario": "Authenticated user without view_team returns 403",
+          "steps": "Send GET /api/v1/teams/TEAM-0001/ with a valid token for a user without teams.view_team.",
+          "expected": "HTTP 403 is returned."
+        },
+        {
+          "id": "TC-TM-303",
+          "severity": "P0",
+          "scenario": "Valid code returns team detail with all fields",
+          "steps": "Ensure a team exists with a known code. Send GET /api/v1/teams/<code>/ with a valid token.",
+          "expected": "HTTP 200. Response data contains: code, name, description, is_active, created_at, created_by, updated_at, updated_by."
+        },
+        {
+          "id": "TC-TM-304",
+          "severity": "P0",
+          "scenario": "Unknown code returns 404",
+          "steps": "Send GET /api/v1/teams/UNKNOWN-9999/ with a valid token.",
+          "expected": "HTTP 404. Response body contains a structured error message. No stack trace is exposed."
+        },
+        {
+          "id": "TC-TM-305",
+          "severity": "P1",
+          "scenario": "Inactive team is retrievable by code",
+          "steps": "Ensure an inactive team exists with a known code. Send GET /api/v1/teams/<code>/ with a valid token.",
+          "expected": "HTTP 200. Team is returned with is_active=false."
+        }
+      ]
+    },
+    {
+      "id": "TC-TM-400",
+      "name": "Create Team — POST /api/v1/teams/",
+      "test_cases": [
+        {
+          "id": "TC-TM-401",
+          "severity": "P0",
+          "scenario": "Unauthenticated request returns 401",
+          "steps": "Send POST /api/v1/teams/ with no Authorization header and a valid JSON body.",
+          "expected": "HTTP 401 is returned."
+        },
+        {
+          "id": "TC-TM-402",
+          "severity": "P0",
+          "scenario": "Authenticated user without add_team returns 403",
+          "steps": "Send POST /api/v1/teams/ with a valid token for a user without teams.add_team.",
+          "expected": "HTTP 403 is returned."
+        },
+        {
+          "id": "TC-TM-403",
+          "severity": "P0",
+          "scenario": "Valid payload creates team and returns 201",
+          "steps": "Send POST /api/v1/teams/ with body: {\"name\": \"Engineering\", \"description\": \"Core engineering team\", \"is_active\": true}. Include valid Bearer token with add_team permission.",
+          "expected": "HTTP 201. Response contains the created team with code, name, description, is_active=true, created_at, created_by."
+        },
+        {
+          "id": "TC-TM-404",
+          "severity": "P0",
+          "scenario": "Duplicate team name returns 409",
+          "steps": "Create a team named 'Engineering'. Send POST /api/v1/teams/ with the same name again.",
+          "expected": "HTTP 409. Response body contains error indicating a team with that name already exists."
+        },
+        {
+          "id": "TC-TM-405",
+          "severity": "P0",
+          "scenario": "Missing required name field returns 400",
+          "steps": "Send POST /api/v1/teams/ with body: {\"description\": \"No name given\"}.",
+          "expected": "HTTP 400. Error response references the name field as required."
+        },
+        {
+          "id": "TC-TM-406",
+          "severity": "P1",
+          "scenario": "Name exceeding 120 characters returns 400",
+          "steps": "Send POST /api/v1/teams/ with name set to a 121-character string.",
+          "expected": "HTTP 400. Error response indicates name is too long."
+        },
+        {
+          "id": "TC-TM-407",
+          "severity": "P1",
+          "scenario": "Description is optional and defaults to empty string",
+          "steps": "Send POST /api/v1/teams/ with body: {\"name\": \"Team Without Desc\"}.",
+          "expected": "HTTP 201. Created team has description as an empty string."
+        },
+        {
+          "id": "TC-TM-408",
+          "severity": "P1",
+          "scenario": "is_active is optional and defaults to true",
+          "steps": "Send POST /api/v1/teams/ with body: {\"name\": \"Team No Active Flag\"}.",
+          "expected": "HTTP 201. Created team has is_active=true."
+        },
+        {
+          "id": "TC-TM-409",
+          "severity": "P1",
+          "scenario": "Creating team with is_active=false creates inactive team",
+          "steps": "Send POST /api/v1/teams/ with body: {\"name\": \"Inactive Team\", \"is_active\": false}.",
+          "expected": "HTTP 201. Response shows is_active=false."
+        },
+        {
+          "id": "TC-TM-410",
+          "severity": "P1",
+          "scenario": "Created team appears in list API immediately",
+          "steps": "Create a team via POST. Then send GET /api/v1/teams/ with is_active=true.",
+          "expected": "The newly created team appears in the list results."
+        },
+        {
+          "id": "TC-TM-411",
+          "severity": "P1",
+          "scenario": "created_by is set to the authenticated user",
+          "steps": "Log in as a specific user. Create a team via POST /api/v1/teams/. Retrieve the team with GET /api/v1/teams/<code>/.",
+          "expected": "created_by in the response reflects the user who made the create request."
+        },
+        {
+          "id": "TC-TM-412",
+          "severity": "P2",
+          "scenario": "Name with exactly 120 characters is accepted",
+          "steps": "Send POST /api/v1/teams/ with name set to exactly 120 characters.",
+          "expected": "HTTP 201. Team is created successfully."
+        }
+      ]
+    },
+    {
+      "id": "TC-TM-500",
+      "name": "Update Team — PATCH /api/v1/teams/<code>/",
+      "test_cases": [
+        {
+          "id": "TC-TM-501",
+          "severity": "P0",
+          "scenario": "Unauthenticated request returns 401",
+          "steps": "Send PATCH /api/v1/teams/<code>/ with no Authorization header.",
+          "expected": "HTTP 401 is returned."
+        },
+        {
+          "id": "TC-TM-502",
+          "severity": "P0",
+          "scenario": "Authenticated user without change_team returns 403",
+          "steps": "Send PATCH /api/v1/teams/<code>/ with a valid token for a user without teams.change_team.",
+          "expected": "HTTP 403 is returned."
+        },
+        {
+          "id": "TC-TM-503",
+          "severity": "P0",
+          "scenario": "Valid partial update of name returns updated team",
+          "steps": "Send PATCH /api/v1/teams/<code>/ with body: {\"name\": \"Updated Name\"}.",
+          "expected": "HTTP 200. Response shows the updated name. Other fields are unchanged."
+        },
+        {
+          "id": "TC-TM-504",
+          "severity": "P1",
+          "scenario": "Updating description returns updated value",
+          "steps": "Send PATCH /api/v1/teams/<code>/ with body: {\"description\": \"New description\"}.",
+          "expected": "HTTP 200. Response shows the updated description."
+        },
+        {
+          "id": "TC-TM-505",
+          "severity": "P1",
+          "scenario": "Updating is_active via PATCH works",
+          "steps": "Create an active team. Send PATCH /api/v1/teams/<code>/ with body: {\"is_active\": false}.",
+          "expected": "HTTP 200. Response shows is_active=false."
+        },
+        {
+          "id": "TC-TM-506",
+          "severity": "P0",
+          "scenario": "Renaming to a name that belongs to another team returns 409",
+          "steps": "Ensure two teams exist: 'Team A' and 'Team B'. Send PATCH /api/v1/teams/<Team A code>/ with body: {\"name\": \"Team B\"}.",
+          "expected": "HTTP 409. Error indicates a team with that name already exists."
+        },
+        {
+          "id": "TC-TM-507",
+          "severity": "P1",
+          "scenario": "Updating a team with its own current name does not conflict",
+          "steps": "Send PATCH /api/v1/teams/<code>/ with body: {\"name\": \"<same name as team>\"}.",
+          "expected": "HTTP 200. Update succeeds. No conflict error is raised."
+        },
+        {
+          "id": "TC-TM-508",
+          "severity": "P0",
+          "scenario": "Updating unknown code returns 404",
+          "steps": "Send PATCH /api/v1/teams/UNKNOWN-9999/ with a valid body and token.",
+          "expected": "HTTP 404."
+        },
+        {
+          "id": "TC-TM-509",
+          "severity": "P1",
+          "scenario": "Name longer than 120 characters returns 400",
+          "steps": "Send PATCH /api/v1/teams/<code>/ with name set to 121 characters.",
+          "expected": "HTTP 400. Error references name length constraint."
+        },
+        {
+          "id": "TC-TM-510",
+          "severity": "P1",
+          "scenario": "Empty PATCH body succeeds without modifying the team",
+          "steps": "Send PATCH /api/v1/teams/<code>/ with an empty JSON body {}.",
+          "expected": "HTTP 200. Team data is unchanged. No error is returned."
+        },
+        {
+          "id": "TC-TM-511",
+          "severity": "P1",
+          "scenario": "updated_by reflects the user who made the update",
+          "steps": "Log in as a specific user. Send PATCH /api/v1/teams/<code>/ with any valid change. Retrieve the team.",
+          "expected": "updated_by in the response reflects the user who performed the update."
+        }
+      ]
+    },
+    {
+      "id": "TC-TM-600",
+      "name": "Delete Team — DELETE /api/v1/teams/<code>/",
+      "test_cases": [
+        {
+          "id": "TC-TM-601",
+          "severity": "P0",
+          "scenario": "Unauthenticated request returns 401",
+          "steps": "Send DELETE /api/v1/teams/<code>/ with no Authorization header.",
+          "expected": "HTTP 401 is returned."
+        },
+        {
+          "id": "TC-TM-602",
+          "severity": "P0",
+          "scenario": "Authenticated user without delete_team returns 403",
+          "steps": "Send DELETE /api/v1/teams/<code>/ with a valid token for a user without teams.delete_team.",
+          "expected": "HTTP 403 is returned."
+        },
+        {
+          "id": "TC-TM-603",
+          "severity": "P0",
+          "scenario": "Valid delete returns 204",
+          "steps": "Ensure a team with a known code exists. Send DELETE /api/v1/teams/<code>/ with a valid token and delete_team permission.",
+          "expected": "HTTP 204. No response body."
+        },
+        {
+          "id": "TC-TM-604",
+          "severity": "P0",
+          "scenario": "Unknown code returns 404",
+          "steps": "Send DELETE /api/v1/teams/UNKNOWN-9999/ with a valid token.",
+          "expected": "HTTP 404. Structured error response is returned."
+        },
+        {
+          "id": "TC-TM-605",
+          "severity": "P1",
+          "scenario": "Deleted team no longer appears in list",
+          "steps": "Create a team. Delete it via DELETE. Then send GET /api/v1/teams/ with is_active filter including both.",
+          "expected": "The deleted team does not appear in any list response."
+        },
+        {
+          "id": "TC-TM-606",
+          "severity": "P1",
+          "scenario": "Retrieve of deleted team returns 404",
+          "steps": "Delete a team. Then send GET /api/v1/teams/<code>/ for the deleted team.",
+          "expected": "HTTP 404."
+        }
+      ]
+    },
+    {
+      "id": "TC-TM-700",
+      "name": "Activate Team — POST /api/v1/teams/<code>/activate/",
+      "test_cases": [
+        {
+          "id": "TC-TM-701",
+          "severity": "P0",
+          "scenario": "Unauthenticated request returns 401",
+          "steps": "Send POST /api/v1/teams/<code>/activate/ with no Authorization header.",
+          "expected": "HTTP 401 is returned."
+        },
+        {
+          "id": "TC-TM-702",
+          "severity": "P0",
+          "scenario": "Authenticated user without change_team returns 403",
+          "steps": "Send POST /api/v1/teams/<code>/activate/ with a valid token for a user without teams.change_team.",
+          "expected": "HTTP 403 is returned."
+        },
+        {
+          "id": "TC-TM-703",
+          "severity": "P0",
+          "scenario": "Activating an inactive team sets is_active to true",
+          "steps": "Ensure a team with is_active=false exists. Send POST /api/v1/teams/<code>/activate/ with a valid token and change_team permission.",
+          "expected": "HTTP 200. Response shows is_active=true. Team now appears in default list."
+        },
+        {
+          "id": "TC-TM-704",
+          "severity": "P1",
+          "scenario": "Activating an already-active team is a no-op",
+          "steps": "Ensure a team with is_active=true exists. Send POST /api/v1/teams/<code>/activate/.",
+          "expected": "HTTP 200. Response shows is_active=true. No error is raised."
+        },
+        {
+          "id": "TC-TM-705",
+          "severity": "P0",
+          "scenario": "Activating unknown code returns 404",
+          "steps": "Send POST /api/v1/teams/UNKNOWN-9999/activate/ with a valid token.",
+          "expected": "HTTP 404."
+        },
+        {
+          "id": "TC-TM-706",
+          "severity": "P1",
+          "scenario": "Activated team appears in default (active-only) list",
+          "steps": "Deactivate a team. Activate it. Send GET /api/v1/teams/.",
+          "expected": "The team appears in the active list results."
+        }
+      ]
+    },
+    {
+      "id": "TC-TM-800",
+      "name": "Deactivate Team — POST /api/v1/teams/<code>/deactivate/",
+      "test_cases": [
+        {
+          "id": "TC-TM-801",
+          "severity": "P0",
+          "scenario": "Unauthenticated request returns 401",
+          "steps": "Send POST /api/v1/teams/<code>/deactivate/ with no Authorization header.",
+          "expected": "HTTP 401 is returned."
+        },
+        {
+          "id": "TC-TM-802",
+          "severity": "P0",
+          "scenario": "Authenticated user without change_team returns 403",
+          "steps": "Send POST /api/v1/teams/<code>/deactivate/ with a valid token for a user without teams.change_team.",
+          "expected": "HTTP 403 is returned."
+        },
+        {
+          "id": "TC-TM-803",
+          "severity": "P0",
+          "scenario": "Deactivating an active team sets is_active to false",
+          "steps": "Ensure a team with is_active=true exists. Send POST /api/v1/teams/<code>/deactivate/ with a valid token and change_team permission.",
+          "expected": "HTTP 200. Response shows is_active=false."
+        },
+        {
+          "id": "TC-TM-804",
+          "severity": "P1",
+          "scenario": "Deactivating an already-inactive team is a no-op",
+          "steps": "Ensure a team with is_active=false exists. Send POST /api/v1/teams/<code>/deactivate/.",
+          "expected": "HTTP 200. Response shows is_active=false. No error is raised."
+        },
+        {
+          "id": "TC-TM-805",
+          "severity": "P0",
+          "scenario": "Deactivating unknown code returns 404",
+          "steps": "Send POST /api/v1/teams/UNKNOWN-9999/deactivate/ with a valid token.",
+          "expected": "HTTP 404."
+        },
+        {
+          "id": "TC-TM-806",
+          "severity": "P1",
+          "scenario": "Deactivated team excluded from default list",
+          "steps": "Deactivate a team. Send GET /api/v1/teams/ (default active-only).",
+          "expected": "The deactivated team is not included in the results."
+        },
+        {
+          "id": "TC-TM-807",
+          "severity": "P1",
+          "scenario": "Deactivated team appears when filtering is_active=false",
+          "steps": "Deactivate a team. Send GET /api/v1/teams/?is_active=false.",
+          "expected": "The deactivated team appears in the results."
+        }
+      ]
+    },
+    {
+      "id": "TC-TM-900",
+      "name": "Statistics — GET /api/v1/teams/stats/",
+      "test_cases": [
+        {
+          "id": "TC-TM-901",
+          "severity": "P0",
+          "scenario": "Unauthenticated request returns 401",
+          "steps": "Send GET /api/v1/teams/stats/ with no Authorization header.",
+          "expected": "HTTP 401 is returned."
+        },
+        {
+          "id": "TC-TM-902",
+          "severity": "P0",
+          "scenario": "Authenticated user without view_team returns 403",
+          "steps": "Send GET /api/v1/teams/stats/ with a valid token for a user without teams.view_team.",
+          "expected": "HTTP 403 is returned."
+        },
+        {
+          "id": "TC-TM-903",
+          "severity": "P1",
+          "scenario": "Statistics returns total, active, and inactive counts",
+          "steps": "Ensure a known set of active and inactive teams exists. Send GET /api/v1/teams/stats/ with a valid token.",
+          "expected": "HTTP 200. Response contains total, active, and inactive counts that match the current state."
+        },
+        {
+          "id": "TC-TM-904",
+          "severity": "P1",
+          "scenario": "Statistics are accurate after create and deactivate operations",
+          "steps": "Note current stats. Create one active team and deactivate one existing team. Send GET /api/v1/teams/stats/ again.",
+          "expected": "total increases by 1, active changes reflect operations, inactive count updates accordingly."
+        },
+        {
+          "id": "TC-TM-905",
+          "severity": "P2",
+          "scenario": "fields param returns only requested stat keys",
+          "steps": "Send GET /api/v1/teams/stats/?fields=active,inactive with a valid token.",
+          "expected": "HTTP 200. Response contains only the active and inactive keys, not total."
+        }
+      ]
+    },
+    {
+      "id": "TC-TM-1000",
+      "name": "Import Teams — POST /api/v1/teams/import/",
+      "test_cases": [
+        {
+          "id": "TC-TM-1001",
+          "severity": "P0",
+          "scenario": "Unauthenticated request returns 401",
+          "steps": "Send POST /api/v1/teams/import/ with no Authorization header.",
+          "expected": "HTTP 401 is returned."
+        },
+        {
+          "id": "TC-TM-1002",
+          "severity": "P0",
+          "scenario": "Authenticated user without import_team returns 403",
+          "steps": "Send POST /api/v1/teams/import/ with a valid token for a user without teams.import_team.",
+          "expected": "HTTP 403 is returned."
+        },
+        {
+          "id": "TC-TM-1003",
+          "severity": "P0",
+          "scenario": "Valid CSV with header and data rows imports successfully",
+          "steps": "Upload a CSV file with header row 'name,description,is_active' and two valid data rows. Send POST /api/v1/teams/import/ with a valid token.",
+          "expected": "HTTP 207. Response shows created_rows list with both teams. errors is empty. Teams are visible in GET /api/v1/teams/."
+        },
+        {
+          "id": "TC-TM-1004",
+          "severity": "P0",
+          "scenario": "No file uploaded returns 400",
+          "steps": "Send POST /api/v1/teams/import/ with a valid token but no file in the request body.",
+          "expected": "HTTP 400. Error indicates no import file was uploaded."
+        },
+        {
+          "id": "TC-TM-1005",
+          "severity": "P0",
+          "scenario": "Non-CSV file returns 400",
+          "steps": "Upload a .xlsx or .txt file to POST /api/v1/teams/import/.",
+          "expected": "HTTP 400. Error indicates unsupported file format and lists allowed formats."
+        },
+        {
+          "id": "TC-TM-1006",
+          "severity": "P0",
+          "scenario": "Missing required 'name' column in CSV returns 400",
+          "steps": "Upload a CSV file with only a 'description' column header (no 'name' column). Send POST /api/v1/teams/import/.",
+          "expected": "HTTP 400. Error indicates the 'name' column is missing."
+        },
+        {
+          "id": "TC-TM-1007",
+          "severity": "P1",
+          "scenario": "Row with blank name is skipped and reported in errors",
+          "steps": "Upload a CSV with one valid row and one row where name is blank. Send POST /api/v1/teams/import/.",
+          "expected": "HTTP 207. The valid row is created. The blank-name row appears in errors with field=name and a message about name being required."
+        },
+        {
+          "id": "TC-TM-1008",
+          "severity": "P1",
+          "scenario": "Row with name exceeding 120 characters is skipped and reported in errors",
+          "steps": "Upload a CSV with a row where name is 121 characters. Send POST /api/v1/teams/import/.",
+          "expected": "HTTP 207. The oversized name row appears in errors. No team is created for that row."
+        },
+        {
+          "id": "TC-TM-1009",
+          "severity": "P1",
+          "scenario": "Row with duplicate team name is skipped and reported in errors",
+          "steps": "Ensure a team named 'Engineering' already exists. Upload a CSV containing a row with name='Engineering'. Send POST /api/v1/teams/import/.",
+          "expected": "HTTP 207. The duplicate row appears in errors. No new team is created for that row."
+        },
+        {
+          "id": "TC-TM-1010",
+          "severity": "P1",
+          "scenario": "File exceeding 5 MB size limit returns 400",
+          "steps": "Upload a CSV file larger than 5 MB. Send POST /api/v1/teams/import/.",
+          "expected": "HTTP 400. Error indicates the file is too large and shows the maximum allowed size."
+        },
+        {
+          "id": "TC-TM-1011",
+          "severity": "P1",
+          "scenario": "File with more than 1000 data rows returns 400",
+          "steps": "Upload a CSV file with 1001 data rows. Send POST /api/v1/teams/import/.",
+          "expected": "HTTP 400. Error indicates too many rows and shows the maximum allowed."
+        },
+        {
+          "id": "TC-TM-1012",
+          "severity": "P1",
+          "scenario": "Dry run (validate=true) previews result without creating teams",
+          "steps": "Upload a valid CSV. Send POST /api/v1/teams/import/?validate=true.",
+          "expected": "HTTP 207. Response shows dry_run=true, created_rows previewed, but no teams are actually created. GET /api/v1/teams/ does not show any new teams."
+        },
+        {
+          "id": "TC-TM-1013",
+          "severity": "P1",
+          "scenario": "CSV row with is_active=false creates an inactive team",
+          "steps": "Upload a CSV with a row: name='Inactive Team',description='',is_active=false.",
+          "expected": "HTTP 207. The team is created. GET /api/v1/teams/?is_active=false confirms it as inactive."
+        },
+        {
+          "id": "TC-TM-1014",
+          "severity": "P2",
+          "scenario": "CSV row with only name column creates team with default values",
+          "steps": "Upload a CSV with header 'name' only and a row with just a team name.",
+          "expected": "HTTP 207. Team is created. description defaults to empty string, is_active defaults to true."
+        },
+        {
+          "id": "TC-TM-1015",
+          "severity": "P1",
+          "scenario": "GET /api/v1/teams/import/specs/ returns field definitions and limits",
+          "steps": "Send GET /api/v1/teams/import/specs/ with a valid token and import_team permission.",
+          "expected": "HTTP 200. Response contains supported_formats, max_rows (1000), max_file_size_mb (5), fields array describing name/description/is_active, and notes array."
+        },
+        {
+          "id": "TC-TM-1016",
+          "severity": "P1",
+          "scenario": "GET /api/v1/teams/import/sample/ downloads a CSV template",
+          "steps": "Send GET /api/v1/teams/import/sample/ with a valid token and import_team permission.",
+          "expected": "Response is a CSV file download (teams_import_template.csv) with header row: name,description,is_active and a sample data row."
+        },
+        {
+          "id": "TC-TM-1017",
+          "severity": "P2",
+          "scenario": "Import response includes accurate total row count",
+          "steps": "Upload a CSV with 5 rows (3 valid, 1 duplicate, 1 blank name). Send POST /api/v1/teams/import/.",
+          "expected": "Response total is 5. created_rows has 3 entries. errors has 2 entries."
+        }
+      ]
+    },
+    {
+      "id": "TC-TM-1100",
+      "name": "Export Teams — GET /api/v1/teams/export/",
+      "test_cases": [
+        {
+          "id": "TC-TM-1101",
+          "severity": "P0",
+          "scenario": "Unauthenticated request returns 401",
+          "steps": "Send GET /api/v1/teams/export/ with no Authorization header.",
+          "expected": "HTTP 401 is returned."
+        },
+        {
+          "id": "TC-TM-1102",
+          "severity": "P0",
+          "scenario": "Authenticated user without export_team returns 403",
+          "steps": "Send GET /api/v1/teams/export/ with a valid token for a user without teams.export_team.",
+          "expected": "HTTP 403 is returned."
+        },
+        {
+          "id": "TC-TM-1103",
+          "severity": "P0",
+          "scenario": "Export as CSV returns a downloadable CSV file",
+          "steps": "Send GET /api/v1/teams/export/?type=csv with a valid token.",
+          "expected": "Response content-type is text/csv. File is downloadable. Contains a header row and data rows for all active teams."
+        },
+        {
+          "id": "TC-TM-1104",
+          "severity": "P1",
+          "scenario": "Export as XLSX returns a downloadable Excel file",
+          "steps": "Send GET /api/v1/teams/export/?type=xlsx with a valid token.",
+          "expected": "Response is an XLSX file. It can be opened in Excel/Google Sheets and contains team data."
+        },
+        {
+          "id": "TC-TM-1105",
+          "severity": "P1",
+          "scenario": "Export as PDF returns a downloadable PDF file",
+          "steps": "Send GET /api/v1/teams/export/?type=pdf with a valid token.",
+          "expected": "Response is a PDF file. It contains teams data in a readable format."
+        },
+        {
+          "id": "TC-TM-1106",
+          "severity": "P1",
+          "scenario": "Export as JSON returns a downloadable JSON file",
+          "steps": "Send GET /api/v1/teams/export/?type=json with a valid token.",
+          "expected": "Response is a JSON file containing team records."
+        },
+        {
+          "id": "TC-TM-1107",
+          "severity": "P1",
+          "scenario": "Unsupported export format returns 400",
+          "steps": "Send GET /api/v1/teams/export/?type=xml with a valid token.",
+          "expected": "HTTP 400. Error indicates unsupported format and lists allowed values: csv, xlsx, pdf, json."
+        },
+        {
+          "id": "TC-TM-1108",
+          "severity": "P1",
+          "scenario": "fields param filters exported columns",
+          "steps": "Send GET /api/v1/teams/export/?type=csv&fields=name,code with a valid token.",
+          "expected": "Exported CSV contains only 'name' and 'code' columns. Other columns are absent."
+        },
+        {
+          "id": "TC-TM-1109",
+          "severity": "P1",
+          "scenario": "Default export includes only active teams",
+          "steps": "Ensure both active and inactive teams exist. Send GET /api/v1/teams/export/?type=csv with no is_active filter.",
+          "expected": "Exported file contains only active teams."
+        },
+        {
+          "id": "TC-TM-1110",
+          "severity": "P1",
+          "scenario": "is_active=all exports both active and inactive teams",
+          "steps": "Send GET /api/v1/teams/export/?type=csv&is_active=all with a valid token.",
+          "expected": "Exported CSV contains both active and inactive teams."
+        },
+        {
+          "id": "TC-TM-1111",
+          "severity": "P1",
+          "scenario": "search filter in export matches list filter behavior",
+          "steps": "Send GET /api/v1/teams/export/?type=csv&search=Engineering with a valid token.",
+          "expected": "Exported file contains only teams whose name matches 'Engineering'."
+        },
+        {
+          "id": "TC-TM-1112",
+          "severity": "P1",
+          "scenario": "GET /api/v1/teams/export/specs/ returns available column definitions",
+          "steps": "Send GET /api/v1/teams/export/specs/ with a valid token and export_team permission.",
+          "expected": "HTTP 200. Response contains a columns array with entries for name, code, description, is_active, created_at, created_by, updated_at, updated_by, each with key, label, and default."
+        },
+        {
+          "id": "TC-TM-1113",
+          "severity": "P2",
+          "scenario": "Export with no matching teams returns file with headers only",
+          "steps": "Apply a search filter that matches no teams. Send GET /api/v1/teams/export/?type=csv&search=ZZZNOMATCH.",
+          "expected": "Exported CSV contains the header row only, no data rows."
+        },
+        {
+          "id": "TC-TM-1114",
+          "severity": "P2",
+          "scenario": "Default exported columns match export specs default=true columns",
+          "steps": "Send GET /api/v1/teams/export/?type=csv with no fields param.",
+          "expected": "Exported CSV headers match the columns where default=true in export specs: name, code, description, is_active, created_at."
+        }
+      ]
+    },
+    {
+      "id": "TC-TM-1200",
+      "name": "Security",
+      "test_cases": [
+        {
+          "id": "TC-TM-1201",
+          "severity": "P0",
+          "scenario": "All team endpoints require a valid Bearer token",
+          "steps": "Send requests to all endpoints (list, retrieve, create, update, delete, activate, deactivate, stats, import, export) with no Authorization header.",
+          "expected": "All return HTTP 401. No endpoint is accessible without authentication."
+        },
+        {
+          "id": "TC-TM-1202",
+          "severity": "P0",
+          "scenario": "Invalid Bearer token returns 401",
+          "steps": "Send GET /api/v1/teams/ with Authorization: Bearer invalidtoken123.",
+          "expected": "HTTP 401 is returned."
+        },
+        {
+          "id": "TC-TM-1203",
+          "severity": "P0",
+          "scenario": "Correct permission is enforced per endpoint",
+          "steps": "Use a user with only view_team. Try POST /api/v1/teams/ (create), PATCH (update), DELETE, activate, deactivate, import, export.",
+          "expected": "All write/import/export endpoints return HTTP 403. Only list, retrieve, and stats succeed."
+        },
+        {
+          "id": "TC-TM-1204",
+          "severity": "P0",
+          "scenario": "Error responses do not expose internal stack traces",
+          "steps": "Trigger a 404 and a 400 error on any team endpoint.",
+          "expected": "Error response contains only code and message. No stack trace, SQL query, or internal file path is visible."
+        },
+        {
+          "id": "TC-TM-1205",
+          "severity": "P1",
+          "scenario": "Response fields do not include unexpected sensitive data",
+          "steps": "Retrieve any team via GET /api/v1/teams/<code>/.",
+          "expected": "Response contains only documented fields: code, name, description, is_active, created_at, created_by, updated_at, updated_by. No internal IDs, raw DB fields, or system fields are exposed."
+        },
+        {
+          "id": "TC-TM-1206",
+          "severity": "P1",
+          "scenario": "Audit log is created on create, update, delete, activate, deactivate",
+          "steps": "Perform create, update, delete, activate, and deactivate operations on a team. Check the audit log (if accessible via API or admin).",
+          "expected": "Each operation generates an audit record with the correct module, resource type, resource code, before/after state, and actor."
+        }
+      ]
+    },
+    {
+      "id": "TC-TM-1300",
+      "name": "Edge Cases",
+      "test_cases": [
+        {
+          "id": "TC-TM-1301",
+          "severity": "P2",
+          "scenario": "Team name with special characters is accepted",
+          "steps": "Send POST /api/v1/teams/ with name: 'R&D / Infra (Beta)'.",
+          "expected": "HTTP 201. Team is created and the name is stored exactly as provided."
+        },
+        {
+          "id": "TC-TM-1302",
+          "severity": "P2",
+          "scenario": "Team name with unicode characters is accepted",
+          "steps": "Send POST /api/v1/teams/ with name containing unicode characters, e.g. 'Équipe Développement'.",
+          "expected": "HTTP 201. Team is created with the unicode name intact."
+        },
+        {
+          "id": "TC-TM-1303",
+          "severity": "P2",
+          "scenario": "Team name with exactly 120 characters (boundary) is accepted",
+          "steps": "Send POST /api/v1/teams/ with a name of exactly 120 characters.",
+          "expected": "HTTP 201. Team is created successfully."
+        },
+        {
+          "id": "TC-TM-1304",
+          "severity": "P1",
+          "scenario": "Team name with 121 characters (boundary +1) is rejected",
+          "steps": "Send POST /api/v1/teams/ with a name of exactly 121 characters.",
+          "expected": "HTTP 400. Error references name length constraint."
+        },
+        {
+          "id": "TC-TM-1305",
+          "severity": "P2",
+          "scenario": "Description can be an empty string on create",
+          "steps": "Send POST /api/v1/teams/ with body: {\"name\": \"Team X\", \"description\": \"\"}.",
+          "expected": "HTTP 201. Team created with empty description."
+        },
+        {
+          "id": "TC-TM-1306",
+          "severity": "P2",
+          "scenario": "Description can be set to empty string on update",
+          "steps": "Create a team with a non-empty description. Then PATCH it with description: ''.",
+          "expected": "HTTP 200. Updated team has empty description."
+        },
+        {
+          "id": "TC-TM-1307",
+          "severity": "P2",
+          "scenario": "Sorting by an unsupported field does not crash the API",
+          "steps": "Send GET /api/v1/teams/?sort=nonexistent_field with a valid token.",
+          "expected": "HTTP 200. Returns teams with default ordering. No 500 error."
+        },
+        {
+          "id": "TC-TM-1308",
+          "severity": "P2",
+          "scenario": "page=0 is treated as page 1",
+          "steps": "Send GET /api/v1/teams/?page=0 with a valid token.",
+          "expected": "HTTP 200. Returns the first page of results. No error."
+        },
+        {
+          "id": "TC-TM-1309",
+          "severity": "P2",
+          "scenario": "Non-numeric page or page_size is handled gracefully",
+          "steps": "Send GET /api/v1/teams/?page=abc&page_size=xyz with a valid token.",
+          "expected": "HTTP 200. Falls back to default page=1, page_size=25. No error."
+        },
+        {
+          "id": "TC-TM-1310",
+          "severity": "P2",
+          "scenario": "Importing a CSV with BOM encoding is handled correctly",
+          "steps": "Save a CSV file with UTF-8 BOM encoding. Upload it via POST /api/v1/teams/import/.",
+          "expected": "HTTP 207. BOM is stripped. Teams are created correctly. No column name error."
+        },
+        {
+          "id": "TC-TM-1311",
+          "severity": "P2",
+          "scenario": "Concurrent create requests with the same name results in only one team created",
+          "steps": "Simultaneously send two POST /api/v1/teams/ requests with the same team name.",
+          "expected": "One request succeeds with HTTP 201. The other returns HTTP 409. Only one team with that name exists in the system."
+        }
+      ]
+    }
+  ]
+}
