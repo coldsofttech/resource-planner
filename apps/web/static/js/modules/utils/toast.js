@@ -33,7 +33,7 @@ function dismiss(toast, host) {
   }, 200);
 }
 
-export function rpToast({
+export function toast({
   type = "info",
   title = "",
   message = "",

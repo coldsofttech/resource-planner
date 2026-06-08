@@ -129,4 +129,4 @@ class StatusModal {
   }
 }
 
-export const rpStatusModal = new StatusModal();
+export const statusModal = new StatusModal();

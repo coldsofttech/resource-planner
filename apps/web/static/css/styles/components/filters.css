@@ -1,0 +1,127 @@
+/* ── Vertical filterpane ────────────────────────────────────────────────── */
+
+.rp-filterpane {
+  width: 280px;
+  flex-shrink: 0;
+  background: var(--rp-surface);
+  border: 1px solid var(--rp-border);
+  border-radius: var(--rp-r-8);
+  align-self: flex-start;
+}
+.rp-filterpane-head {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--rp-divider);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.rp-filterpane-body {
+  padding: 4px 16px 16px;
+}
+.rp-filter-group {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rp-divider);
+}
+.rp-filter-group:last-child {
+  border-bottom: 0;
+}
+
+/* ── filter-panel: horizontal layout (default) ─────────────────────────────── */
+
+filter-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Search field grows to fill remaining space on the same row */
+filter-panel search-field {
+  flex: 1 1 0%;
+  min-width: 160px;
+  display: block;
+}
+filter-panel search-field .rp-input-affix {
+  width: 100%;
+}
+
+/* Dropdown filters stay at fixed width and don't shrink */
+filter-panel is-active-field,
+filter-panel dropdown-field {
+  display: block;
+  flex-shrink: 0;
+  width: 170px;
+}
+
+/* Mobile: stack all fields full-width */
+@media (max-width: 640px) {
+  filter-panel {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  filter-panel is-active-field,
+  filter-panel dropdown-field {
+    width: 100%;
+  }
+}
+
+/* ── active-filter ────────────────────────────────────────────────────── */
+
+active-filter {
+  display: block;
+}
+
+active-filter[hidden] {
+  display: none;
+}
+
+.rp-active-filter-eyebrow {
+  margin: 0 0 6px;
+}
+
+.rp-active-filter-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .rp-active-filter-tags {
+    gap: 6px;
+  }
+}
+
+/* ── list-view: layout coordinator ──────────────────────────────────── */
+
+list-view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Vertical: filterpane on left, table on right.
+   Active-filter row (if present) spans full width above both. */
+list-view[layout="vertical"] {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 20px;
+}
+list-view[layout="vertical"] > active-filter {
+  flex: 0 0 100%;
+}
+list-view[layout="vertical"] > data-table {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  list-view[layout="vertical"] {
+    flex-direction: column;
+  }
+  .rp-filterpane {
+    width: 100%;
+  }
+}

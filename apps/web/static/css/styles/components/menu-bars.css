@@ -1,0 +1,152 @@
+.rp-menubar {
+  position: relative; /* establishes positioning context for dropdown panels */
+  height: 42px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 2px;
+  border-top: 1px solid var(--rp-divider);
+  background: var(--rp-bg-elev);
+  /* overflow must stay visible so absolutely-positioned dropdown panels are not clipped */
+  overflow: visible;
+}
+
+/* Inner scrollable container for nav items */
+.rp-menubar-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.rp-menubar-nav::-webkit-scrollbar {
+  display: none;
+  height: 0;
+  width: 0;
+}
+
+.rp-menubar-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: var(--rp-r-6);
+  color: var(--rp-text);
+  font-weight: 600;
+  font-size: var(--rp-fs-13);
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  white-space: nowrap;
+}
+.rp-menubar-item:hover {
+  background: var(--rp-surface-hover);
+  color: var(--rp-text);
+}
+.rp-menubar-item.is-active {
+  color: var(--rp-accent-soft-text);
+  background: var(--rp-accent-soft);
+}
+.rp-menubar-item .bi-chevron-down {
+  font-size: 10px;
+  opacity: 0.55;
+}
+
+.rp-mega-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* Hamburger toggle — hidden on desktop */
+.rp-menubar-toggle {
+  display: none;
+}
+
+/* ── Mobile (≤ 640px) ──────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .rp-menubar {
+    flex-direction: column;
+    align-items: stretch;
+    height: auto;
+    padding: 0;
+  }
+
+  .rp-menubar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 40px;
+    padding: 0 14px;
+    background: none;
+    border: 0;
+    color: var(--rp-text);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    width: 100%;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .rp-menubar-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .rp-menubar-toggle-chevron {
+    font-size: 10px;
+    opacity: 0.55;
+    transition: transform 0.15s ease;
+  }
+  .rp-menubar.rp-mobile-open .rp-menubar-toggle-chevron {
+    transform: rotate(180deg);
+  }
+
+  /* Nav items hidden by default on mobile */
+  .rp-menubar-nav {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    overflow: visible;
+    padding: 2px 8px 8px;
+  }
+  .rp-menubar.rp-mobile-open .rp-menubar-nav {
+    display: flex;
+  }
+
+  .rp-menubar-item {
+    height: auto;
+    padding: 8px 10px;
+    font-size: 13px;
+    gap: 8px;
+    width: 100%;
+  }
+  .rp-menubar-item > i {
+    font-size: 14px;
+  }
+
+  /* Dropdown panels: show inline beneath trigger on mobile */
+  .rp-menubar .rp-dd-panel {
+    position: static !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    border-left: 2px solid var(--rp-border) !important;
+    border-radius: 0 !important;
+    margin: 0 0 4px 16px !important;
+    min-width: 0 !important;
+    transition: none !important;
+    display: none;
+    padding: 4px 0 !important;
+  }
+  .rp-menubar .rp-dd-panel.rp-dd-open {
+    display: block;
+  }
+}

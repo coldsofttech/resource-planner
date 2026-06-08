@@ -1,0 +1,96 @@
+.rp-dd-panel {
+  position: absolute;
+  top: 100%; /* relative to .rp-menubar (42px) — panel opens just below the bar */
+  left: 0; /* overridden per-panel by JS */
+  background: var(--rp-bg-elev);
+  border: 1px solid var(--rp-border-strong);
+  border-radius: var(--rp-r-12);
+  box-shadow: var(--rp-shadow-lg);
+  min-width: 220px;
+  padding: 6px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition:
+    opacity 0.12s,
+    transform 0.12s,
+    visibility 0.12s;
+  z-index: 60;
+}
+.rp-dd-panel.rp-dd-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.rp-dd-panel a,
+.rp-dd-panel button.rp-dd-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: var(--rp-r-6);
+  color: var(--rp-text);
+  font-size: var(--rp-fs-13);
+  font-weight: 500;
+  text-decoration: none;
+  background: none;
+  border: 0;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+.rp-dd-panel a:hover,
+.rp-dd-panel button.rp-dd-link:hover {
+  background: var(--rp-surface-hover);
+}
+.rp-dd-panel a .bi,
+.rp-dd-panel button.rp-dd-link .bi {
+  width: 16px;
+  color: var(--rp-text-muted);
+  font-size: 14px;
+}
+.rp-dd-panel .rp-dd-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--rp-text-subtle);
+  padding: 6px 10px 2px;
+}
+.rp-dd-panel hr {
+  border: 0;
+  height: 1px;
+  background: var(--rp-divider);
+  margin: 4px 0;
+}
+
+/* Mega menu — multi-column */
+.rp-dd-panel.mega {
+  padding: 12px;
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(var(--cols, 3), minmax(180px, 1fr));
+}
+.rp-mega-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* Right-aligned dropdown */
+.rp-dd-panel.dd-right {
+  left: auto;
+  right: 0;
+}
+
+@media (max-width: 900px) {
+  .rp-dd-panel {
+    max-width: calc(100vw - 24px);
+  }
+  .rp-dd-panel.mega {
+    grid-template-columns: 1fr !important;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+}

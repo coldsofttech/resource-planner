@@ -1,0 +1,363 @@
+.rp-rdrawer-back {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 120;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
+}
+.rp-rdrawer-back.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.rp-rdrawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 520px; /* default; JS/resize overrides via inline width */
+  min-width: 360px;
+  max-width: 96vw;
+  background: var(--rp-bg-elev);
+  border-left: 1px solid var(--rp-border);
+  box-shadow: var(--rp-shadow-lg);
+  z-index: 130;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.26s cubic-bezier(0.22, 0.9, 0.3, 1);
+}
+.rp-rdrawer-back.is-open .rp-rdrawer {
+  transform: translateX(0);
+}
+.rp-rdrawer.no-anim {
+  transition: none;
+}
+
+/* Resize handle on the left edge */
+.rp-rdrawer-resize {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  margin-left: -4px;
+  cursor: ew-resize;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rp-rdrawer-resize::before {
+  content: "";
+  width: 2px;
+  height: 100%;
+  background: transparent;
+  transition: background 0.12s;
+}
+.rp-rdrawer-resize:hover::before,
+.rp-rdrawer-resize.is-dragging::before {
+  background: var(--rp-accent);
+}
+.rp-rdrawer-resize .grip {
+  position: absolute;
+  width: 18px;
+  height: 40px;
+  border-radius: 6px;
+  background: var(--rp-bg-elev);
+  border: 1px solid var(--rp-border-strong);
+  display: grid;
+  place-items: center;
+  color: var(--rp-text-subtle);
+  opacity: 0;
+  transition: opacity 0.12s;
+  pointer-events: none;
+  font-size: 12px;
+}
+.rp-rdrawer-resize:hover .grip,
+.rp-rdrawer-resize.is-dragging .grip {
+  opacity: 1;
+}
+body.rp-resizing {
+  cursor: ew-resize !important;
+  user-select: none;
+}
+body.rp-resizing iframe {
+  pointer-events: none;
+}
+
+/* Header */
+.rp-rdrawer-head {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--rp-divider);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.rp-rdrawer-head .rp-rdrawer-avatar {
+  flex-shrink: 0;
+}
+.rp-rdrawer-head .rp-rdrawer-titles {
+  flex: 1;
+  min-width: 0;
+}
+.rp-rdrawer-head .rp-rdrawer-eyebrow {
+  font-size: 11px;
+  color: var(--rp-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+.rp-rdrawer-head h3 {
+  font-size: 18px;
+  margin: 2px 0 0;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rp-rdrawer-head .rp-rdrawer-head-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Width presets + snap buttons */
+.rp-rdrawer-sizes {
+  display: inline-flex;
+  gap: 2px;
+}
+.rp-rdrawer-sizes button {
+  width: 26px;
+  height: 26px;
+  border: 0;
+  background: transparent;
+  border-radius: var(--rp-r-4);
+  color: var(--rp-text-muted);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+}
+.rp-rdrawer-sizes button:hover {
+  background: var(--rp-surface-hover);
+  color: var(--rp-text);
+}
+.rp-rdrawer-sizes button.is-active {
+  background: var(--rp-accent-soft);
+  color: var(--rp-accent-soft-text);
+}
+
+/* Tabs inside drawer */
+.rp-rdrawer-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--rp-divider);
+}
+.rp-rdrawer-tab {
+  padding: 10px 12px;
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--rp-text-muted);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: -1px;
+}
+.rp-rdrawer-tab:hover {
+  color: var(--rp-text);
+}
+.rp-rdrawer-tab.is-active {
+  color: var(--rp-text);
+  border-bottom-color: var(--rp-accent);
+}
+
+.rp-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--rp-surface-hover);
+  color: var(--rp-text-muted);
+  margin-left: 5px;
+  line-height: 1;
+}
+.rp-rdrawer-tab.is-active .rp-tab-count {
+  background: var(--rp-accent-soft);
+  color: var(--rp-accent-soft-text);
+}
+
+.rp-rdrawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* View mode: read-only field display */
+.rp-view-field,
+view-field {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--rp-divider);
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 12px;
+}
+.rp-view-field:last-child,
+view-field:last-child {
+  border-bottom: 0;
+}
+.rp-view-field > dt,
+view-field > dt {
+  font-size: 13px;
+  color: var(--rp-text-muted);
+  font-weight: 500;
+}
+.rp-view-field > dd,
+view-field > dd {
+  font-size: 14px;
+  color: var(--rp-text);
+  margin: 0;
+}
+@media (max-width: 480px) {
+  .rp-view-field,
+  view-field {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+/* Desc mode — stacked single-column layout for long value content */
+view-field[desc] {
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+
+/* Tags mode — flex-wrap layout for multi-value badge lists */
+view-field[tags] > dd[data-rp-fv] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+/* Meta audit fields — smaller, muted; no dividers between them */
+view-field.is-meta {
+  padding: 5px 0;
+  border-bottom: 0;
+}
+view-field.is-meta > dt {
+  font-size: 11px;
+  color: var(--rp-text-subtle);
+}
+view-field.is-meta > dd {
+  font-size: 12px;
+  color: var(--rp-text-muted);
+}
+
+/* mode visibility */
+.rp-rdrawer[data-mode="view"] .rp-show-edit {
+  display: none;
+}
+.rp-rdrawer[data-mode="edit"] .rp-show-view {
+  display: none;
+}
+
+.rp-rdrawer-foot {
+  padding: 14px 20px;
+  border-top: 1px solid var(--rp-divider);
+  background: var(--rp-bg-sunken);
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.rp-rdrawer-foot .rp-rdrawer-foot-meta {
+  font-size: 11px;
+  color: var(--rp-text-subtle);
+  font-family: var(--rp-font-mono);
+}
+.rp-rdrawer-foot .rp-rdrawer-foot-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Mobile: full-screen sheet, no horizontal resize */
+@media (max-width: 640px) {
+  .rp-rdrawer {
+    width: 100vw !important;
+    max-width: 100vw;
+    min-width: 0;
+    border-left: 0;
+  }
+  .rp-rdrawer-resize {
+    display: none;
+  }
+  .rp-rdrawer-head {
+    padding: 14px 16px;
+  }
+  .rp-rdrawer-body {
+    padding: 16px;
+  }
+  .rp-rdrawer-foot {
+    padding: 12px 16px;
+  }
+  .rp-rdrawer-sizes {
+    display: none;
+  }
+  .rp-rdrawer-foot .rp-rdrawer-foot-actions {
+    margin-left: auto;
+  }
+  .rp-rdrawer-foot .rp-rdrawer-foot-meta {
+    display: none;
+  }
+  /* On phones the drawer slides up from the bottom for thumb reach */
+  .rp-rdrawer.sheet {
+    top: auto;
+    height: 92vh;
+    border-radius: var(--rp-r-12) var(--rp-r-12) 0 0;
+    transform: translateY(100%);
+  }
+  .rp-rdrawer-back.is-open .rp-rdrawer.sheet {
+    transform: translateY(0);
+  }
+  .rp-rdrawer.sheet .rp-rdrawer-grabber {
+    width: 100%;
+    padding: 10px 0 4px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-shrink: 0;
+    cursor: grab;
+    touch-action: none;
+  }
+  .rp-rdrawer.sheet .rp-rdrawer-grabber::after {
+    content: "";
+    display: block;
+    width: 36px;
+    height: 4px;
+    border-radius: 99px;
+    background: var(--rp-border-strong);
+  }
+}
+.rp-rdrawer-grabber {
+  display: none;
+}
+@media (max-width: 640px) {
+  .rp-rdrawer.sheet .rp-rdrawer-grabber {
+    display: flex;
+  }
+}

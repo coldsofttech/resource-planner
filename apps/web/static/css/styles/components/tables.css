@@ -1,0 +1,200 @@
+data-table {
+  display: block;
+}
+
+.rp-table-wrap {
+  background: var(--rp-surface);
+  border: 1px solid var(--rp-border);
+  border-radius: var(--rp-r-8);
+  overflow: hidden;
+}
+
+.rp-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--rp-fs-13);
+}
+.rp-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--rp-bg-sunken);
+  font-weight: 600;
+  color: var(--rp-text-muted);
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--rp-border);
+  white-space: nowrap;
+  font-size: var(--rp-fs-12);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.rp-table thead th .rp-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+.rp-table thead th .rp-sort:hover {
+  color: var(--rp-text);
+}
+.rp-table tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--rp-divider);
+  color: var(--rp-text);
+  vertical-align: middle;
+}
+.rp-table tbody tr:hover td {
+  background: var(--rp-surface-hover);
+}
+.rp-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.rp-table .rp-td-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--rp-font-mono);
+  font-size: var(--rp-fs-13);
+}
+.rp-table .rp-td-actions {
+  text-align: right;
+  white-space: nowrap;
+}
+.rp-table .rp-row-drag {
+  color: var(--rp-text-subtle);
+  cursor: grab;
+}
+
+.rp-table .rp-cell-icon {
+  width: 32px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: var(--rp-r-6);
+  background: var(--rp-bg-sunken);
+  color: var(--rp-text-muted);
+  font-size: 13px;
+}
+.rp-table .rp-cell-icon.accent {
+  background: var(--rp-accent-soft);
+  color: var(--rp-accent-soft-text);
+}
+.rp-table .rp-cell-icon.success {
+  background: var(--rp-success-soft);
+  color: var(--rp-success-soft-text);
+}
+.rp-table .rp-cell-icon.warning {
+  background: var(--rp-warning-soft);
+  color: var(--rp-warning-soft-text);
+}
+.rp-table .rp-cell-icon.danger {
+  background: var(--rp-danger-soft);
+  color: var(--rp-danger-soft-text);
+}
+.rp-table .rp-cell-icon.info {
+  background: var(--rp-info-soft);
+  color: var(--rp-info-soft-text);
+}
+.rp-table .rp-cell-icon.purple {
+  background: var(--rp-purple-soft);
+  color: var(--rp-purple-soft-text);
+}
+.rp-table .rp-icon-row {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.rp-table tr[data-rp-row] {
+  cursor: pointer;
+}
+
+.rp-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  border-top: 1px solid var(--rp-divider);
+  font-size: var(--rp-fs-13);
+  color: var(--rp-text-muted);
+}
+.rp-pager {
+  display: flex;
+  gap: 4px;
+}
+.rp-pager button {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--rp-border);
+  background: var(--rp-surface);
+  border-radius: var(--rp-r-4);
+  color: var(--rp-text);
+  font-size: var(--rp-fs-13);
+  cursor: pointer;
+  display: inline-grid;
+  place-items: center;
+}
+.rp-pager button:hover {
+  background: var(--rp-surface-hover);
+}
+.rp-pager button.is-active {
+  background: var(--rp-accent);
+  color: #fff;
+  border-color: var(--rp-accent);
+}
+.rp-pager button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.rp-table-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.rp-table-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 36px 16px;
+  color: var(--rp-text-muted);
+  font-size: var(--rp-fs-13);
+  border-top: 1px solid var(--rp-border);
+}
+.rp-table-state--error {
+  color: var(--rp-danger);
+}
+
+.rp-table-subtitle {
+  font-size: var(--rp-fs-13);
+  color: var(--rp-text-muted);
+  margin: 2px 0 0;
+}
+
+.rp-sort-icon {
+  font-size: 11px;
+  color: var(--rp-text-subtle);
+  transition: color 0.1s;
+}
+.rp-sort-icon--active {
+  color: var(--rp-accent);
+  font-size: 12px;
+}
+
+.rp-table-more-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+@media (max-width: 640px) {
+  [data-rp-hide-mobile] {
+    display: none;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 900px) {
+  .rp-table-scroll .rp-table {
+    min-width: 720px;
+  }
+}

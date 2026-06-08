@@ -1,0 +1,32 @@
+.rp-accordion-item {
+  border-bottom: 1px solid var(--rp-divider);
+}
+.rp-accordion-trigger {
+  width: 100%;
+  background: none;
+  border: 0;
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--rp-text);
+  font-weight: 600;
+  font-size: var(--rp-fs-14);
+  cursor: pointer;
+}
+.rp-accordion-trigger .bi {
+  transition: transform 0.15s;
+  color: var(--rp-text-muted);
+}
+.rp-accordion-trigger.is-open .bi {
+  transform: rotate(90deg);
+}
+.rp-accordion-body {
+  display: none;
+  padding: 0 0 12px;
+  color: var(--rp-text-muted);
+  font-size: var(--rp-fs-13);
+}
+.rp-accordion-trigger.is-open + .rp-accordion-body {
+  display: block;
+}

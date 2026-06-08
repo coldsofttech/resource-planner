@@ -49,3 +49,6 @@
   color: var(--rp-text-subtle);
   flex-shrink: 0;
 }
+section-panel {
+  display: block;
+}

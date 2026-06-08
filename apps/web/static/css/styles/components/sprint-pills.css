@@ -1,0 +1,26 @@
+.rp-sprint-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 12px;
+  background: var(--rp-surface);
+  border: 1px solid var(--rp-border);
+  border-radius: var(--rp-r-pill);
+  font-size: var(--rp-fs-13);
+  font-weight: 600;
+}
+.rp-sprint-pill .rp-sprint-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--rp-success);
+}
+.rp-sprint-pill .rp-sprint-name {
+  color: var(--rp-text);
+}
+.rp-sprint-pill .rp-sprint-time {
+  color: var(--rp-text-muted);
+  font-family: var(--rp-font-mono);
+  font-size: var(--rp-fs-12);
+}
