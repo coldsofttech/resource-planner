@@ -1,37 +1,25 @@
-from datetime import timedelta
+from unittest.mock import patch
 
 from django.test import TestCase
-from django.utils import timezone
 from rest_framework.test import APIClient
 
-from apps.auth.models import PasswordResetToken
+from apps.auth.services import UserTokenService
+from apps.auth.tests.factories import make_token
 from apps.users.models import User
+from apps.users.tests.factories import make_profile, make_superuser, make_user
 
 LOGIN_URL = "/api/v1/auth/login/"
+LOGOUT_URL = "/api/v1/auth/logout/"
 FP_REQUEST_URL = "/api/v1/auth/forgot-password/"
 FP_VERIFY_URL = "/api/v1/auth/forgot-password/verify/"
 FP_RESET_URL = "/api/v1/auth/forgot-password/reset/"
 REGISTER_URL = "/api/v1/auth/register/"
+ME_URL = "/api/v1/auth/me/"
 
 VALID_CREDENTIALS = {
     "email": "user@example.com",
-    "password": "SecurePass123!",
+    "password": "StrongPass123!",
 }
-
-
-def make_user(email="user@example.com", password="SecurePass123!", is_active=True):
-    return User.objects.create_user(
-        username=email, email=email, password=password, is_active=is_active
-    )
-
-
-def make_token(user, code_hash, minutes=10):
-    return PasswordResetToken.objects.create(
-        user=user,
-        email=user.email,
-        token_hash=code_hash,
-        expires_at=timezone.now() + timedelta(minutes=minutes),
-    )
 
 
 # ---------------------------------------------------------------------------
@@ -77,6 +65,10 @@ class AuthLoginSuccessTest(TestCase):
         token = response.data["data"]["token"]
         self.assertIsInstance(token, str)
         self.assertTrue(len(token) > 0)
+
+    def test_token_is_64_characters(self):
+        response = self.client.post(LOGIN_URL, VALID_CREDENTIALS, format="json")
+        self.assertEqual(len(response.data["data"]["token"]), 64)
 
 
 # ---------------------------------------------------------------------------
@@ -190,6 +182,96 @@ class AuthLoginAuthenticationTest(TestCase):
 
 
 # ---------------------------------------------------------------------------
+# POST /api/v1/auth/login/ — non-classic auth mode
+# ---------------------------------------------------------------------------
+
+
+class AuthLoginNonClassicModeTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_saml_mode_returns_422_for_non_superuser(self):
+        from apps.configurations.models import Configuration
+
+        make_user()
+        Configuration.objects.filter(config_code="AUTH_MODE").update(value="saml")
+        response = self.client.post(LOGIN_URL, VALID_CREDENTIALS, format="json")
+        self.assertEqual(response.status_code, 422)
+
+    def test_oauth_mode_returns_422_for_non_superuser(self):
+        from apps.configurations.models import Configuration
+
+        make_user()
+        Configuration.objects.filter(config_code="AUTH_MODE").update(value="oauth")
+        response = self.client.post(LOGIN_URL, VALID_CREDENTIALS, format="json")
+        self.assertEqual(response.status_code, 422)
+
+    def test_non_classic_mode_response_success_is_false(self):
+        from apps.configurations.models import Configuration
+
+        make_user()
+        Configuration.objects.filter(config_code="AUTH_MODE").update(value="saml")
+        response = self.client.post(LOGIN_URL, VALID_CREDENTIALS, format="json")
+        self.assertFalse(response.data["success"])
+
+    @patch("apps.auth.services.auth_login")
+    def test_superuser_can_login_in_saml_mode(self, _mock_login):
+        from apps.configurations.models import Configuration
+
+        make_superuser()
+        Configuration.objects.filter(config_code="AUTH_MODE").update(value="saml")
+        response = self.client.post(
+            LOGIN_URL,
+            {"email": "admin@example.com", "password": "StrongPass123!"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+
+
+# ---------------------------------------------------------------------------
+# POST /api/v1/auth/logout/
+# ---------------------------------------------------------------------------
+
+
+class AuthLogoutTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = make_user()
+
+    def test_logout_returns_200(self):
+        response = self.client.post(LOGOUT_URL, format="json")
+        self.assertEqual(response.status_code, 200)
+
+    def test_logout_success_flag_is_true(self):
+        response = self.client.post(LOGOUT_URL, format="json")
+        self.assertTrue(response.data["success"])
+
+    def test_logout_message(self):
+        response = self.client.post(LOGOUT_URL, format="json")
+        self.assertEqual(response.data["message"], "Signed out successfully.")
+
+    def test_logout_without_any_token_succeeds(self):
+        response = self.client.post(LOGOUT_URL, format="json")
+        self.assertEqual(response.status_code, 200)
+
+    def test_logout_revokes_active_bearer_token(self):
+        svc = UserTokenService(user=None, request=None)
+        token = svc.create_token(self.user)
+
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token.key}")
+        self.client.post(LOGOUT_URL, format="json")
+
+        token.refresh_from_db()
+        self.assertFalse(token.is_active)
+
+    def test_logout_clears_session(self):
+        self.client.force_login(self.user)
+        self.assertIn("_auth_user_id", self.client.session)
+        self.client.post(LOGOUT_URL, format="json")
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+
+# ---------------------------------------------------------------------------
 # POST /api/v1/auth/forgot-password/ — request reset
 # ---------------------------------------------------------------------------
 
@@ -200,8 +282,6 @@ class ForgotPasswordRequestAPITest(TestCase):
         self.user = make_user()
 
     def test_known_email_returns_200(self):
-        from unittest.mock import patch
-
         with patch("apps.auth.services.build_email_sender") as mock_sender:
             mock_sender.return_value.send.return_value = None
             response = self.client.post(
@@ -210,8 +290,6 @@ class ForgotPasswordRequestAPITest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_known_email_response_success_is_true(self):
-        from unittest.mock import patch
-
         with patch("apps.auth.services.build_email_sender") as mock_sender:
             mock_sender.return_value.send.return_value = None
             response = self.client.post(
@@ -255,7 +333,7 @@ class ForgotPasswordVerifyAPITest(TestCase):
         self.client = APIClient()
         self.user = make_user()
         self.valid_code = "654321"
-        make_token(self.user, code_hash=hash_otp(self.valid_code))
+        make_token(self.user, token_hash=hash_otp(self.valid_code))
 
     def test_valid_code_returns_200(self):
         response = self.client.post(
@@ -285,7 +363,9 @@ class ForgotPasswordVerifyAPITest(TestCase):
         from otpcore import hash_otp
 
         expired_code = "111111"
-        make_token(self.user, code_hash=hash_otp(expired_code), minutes=-1)
+        make_token(
+            self.user, token_hash=hash_otp(expired_code), minutes_until_expiry=-1
+        )
         response = self.client.post(
             FP_VERIFY_URL,
             {"email": self.user.email, "code": expired_code},
@@ -313,6 +393,14 @@ class ForgotPasswordVerifyAPITest(TestCase):
         )
         self.assertEqual(response.status_code, 400)
 
+    def test_unknown_email_returns_422(self):
+        response = self.client.post(
+            FP_VERIFY_URL,
+            {"email": "nobody@example.com", "code": self.valid_code},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 422)
+
 
 # ---------------------------------------------------------------------------
 # POST /api/v1/auth/forgot-password/reset/ — reset password
@@ -326,7 +414,7 @@ class ForgotPasswordResetAPITest(TestCase):
         self.client = APIClient()
         self.user = make_user()
         self.valid_code = "789012"
-        make_token(self.user, code_hash=hash_otp(self.valid_code))
+        make_token(self.user, token_hash=hash_otp(self.valid_code))
 
     def test_valid_reset_returns_200(self):
         response = self.client.post(
@@ -386,8 +474,8 @@ class ForgotPasswordResetAPITest(TestCase):
             {
                 "email": self.user.email,
                 "code": self.valid_code,
-                "new_password": "SecurePass123!",
-                "confirm_password": "SecurePass123!",
+                "new_password": "StrongPass123!",
+                "confirm_password": "StrongPass123!",
             },
             format="json",
         )
@@ -570,3 +658,70 @@ class RegisterNonClassicAuthModeAPITest(TestCase):
         Configuration.objects.filter(config_code="AUTH_MODE").update(value="saml")
         response = self.client.post(REGISTER_URL, VALID_REGISTER_PAYLOAD, format="json")
         self.assertFalse(response.data["success"])
+
+
+# ---------------------------------------------------------------------------
+# GET /api/v1/auth/me/ — unauthenticated
+# ---------------------------------------------------------------------------
+
+
+class MeGetUnauthenticatedTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_unauthenticated_returns_401(self):
+        response = self.client.get(ME_URL)
+        self.assertEqual(response.status_code, 401)
+
+
+# ---------------------------------------------------------------------------
+# GET /api/v1/auth/me/ — authenticated
+# ---------------------------------------------------------------------------
+
+
+class MeGetAuthenticatedTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = make_user(
+            email="me@example.com",
+            first_name="Ada",
+            last_name="Lovelace",
+        )
+        token = UserTokenService(user=self.user, request=None).create_token(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token.key}")
+
+    def test_returns_200(self):
+        response = self.client.get(ME_URL)
+        self.assertEqual(response.status_code, 200)
+
+    def test_response_success_is_true(self):
+        response = self.client.get(ME_URL)
+        self.assertTrue(response.data["success"])
+
+    def test_response_contains_first_name(self):
+        response = self.client.get(ME_URL)
+        self.assertEqual(response.data["data"]["first_name"], "Ada")
+
+    def test_response_contains_last_name(self):
+        response = self.client.get(ME_URL)
+        self.assertEqual(response.data["data"]["last_name"], "Lovelace")
+
+    def test_response_contains_email(self):
+        response = self.client.get(ME_URL)
+        self.assertEqual(response.data["data"]["email"], "me@example.com")
+
+    def test_response_contains_theme(self):
+        response = self.client.get(ME_URL)
+        self.assertIn("theme", response.data["data"])
+
+    def test_default_theme_is_light(self):
+        response = self.client.get(ME_URL)
+        self.assertEqual(response.data["data"]["theme"], "light")
+
+    def test_returns_profile_theme_when_profile_exists(self):
+        make_profile(user=self.user, theme="dark")
+        response = self.client.get(ME_URL)
+        self.assertEqual(response.data["data"]["theme"], "dark")
+
+
+# PATCH /api/v1/users/me/ tests are in apps/users/tests/integration/test_api.py

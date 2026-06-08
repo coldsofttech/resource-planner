@@ -33,4 +33,9 @@ urlpatterns = [
         AuthViewSet.as_view({"post": "logout"}),
         name="auth-logout",
     ),
+    path(
+        "auth/me/",
+        AuthViewSet.as_view({"get": "me"}),
+        name="auth-me",
+    ),
 ]

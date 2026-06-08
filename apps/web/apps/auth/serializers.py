@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
 from apps.core.serializers import BaseSerializer, WriteMixin
+from apps.users.constants import ThemeChoices
 
 
 class LoginSerializer(WriteMixin, BaseSerializer):
@@ -60,3 +61,14 @@ class ForgotPasswordResetSerializer(WriteMixin, BaseSerializer):
                 {"confirm_password": "Passwords do not match."}
             )
         return attrs
+
+
+class MeSerializer(BaseSerializer):
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    email = serializers.EmailField()
+    display_name = serializers.CharField()
+    theme = serializers.ChoiceField(choices=ThemeChoices.choices)
+    avatar_url = serializers.CharField(allow_null=True)
+    is_sso = serializers.BooleanField()
+    sso_provider_name = serializers.CharField(allow_null=True)

@@ -58,6 +58,33 @@ class AuthService(ContextService):
         logger.info("User '%s' signed in via classic auth.", email)
         return user
 
+    def get_me(self) -> dict:
+        from apps.users.constants import ThemeChoices
+        from apps.users.models import UserAvatar, UserProfile
+
+        user = self.user
+        profile: UserProfile | None = getattr(user, "profile", None)
+        theme = profile.theme if profile else ThemeChoices.LIGHT
+
+        is_sso = bool(profile and profile.sso_uid)
+        sso_provider_name: str | None = None
+        if is_sso and profile and profile.sso_provider:
+            sso_provider_name = getattr(profile.sso_provider, "name", None)
+
+        has_avatar = UserAvatar.objects.filter(user=user).exists()
+        avatar_url = "/api/v1/users/me/avatar/" if has_avatar else None
+
+        return {
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "email": user.email,
+            "display_name": profile.display_name if profile else "",
+            "theme": theme,
+            "avatar_url": avatar_url,
+            "is_sso": is_sso,
+            "sso_provider_name": sso_provider_name,
+        }
+
 
 class UserTokenService(ContextService):
     def create_token(self, user):

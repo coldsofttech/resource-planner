@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from apps.auth.serializers import (
     ForgotPasswordRequestSerializer,
@@ -18,7 +18,7 @@ VALID_LOGIN = {
 }
 
 
-class LoginSerializerValidationTest(TestCase):
+class LoginSerializerValidationTest(SimpleTestCase):
     def test_valid_data_passes(self):
         s = LoginSerializer(data=VALID_LOGIN)
         self.assertTrue(s.is_valid(), s.errors)
@@ -72,7 +72,7 @@ class LoginSerializerValidationTest(TestCase):
 # ---------------------------------------------------------------------------
 
 
-class ForgotPasswordRequestSerializerTest(TestCase):
+class ForgotPasswordRequestSerializerTest(SimpleTestCase):
     def test_valid_email_passes(self):
         s = ForgotPasswordRequestSerializer(data={"email": "user@example.com"})
         self.assertTrue(s.is_valid(), s.errors)
@@ -108,7 +108,7 @@ VALID_VERIFY = {
 }
 
 
-class ForgotPasswordVerifySerializerTest(TestCase):
+class ForgotPasswordVerifySerializerTest(SimpleTestCase):
     def test_valid_data_passes(self):
         s = ForgotPasswordVerifySerializer(data=VALID_VERIFY)
         self.assertTrue(s.is_valid(), s.errors)
@@ -137,6 +137,14 @@ class ForgotPasswordVerifySerializerTest(TestCase):
         s = ForgotPasswordVerifySerializer(data={})
         self.assertFalse(s.is_valid())
 
+    def test_all_zeros_code_passes(self):
+        s = ForgotPasswordVerifySerializer(data={**VALID_VERIFY, "code": "000000"})
+        self.assertTrue(s.is_valid(), s.errors)
+
+    def test_alphanumeric_code_passes(self):
+        s = ForgotPasswordVerifySerializer(data={**VALID_VERIFY, "code": "abc123"})
+        self.assertTrue(s.is_valid(), s.errors)
+
 
 # ---------------------------------------------------------------------------
 # ForgotPasswordResetSerializer
@@ -150,7 +158,7 @@ VALID_RESET = {
 }
 
 
-class ForgotPasswordResetSerializerTest(TestCase):
+class ForgotPasswordResetSerializerTest(SimpleTestCase):
     def test_valid_data_passes(self):
         s = ForgotPasswordResetSerializer(data=VALID_RESET)
         self.assertTrue(s.is_valid(), s.errors)
@@ -193,19 +201,30 @@ class ForgotPasswordResetSerializerTest(TestCase):
         )
         self.assertFalse(s.is_valid())
 
+    def test_numeric_only_password_fails_django_validator(self):
+        s = ForgotPasswordResetSerializer(
+            data={
+                **VALID_RESET,
+                "new_password": "123456789012",
+                "confirm_password": "123456789012",
+            }
+        )
+        self.assertFalse(s.is_valid())
+
     def test_mismatched_passwords_fails(self):
         s = ForgotPasswordResetSerializer(
             data={**VALID_RESET, "confirm_password": "DifferentPass789!"}
         )
         self.assertFalse(s.is_valid())
 
-    def test_mismatched_passwords_error_is_on_confirm_password(self):
+    def test_mismatched_passwords_error_is_on_confirm_password_or_non_field(self):
         s = ForgotPasswordResetSerializer(
             data={**VALID_RESET, "confirm_password": "DifferentPass789!"}
         )
         s.is_valid()
-        errors = s.errors
-        self.assertTrue("confirm_password" in errors or "non_field_errors" in errors)
+        self.assertTrue(
+            "confirm_password" in s.errors or "non_field_errors" in s.errors
+        )
 
     def test_empty_payload_fails(self):
         s = ForgotPasswordResetSerializer(data={})
@@ -225,7 +244,7 @@ VALID_REGISTER = {
 }
 
 
-class RegisterSerializerValidationTest(TestCase):
+class RegisterSerializerValidationTest(SimpleTestCase):
     def test_valid_data_passes(self):
         s = RegisterSerializer(data=VALID_REGISTER)
         self.assertTrue(s.is_valid(), s.errors)
@@ -273,6 +292,16 @@ class RegisterSerializerValidationTest(TestCase):
         )
         self.assertFalse(s.is_valid())
 
+    def test_numeric_only_password_fails_django_validator(self):
+        s = RegisterSerializer(
+            data={
+                **VALID_REGISTER,
+                "password": "123456789012",
+                "confirm_password": "123456789012",
+            }
+        )
+        self.assertFalse(s.is_valid())
+
     def test_missing_confirm_password_fails(self):
         data = {**VALID_REGISTER}
         del data["confirm_password"]
@@ -290,13 +319,23 @@ class RegisterSerializerValidationTest(TestCase):
         s = RegisterSerializer(data={})
         self.assertFalse(s.is_valid())
 
+    def test_empty_first_name_fails(self):
+        s = RegisterSerializer(data={**VALID_REGISTER, "first_name": ""})
+        self.assertFalse(s.is_valid())
+        self.assertIn("first_name", s.errors)
+
+    def test_whitespace_only_first_name_fails(self):
+        s = RegisterSerializer(data={**VALID_REGISTER, "first_name": "   "})
+        self.assertFalse(s.is_valid())
+        self.assertIn("first_name", s.errors)
+
+    def test_whitespace_only_last_name_fails(self):
+        s = RegisterSerializer(data={**VALID_REGISTER, "last_name": "   "})
+        self.assertFalse(s.is_valid())
+        self.assertIn("last_name", s.errors)
+
     def test_validated_data_contains_all_fields(self):
         s = RegisterSerializer(data=VALID_REGISTER)
         s.is_valid()
         for field in ["first_name", "last_name", "email", "password"]:
             self.assertIn(field, s.validated_data)
-
-    def test_empty_first_name_fails(self):
-        s = RegisterSerializer(data={**VALID_REGISTER, "first_name": ""})
-        self.assertFalse(s.is_valid())
-        self.assertIn("first_name", s.errors)

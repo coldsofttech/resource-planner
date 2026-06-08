@@ -1,8 +1,6 @@
-from datetime import timedelta
 from unittest.mock import MagicMock, patch
 
 from django.test import TestCase
-from django.utils import timezone
 
 from apps.auth.models import PasswordResetToken
 from apps.auth.services import (
@@ -11,6 +9,7 @@ from apps.auth.services import (
     RegisterService,
     UserTokenService,
 )
+from apps.auth.tests.factories import make_token
 from apps.core.exceptions import (
     AlreadyExistsException,
     AuthFailedException,
@@ -18,23 +17,7 @@ from apps.core.exceptions import (
     ValidationException,
 )
 from apps.users.models import User
-
-
-def make_user(email="user@example.com", password="StrongPass123!", is_active=True):
-    return User.objects.create_user(
-        username=email, email=email, password=password, is_active=is_active
-    )
-
-
-def make_token(user, code_hash, minutes_until_expiry=10, is_used=False):
-    return PasswordResetToken.objects.create(
-        user=user,
-        email=user.email,
-        token_hash=code_hash,
-        expires_at=timezone.now() + timedelta(minutes=minutes_until_expiry),
-        is_used=is_used,
-    )
-
+from apps.users.tests.factories import make_superuser, make_user
 
 # ---------------------------------------------------------------------------
 # AuthService — classic_login
@@ -79,7 +62,18 @@ class AuthServiceClassicLoginTest(TestCase):
             "apps.auth.constants", fromlist=["AuthMode"]
         ).AuthMode.SAML,
     )
-    def test_raises_validation_for_non_classic_auth_mode_non_superuser(self, _mode):
+    def test_raises_validation_for_saml_auth_mode_non_superuser(self, _mode):
+        svc = AuthService(user=None, request=None)
+        with self.assertRaises(ValidationException):
+            svc.classic_login(email="user@example.com", password="StrongPass123!")
+
+    @patch(
+        "apps.configurations.selectors.Auth.get_auth_mode",
+        return_value=__import__(
+            "apps.auth.constants", fromlist=["AuthMode"]
+        ).AuthMode.OAUTH,
+    )
+    def test_raises_validation_for_oauth_auth_mode_non_superuser(self, _mode):
         svc = AuthService(user=None, request=None)
         with self.assertRaises(ValidationException):
             svc.classic_login(email="user@example.com", password="StrongPass123!")
@@ -92,11 +86,7 @@ class AuthServiceClassicLoginTest(TestCase):
         ).AuthMode.SAML,
     )
     def test_superuser_can_login_regardless_of_auth_mode(self, _mode, _login):
-        superuser = User.objects.create_superuser(
-            username="super@example.com",
-            email="super@example.com",
-            password="StrongPass123!",
-        )
+        superuser = make_superuser("super@example.com")
         svc = AuthService(user=None, request=None)
         result = svc.classic_login(email="super@example.com", password="StrongPass123!")
         self.assertEqual(result.pk, superuser.pk)
@@ -144,10 +134,10 @@ class UserTokenServiceRevokeTest(TestCase):
     def setUp(self):
         self.user = make_user()
 
-    def _make_mock_request(self, key=None):
+    def _make_mock_request(self, key=None, scheme="Bearer"):
         request = MagicMock()
         if key:
-            request.META = {"HTTP_AUTHORIZATION": f"Bearer {key}"}
+            request.META = {"HTTP_AUTHORIZATION": f"{scheme} {key}"}
         else:
             request.META = {}
         return request
@@ -182,6 +172,17 @@ class UserTokenServiceRevokeTest(TestCase):
         svc.revoke_current_token()
         self.assertEqual(UserToken.objects.filter(is_active=False).count(), 0)
 
+    def test_revoke_is_case_insensitive_for_bearer_keyword(self):
+        svc_create = UserTokenService(user=None, request=None)
+        token = svc_create.create_token(self.user)
+
+        request = self._make_mock_request(key=token.key, scheme="BEARER")
+        svc_revoke = UserTokenService(user=None, request=request)
+        svc_revoke.revoke_current_token()
+
+        token.refresh_from_db()
+        self.assertFalse(token.is_active)
+
 
 # ---------------------------------------------------------------------------
 # ForgotPasswordService — request_password_reset
@@ -213,7 +214,7 @@ class ForgotPasswordServiceRequestTest(TestCase):
     @patch("apps.auth.services.build_email_sender")
     def test_invalidates_old_tokens_before_generating_new(self, mock_sender):
         mock_sender.return_value.send.return_value = None
-        make_token(self.user, code_hash="old" * 21 + "x")
+        make_token(self.user, token_hash="old" * 21 + "x")
         self.svc.request_password_reset(email=self.user.email)
         old_tokens = PasswordResetToken.objects.filter(user=self.user, is_used=True)
         self.assertEqual(old_tokens.count(), 1)
@@ -248,7 +249,7 @@ class ForgotPasswordServiceVerifyTest(TestCase):
         self.user = make_user()
         self.svc = ForgotPasswordService(user=None, request=None)
         self.valid_code = "654321"
-        make_token(self.user, code_hash=hash_otp(self.valid_code))
+        make_token(self.user, token_hash=hash_otp(self.valid_code))
 
     def test_returns_true_for_valid_code(self):
         result = self.svc.verify_reset_code(email=self.user.email, code=self.valid_code)
@@ -262,7 +263,9 @@ class ForgotPasswordServiceVerifyTest(TestCase):
         from otpcore import hash_otp
 
         expired_code = "111111"
-        make_token(self.user, code_hash=hash_otp(expired_code), minutes_until_expiry=-1)
+        make_token(
+            self.user, token_hash=hash_otp(expired_code), minutes_until_expiry=-1
+        )
         result = self.svc.verify_reset_code(email=self.user.email, code=expired_code)
         self.assertFalse(result)
 
@@ -270,8 +273,14 @@ class ForgotPasswordServiceVerifyTest(TestCase):
         from otpcore import hash_otp
 
         used_code = "222222"
-        make_token(self.user, code_hash=hash_otp(used_code), is_used=True)
+        make_token(self.user, token_hash=hash_otp(used_code), is_used=True)
         result = self.svc.verify_reset_code(email=self.user.email, code=used_code)
+        self.assertFalse(result)
+
+    def test_returns_false_for_nonexistent_email(self):
+        result = self.svc.verify_reset_code(
+            email="nobody@example.com", code=self.valid_code
+        )
         self.assertFalse(result)
 
     def test_does_not_consume_token_on_verify(self):
@@ -294,7 +303,7 @@ class ForgotPasswordServiceResetTest(TestCase):
         self.user = make_user()
         self.svc = ForgotPasswordService(user=None, request=None)
         self.valid_code = "789012"
-        make_token(self.user, code_hash=hash_otp(self.valid_code))
+        make_token(self.user, token_hash=hash_otp(self.valid_code))
 
     def test_resets_password_successfully(self):
         self.svc.reset_password(
