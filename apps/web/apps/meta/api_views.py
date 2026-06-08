@@ -8,6 +8,7 @@ from apps.meta.services import MetaService
 
 class MetaViewSet(BaseViewSet):
     permission_classes = [AllowAny]
+    http_method_names = ["get", "head", "options"]
 
     @extend_schema(
         summary="Retrieve application metadata",

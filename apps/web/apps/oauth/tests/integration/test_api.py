@@ -3,8 +3,7 @@ from unittest.mock import patch
 from django.test import TestCase
 from rest_framework.test import APIClient
 
-from apps.oauth.models import OAuth
-from apps.users.models import User
+from apps.oauth.tests.factories import make_provider, make_superuser
 
 CREATE_URL = "/api/v1/auth/oauth/"
 CALLBACK_URL = "/api/v1/auth/oauth/callback/"
@@ -19,30 +18,16 @@ PROVIDER_PAYLOAD = {
     "scope": "openid email profile",
 }
 
-PROVIDER_BASE = {
-    "client_id": "cid",
-    "client_secret": "csecret",
-    "auth_endpoint": "https://idp.example.com/auth",
-    "token_endpoint": "https://idp.example.com/token",
-    "userinfo_endpoint": "https://idp.example.com/userinfo",
-    "scope": "openid email",
-}
 
-
-def make_provider(name="Test Provider", is_active=True, **overrides):
-    return OAuth.objects.create(
-        name=name, is_active=is_active, **{**PROVIDER_BASE, **overrides}
-    )
-
-
-def make_user(email="admin@example.com"):
-    return User.objects.create_superuser(username=email, email=email, password="pass")
+# ---------------------------------------------------------------------------
+# POST /api/v1/auth/oauth/ — create provider
+# ---------------------------------------------------------------------------
 
 
 class OAuthCreateAPITest(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.client.force_authenticate(user=make_user())
+        self.client.force_authenticate(user=make_superuser())
 
     @patch("apps.oauth.services.encrypt_value", side_effect=lambda v, _: v)
     @patch("apps.oauth.services.Infra.get_secrets_prefix", return_value="")
@@ -76,6 +61,12 @@ class OAuthCreateAPITest(TestCase):
 
     @patch("apps.oauth.services.encrypt_value", side_effect=lambda v, _: v)
     @patch("apps.oauth.services.Infra.get_secrets_prefix", return_value="")
+    def test_create_response_contains_is_active_true(self, _prefix, _enc):
+        response = self.client.post(CREATE_URL, PROVIDER_PAYLOAD, format="json")
+        self.assertTrue(response.data["data"]["is_active"])
+
+    @patch("apps.oauth.services.encrypt_value", side_effect=lambda v, _: v)
+    @patch("apps.oauth.services.Infra.get_secrets_prefix", return_value="")
     def test_duplicate_provider_name_returns_409(self, _prefix, _enc):
         self.client.post(CREATE_URL, PROVIDER_PAYLOAD, format="json")
         response = self.client.post(CREATE_URL, PROVIDER_PAYLOAD, format="json")
@@ -88,6 +79,16 @@ class OAuthCreateAPITest(TestCase):
     def test_empty_payload_returns_error(self):
         response = self.client.post(CREATE_URL, {}, format="json")
         self.assertIn(response.status_code, [400, 422])
+
+    def test_unauthenticated_request_returns_401(self):
+        unauthenticated = APIClient()
+        response = unauthenticated.post(CREATE_URL, PROVIDER_PAYLOAD, format="json")
+        self.assertEqual(response.status_code, 401)
+
+
+# ---------------------------------------------------------------------------
+# GET /api/v1/auth/oauth/<code>/authorize/ — begin OAuth flow
+# ---------------------------------------------------------------------------
 
 
 class OAuthAuthorizeAPITest(TestCase):
@@ -126,6 +127,15 @@ class OAuthAuthorizeAPITest(TestCase):
         self.assertTrue(len(response.data["data"]["state"]) > 0)
 
     @patch("apps.oauth.services.decrypt_value", side_effect=lambda v: v)
+    def test_state_token_has_sufficient_length(self, _dec):
+        provider = make_provider(name="Token Length Provider")
+        response = self.client.get(
+            self._authorize_url(provider),
+            {"redirect_uri": "https://app.example.com/callback"},
+        )
+        self.assertGreaterEqual(len(response.data["data"]["state"]), 32)
+
+    @patch("apps.oauth.services.decrypt_value", side_effect=lambda v: v)
     def test_authorize_url_contains_provider_auth_endpoint(self, _dec):
         provider = make_provider(name="Auth Endpoint Provider")
         response = self.client.get(
@@ -134,6 +144,17 @@ class OAuthAuthorizeAPITest(TestCase):
         )
         auth_url = response.data["data"]["authorization_url"]
         self.assertIn("https://idp.example.com/auth", auth_url)
+
+    @patch("apps.oauth.services.decrypt_value", side_effect=lambda v: v)
+    def test_authorization_url_contains_state_value(self, _dec):
+        provider = make_provider(name="State In URL Provider")
+        response = self.client.get(
+            self._authorize_url(provider),
+            {"redirect_uri": "https://app.example.com/callback"},
+        )
+        state = response.data["data"]["state"]
+        auth_url = response.data["data"]["authorization_url"]
+        self.assertIn(state, auth_url)
 
     def test_authorize_without_redirect_uri_returns_error(self):
         provider = make_provider(name="No Redirect Provider")
@@ -165,6 +186,19 @@ class OAuthAuthorizeAPITest(TestCase):
         self.assertIn("oauth_state", self.client.session)
         self.assertIn("oauth_provider_code", self.client.session)
         self.assertIn("oauth_redirect_uri", self.client.session)
+
+    @patch("apps.oauth.services.decrypt_value", side_effect=lambda v: v)
+    def test_state_tokens_are_unique_across_authorize_calls(self, _dec):
+        provider = make_provider(name="State Unique Provider")
+        url = f"/api/v1/auth/oauth/{provider.code}/authorize/"
+        r1 = self.client.get(url, {"redirect_uri": "https://app.example.com/cb"})
+        r2 = self.client.get(url, {"redirect_uri": "https://app.example.com/cb"})
+        self.assertNotEqual(r1.data["data"]["state"], r2.data["data"]["state"])
+
+
+# ---------------------------------------------------------------------------
+# POST /api/v1/auth/oauth/callback/ — complete OAuth flow
+# ---------------------------------------------------------------------------
 
 
 class OAuthCallbackAPITest(TestCase):
@@ -340,16 +374,88 @@ class OAuthCallbackAPITest(TestCase):
     @patch("apps.oauth.services.decrypt_value", side_effect=lambda v: v)
     @patch(
         "apps.oauth.services.fetch_userinfo",
-        return_value={"email": "state1@example.com", "sub": "uid-state1"},
+        return_value={"email": "deact@example.com", "sub": "uid-deact"},
     )
     @patch(
         "apps.oauth.services.exchange_code", return_value={"access_token": "tok-xyz"}
     )
-    def test_state_tokens_are_unique_across_authorize_calls(self, _exc, _fetch, _dec):
-        provider = make_provider(name="State Unique Provider")
-        url = f"/api/v1/auth/oauth/{provider.code}/authorize/"
-        r1 = self.client.get(url, {"redirect_uri": "https://app.example.com/cb"})
-        r2 = self.client.get(url, {"redirect_uri": "https://app.example.com/cb"})
-        state1 = r1.data["data"]["state"]
-        state2 = r2.data["data"]["state"]
-        self.assertNotEqual(state1, state2)
+    def test_callback_with_provider_deactivated_after_authorize_returns_404(
+        self, _exc, _fetch, _dec
+    ):
+        provider = make_provider(name="Deactivated Mid-Flow Provider")
+        self._seed_session(provider, state="deact-state")
+        provider.is_active = False
+        provider.save()
+        response = self.client.post(
+            CALLBACK_URL,
+            {"code": "auth-code", "state": "deact-state"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 404)
+
+    @patch("apps.oauth.services.decrypt_value", side_effect=lambda v: v)
+    @patch(
+        "apps.oauth.services.fetch_userinfo",
+        return_value={"email": "success@example.com", "sub": "uid-success"},
+    )
+    @patch(
+        "apps.oauth.services.exchange_code", return_value={"access_token": "tok-xyz"}
+    )
+    def test_callback_response_success_flag_is_true(self, _exc, _fetch, _dec):
+        provider = make_provider(name="Success Flag Provider")
+        self._seed_session(provider, state="success-state")
+        response = self.client.post(
+            CALLBACK_URL,
+            {"code": "auth-code", "state": "success-state"},
+            format="json",
+        )
+        self.assertTrue(response.data["success"])
+
+    @patch("apps.oauth.services.decrypt_value", side_effect=lambda v: v)
+    @patch(
+        "apps.oauth.services.fetch_userinfo",
+        return_value={"email": "newuser@example.com", "sub": "uid-newuser"},
+    )
+    @patch(
+        "apps.oauth.services.exchange_code", return_value={"access_token": "tok-xyz"}
+    )
+    def test_successful_callback_creates_user_in_database(self, _exc, _fetch, _dec):
+        from apps.users.models import User
+
+        provider = make_provider(name="DB Create Provider")
+        self._seed_session(provider, state="db-create-state")
+        self.client.post(
+            CALLBACK_URL,
+            {"code": "auth-code", "state": "db-create-state"},
+            format="json",
+        )
+        self.assertTrue(User.objects.filter(email="newuser@example.com").exists())
+
+    @patch("apps.oauth.services.decrypt_value", side_effect=lambda v: v)
+    @patch(
+        "apps.oauth.services.fetch_userinfo",
+        return_value={"email": "repeat@example.com", "sub": "uid-repeat"},
+    )
+    @patch(
+        "apps.oauth.services.exchange_code", return_value={"access_token": "tok-xyz"}
+    )
+    def test_repeat_callback_does_not_create_duplicate_user(self, _exc, _fetch, _dec):
+        from apps.users.models import User
+
+        provider = make_provider(name="No Dupe Provider")
+        self._seed_session(provider, state="dupe-state-1")
+        self.client.post(
+            CALLBACK_URL,
+            {"code": "auth-code", "state": "dupe-state-1"},
+            format="json",
+        )
+
+        self._seed_session(provider, state="dupe-state-2")
+        self.client.post(
+            CALLBACK_URL,
+            {"code": "auth-code-2", "state": "dupe-state-2"},
+            format="json",
+        )
+
+        count = User.objects.filter(email="repeat@example.com").count()
+        self.assertEqual(count, 1)

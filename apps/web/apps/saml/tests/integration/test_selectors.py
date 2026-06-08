@@ -1,23 +1,12 @@
 from django.test import TestCase
 
-from apps.saml.models import SAML
 from apps.saml.selectors import (
+    get_active_provider,
     get_active_provider_by_code,
     get_provider_by_entity_id,
     provider_exists,
 )
-
-PROVIDER_BASE = {
-    "idp_entity_id": "https://idp.example.com/entity",
-    "idp_sso_url": "https://idp.example.com/sso",
-    "idp_x509_cert": "MIICERT...",
-    "sp_entity_id": "https://sp.example.com/entity",
-    "sp_assertion_url": "https://sp.example.com/acs",
-}
-
-
-def make_provider(name="Test Provider", **overrides):
-    return SAML.objects.create(name=name, **{**PROVIDER_BASE, **overrides})
+from apps.saml.tests.factories import make_provider
 
 
 class ProviderExistsTest(TestCase):
@@ -32,6 +21,24 @@ class ProviderExistsTest(TestCase):
         make_provider(name="My Provider")
         self.assertFalse(provider_exists("my provider"))
         self.assertFalse(provider_exists("My Provider "))
+
+
+class GetActiveProviderTest(TestCase):
+    def test_returns_none_when_no_providers_exist(self):
+        self.assertIsNone(get_active_provider())
+
+    def test_returns_active_provider(self):
+        provider = make_provider(name="Active Provider")
+        self.assertEqual(get_active_provider(), provider)
+
+    def test_returns_none_when_all_providers_are_inactive(self):
+        make_provider(name="Inactive Provider", is_active=False)
+        self.assertIsNone(get_active_provider())
+
+    def test_returns_active_provider_among_mixed(self):
+        make_provider(name="Inactive One", is_active=False)
+        active = make_provider(name="Active One", is_active=True)
+        self.assertEqual(get_active_provider(), active)
 
 
 class GetActiveProviderByCodeTest(TestCase):

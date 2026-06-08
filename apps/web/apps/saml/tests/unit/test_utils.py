@@ -1,5 +1,6 @@
 import base64
 import binascii
+import re
 import urllib.parse
 import xml.etree.ElementTree as ET  # nosec B405
 import zlib
@@ -63,6 +64,14 @@ FAILURE_STATUS_XML = f"""
 <samlp:Response xmlns:samlp="{_SAMLP_NS}" xmlns:saml="{_SAML_NS}">
   <samlp:Status>
     <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:AuthnFailed"/>
+  </samlp:Status>
+</samlp:Response>
+""".strip()
+
+RESPONDER_STATUS_XML = f"""
+<samlp:Response xmlns:samlp="{_SAMLP_NS}" xmlns:saml="{_SAML_NS}">
+  <samlp:Status>
+    <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Responder"/>
   </samlp:Status>
 </samlp:Response>
 """.strip()
@@ -132,11 +141,33 @@ class BuildAuthnRequestRedirectUrlTest(SimpleTestCase):
     def test_each_call_produces_unique_request_id(self):
         xml1 = self._decode_saml_request(self._build())
         xml2 = self._decode_saml_request(self._build())
-        import re
-
         id1 = re.search(r'ID="([^"]+)"', xml1).group(1)
         id2 = re.search(r'ID="([^"]+)"', xml2).group(1)
         self.assertNotEqual(id1, id2)
+
+    def test_saml_request_destination_matches_idp_sso_url(self):
+        xml = self._decode_saml_request(self._build())
+        self.assertIn('Destination="https://idp.example.com/sso"', xml)
+
+    def test_saml_request_contains_issue_instant(self):
+        xml = self._decode_saml_request(self._build())
+        self.assertIn("IssueInstant=", xml)
+
+    def test_saml_request_protocol_binding_is_http_post(self):
+        xml = self._decode_saml_request(self._build())
+        self.assertIn(
+            'ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"', xml
+        )
+
+    def test_saml_request_name_id_policy_format_is_email_address(self):
+        xml = self._decode_saml_request(self._build())
+        self.assertIn(
+            'Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"', xml
+        )
+
+    def test_saml_request_version_is_2_0(self):
+        xml = self._decode_saml_request(self._build())
+        self.assertIn('Version="2.0"', xml)
 
 
 # ---------------------------------------------------------------------------
@@ -175,11 +206,13 @@ class GetIssuerTest(SimpleTestCase):
         self.assertEqual(get_issuer(root), "https://idp.example.com/entity")
 
     def test_returns_issuer_from_assertion_when_missing_at_response_level(self):
-        xml = f"""<samlp:Response xmlns:samlp="{_SAMLP_NS}" xmlns:saml="{_SAML_NS}">
-          <saml:Assertion>
-            <saml:Issuer>https://assertion-idp.example.com/entity</saml:Issuer>
-          </saml:Assertion>
-        </samlp:Response>"""
+        xml = (
+            f'<samlp:Response xmlns:samlp="{_SAMLP_NS}" xmlns:saml="{_SAML_NS}">'
+            f"<saml:Assertion>"
+            f"<saml:Issuer>https://assertion-idp.example.com/entity</saml:Issuer>"
+            f"</saml:Assertion>"
+            f"</samlp:Response>"
+        )
         root = _parse_xml(xml)
         self.assertEqual(get_issuer(root), "https://assertion-idp.example.com/entity")
 
@@ -188,9 +221,11 @@ class GetIssuerTest(SimpleTestCase):
         self.assertEqual(get_issuer(root), "")
 
     def test_strips_whitespace_from_issuer(self):
-        xml = f"""<samlp:Response xmlns:samlp="{_SAMLP_NS}" xmlns:saml="{_SAML_NS}">
-          <saml:Issuer>  https://idp.example.com/entity  </saml:Issuer>
-        </samlp:Response>"""
+        xml = (
+            f'<samlp:Response xmlns:samlp="{_SAMLP_NS}" xmlns:saml="{_SAML_NS}">'
+            f"<saml:Issuer>  https://idp.example.com/entity  </saml:Issuer>"
+            f"</samlp:Response>"
+        )
         root = _parse_xml(xml)
         self.assertEqual(get_issuer(root), "https://idp.example.com/entity")
 
@@ -210,8 +245,12 @@ class CheckStatusSuccessTest(SimpleTestCase):
         self.assertFalse(check_status_success(root))
 
     def test_returns_false_when_status_element_missing(self):
-        xml = f"""<samlp:Response xmlns:samlp="{_SAMLP_NS}"></samlp:Response>"""
+        xml = f'<samlp:Response xmlns:samlp="{_SAMLP_NS}"></samlp:Response>'
         root = _parse_xml(xml)
+        self.assertFalse(check_status_success(root))
+
+    def test_returns_false_for_responder_status_code(self):
+        root = _parse_xml(RESPONDER_STATUS_XML)
         self.assertFalse(check_status_success(root))
 
 
@@ -230,13 +269,28 @@ class GetNameIdTest(SimpleTestCase):
         self.assertEqual(get_name_id(root), "")
 
     def test_returns_empty_string_when_no_name_id_in_subject(self):
-        xml = f"""<samlp:Response xmlns:samlp="{_SAMLP_NS}" xmlns:saml="{_SAML_NS}">
-          <saml:Assertion>
-            <saml:Subject></saml:Subject>
-          </saml:Assertion>
-        </samlp:Response>"""
+        xml = (
+            f'<samlp:Response xmlns:samlp="{_SAMLP_NS}" xmlns:saml="{_SAML_NS}">'
+            f"<saml:Assertion>"
+            f"<saml:Subject></saml:Subject>"
+            f"</saml:Assertion>"
+            f"</samlp:Response>"
+        )
         root = _parse_xml(xml)
         self.assertEqual(get_name_id(root), "")
+
+    def test_strips_whitespace_from_name_id(self):
+        xml = (
+            f'<samlp:Response xmlns:samlp="{_SAMLP_NS}" xmlns:saml="{_SAML_NS}">'
+            f"<saml:Assertion>"
+            f"<saml:Subject>"
+            f"<saml:NameID>  user@example.com  </saml:NameID>"
+            f"</saml:Subject>"
+            f"</saml:Assertion>"
+            f"</samlp:Response>"
+        )
+        root = _parse_xml(xml)
+        self.assertEqual(get_name_id(root), "user@example.com")
 
 
 # ---------------------------------------------------------------------------
@@ -262,9 +316,11 @@ class GetAttributesTest(SimpleTestCase):
         self.assertEqual(get_attributes(root), {})
 
     def test_returns_empty_dict_when_no_attribute_statement(self):
-        xml = f"""<samlp:Response xmlns:samlp="{_SAMLP_NS}" xmlns:saml="{_SAML_NS}">
-          <saml:Assertion></saml:Assertion>
-        </samlp:Response>"""
+        xml = (
+            f'<samlp:Response xmlns:samlp="{_SAMLP_NS}" xmlns:saml="{_SAML_NS}">'
+            f"<saml:Assertion></saml:Assertion>"
+            f"</samlp:Response>"
+        )
         root = _parse_xml(xml)
         self.assertEqual(get_attributes(root), {})
 
@@ -284,3 +340,18 @@ class VerifySignatureTest(SimpleTestCase):
 
     def test_returns_false_for_empty_xml(self):
         self.assertFalse(verify_signature(b"", "cert"))
+
+    def test_returns_false_when_signature_value_is_empty(self):
+        _DS_NS = "http://www.w3.org/2000/09/xmldsig#"
+        xml = (
+            f'<samlp:Response xmlns:samlp="{_SAMLP_NS}" xmlns:saml="{_SAML_NS}"'
+            f' xmlns:ds="{_DS_NS}">'
+            f"<ds:Signature>"
+            f"<ds:SignedInfo>"
+            f'<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>'
+            f"</ds:SignedInfo>"
+            f"<ds:SignatureValue></ds:SignatureValue>"
+            f"</ds:Signature>"
+            f"</samlp:Response>"
+        )
+        self.assertFalse(verify_signature(xml.encode("utf-8"), "cert"))

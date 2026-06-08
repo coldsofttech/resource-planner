@@ -1,20 +1,8 @@
 from django.db import IntegrityError
 from django.test import TestCase
 
-from apps.saml.models import SAML
-from apps.users.models import User
-
-PROVIDER_BASE = {
-    "idp_entity_id": "https://idp.example.com/entity",
-    "idp_sso_url": "https://idp.example.com/sso",
-    "idp_x509_cert": "MIICERT...",
-    "sp_entity_id": "https://sp.example.com/entity",
-    "sp_assertion_url": "https://sp.example.com/acs",
-}
-
-
-def make_provider(name="Test Provider", **overrides):
-    return SAML.objects.create(name=name, **{**PROVIDER_BASE, **overrides})
+from apps.saml.tests.factories import make_provider
+from apps.users.tests.factories import make_user
 
 
 class SAMLModelCodeTest(TestCase):
@@ -57,6 +45,14 @@ class SAMLModelFieldsTest(TestCase):
         provider = make_provider()
         self.assertIsNotNone(provider.updated_at)
 
+    def test_icon_defaults_to_empty_string(self):
+        provider = make_provider()
+        self.assertEqual(provider.icon, "")
+
+    def test_updated_by_defaults_to_none(self):
+        provider = make_provider()
+        self.assertIsNone(provider.updated_by)
+
 
 class SAMLModelConstraintsTest(TestCase):
     def test_name_unique_constraint_enforced(self):
@@ -72,9 +68,7 @@ class SAMLModelConstraintsTest(TestCase):
 
 class SAMLModelAuditTest(TestCase):
     def test_created_by_can_be_set(self):
-        user = User.objects.create_user(
-            username="admin@example.com", email="admin@example.com", password="pass"
-        )
+        user = make_user()
         provider = make_provider(created_by=user)
         self.assertEqual(provider.created_by, user)
 

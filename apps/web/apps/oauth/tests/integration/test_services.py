@@ -10,7 +10,7 @@ from apps.core.exceptions import (
 )
 from apps.oauth.models import OAuth
 from apps.oauth.services import AdminOAuthService, OAuthFlowService, OAuthService
-from apps.users.models import User
+from apps.oauth.tests.factories import make_provider, make_user
 
 PROVIDER_DEFAULTS = {
     "name": "Test IdP",
@@ -22,18 +22,10 @@ PROVIDER_DEFAULTS = {
     "scope": "openid email profile",
 }
 
-PROVIDER_BASE = {
-    "client_id": "raw-cid",
-    "client_secret": "raw-secret",
-    "auth_endpoint": "https://idp.example.com/auth",
-    "token_endpoint": "https://idp.example.com/token",
-    "userinfo_endpoint": "https://idp.example.com/userinfo",
-    "scope": "openid email",
-}
 
-
-def make_provider(name="Flow Provider", **overrides):
-    return OAuth.objects.create(name=name, **{**PROVIDER_BASE, **overrides})
+# ---------------------------------------------------------------------------
+# OAuthService.create
+# ---------------------------------------------------------------------------
 
 
 class OAuthServiceCreateTest(TestCase):
@@ -68,9 +60,7 @@ class OAuthServiceCreateTest(TestCase):
     @patch("apps.oauth.services.encrypt_value", side_effect=lambda v, _: v)
     @patch("apps.oauth.services.Infra.get_secrets_prefix", return_value="")
     def test_create_sets_created_by_from_user(self, _prefix, _enc):
-        user = User.objects.create_user(
-            username="admin@example.com", email="admin@example.com", password="pass"
-        )
+        user = make_user(email="admin@example.com")
         svc = OAuthService(user=user)
         provider = svc.create(**PROVIDER_DEFAULTS)
         self.assertEqual(provider.created_by, user)
@@ -89,6 +79,18 @@ class OAuthServiceCreateTest(TestCase):
         svc = OAuthService()
         provider = svc.create(**PROVIDER_DEFAULTS)
         self.assertTrue(OAuth.objects.filter(pk=provider.pk).exists())
+
+    @patch("apps.oauth.services.encrypt_value", side_effect=lambda v, _: v)
+    @patch("apps.oauth.services.Infra.get_secrets_prefix", return_value="")
+    def test_create_with_icon_persists_icon(self, _prefix, _enc):
+        svc = OAuthService()
+        provider = svc.create(**PROVIDER_DEFAULTS, icon="bi-shield-lock")
+        self.assertEqual(provider.icon, "bi-shield-lock")
+
+
+# ---------------------------------------------------------------------------
+# AdminOAuthService.create
+# ---------------------------------------------------------------------------
 
 
 class AdminOAuthServiceCreateTest(TestCase):
@@ -113,6 +115,50 @@ class AdminOAuthServiceCreateTest(TestCase):
         svc.create(**PROVIDER_DEFAULTS)
         with self.assertRaises(AlreadyExistsException):
             svc.create(**PROVIDER_DEFAULTS)
+
+
+# ---------------------------------------------------------------------------
+# OAuthService / AdminOAuthService — deactivation of existing providers
+# ---------------------------------------------------------------------------
+
+
+class OAuthServiceDeactivationTest(TestCase):
+    @patch("apps.oauth.services.encrypt_value", side_effect=lambda v, _: v)
+    @patch("apps.oauth.services.Infra.get_secrets_prefix", return_value="")
+    def test_creating_provider_deactivates_existing_active_providers(
+        self, _prefix, _enc
+    ):
+        existing = make_provider(name="Old Active Provider")
+        self.assertTrue(existing.is_active)
+
+        svc = OAuthService()
+        svc.create(**PROVIDER_DEFAULTS)
+
+        existing.refresh_from_db()
+        self.assertFalse(existing.is_active)
+
+    @patch("apps.oauth.services.encrypt_value", side_effect=lambda v, _: v)
+    @patch("apps.oauth.services.Infra.get_secrets_prefix", return_value="")
+    def test_new_provider_is_active_after_creation(self, _prefix, _enc):
+        make_provider(name="Existing Provider")
+        svc = OAuthService()
+        new_provider = svc.create(**PROVIDER_DEFAULTS)
+        self.assertTrue(new_provider.is_active)
+
+    @patch("apps.oauth.services.encrypt_value", side_effect=lambda v, _: v)
+    @patch("apps.oauth.services.Infra.get_secrets_prefix", return_value="")
+    def test_only_one_active_provider_after_creation(self, _prefix, _enc):
+        make_provider(name="Old Provider A")
+        make_provider(name="Old Provider B")
+        svc = OAuthService()
+        svc.create(**PROVIDER_DEFAULTS)
+        active_count = OAuth.objects.filter(is_active=True).count()
+        self.assertEqual(active_count, 1)
+
+
+# ---------------------------------------------------------------------------
+# OAuthFlowService.build_authorize_url
+# ---------------------------------------------------------------------------
 
 
 class OAuthFlowServiceBuildAuthorizeUrlTest(TestCase):
@@ -161,7 +207,7 @@ class OAuthFlowServiceBuildAuthorizeUrlTest(TestCase):
         self.assertIn("scope=", url)
 
     @patch("apps.oauth.services.decrypt_value", side_effect=lambda v: v)
-    def test_url_contains_redirect_uri(self, _dec):
+    def test_url_contains_redirect_uri_param(self, _dec):
         provider = make_provider()
         svc = OAuthFlowService()
         url = svc.build_authorize_url(
@@ -170,6 +216,22 @@ class OAuthFlowServiceBuildAuthorizeUrlTest(TestCase):
             state="s",
         )
         self.assertIn("redirect_uri=", url)
+
+    @patch("apps.oauth.services.decrypt_value", side_effect=lambda v: v)
+    def test_url_contains_client_id_param(self, _dec):
+        provider = make_provider()
+        svc = OAuthFlowService()
+        url = svc.build_authorize_url(
+            provider=provider,
+            redirect_uri="https://app.example.com/callback",
+            state="s",
+        )
+        self.assertIn("client_id=", url)
+
+
+# ---------------------------------------------------------------------------
+# OAuthFlowService.complete_login
+# ---------------------------------------------------------------------------
 
 
 class OAuthFlowServiceCompleteLoginTest(TestCase):
@@ -303,41 +365,69 @@ class OAuthFlowServiceCompleteLoginTest(TestCase):
                 redirect_uri="https://app.example.com/cb",
             )
 
+    @patch("apps.oauth.services.decrypt_value", side_effect=lambda v: v)
+    @patch(
+        "apps.oauth.services.fetch_userinfo",
+        return_value={
+            "email": "named@example.com",
+            "sub": "uid-named",
+            "given_name": "Alice",
+            "family_name": "Smith",
+        },
+    )
+    @patch(
+        "apps.oauth.services.exchange_code", return_value={"access_token": "tok-abc"}
+    )
+    def test_new_user_first_name_populated_from_userinfo(self, _exc, _fetch, _dec):
+        provider = make_provider(name="Named Provider")
+        svc = OAuthFlowService()
+        user = svc.complete_login(
+            provider=provider,
+            code="code",
+            redirect_uri="https://app.example.com/cb",
+        )
+        self.assertEqual(user.first_name, "Alice")
 
-# ---------------------------------------------------------------------------
-# OAuthService / AdminOAuthService — deactivation of existing providers
-# ---------------------------------------------------------------------------
+    @patch("apps.oauth.services.decrypt_value", side_effect=lambda v: v)
+    @patch(
+        "apps.oauth.services.fetch_userinfo",
+        return_value={
+            "email": "named@example.com",
+            "sub": "uid-named-2",
+            "given_name": "Alice",
+            "family_name": "Smith",
+        },
+    )
+    @patch(
+        "apps.oauth.services.exchange_code", return_value={"access_token": "tok-abc"}
+    )
+    def test_new_user_last_name_populated_from_userinfo(self, _exc, _fetch, _dec):
+        provider = make_provider(name="Named Provider Last")
+        svc = OAuthFlowService()
+        user = svc.complete_login(
+            provider=provider,
+            code="code",
+            redirect_uri="https://app.example.com/cb",
+        )
+        self.assertEqual(user.last_name, "Smith")
 
-
-class OAuthServiceDeactivationTest(TestCase):
-    @patch("apps.oauth.services.encrypt_value", side_effect=lambda v, _: v)
-    @patch("apps.oauth.services.Infra.get_secrets_prefix", return_value="")
-    def test_creating_provider_deactivates_existing_active_providers(
-        self, _prefix, _enc
+    @patch("apps.oauth.services.decrypt_value", side_effect=lambda v: v)
+    @patch(
+        "apps.oauth.services.fetch_userinfo",
+        return_value={"email": "noname@example.com", "sub": "uid-noname"},
+    )
+    @patch(
+        "apps.oauth.services.exchange_code", return_value={"access_token": "tok-abc"}
+    )
+    def test_new_user_created_with_empty_names_when_not_in_userinfo(
+        self, _exc, _fetch, _dec
     ):
-        existing = make_provider(name="Old Active Provider")
-        self.assertTrue(existing.is_active)
-
-        svc = OAuthService()
-        svc.create(**PROVIDER_DEFAULTS)
-
-        existing.refresh_from_db()
-        self.assertFalse(existing.is_active)
-
-    @patch("apps.oauth.services.encrypt_value", side_effect=lambda v, _: v)
-    @patch("apps.oauth.services.Infra.get_secrets_prefix", return_value="")
-    def test_new_provider_is_active_after_creation(self, _prefix, _enc):
-        make_provider(name="Existing Provider")
-        svc = OAuthService()
-        new_provider = svc.create(**PROVIDER_DEFAULTS)
-        self.assertTrue(new_provider.is_active)
-
-    @patch("apps.oauth.services.encrypt_value", side_effect=lambda v, _: v)
-    @patch("apps.oauth.services.Infra.get_secrets_prefix", return_value="")
-    def test_only_one_active_provider_after_creation(self, _prefix, _enc):
-        make_provider(name="Old Provider A")
-        make_provider(name="Old Provider B")
-        svc = OAuthService()
-        svc.create(**PROVIDER_DEFAULTS)
-        active_count = OAuth.objects.filter(is_active=True).count()
-        self.assertEqual(active_count, 1)
+        provider = make_provider(name="No Name Provider")
+        svc = OAuthFlowService()
+        user = svc.complete_login(
+            provider=provider,
+            code="code",
+            redirect_uri="https://app.example.com/cb",
+        )
+        self.assertEqual(user.first_name, "")
+        self.assertEqual(user.last_name, "")

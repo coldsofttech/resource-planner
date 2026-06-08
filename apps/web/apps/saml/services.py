@@ -145,6 +145,17 @@ class SAMLFlowService(ContextService):
         "mail",
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
     )
+    # Avatar attributes — checked in order; only HTTP(S) URLs are accepted.
+    _AVATAR_ATTRS = (
+        "thumbnailPhoto",
+        "profilePhoto",
+        "photo",
+        "jpegPhoto",
+        "picture",
+        "avatar",
+        "avatarUrl",
+        "profilePicture",
+    )
 
     def build_authorize_url(self, *, provider, relay_state: str = "") -> str:
         # Extract the path from the stored ACS URL, then rebuild it using the
@@ -169,9 +180,11 @@ class SAMLFlowService(ContextService):
         root, xml_bytes = self._parse_response(saml_response_b64)
         self._validate_status(root)
         provider = self._resolve_provider(root, xml_bytes)
-        email, first_name, last_name, name_id = self._extract_identity(root)
+        email, first_name, last_name, name_id, picture_url = self._extract_identity(
+            root
+        )
 
-        from apps.users.services import SSOUserService
+        from apps.users.services import SSOUserService, UserAvatarService
 
         user, _ = SSOUserService().get_or_create(
             email=email,
@@ -180,6 +193,10 @@ class SAMLFlowService(ContextService):
             sso_provider=provider,
             sso_uid=name_id,
         )
+
+        if picture_url:
+            UserAvatarService().sync_from_url(user, picture_url)
+
         return user
 
     def _parse_response(self, saml_response_b64: str) -> tuple[ET.Element, bytes]:
@@ -211,7 +228,7 @@ class SAMLFlowService(ContextService):
 
         return provider
 
-    def _extract_identity(self, root: ET.Element) -> tuple[str, str, str, str]:
+    def _extract_identity(self, root: ET.Element) -> tuple[str, str, str, str, str]:
         name_id = get_name_id(root)
         if not name_id:
             raise ValidationException("SAMLResponse Assertion is missing NameID.")
@@ -224,5 +241,17 @@ class SAMLFlowService(ContextService):
         )
         first_name = first_match(attributes, self._FIRST_NAME_ATTRS) or ""
         last_name = first_match(attributes, self._LAST_NAME_ATTRS) or ""
+        picture_url = self._extract_picture_url(attributes)
 
-        return email, first_name, last_name, name_id
+        return email, first_name, last_name, name_id, picture_url
+
+    def _extract_picture_url(self, attributes: dict) -> str:
+        """
+        Return the first avatar attribute value that is an HTTP(S) URL.
+        Non-URL values (e.g. binary LDAP jpegPhoto) are skipped.
+        """
+        for attr in self._AVATAR_ATTRS:
+            value = (attributes.get(attr) or "").strip()
+            if value.startswith("http://") or value.startswith("https://"):
+                return value
+        return ""

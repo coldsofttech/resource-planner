@@ -1,20 +1,15 @@
 from django.test import TestCase
 
-from apps.oauth.models import OAuth
-from apps.oauth.selectors import get_active_provider_by_code, provider_exists
+from apps.oauth.selectors import (
+    get_active_provider,
+    get_active_provider_by_code,
+    provider_exists,
+)
+from apps.oauth.tests.factories import make_provider
 
-PROVIDER_BASE = {
-    "client_id": "cid",
-    "client_secret": "csecret",
-    "auth_endpoint": "https://idp.example.com/auth",
-    "token_endpoint": "https://idp.example.com/token",
-    "userinfo_endpoint": "https://idp.example.com/userinfo",
-    "scope": "openid email",
-}
-
-
-def make_provider(name="Test Provider", **overrides):
-    return OAuth.objects.create(name=name, **{**PROVIDER_BASE, **overrides})
+# ---------------------------------------------------------------------------
+# provider_exists
+# ---------------------------------------------------------------------------
 
 
 class ProviderExistsTest(TestCase):
@@ -29,6 +24,36 @@ class ProviderExistsTest(TestCase):
         make_provider(name="My Provider")
         self.assertFalse(provider_exists("my provider"))
         self.assertFalse(provider_exists("My Provider "))
+
+
+# ---------------------------------------------------------------------------
+# get_active_provider
+# ---------------------------------------------------------------------------
+
+
+class GetActiveProviderTest(TestCase):
+    def test_returns_none_when_no_providers_exist(self):
+        self.assertIsNone(get_active_provider())
+
+    def test_returns_active_provider(self):
+        provider = make_provider(name="Active Provider")
+        result = get_active_provider()
+        self.assertEqual(result, provider)
+
+    def test_returns_none_when_all_providers_are_inactive(self):
+        make_provider(name="Inactive Provider", is_active=False)
+        self.assertIsNone(get_active_provider())
+
+    def test_does_not_return_inactive_when_active_exists(self):
+        make_provider(name="Old Inactive", is_active=False)
+        active = make_provider(name="New Active", is_active=True)
+        result = get_active_provider()
+        self.assertEqual(result, active)
+
+
+# ---------------------------------------------------------------------------
+# get_active_provider_by_code
+# ---------------------------------------------------------------------------
 
 
 class GetActiveProviderByCodeTest(TestCase):

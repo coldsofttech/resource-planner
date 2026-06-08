@@ -1,4 +1,5 @@
 import json
+import urllib.parse
 from unittest.mock import MagicMock, patch
 
 from django.test import SimpleTestCase
@@ -9,6 +10,10 @@ from apps.oauth.helpers import (
     fetch_userinfo,
     parse_userinfo,
 )
+
+# ---------------------------------------------------------------------------
+# parse_userinfo
+# ---------------------------------------------------------------------------
 
 
 class ParseUserinfoTest(SimpleTestCase):
@@ -118,6 +123,11 @@ class ParseUserinfoTest(SimpleTestCase):
         self.assertEqual(info.last_name, "")
 
 
+# ---------------------------------------------------------------------------
+# exchange_code
+# ---------------------------------------------------------------------------
+
+
 class ExchangeCodeTest(SimpleTestCase):
     def _make_mock_response(self, payload: dict):
         mock_resp = MagicMock()
@@ -151,8 +161,83 @@ class ExchangeCodeTest(SimpleTestCase):
             client_secret="csecret",
         )
         args, _ = mock_urlopen.call_args
-        request_obj = args[0]
-        self.assertEqual(request_obj.get_method(), "POST")
+        self.assertEqual(args[0].get_method(), "POST")
+
+    @patch("apps.oauth.helpers.urllib.request.urlopen")
+    def test_sends_content_type_header(self, mock_urlopen):
+        mock_urlopen.return_value = self._make_mock_response({})
+        exchange_code(
+            token_endpoint="https://idp.example.com/token",
+            code="code",
+            redirect_uri="https://app.example.com/cb",
+            client_id="cid",
+            client_secret="csecret",
+        )
+        args, _ = mock_urlopen.call_args
+        self.assertEqual(
+            args[0].get_header("Content-type"),
+            "application/x-www-form-urlencoded",
+        )
+
+    @patch("apps.oauth.helpers.urllib.request.urlopen")
+    def test_sends_accept_json_header(self, mock_urlopen):
+        mock_urlopen.return_value = self._make_mock_response({})
+        exchange_code(
+            token_endpoint="https://idp.example.com/token",
+            code="code",
+            redirect_uri="https://app.example.com/cb",
+            client_id="cid",
+            client_secret="csecret",
+        )
+        args, _ = mock_urlopen.call_args
+        self.assertEqual(args[0].get_header("Accept"), "application/json")
+
+    @patch("apps.oauth.helpers.urllib.request.urlopen")
+    def test_body_contains_grant_type_authorization_code(self, mock_urlopen):
+        mock_urlopen.return_value = self._make_mock_response({})
+        exchange_code(
+            token_endpoint="https://idp.example.com/token",
+            code="auth-code",
+            redirect_uri="https://app.example.com/cb",
+            client_id="cid",
+            client_secret="csecret",
+        )
+        args, _ = mock_urlopen.call_args
+        body = urllib.parse.parse_qs(args[0].data.decode())
+        self.assertEqual(body["grant_type"], ["authorization_code"])
+
+    @patch("apps.oauth.helpers.urllib.request.urlopen")
+    def test_body_contains_provided_code(self, mock_urlopen):
+        mock_urlopen.return_value = self._make_mock_response({})
+        exchange_code(
+            token_endpoint="https://idp.example.com/token",
+            code="my-auth-code",
+            redirect_uri="https://app.example.com/cb",
+            client_id="cid",
+            client_secret="csecret",
+        )
+        args, _ = mock_urlopen.call_args
+        body = urllib.parse.parse_qs(args[0].data.decode())
+        self.assertEqual(body["code"], ["my-auth-code"])
+
+    @patch("apps.oauth.helpers.urllib.request.urlopen")
+    def test_body_contains_client_id(self, mock_urlopen):
+        mock_urlopen.return_value = self._make_mock_response({})
+        exchange_code(
+            token_endpoint="https://idp.example.com/token",
+            code="code",
+            redirect_uri="https://app.example.com/cb",
+            client_id="my-client-id",
+            client_secret="csecret",
+        )
+        args, _ = mock_urlopen.call_args
+        body = urllib.parse.parse_qs(args[0].data.decode())
+        self.assertEqual(body["client_id"], ["my-client-id"])
+
+
+# ---------------------------------------------------------------------------
+# fetch_userinfo
+# ---------------------------------------------------------------------------
 
 
 class FetchUserinfoTest(SimpleTestCase):
@@ -182,5 +267,24 @@ class FetchUserinfoTest(SimpleTestCase):
             access_token="tok-xyz",
         )
         args, _ = mock_urlopen.call_args
-        request_obj = args[0]
-        self.assertEqual(request_obj.get_header("Authorization"), "Bearer tok-xyz")
+        self.assertEqual(args[0].get_header("Authorization"), "Bearer tok-xyz")
+
+    @patch("apps.oauth.helpers.urllib.request.urlopen")
+    def test_sends_get_request(self, mock_urlopen):
+        mock_urlopen.return_value = self._make_mock_response({})
+        fetch_userinfo(
+            userinfo_endpoint="https://idp.example.com/userinfo",
+            access_token="tok-abc",
+        )
+        args, _ = mock_urlopen.call_args
+        self.assertEqual(args[0].get_method(), "GET")
+
+    @patch("apps.oauth.helpers.urllib.request.urlopen")
+    def test_sends_accept_json_header(self, mock_urlopen):
+        mock_urlopen.return_value = self._make_mock_response({})
+        fetch_userinfo(
+            userinfo_endpoint="https://idp.example.com/userinfo",
+            access_token="tok-abc",
+        )
+        args, _ = mock_urlopen.call_args
+        self.assertEqual(args[0].get_header("Accept"), "application/json")

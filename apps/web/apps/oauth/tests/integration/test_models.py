@@ -1,21 +1,11 @@
 from django.db import IntegrityError
 from django.test import TestCase
 
-from apps.oauth.models import OAuth
-from apps.users.models import User
+from apps.oauth.tests.factories import make_provider, make_user
 
-PROVIDER_BASE = {
-    "client_id": "cid",
-    "client_secret": "csecret",
-    "auth_endpoint": "https://idp.example.com/auth",
-    "token_endpoint": "https://idp.example.com/token",
-    "userinfo_endpoint": "https://idp.example.com/userinfo",
-    "scope": "openid email",
-}
-
-
-def make_provider(name="Test Provider", **overrides):
-    return OAuth.objects.create(name=name, **{**PROVIDER_BASE, **overrides})
+# ---------------------------------------------------------------------------
+# Code generation
+# ---------------------------------------------------------------------------
 
 
 class OAuthModelCodeTest(TestCase):
@@ -31,6 +21,11 @@ class OAuthModelCodeTest(TestCase):
         p1 = make_provider(name="Provider One")
         p2 = make_provider(name="Provider Two")
         self.assertNotEqual(p1.code, p2.code)
+
+
+# ---------------------------------------------------------------------------
+# Field defaults and behaviour
+# ---------------------------------------------------------------------------
 
 
 class OAuthModelFieldsTest(TestCase):
@@ -54,6 +49,19 @@ class OAuthModelFieldsTest(TestCase):
         provider = make_provider()
         self.assertIsNotNone(provider.updated_at)
 
+    def test_icon_defaults_to_empty_string(self):
+        provider = make_provider()
+        self.assertEqual(provider.icon, "")
+
+    def test_icon_can_be_set(self):
+        provider = make_provider(icon="bi-shield-lock")
+        self.assertEqual(provider.icon, "bi-shield-lock")
+
+
+# ---------------------------------------------------------------------------
+# Uniqueness constraints
+# ---------------------------------------------------------------------------
+
 
 class OAuthModelConstraintsTest(TestCase):
     def test_name_unique_constraint_enforced(self):
@@ -67,11 +75,14 @@ class OAuthModelConstraintsTest(TestCase):
         self.assertNotEqual(p1.pk, p2.pk)
 
 
+# ---------------------------------------------------------------------------
+# Audit fields
+# ---------------------------------------------------------------------------
+
+
 class OAuthModelAuditTest(TestCase):
     def test_created_by_can_be_set(self):
-        user = User.objects.create_user(
-            username="admin@example.com", email="admin@example.com", password="pass"
-        )
+        user = make_user(email="admin@example.com")
         provider = make_provider(created_by=user)
         self.assertEqual(provider.created_by, user)
 

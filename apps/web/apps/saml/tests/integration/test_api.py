@@ -3,8 +3,9 @@ from unittest.mock import patch
 from django.test import TestCase
 from rest_framework.test import APIClient
 
-from apps.saml.models import SAML
-from apps.users.models import User
+from apps.core.exceptions import NotFoundException, ValidationException
+from apps.saml.tests.factories import make_provider
+from apps.users.tests.factories import make_superuser, make_user
 
 CREATE_URL = "/api/v1/auth/saml/"
 ACS_URL = "/api/v1/auth/saml/acs/"
@@ -18,28 +19,6 @@ PROVIDER_PAYLOAD = {
     "sp_assertion_url": "https://sp.example.com/acs",
 }
 
-PROVIDER_BASE = {
-    "idp_entity_id": "https://idp.example.com/entity",
-    "idp_sso_url": "https://idp.example.com/sso",
-    "idp_x509_cert": "MIICERT...",
-    "sp_entity_id": "https://sp.example.com/entity",
-    "sp_assertion_url": "https://sp.example.com/acs",
-}
-
-
-def make_provider(name="Test Provider", is_active=True, **overrides):
-    return SAML.objects.create(
-        name=name, is_active=is_active, **{**PROVIDER_BASE, **overrides}
-    )
-
-
-def make_user(email="user@example.com", superuser=False):
-    if superuser:
-        return User.objects.create_superuser(
-            username=email, email=email, password="pass"
-        )
-    return User.objects.create_user(username=email, email=email, password="pass")
-
 
 # ---------------------------------------------------------------------------
 # POST /api/v1/auth/saml/ — create provider
@@ -49,13 +28,7 @@ def make_user(email="user@example.com", superuser=False):
 class SAMLCreateAPITest(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.client.force_authenticate(user=make_user(superuser=True))
-
-    @patch("apps.saml.services.encrypt_value", side_effect=lambda v, _: v)
-    def test_create_response_contains_idp_x509_cert(self, _enc):
-        response = self.client.post(CREATE_URL, PROVIDER_PAYLOAD, format="json")
-        self.assertEqual(response.status_code, 201)
-        self.assertIn("idp_x509_cert", response.data.get("data", {}))
+        self.client.force_authenticate(user=make_superuser())
 
     @patch("apps.saml.services.encrypt_value", side_effect=lambda v, _: v)
     def test_create_returns_201(self, _enc):
@@ -78,6 +51,11 @@ class SAMLCreateAPITest(TestCase):
         self.assertTrue(response.data["data"]["code"].startswith("SAML-"))
 
     @patch("apps.saml.services.encrypt_value", side_effect=lambda v, _: v)
+    def test_create_response_contains_idp_x509_cert(self, _enc):
+        response = self.client.post(CREATE_URL, PROVIDER_PAYLOAD, format="json")
+        self.assertIn("idp_x509_cert", response.data.get("data", {}))
+
+    @patch("apps.saml.services.encrypt_value", side_effect=lambda v, _: v)
     def test_duplicate_provider_name_returns_409(self, _enc):
         self.client.post(CREATE_URL, PROVIDER_PAYLOAD, format="json")
         response = self.client.post(CREATE_URL, PROVIDER_PAYLOAD, format="json")
@@ -90,6 +68,21 @@ class SAMLCreateAPITest(TestCase):
     def test_empty_payload_returns_error(self):
         response = self.client.post(CREATE_URL, {}, format="json")
         self.assertIn(response.status_code, [400, 422])
+
+
+class SAMLCreateAPIPermissionTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_unauthenticated_create_returns_401(self):
+        response = self.client.post(CREATE_URL, PROVIDER_PAYLOAD, format="json")
+        self.assertEqual(response.status_code, 401)
+
+    @patch("apps.saml.services.encrypt_value", side_effect=lambda v, _: v)
+    def test_authenticated_non_superuser_can_create(self, _enc):
+        self.client.force_authenticate(user=make_user())
+        response = self.client.post(CREATE_URL, PROVIDER_PAYLOAD, format="json")
+        self.assertEqual(response.status_code, 201)
 
 
 # ---------------------------------------------------------------------------
@@ -143,10 +136,15 @@ class SAMLAuthorizeAPITest(TestCase):
         response = self.client.get(self._authorize_url(provider))
         self.assertEqual(response.status_code, 404)
 
-    def test_authorize_response_contains_success_message(self):
+    def test_authorize_response_contains_message(self):
         provider = make_provider(name="Message Provider")
         response = self.client.get(self._authorize_url(provider))
         self.assertIn("message", response.data)
+
+    def test_authorize_accessible_without_authentication(self):
+        provider = make_provider(name="Public Authorize Provider")
+        response = self.client.get(self._authorize_url(provider))
+        self.assertEqual(response.status_code, 200)
 
 
 # ---------------------------------------------------------------------------
@@ -170,6 +168,10 @@ class SAMLACSAPITest(TestCase):
 
     def test_acs_with_empty_saml_response_returns_error(self):
         response = self.client.post(ACS_URL, {"SAMLResponse": ""})
+        self.assertIn(response.status_code, [400, 422])
+
+    def test_acs_with_whitespace_only_saml_response_returns_error(self):
+        response = self.client.post(ACS_URL, {"SAMLResponse": "   "})
         self.assertIn(response.status_code, [400, 422])
 
     @patch("apps.saml.api_views.SAMLFlowService.complete_login")
@@ -201,9 +203,7 @@ class SAMLACSAPITest(TestCase):
 
     @patch(
         "apps.saml.api_views.SAMLFlowService.complete_login",
-        side_effect=__import__(
-            "apps.core.exceptions", fromlist=["ValidationException"]
-        ).ValidationException("SAML authentication was not successful."),
+        side_effect=ValidationException("SAML authentication was not successful."),
     )
     def test_acs_returns_error_when_service_raises_validation_exception(self, _login):
         response = self._post_acs()
@@ -211,9 +211,7 @@ class SAMLACSAPITest(TestCase):
 
     @patch(
         "apps.saml.api_views.SAMLFlowService.complete_login",
-        side_effect=__import__(
-            "apps.core.exceptions", fromlist=["NotFoundException"]
-        ).NotFoundException(
+        side_effect=NotFoundException(
             resource="SAML provider",
             lookup_field="idp_entity_id",
             lookup_value="https://unknown.example.com",
@@ -228,6 +226,14 @@ class SAMLACSAPITest(TestCase):
         mock_login.return_value = make_user()
         self._post_acs()
         self.assertIn("_auth_user_id", self.client.session)
+
+    @patch(
+        "apps.saml.api_views.SAMLFlowService.complete_login",
+        side_effect=ValidationException("SAML authentication was not successful."),
+    )
+    def test_acs_does_not_establish_session_on_failed_login(self, _login):
+        self._post_acs()
+        self.assertNotIn("_auth_user_id", self.client.session)
 
     @patch("apps.saml.api_views.SAMLFlowService.complete_login")
     def test_acs_ignores_double_slash_relay_state(self, mock_login):
@@ -248,3 +254,7 @@ class SAMLACSAPITest(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response["Location"], "/projects/")
+
+    def test_acs_accessible_without_authentication(self):
+        response = self.client.post(ACS_URL, {"SAMLResponse": ""})
+        self.assertNotEqual(response.status_code, 401)

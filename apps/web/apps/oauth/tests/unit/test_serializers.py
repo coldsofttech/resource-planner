@@ -1,7 +1,6 @@
-from django.test import TestCase
+from django.test import SimpleTestCase
 
-from apps.oauth.models import OAuth
-from apps.oauth.serializers import OAuthCreateSerializer, OAuthSerializer
+from apps.oauth.serializers import OAuthCreateSerializer
 
 VALID_DATA = {
     "name": "My IdP",
@@ -13,21 +12,13 @@ VALID_DATA = {
     "scope": "openid email profile",
 }
 
-PROVIDER_BASE = {
-    "client_id": "cid",
-    "client_secret": "csecret",
-    "auth_endpoint": "https://idp.example.com/auth",
-    "token_endpoint": "https://idp.example.com/token",
-    "userinfo_endpoint": "https://idp.example.com/userinfo",
-    "scope": "openid email",
-}
+
+# ---------------------------------------------------------------------------
+# OAuthCreateSerializer — required field validation
+# ---------------------------------------------------------------------------
 
 
-def make_provider(name="Test Provider", **overrides):
-    return OAuth.objects.create(name=name, **{**PROVIDER_BASE, **overrides})
-
-
-class OAuthCreateSerializerValidationTest(TestCase):
+class OAuthCreateSerializerValidationTest(SimpleTestCase):
     def test_valid_data_passes(self):
         s = OAuthCreateSerializer(data=VALID_DATA)
         self.assertTrue(s.is_valid(), s.errors)
@@ -39,6 +30,11 @@ class OAuthCreateSerializerValidationTest(TestCase):
         self.assertFalse(s.is_valid())
         self.assertIn("name", s.errors)
 
+    def test_empty_string_name_fails(self):
+        s = OAuthCreateSerializer(data={**VALID_DATA, "name": ""})
+        self.assertFalse(s.is_valid())
+        self.assertIn("name", s.errors)
+
     def test_missing_client_id_fails(self):
         data = {**VALID_DATA}
         del data["client_id"]
@@ -46,10 +42,20 @@ class OAuthCreateSerializerValidationTest(TestCase):
         self.assertFalse(s.is_valid())
         self.assertIn("client_id", s.errors)
 
+    def test_empty_string_client_id_fails(self):
+        s = OAuthCreateSerializer(data={**VALID_DATA, "client_id": ""})
+        self.assertFalse(s.is_valid())
+        self.assertIn("client_id", s.errors)
+
     def test_missing_client_secret_fails(self):
         data = {**VALID_DATA}
         del data["client_secret"]
         s = OAuthCreateSerializer(data=data)
+        self.assertFalse(s.is_valid())
+        self.assertIn("client_secret", s.errors)
+
+    def test_empty_string_client_secret_fails(self):
+        s = OAuthCreateSerializer(data={**VALID_DATA, "client_secret": ""})
         self.assertFalse(s.is_valid())
         self.assertIn("client_secret", s.errors)
 
@@ -81,18 +87,47 @@ class OAuthCreateSerializerValidationTest(TestCase):
         self.assertFalse(s.is_valid())
         self.assertIn("scope", s.errors)
 
+    def test_empty_string_scope_fails(self):
+        s = OAuthCreateSerializer(data={**VALID_DATA, "scope": ""})
+        self.assertFalse(s.is_valid())
+        self.assertIn("scope", s.errors)
+
     def test_empty_payload_fails(self):
         s = OAuthCreateSerializer(data={})
         self.assertFalse(s.is_valid())
 
+    def test_icon_is_optional(self):
+        data = {k: v for k, v in VALID_DATA.items()}
+        s = OAuthCreateSerializer(data=data)
+        self.assertTrue(s.is_valid(), s.errors)
 
-class OAuthCreateSerializerSecurityTest(TestCase):
+    def test_icon_defaults_to_empty_string_when_omitted(self):
+        s = OAuthCreateSerializer(data=VALID_DATA)
+        s.is_valid()
+        self.assertEqual(s.validated_data.get("icon"), "")
+
+    def test_icon_accepts_blank_string(self):
+        s = OAuthCreateSerializer(data={**VALID_DATA, "icon": ""})
+        self.assertTrue(s.is_valid(), s.errors)
+
+    def test_icon_accepts_value(self):
+        s = OAuthCreateSerializer(data={**VALID_DATA, "icon": "bi-shield-lock"})
+        self.assertTrue(s.is_valid(), s.errors)
+        self.assertEqual(s.validated_data["icon"], "bi-shield-lock")
+
+
+# ---------------------------------------------------------------------------
+# OAuthCreateSerializer — write-only security
+# ---------------------------------------------------------------------------
+
+
+class OAuthCreateSerializerSecurityTest(SimpleTestCase):
     def test_client_secret_is_write_only(self):
         s = OAuthCreateSerializer(data=VALID_DATA)
         s.is_valid()
         self.assertNotIn("client_secret", s.data)
 
-    def test_validated_data_contains_all_fields(self):
+    def test_validated_data_contains_all_required_fields(self):
         s = OAuthCreateSerializer(data=VALID_DATA)
         s.is_valid()
         for field in [
@@ -105,45 +140,3 @@ class OAuthCreateSerializerSecurityTest(TestCase):
             "scope",
         ]:
             self.assertIn(field, s.validated_data)
-
-
-class OAuthSerializerOutputTest(TestCase):
-    def test_serializer_includes_all_expected_fields(self):
-        provider = make_provider()
-        data = OAuthSerializer(provider).data
-        expected_fields = [
-            "code",
-            "name",
-            "client_id",
-            "auth_endpoint",
-            "token_endpoint",
-            "userinfo_endpoint",
-            "scope",
-            "is_active",
-            "created_at",
-            "created_by",
-            "updated_at",
-            "updated_by",
-        ]
-        for field in expected_fields:
-            self.assertIn(field, data)
-
-    def test_client_secret_not_exposed_in_read_serializer(self):
-        provider = make_provider()
-        data = OAuthSerializer(provider).data
-        self.assertNotIn("client_secret", data)
-
-    def test_code_reflects_provider_code(self):
-        provider = make_provider(name="Code Test Provider")
-        data = OAuthSerializer(provider).data
-        self.assertEqual(data["code"], provider.code)
-
-    def test_is_active_true_by_default(self):
-        provider = make_provider()
-        data = OAuthSerializer(provider).data
-        self.assertTrue(data["is_active"])
-
-    def test_is_active_false_for_inactive_provider(self):
-        provider = make_provider(is_active=False)
-        data = OAuthSerializer(provider).data
-        self.assertFalse(data["is_active"])
