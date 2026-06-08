@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Locations
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/locations.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Configurations
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Locations
+{% endblock page_title %}
+{% block page_sub %}
+  Manage office and delivery locations for your organisation.
+{% endblock page_sub %}
+{% block page_actions %}
+  <secondary-button id="rp-locations-import-btn" label="Import" prefix-icon="bi-upload" hidden></secondary-button>
+  <secondary-button id="rp-locations-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+  <primary-button id="rp-locations-add-btn" label="Add Location" prefix-icon="bi-plus-lg" hidden></primary-button>
+{% endblock page_actions %}
+{% block content %}
+  <list-view show-active-filters>
+  <filter-panel id="rp-locations-filter-panel">
+  <search-field id="rp-locations-search" name="search" placeholder="Search locations..." shortcut="/" show-label></search-field>
+  <is-active-field id="rp-locations-status" name="is_active" value="true" show-label></is-active-field>
+  </filter-panel>
+  <data-table id="rp-locations-table" url="/api/v1/locations/" paginated page-size="25" row-template="renderLocationsRow" empty-message="No locations found.">
+    <table-columns>
+      <table-column label="City" key="city" sortable>
+      </table-column>
+      <table-column label="Country" key="country" sortable hide-mobile>
+      </table-column>
+      <table-column label="Code" key="code" mono width="130px" hide-mobile>
+      </table-column>
+      <table-column label="Default" key="is_default" hide-mobile sortable>
+      </table-column>
+      <table-column label="Status" key="is_active">
+      </table-column>
+      <table-column label="Created" key="created_at" hide-mobile sortable>
+      </table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_location %}
+        <table-action icon="bi-pencil" label="Edit" event="rp:location:edit">
+        </table-action>
+        <table-action icon="bi-toggle-on" label="Toggle" event="rp:location:toggle" color-key="is_active">
+        </table-action>
+        <table-action icon="bi-star" label="Set as Default" event="rp:location:set-default" hidden-key="is_default">
+        </table-action>
+      {% endif %}
+      {% if can_delete_location %}
+        <table-action icon="bi-trash" label="Delete" event="rp:location:delete" danger>
+        </table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </list-view>
+  <!-- Create drawer -->
+  <drawer-modal id="rp-location-create-drawer" width="900">
+  <drawer-header eyebrow="New record" title="Create location" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-new-location-city" col="col-12" label="City" placeholder="e.g. London" required maxlength="100" show-counter></text-field>
+    <text-field id="rp-new-location-country" col="col-12" label="Country" placeholder="e.g. United Kingdom" required maxlength="100" show-counter></text-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Create location" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <!-- Edit drawer -->
+  <drawer-modal id="rp-location-edit-drawer" width="900">
+  <drawer-header eyebrow="Edit record" title="Edit location" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-edit-location-city" col="col-12" label="City" placeholder="e.g. London" required maxlength="100" show-counter></text-field>
+    <text-field id="rp-edit-location-country" col="col-12" label="Country" placeholder="e.g. United Kingdom" required maxlength="100" show-counter></text-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <!-- View drawer -->
+  <drawer-modal id="rp-location-view-drawer" width="900">
+  <drawer-header eyebrow="Location details" title="View location" no-sizes>
+  <span id="rp-view-location-default-badge"
+        class="rp-badge rp-badge-soft rp-badge-success"
+        hidden>Default</span>
+  </drawer-header>
+  <drawer-panel>
+  <view-field id="rp-view-location-city" label="City"></view-field>
+  <view-field id="rp-view-location-country" label="Country"></view-field>
+  <view-field id="rp-view-location-code" label="Code" code></view-field>
+  <view-field id="rp-view-location-status" label="Status"></view-field>
+  <view-field id="rp-view-location-created" label="Created" meta></view-field>
+  <view-field id="rp-view-location-created-by" label="Created by" meta></view-field>
+  </drawer-panel>
+  <drawer-footer close="Close"
+  {% if    can_change_location %}primary="Edit location"    primary-icon="bi-pencil"{% endif %}
+  ></drawer-footer>
+  </drawer-modal>
+  <delete-modal id="rp-location-delete-modal" action-label="Delete location"></delete-modal>
+  <activate-modal id="rp-location-activate-modal"></activate-modal>
+  <deactivate-modal id="rp-location-deactivate-modal"></deactivate-modal>
+  <set-default-modal id="rp-location-set-default-modal"></set-default-modal>
+  <import-view id="rp-locations-import-view" title="Import Locations" eyebrow="Locations"></import-view>
+  <export-view id="rp-locations-export-view" title="Export Locations" eyebrow="Locations" active-filter-id="rp-locations-filter-panel"></export-view>
+{% endblock content %}
