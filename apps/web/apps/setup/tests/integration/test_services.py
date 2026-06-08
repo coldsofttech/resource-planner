@@ -1,5 +1,6 @@
 """Integration tests for apps.setup services — verifies DB writes after create()."""
 
+import os
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -64,6 +65,21 @@ def _run_create(svc, payload):
         patch.object(svc, "_set_base_url"),
     ):
         svc.create(**payload)
+
+
+@pytest.fixture
+def fernet_env():
+    """Set a valid FERNET_KEY in os.environ for tests that mock _write_infra_env."""
+    from cryptography.fernet import Fernet
+
+    key = Fernet.generate_key().decode()
+    old = os.environ.get("FERNET_KEY")
+    os.environ["FERNET_KEY"] = key
+    yield key
+    if old is None:
+        os.environ.pop("FERNET_KEY", None)
+    else:
+        os.environ["FERNET_KEY"] = old
 
 
 @pytest.fixture(autouse=True)
@@ -140,6 +156,7 @@ class TestSetupServiceCreateWorkflow:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.usefixtures("fernet_env")
 class TestSetupServiceSetAuthTypeSaml:
     def _saml_payload(self):
         from cryptography.fernet import Fernet
@@ -221,6 +238,7 @@ class TestSetupServiceSetAuthTypeSaml:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.usefixtures("fernet_env")
 class TestSetupServiceSetAuthTypeOauth:
     def _oauth_payload(self):
         from cryptography.fernet import Fernet

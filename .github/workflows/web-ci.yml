@@ -11,7 +11,8 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  lint:
+    name: Lint & Build
     runs-on: ubuntu-latest
 
     steps:
@@ -27,6 +28,7 @@ jobs:
 
       - name: Install Python dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install -r requirements/base.txt
           pip install -r requirements/dev.txt
 
@@ -63,18 +65,6 @@ jobs:
       - name: mypy
         run: mypy apps/web
 
-      - name: pytest (integration)
-        run: |
-          mkdir -p .pytest-reports
-          pytest --override-ini=addopts= -m integration -n auto --dist=loadfile --junit-xml=.pytest-reports/junit.xml --html=.pytest-reports/test-report.html --self-contained-html || [ $? -eq 5 ]
-
-      - name: Upload test report
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: test-report
-          path: .pytest-reports/
-
       - name: Bandit
         run: bandit -r apps/web packages --configfile pyproject.toml
 
@@ -85,3 +75,54 @@ jobs:
         run: |
           cd apps/web
           python manage.py check --deploy
+
+  integration-tests:
+    name: Integration Tests (${{ matrix.app }})
+    needs: lint
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app:
+          - audit
+          - auth
+          - configurations
+          - employment_types
+          - locations
+          - meta
+          - oauth
+          - permissions
+          - saml
+          - setup
+          - skills
+          - teams
+          - users
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements/base.txt
+          pip install -r requirements/dev.txt
+
+      - name: pytest (integration — ${{ matrix.app }})
+        run: |
+          mkdir -p .pytest-reports
+          pytest --override-ini=addopts= -m integration \
+            --junit-xml=.pytest-reports/junit-${{ matrix.app }}.xml \
+            --html=.pytest-reports/test-report-${{ matrix.app }}.html \
+            --self-contained-html \
+            apps/web/apps/${{ matrix.app }}/tests/ || [ $? -eq 5 ]
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-report-${{ matrix.app }}
+          path: .pytest-reports/
