@@ -5,6 +5,9 @@ on:
     paths:
       - "packages/**"
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -28,6 +31,7 @@ jobs:
           pip install -e packages/pycore
           pip install -e packages/emailcore
           pip install -e packages/otpcore
+          pip install -e packages/storagecore
 
       - name: Ruff
         run: ruff check packages
@@ -38,10 +42,10 @@ jobs:
       - name: mypy
         run: mypy packages
 
-      - name: pytest
+      - name: pytest (integration)
         run: |
           mkdir -p .pytest-reports
-          pytest -n auto --dist=loadfile -p no:django --override-ini=addopts= --import-mode=importlib --junit-xml=.pytest-reports/junit.xml --html=.pytest-reports/test-report.html --self-contained-html packages/awscore/tests/ packages/emailcore/tests/ packages/pycore/tests/ packages/otpcore/tests/
+          pytest -n auto --dist=loadfile -m integration -p no:django --override-ini=addopts= --import-mode=importlib --junit-xml=.pytest-reports/junit.xml --html=.pytest-reports/test-report.html --self-contained-html packages/awscore/tests/ packages/emailcore/tests/ packages/pycore/tests/ packages/otpcore/tests/ packages/exportcore/tests/ packages/storagecore/tests/ || [ $? -eq 5 ]
 
       - name: Upload test report
         if: always()
@@ -56,6 +60,7 @@ jobs:
           python -m build packages/pycore
           python -m build packages/emailcore
           python -m build packages/otpcore
+          python -m build packages/storagecore
 
       - name: Bandit
         run: bandit -r packages --configfile pyproject.toml

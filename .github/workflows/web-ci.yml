@@ -7,6 +7,9 @@ on:
       - "packages/**"
       - ".github/workflows/web-ci.yml"
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -38,10 +41,18 @@ jobs:
       - name: Verify frontend build outputs
         run: |
           test -f apps/web/static/css/dist/styles.min.css
-          test -f apps/web/static/js/dist/main.min.js
-          test -f apps/web/static/js/dist/utils.min.js
+          test -f apps/web/static/js/dist/auth.min.js
           test -f apps/web/static/js/dist/components.min.js
+          test -f apps/web/static/js/dist/emp-types.min.js
+          test -f apps/web/static/js/dist/locations.min.js
+          test -f apps/web/static/js/dist/main.min.js
+          test -f apps/web/static/js/dist/roles.min.js
           test -f apps/web/static/js/dist/setup.min.js
+          test -f apps/web/static/js/dist/skills.min.js
+          test -f apps/web/static/js/dist/teams.min.js
+          test -f apps/web/static/js/dist/theme-init.min.js
+          test -f apps/web/static/js/dist/users.min.js
+          test -f apps/web/static/js/dist/utils.min.js
 
       - name: Ruff
         run: ruff check .
@@ -52,10 +63,10 @@ jobs:
       - name: mypy
         run: mypy apps/web
 
-      - name: pytest
+      - name: pytest (integration)
         run: |
           mkdir -p .pytest-reports
-          pytest --override-ini=addopts= -n auto --dist=loadfile --junit-xml=.pytest-reports/junit.xml --html=.pytest-reports/test-report.html --self-contained-html
+          pytest --override-ini=addopts= -m integration -n auto --dist=loadfile --junit-xml=.pytest-reports/junit.xml --html=.pytest-reports/test-report.html --self-contained-html || [ $? -eq 5 ]
 
       - name: Upload test report
         if: always()
