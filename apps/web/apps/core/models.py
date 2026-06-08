@@ -119,6 +119,15 @@ class ActivatableModel(models.Model):
         abstract = True
 
 
+class DefaultableModel(models.Model):
+    """Adds is_default=TRUE/FALSE field."""
+
+    is_default = models.BooleanField(default=False, db_index=True)
+
+    class Meta:
+        abstract = True
+
+
 class NamedModel(models.Model):
     """Adds name field with MAX_LENGTH=255."""
 

@@ -20,19 +20,41 @@ class BaseViewSet(ViewSet):
     MAX_PAGE_SIZE = 100
 
     service_class: type | None = None
+    import_service_class: type | None = None
+    export_service_class: type | None = None
 
     @property
     def service(self):
         if not hasattr(self, "_service"):
             if self.service_class is None:
                 raise NotImplementedError("service_class must be defined.")
-
             self._service = self.service_class(
                 user=self.request.user,
                 request=self.request,
             )
-
         return self._service
+
+    @property
+    def import_service(self):
+        if not hasattr(self, "_import_service"):
+            if self.import_service_class is None:
+                raise NotImplementedError("import_service_class must be defined.")
+            self._import_service = self.import_service_class(
+                user=self.request.user,
+                request=self.request,
+            )
+        return self._import_service
+
+    @property
+    def export_service(self):
+        if not hasattr(self, "_export_service"):
+            if self.export_service_class is None:
+                raise NotImplementedError("export_service_class must be defined.")
+            self._export_service = self.export_service_class(
+                user=self.request.user,
+                request=self.request,
+            )
+        return self._export_service
 
     def get_pagination_params(self, request):
         """Extract pagination params safely."""
@@ -120,15 +142,15 @@ class BaseViewSet(ViewSet):
 
     def get_list_params(self, request) -> ListParams:
         page, page_size = self.get_pagination_params(request)
-        sorts = []
-        for part in request.query_params.get("ordering", "id").split(","):
-            part = part.strip()
-            if part.startswith("-"):
-                sorts.append(SortParam(sort_by=part[1:], direction="desc"))
-            elif part:
-                sorts.append(SortParam(sort_by=part, direction="asc"))
+        sort_key = request.query_params.get("sort", "").strip()
+        sort_dir = request.query_params.get("order_by", "ASC").upper()
+        if sort_key:
+            direction: str = "desc" if sort_dir == "DESC" else "asc"
+            sorts = [SortParam(sort_by=sort_key, direction=direction)]
+        else:
+            sorts = []
         return ListParams(
-            filters=dict(request.query_params),
+            filters=request.query_params.dict(),
             search=request.query_params.get("search", ""),
             sorts=sorts or [SortParam()],
             page=page,
@@ -310,6 +332,30 @@ class BaseViewSet(ViewSet):
             status_code=self.get_delete_status_code(),
         )
 
+    def get_activate_custom_message(self):
+        """Uses 'Activated successfully.' by default."""
+        return "Activated successfully."
+
+    def get_activate_status_code(self):
+        """Uses HTTP 200 OK by default."""
+        return status.HTTP_200_OK
+
+    def get_deactivate_custom_message(self):
+        """Uses 'Deactivated successfully.' by default."""
+        return "Deactivated successfully."
+
+    def get_deactivate_status_code(self):
+        """Uses HTTP 200 OK by default."""
+        return status.HTTP_200_OK
+
+    def get_set_default_custom_message(self):
+        """Uses 'Set as default successfully.' by default."""
+        return "Set as default successfully."
+
+    def get_set_default_status_code(self):
+        """Uses HTTP 200 OK by default."""
+        return status.HTTP_200_OK
+
 
 class StatisticsMixin:
     """ViewSet with /stats API endpoint."""
@@ -371,7 +417,7 @@ class ImportMixin:
     and GET /import/specs.
     """
 
-    import_fields: list[str] = []
+    import_fields: list[dict] = []
     import_notes: list[str] = []
     import_sample_filename = "import_template.csv"
 
@@ -386,7 +432,7 @@ class ImportMixin:
     @action(detail=False, methods=["get"], url_path="import/specs")
     def import_specs(self, request):
         """GET /module/import/specs"""
-        svc = self.service.import_specs
+        svc = self.import_service
         return self.response(
             data={
                 "supported_formats": svc.SUPPORTED_IMPORT_FORMATS,
@@ -443,20 +489,12 @@ class ImportMixin:
         if not uploaded_file:
             raise ValidationException("No import file uploaded.")
 
-        self.service.validate_file(uploaded_file)
+        svc = self.import_service
+        svc.validate_file(uploaded_file)
 
-        dry_run = (
-            request.query_params.get(
-                "validate",
-                "false",
-            ).lower()
-            == "true"
-        )
+        dry_run = request.query_params.get("validate", "false").lower() == "true"
 
-        result = self.service.bulk_import(
-            file=uploaded_file,
-            dry_run=dry_run,
-        )
+        result = svc.bulk_import(file=uploaded_file, dry_run=dry_run)
 
         return self.response(
             data=result,
@@ -470,7 +508,28 @@ class ImportMixin:
 
 
 class ExportMixin:
-    """ViewSet with /export API endpoint."""
+    """
+    ViewSet with /export API endpoints. Supports GET /export and GET /export/specs.
+    """
+
+    export_columns: list[dict] = []
+
+    def get_export_specs_custom_message(self):
+        """Uses 'Success.' by default. Implement in child ViewSet to override."""
+        return "Success."
+
+    def get_export_specs_status_code(self):
+        """Uses HTTP 200 OK by default. Implement in child ViewSet to override."""
+        return status.HTTP_200_OK
+
+    @action(detail=False, methods=["get"], url_path="export/specs")
+    def export_specs(self, request):
+        """GET /module/export/specs/"""
+        return self.response(
+            data={"columns": self.export_columns},
+            message=self.get_export_specs_custom_message(),
+            status_code=self.get_export_specs_status_code(),
+        )
 
     def get_export_custom_message(self):
         """
@@ -485,11 +544,11 @@ class ExportMixin:
 
     @action(detail=False, methods=["get"], url_path="export")
     def export(self, request):
-        """GET /module/export/"""
-        result = self.service.export(filters=request.query_params)
-
-        return self.response(
-            result=result,
-            message=self.get_export_custom_message(),
-            status_code=self.get_export_status_code(),
+        """GET /module/export/?type=csv|xlsx|pdf|json&fields=f1,f2"""
+        fields = self._parse_fields_param(request)
+        export_format = request.query_params.get("type", "csv").lower()
+        return self.export_service.export(
+            fields=fields,
+            export_format=export_format,
+            filters=request.query_params.dict(),
         )

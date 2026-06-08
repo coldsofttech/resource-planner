@@ -37,3 +37,7 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-n auto --dist=loadfile --html=.pytest-reports/test-report.html --self-contained-html"
+markers = [
+    "unit: fast tests using SimpleTestCase — no database",
+    "integration: tests that require a database",
+]
