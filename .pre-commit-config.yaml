@@ -25,6 +25,7 @@ repos:
         name: prettier
         entry: npx prettier --write
         language: system
+        exclude: .*templates/.*\.html$
         types_or:
           - javascript
           - jsx
@@ -63,3 +64,25 @@ repos:
         language: system
         pass_filenames: false
         files: ^apps/web/static/js/
+
+  - repo: local
+    hooks:
+      - id: unit-tests
+        name: Unit tests
+        entry: "'venv\\Scripts\\python.exe' scripts/run_pytest.py apps/web -m unit -v -n auto --dist=load --override-ini=addopts="
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+  - repo: local
+    hooks:
+      - id: packages-unit-tests
+        name: Package unit tests
+        entry: >-
+          'venv\Scripts\python.exe' scripts/run_pytest.py -m unit -v -n auto --dist=load
+          -p no:django --override-ini=addopts= --import-mode=importlib
+          packages/awscore/tests packages/emailcore/tests packages/pycore/tests
+          packages/otpcore/tests packages/exportcore/tests
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]

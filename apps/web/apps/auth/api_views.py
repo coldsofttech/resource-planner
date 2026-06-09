@@ -12,6 +12,7 @@ from apps.auth.serializers import (
     ForgotPasswordResetSerializer,
     ForgotPasswordVerifySerializer,
     LoginSerializer,
+    MeSerializer,
     RegisterSerializer,
 )
 from apps.auth.services import (
@@ -29,6 +30,25 @@ logger = logging.getLogger(__name__)
 class AuthViewSet(BaseViewSet):
     authentication_classes: list[type] = []
     permission_classes = [AllowAny]
+
+    def get_authenticators(self):
+        # action_map is set before dispatch; self.action is set after
+        # initialize_request. Use action_map here to avoid AttributeError
+        # during request initialization.
+        if "me" in getattr(self, "action_map", {}).values():
+            from rest_framework.authentication import SessionAuthentication
+
+            from apps.auth.authentication import BearerTokenAuthentication
+
+            return [BearerTokenAuthentication(), SessionAuthentication()]
+        return []
+
+    def get_permissions(self):
+        if "me" in getattr(self, "action_map", {}).values():
+            from rest_framework.permissions import IsAuthenticated
+
+            return [IsAuthenticated()]
+        return [AllowAny()]
 
     def _auth_service(self):
         return AuthService(user=self.request.user, request=self.request)
@@ -94,6 +114,21 @@ class AuthViewSet(BaseViewSet):
             message="Signed out successfully.",
             status_code=status.HTTP_200_OK,
         )
+
+    @extend_schema(
+        summary="Get current user",
+        description="Returns the authenticated user's name, email, and UI preferences.",
+        responses={
+            200: OpenApiResponse(description="User identity returned."),
+            401: OpenApiResponse(description="Authentication required."),
+        },
+    )
+    @action(detail=False, methods=["get"], url_path="me", url_name="me")
+    def me(self, request: Request):
+        """GET /auth/me/"""
+        data = self._auth_service().get_me()
+        serializer = MeSerializer(data)
+        return self.response(data=serializer.data)
 
 
 class RegisterViewSet(BaseViewSet):

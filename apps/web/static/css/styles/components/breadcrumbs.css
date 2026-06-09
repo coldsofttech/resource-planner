@@ -1,0 +1,21 @@
+.rp-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--rp-fs-13);
+  color: var(--rp-text-muted);
+}
+.rp-breadcrumbs a {
+  color: var(--rp-text-muted);
+  text-decoration: none;
+}
+.rp-breadcrumbs a:hover {
+  color: var(--rp-text);
+}
+.rp-breadcrumbs .sep {
+  color: var(--rp-text-subtle);
+}
+.rp-breadcrumbs .current {
+  color: var(--rp-text);
+  font-weight: 600;
+}

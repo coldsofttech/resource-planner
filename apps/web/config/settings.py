@@ -66,6 +66,12 @@ INSTALLED_APPS = [
     "apps.users.apps.UserConfig",
     "apps.permissions.apps.PermissionConfig",
     "apps.meta.apps.MetaConfig",
+    "apps.audit.apps.AuditConfig",
+    "apps.teams.apps.TeamConfig",
+    "apps.skills.apps.SkillConfig",
+    "apps.locations.apps.LocationConfig",
+    "apps.employment_types.apps.EmploymentTypeConfig",
+    "apps.roles.apps.RoleConfig",
     "apps.dashboard.apps.DashboardConfig",
 ]
 
@@ -93,6 +99,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "apps.core.context_processors.user_permissions",
             ],
         },
     },
@@ -104,6 +111,8 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database — see config/database.py for engine selection and connection details.
 DATABASES = database.DATABASES
 
+
+LOGIN_URL = "/login/"
 
 AUTHENTICATION_BACKENDS = [
     "apps.permissions.backends.PermissionCategoryBackend",

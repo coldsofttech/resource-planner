@@ -1,6 +1,17 @@
 import esbuild from "esbuild";
 
-const esmModules = ["utils", "main", "setup", "auth"];
+const esmModules = [
+  "utils",
+  "main",
+  "setup",
+  "auth",
+  "teams",
+  "skills",
+  "roles",
+  "locations",
+  "emp-types",
+  "users",
+];
 
 const buildConfigs = [
   // Web-component bundle (ESM)

@@ -10,6 +10,7 @@ class OAuthUserInfo:
     first_name: str
     last_name: str
     sso_uid: str
+    picture_url: str = ""
 
 
 def exchange_code(
@@ -59,9 +60,14 @@ def parse_userinfo(userinfo: dict) -> OAuthUserInfo:
         first_name = parts[0].strip()
         last_name = parts[1].strip() if len(parts) > 1 else ""
 
+    picture_url = (
+        userinfo.get("picture") or userinfo.get("photo") or userinfo.get("avatar") or ""
+    ).strip()
+
     return OAuthUserInfo(
         email=email,
         first_name=first_name,
         last_name=last_name,
         sso_uid=sso_uid,
+        picture_url=picture_url,
     )

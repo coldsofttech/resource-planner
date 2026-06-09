@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Members
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/users.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Organisation
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Members
+{% endblock page_title %}
+{% block page_sub %}
+  View and manage your organisation's workforce details.
+{% endblock page_sub %}
+{% block page_actions %}
+  <secondary-button id="rp-members-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+{% endblock page_actions %}
+{% block content %}
+  <list-view show-active-filters>
+  <filter-panel id="rp-members-filter-panel">
+  <search-field id="rp-members-search" name="search" placeholder="Search members..." shortcut="/" show-label></search-field>
+  <is-active-field id="rp-members-filter-active" name="is_active" value="true" show-label></is-active-field>
+  <role-field id="rp-members-filter-role" name="role" col="col-auto" allow-all show-label></role-field>
+  <employment-type-field id="rp-members-filter-emp-type" name="employment_type" col="col-auto" allow-all show-label></employment-type-field>
+  <location-field id="rp-members-filter-location" name="location" col="col-auto" allow-all show-label></location-field>
+  </filter-panel>
+  <data-table id="rp-members-table" url="/api/v1/members/" paginated page-size="25" row-template="renderMembersRow" empty-message="No members found.">
+    <table-columns>
+      <table-column width="44px">
+      </table-column>
+      <table-column label="Name" key="display_name" sortable>
+      </table-column>
+      <table-column label="Email" key="email" hide-mobile sortable>
+      </table-column>
+      <table-column label="Location" key="location" hide-mobile sortable>
+      </table-column>
+      <table-column label="Employment Type" key="employment_type" hide-mobile sortable>
+      </table-column>
+      <table-column label="Role" key="role" hide-mobile sortable>
+      </table-column>
+      <table-column label="Status" key="is_active" hide-mobile>
+      </table-column>
+      <table-column label="Joined" key="joined_date" hide-mobile sortable>
+      </table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_workforce %}
+        <table-action icon="bi-pencil" label="Edit" event="rp:member:edit">
+        </table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </list-view>
+  <!-- Edit drawer -->
+  <drawer-modal id="rp-member-edit-drawer" width="900">
+  <drawer-header eyebrow="Edit member" title="Member" no-sizes>
+  <user-avatar id="rp-edit-member-avatar-cell" size="lg"></user-avatar>
+  </drawer-header>
+  <drawer-panel>
+  <div class="alert alert-info d-flex gap-2 mb-3 py-2 px-3"
+       style="font-size: 0.85rem"
+       role="alert">
+    <i class="bi bi-info-circle"></i>
+    <span>Personal details (name, display name, skills, etc.) can only be updated by the member themselves via their
+    profile page.</span>
+  </div>
+  <div class="row g-3">
+    <location-field id="rp-edit-member-location" col="col-md-6" label="Location"></location-field>
+    <employment-type-field id="rp-edit-member-emp-type" col="col-md-6" label="Employment type"></employment-type-field>
+    <role-field id="rp-edit-member-role" col="col-12" label="Role"></role-field>
+    <date-field id="rp-edit-member-joined-date" col="col-md-6" label="Joined date"></date-field>
+    <date-field id="rp-edit-member-leaving-date" col="col-md-6" label="Leaving date"></date-field>
+    <number-field id="rp-edit-member-holidays" col="col-12" label="Default holidays" placeholder="e.g. 20" hint="Holiday days per financial year. Leave blank to use the organisation default." min="0"></number-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <export-view id="rp-members-export-view" title="Export Members" eyebrow="Members" active-filter-id="rp-members-filter-panel"></export-view>
+  <!-- View drawer -->
+  <drawer-modal id="rp-member-view-drawer" width="900">
+  <drawer-header eyebrow="Member" title="Member" no-sizes>
+  <user-avatar id="rp-view-member-avatar-cell" size="lg"></user-avatar>
+  </drawer-header>
+  <drawer-panel>
+  <view-field id="rp-view-member-code" label="Code" code></view-field>
+  <view-field id="rp-view-member-status" label="Status"></view-field>
+  <view-field id="rp-view-member-first-name" label="First name"></view-field>
+  <view-field id="rp-view-member-last-name" label="Last name"></view-field>
+  <view-field id="rp-view-member-display-name" label="Display name"></view-field>
+  <view-field id="rp-view-member-email" label="Email address"></view-field>
+  <view-field id="rp-view-member-location" label="Location"></view-field>
+  <view-field id="rp-view-member-emp-type" label="Employment type"></view-field>
+  <view-field id="rp-view-member-role" label="Role"></view-field>
+  <view-field id="rp-view-member-joined" label="Joined date"></view-field>
+  <view-field id="rp-view-member-leaving" label="Leaving date"></view-field>
+  <view-field id="rp-view-member-holidays" label="Default holidays"></view-field>
+  <view-field id="rp-view-member-skills" label="Skills" tags="rp-badge rp-badge-soft"></view-field>
+  <view-field id="rp-view-member-created" label="Created" meta></view-field>
+  <view-field id="rp-view-member-created-by" label="Created by" meta></view-field>
+  </drawer-panel>
+  <drawer-footer close="Close"
+  {% if  can_change_workforce %}primary="Edit member"  primary-icon="bi-pencil"{% endif %}
+  ></drawer-footer>
+  </drawer-modal>
+{% endblock content %}

@@ -38,6 +38,22 @@ def run(cmd, cwd=ROOT):
     return result.returncode
 
 
+_PYTEST_NO_TESTS = 5  # pytest exit code when no tests are collected
+
+
+def _run_pytest(cmd: str) -> int:
+    """Run a pytest command; exit code 5 (no tests collected) is treated as success."""
+    print(f"\n>>> {cmd}\n")
+    result = subprocess.run(cmd, shell=True, cwd=ROOT)  # nosec B602
+    rc = result.returncode
+    if rc == _PYTEST_NO_TESTS:
+        print(f"{YELLOW}No tests collected — skipping.{RESET}")
+        return 0
+    if rc != 0:
+        print(f"{RED}\nCommand failed: {cmd}{RESET}")
+    return rc
+
+
 def pause():
     input("\nPlease enter to continue...")
 
@@ -1547,7 +1563,7 @@ def _discover_package_test_dirs() -> list[Path]:
     for pkg in sorted(PACKAGES_DIR.iterdir()):
         if pkg.is_dir() and not pkg.name.startswith("."):
             tests_dir = pkg / "tests"
-            if tests_dir.exists() and any(tests_dir.glob("test_*.py")):
+            if tests_dir.exists() and any(tests_dir.rglob("test_*.py")):
                 dirs.append(tests_dir)
     return dirs
 
@@ -1561,25 +1577,100 @@ def _run_django_tests(path: str = "", report: str = "django-report.html") -> int
     )
     if path:
         cmd += f" {path}"
-    return run(cmd)
+    return _run_pytest(cmd)
+
+
+def _run_django_unit_tests(
+    path: str = "", report: str = "django-unit-report.html"
+) -> int:
+    # Unit tests use SimpleTestCase (no DB) — dist=load gives pure load-balancing
+    # without the file-grouping constraint that loadfile adds for DB isolation.
+    cmd = (
+        f"pytest -v -n auto --dist=load -m unit "
+        f"--override-ini=addopts= {_html_flags(report)}"
+    )
+    if path:
+        cmd += f" {path}"
+    return _run_pytest(cmd)
+
+
+def _run_django_integration_tests(
+    path: str = "", report: str = "django-integration-report.html"
+) -> int:
+    # Integration tests hit the DB — loadfile keeps tests in the same file on the
+    # same worker so they share DB state correctly.
+    cmd = (
+        f"pytest -v -n auto --dist=loadfile -m integration "
+        f"--override-ini=addopts= {_html_flags(report)}"
+    )
+    if path:
+        cmd += f" {path}"
+    return _run_pytest(cmd)
+
+
+def _pkg_base_cmd(marker: str = "", report: str = "packages-report.html") -> str:
+    # -p no:django disables pytest-django so packages can be collected in a single
+    # pytest call regardless of which pyproject.toml becomes the rootdir.
+    # --rootdir ensures packages/conftest.py is always discovered.
+    html = _html_flags(report)
+    marker_flag = f"-m {marker} " if marker else ""
+    return (
+        f"pytest -v -n auto --dist=loadfile {marker_flag}"
+        f"-p no:django --override-ini=addopts= "
+        f'--rootdir="{ROOT}" --import-mode=importlib {html}'
+    )
 
 
 def _run_package_tests(path: str = "", report: str = "packages-report.html") -> int:
-    # -p no:django disables pytest-django so packages can be collected in a single
-    # pytest call regardless of which pyproject.toml becomes the rootdir.
-    html = _html_flags(report)
-    base = (
-        f"pytest -v -n auto --dist=loadfile -p no:django --override-ini=addopts= "
-        f"--import-mode=importlib {html}"
-    )
+    base = _pkg_base_cmd(report=report)
     if path:
-        return run(f"{base} {path}")
+        return _run_pytest(f"{base} {path}")
     test_dirs = _discover_package_test_dirs()
     if not test_dirs:
         print("No package test directories found.")
         return 0
     paths = " ".join(str(d) for d in test_dirs)
-    return run(f"{base} {paths}")
+    return _run_pytest(f"{base} {paths}")
+
+
+def _run_package_unit_tests(
+    path: str = "", report: str = "packages-unit-report.html"
+) -> int:
+    # Unit tests have no external dependencies — use dist=load
+    # (no file grouping needed).
+    html = _html_flags(report)
+    base = (
+        f"pytest -v -n auto --dist=load -m unit "
+        f"-p no:django --override-ini=addopts= "
+        f'--rootdir="{ROOT}" --import-mode=importlib {html}'
+    )
+    if path:
+        return _run_pytest(f"{base} {path}")
+    test_dirs = _discover_package_test_dirs()
+    if not test_dirs:
+        print("No package test directories found.")
+        return 0
+    paths = " ".join(str(d) for d in test_dirs)
+    return _run_pytest(f"{base} {paths}")
+
+
+def _run_package_integration_tests(
+    path: str = "", report: str = "packages-integration-report.html"
+) -> int:
+    html = _html_flags(report)
+    base = (
+        f"pytest -v -n auto --dist=loadfile -m integration "
+        f"-p no:django --override-ini=addopts= "
+        f'--rootdir="{ROOT}" --import-mode=importlib {html}'
+    )
+    if path:
+        return _run_pytest(f"{base} {path}")
+    test_dirs = _discover_package_test_dirs()
+    if not test_dirs:
+        print("No package test directories found.")
+        return 0
+    paths = " ".join(str(d) for d in test_dirs)
+    return _run_pytest(f"{base} {paths}")
 
 
 def _write_all_report_index(django_rc: int, packages_rc: int) -> None:
@@ -1631,6 +1722,66 @@ def _write_all_report_index(django_rc: int, packages_rc: int) -> None:
     print(f"  packages-report.html ({packages_status})")
 
 
+def _run_django_tests_menu() -> None:
+    while True:
+        os.system("cls" if os.name == "nt" else "clear")  # nosec B605
+        print("=== RUN TESTS: DJANGO ===")
+        print("1. All")
+        print("2. Unit")
+        print("3. Integration")
+        print("0. Back")
+
+        choice = input("\nSelect: ").strip()
+
+        if choice == "1":
+            path = input("Test path (blank = full suite): ").strip()
+            _run_django_tests(path)
+            pause()
+        elif choice == "2":
+            path = input("Test path (blank = all unit tests): ").strip()
+            _run_django_unit_tests(path)
+            pause()
+        elif choice == "3":
+            path = input("Test path (blank = all integration tests): ").strip()
+            _run_django_integration_tests(path)
+            pause()
+        elif choice == "0":
+            return
+        else:
+            print(f"{YELLOW}Invalid choice{RESET}")
+            pause()
+
+
+def _run_packages_tests_menu() -> None:
+    while True:
+        os.system("cls" if os.name == "nt" else "clear")  # nosec B605
+        print("=== RUN TESTS: PACKAGES ===")
+        print("1. All")
+        print("2. Unit")
+        print("3. Integration")
+        print("0. Back")
+
+        choice = input("\nSelect: ").strip()
+
+        if choice == "1":
+            path = input("Test path (blank = full suite): ").strip()
+            _run_package_tests(path)
+            pause()
+        elif choice == "2":
+            path = input("Test path (blank = all unit tests): ").strip()
+            _run_package_unit_tests(path)
+            pause()
+        elif choice == "3":
+            path = input("Test path (blank = all integration tests): ").strip()
+            _run_package_integration_tests(path)
+            pause()
+        elif choice == "0":
+            return
+        else:
+            print(f"{YELLOW}Invalid choice{RESET}")
+            pause()
+
+
 def run_tests():
     while True:
         os.system("cls" if os.name == "nt" else "clear")  # nosec B605
@@ -1648,13 +1799,9 @@ def run_tests():
             _write_all_report_index(django_rc, packages_rc)
             pause()
         elif choice == "2":
-            path = input("Test path (blank = full suite): ").strip()
-            _run_django_tests(path)
-            pause()
+            _run_django_tests_menu()
         elif choice == "3":
-            path = input("Test path (blank = all packages): ").strip()
-            _run_package_tests(path)
-            pause()
+            _run_packages_tests_menu()
         elif choice == "0":
             return
         else:

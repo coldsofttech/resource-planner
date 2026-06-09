@@ -13,3 +13,7 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+markers = [
+  "unit: fast tests with no external services",
+  "integration: tests that require external services",
+]

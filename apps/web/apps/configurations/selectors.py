@@ -152,3 +152,9 @@ class Email:
     @staticmethod
     def get_smtp_password() -> str:
         return get_config_value("EMAIL_SMTP_PASSWORD")
+
+
+class Holidays:
+    @staticmethod
+    def get_default_holidays() -> int:
+        return int(get_config_value("DEFAULT_HOLIDAYS"))

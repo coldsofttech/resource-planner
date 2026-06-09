@@ -2,9 +2,9 @@ name: Markdown Lint
 
 on:
   pull_request:
-    paths:
-      - "docs/**"
-      - "*.md"
+
+permissions:
+  contents: read
 
 jobs:
   markdown:

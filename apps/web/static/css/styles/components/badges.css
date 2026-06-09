@@ -50,3 +50,28 @@
   background: var(--rp-bg-sunken);
   color: var(--rp-text-muted);
 }
+
+.rp-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: var(--rp-r-4);
+  font-size: var(--rp-fs-12);
+  font-weight: 500;
+  background: var(--rp-bg-sunken);
+  color: var(--rp-text);
+  border: 1px solid var(--rp-border);
+}
+.rp-tag button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+  color: var(--rp-text-muted);
+  line-height: 1;
+}
+.rp-tag button:hover {
+  color: var(--rp-text);
+}

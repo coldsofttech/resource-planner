@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Roles
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/roles.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Configurations
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Roles
+{% endblock page_title %}
+{% block page_sub %}
+  Manage roles and responsibilities across your organisation.
+{% endblock
+page_sub %}
+{% block page_actions %}
+  <secondary-button id="rp-roles-import-btn" label="Import" prefix-icon="bi-upload" hidden></secondary-button>
+  <secondary-button id="rp-roles-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+  <primary-button id="rp-roles-add-btn" label="Add Role" prefix-icon="bi-plus-lg" hidden></primary-button>
+{% endblock page_actions %}
+{% block content %}
+  <list-view show-active-filters>
+  <filter-panel id="rp-roles-filter-panel">
+  <search-field id="rp-roles-search" name="search" placeholder="Search roles..." shortcut="/" show-label></search-field>
+  <is-active-field id="rp-roles-status" name="is_active" value="true" show-label></is-active-field>
+  </filter-panel>
+  <data-table id="rp-roles-table" url="/api/v1/roles/" paginated page-size="25" row-template="renderRolesRow" empty-message="No roles found.">
+    <table-columns>
+      <table-column label="Role Name" key="role" sortable>
+      </table-column>
+      <table-column label="Code" key="code" mono width="130px" hide-mobile>
+      </table-column>
+      <table-column label="Assignable" key="is_assignable" hide-mobile sortable>
+      </table-column>
+      <table-column label="Leadership" key="is_leadership" hide-mobile sortable>
+      </table-column>
+      <table-column label="Default" key="is_default" hide-mobile sortable>
+      </table-column>
+      <table-column label="Status" key="is_active">
+      </table-column>
+      <table-column label="Created" key="created_at" hide-mobile sortable>
+      </table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_role %}
+        <table-action icon="bi-pencil" label="Edit" event="rp:role:edit">
+        </table-action>
+        <table-action icon="bi-toggle-on" label="Toggle" event="rp:role:toggle" color-key="is_active">
+        </table-action>
+        <table-action icon="bi-star" label="Set as Default" event="rp:role:set-default" hidden-key="is_default">
+        </table-action>
+      {% endif %}
+      {% if can_delete_role %}
+        <table-action icon="bi-trash" label="Delete" event="rp:role:delete" danger>
+        </table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </list-view>
+  <!-- Create drawer -->
+  <drawer-modal id="rp-role-create-drawer" width="900">
+  <drawer-header eyebrow="New record" title="Create role" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-new-role-name" col="col-12" label="Role Name" placeholder="e.g. Developer" required maxlength="100" show-counter></text-field>
+    <toggle-field id="rp-new-role-assignable" col="col-12 col-md-6" label="Assignable to resources"></toggle-field>
+    <toggle-field id="rp-new-role-leadership" col="col-12 col-md-6" label="Leadership role"></toggle-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Create role" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <!-- Edit drawer -->
+  <drawer-modal id="rp-role-edit-drawer" width="900">
+  <drawer-header eyebrow="Edit record" title="Edit role" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-edit-role-name" col="col-12" label="Role Name" placeholder="e.g. Developer" required maxlength="100" show-counter></text-field>
+    <toggle-field id="rp-edit-role-assignable" col="col-12 col-md-6" label="Assignable to resources"></toggle-field>
+    <toggle-field id="rp-edit-role-leadership" col="col-12 col-md-6" label="Leadership role"></toggle-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <!-- View drawer -->
+  <drawer-modal id="rp-role-view-drawer" width="900">
+  <drawer-header eyebrow="Role details" title="View role" no-sizes>
+  <span id="rp-view-role-default-badge"
+        class="rp-badge rp-badge-soft rp-badge-success"
+        hidden>Default</span>
+  </drawer-header>
+  <drawer-panel>
+  <view-field id="rp-view-role-name" label="Role Name"></view-field>
+  <view-field id="rp-view-role-code" label="Code" code></view-field>
+  <view-field id="rp-view-role-status" label="Status"></view-field>
+  <view-field id="rp-view-role-assignable" label="Assignable"></view-field>
+  <view-field id="rp-view-role-leadership" label="Leadership"></view-field>
+  <view-field id="rp-view-role-created" label="Created" meta></view-field>
+  <view-field id="rp-view-role-created-by" label="Created by" meta></view-field>
+  </drawer-panel>
+  <drawer-footer close="Close"
+  {% if  can_change_role %}primary="Edit role"  primary-icon="bi-pencil"{% endif %}
+  ></drawer-footer>
+  </drawer-modal>
+  <delete-modal id="rp-role-delete-modal" action-label="Delete role"></delete-modal>
+  <activate-modal id="rp-role-activate-modal"></activate-modal>
+  <deactivate-modal id="rp-role-deactivate-modal"></deactivate-modal>
+  <set-default-modal id="rp-role-set-default-modal"></set-default-modal>
+  <import-view id="rp-roles-import-view" title="Import Roles" eyebrow="Roles"></import-view>
+  <export-view id="rp-roles-export-view" title="Export Roles" eyebrow="Roles" active-filter-id="rp-roles-filter-panel"></export-view>
+{% endblock content %}

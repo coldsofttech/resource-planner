@@ -5,6 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 from apps.core.models import AuditableModel, CodeModel
+from apps.users.constants import ThemeChoices
 
 User = get_user_model()
 
@@ -37,8 +38,77 @@ class UserProfile(AuditableModel, CodeModel):
     must_change_password = models.BooleanField(default=False)
     password_last_changed = models.DateTimeField(null=True, blank=True)
 
+    # User preferences.
+    theme = models.CharField(
+        max_length=10,
+        choices=ThemeChoices.choices,
+        default=ThemeChoices.LIGHT,
+    )
+    timezone = models.CharField(max_length=100, default="UTC", blank=True)
+
+    # Auto-populated as "lastname, firstname" on creation; user-overridable.
+    display_name = models.CharField(max_length=150, blank=True)
+
+    # Workforce fields — updatable only by users with change_user_workforce permission.
+    location = models.ForeignKey(
+        "locations.Location",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="user_profiles",
+    )
+    employment_type = models.ForeignKey(
+        "employment_types.EmploymentType",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="user_profiles",
+    )
+    role = models.ForeignKey(
+        "roles.Role",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="user_profiles",
+    )
+
+    # Skills — user-updatable; constrained to active skills at the service/API layer.
+    skills = models.ManyToManyField(
+        "skills.Skill",
+        blank=True,
+        related_name="user_profiles",
+    )
+
+    # Workforce dates and capacity — managed via the Members page.
+    joined_date = models.DateField(null=True, blank=True)
+    leaving_date = models.DateField(null=True, blank=True)
+    default_holidays = models.PositiveIntegerField(null=True, blank=True)
+
     class Meta:
         ordering = ["user"]
+        permissions = [
+            ("change_user_workforce", "Can change user workforce details"),
+            ("export_member", "Can export members"),
+        ]
+
+
+class UserAvatar(AuditableModel):
+    """
+    Stores a user's active avatar URI.  The avatar field holds one of:
+      data:<mime>;base64,<b64>                           — database backend
+      file:<absolute-path>                               — filesystem backend
+      aws:arn:aws:s3:::<bucket>/<folder>/<filename>      — S3 backend
+    """
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="avatars",
+    )
+    avatar = models.TextField()
+
+    class Meta:
+        ordering = ["-created_at"]
 
 
 class GroupProfile(AuditableModel, CodeModel):

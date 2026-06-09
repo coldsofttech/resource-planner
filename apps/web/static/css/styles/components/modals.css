@@ -92,6 +92,23 @@ rp-status-modal .rp-modal {
 .rp-status-modal .rp-status-additional {
   padding: 0 24px 16px;
 }
+/* Panel modals — delete / activate / deactivate / set-default */
+delete-modal .rp-modal,
+activate-modal .rp-modal,
+deactivate-modal .rp-modal,
+set-default-modal .rp-modal {
+  max-width: 440px;
+}
+delete-modal .rp-modal-body p,
+activate-modal .rp-modal-body p,
+deactivate-modal .rp-modal-body p,
+set-default-modal .rp-modal-body p {
+  color: var(--rp-text-muted);
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.55;
+}
+
 .rp-status-steps {
   display: flex;
   flex-direction: column;

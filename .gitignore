@@ -224,8 +224,11 @@ graphify-out/
 .vscode/
 node_modules/
 apps/web/logs/
+apps/web/media/
+apps/web/media/user_avatars/
 .pytest-reports/
 .dev-cache/
+.temp/
 
 # Test tracker database and SQLite WAL files
 tools/test-tracker/tracker.db

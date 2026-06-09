@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>
+      {% block title %}
+        Home
+      {% endblock title %}
+    </title>
+    <!-- theme-init runs synchronously to set data-theme before CSS renders -->
+    <script src="{% static 'js/dist/theme-init.min.js' %}"></script>
+    <script type="module" src="{% static 'js/dist/components.min.js' %}"></script>
+    <script type="module" src="{% static 'js/dist/main.min.js' %}"></script>
+    {% block scripts %}
+    {% endblock scripts %}
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+          crossorigin="anonymous" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="{% static 'css/dist/styles.min.css' %}" />
+    {% block head_extra %}
+    {% endblock head_extra %}
+  </head>
+  <body>
+    {% if messages %}
+      <script type="application/json" id="django-messages">
+      [{% for msg in messages %}{"type":"{{ msg.tags }}","message":"{{ msg.message|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}]
+      </script>
+    {% endif %}
+    <script type="application/json" id="rp-permissions">{{ rp_permissions_json|safe }}</script>
+    <div class="rp-app"
+         data-screen-label="{% block screen_label %}Home{% endblock screen_label %}">
+      <main class="rp-app-main">
+        <header class="rp-top">
+          <div class="rp-top-row1">
+            <div class="rp-top-brand">
+              <div class="rp-logo" id="rp-app-logo" data-app-logo>RP</div>
+              <div class="rp-top-brand-title" id="rp-app-name">
+                Resource<b>Planner</b>
+                <small id="rp-app-subtle"></small>
+              </div>
+            </div>
+            <page-breadcrumbs id="app-breadcrumbs"></page-breadcrumbs>
+            <div class="rp-top-spacer"></div>
+            <div class="rp-top-actions">
+              <search-field id="global-search" name="q"></search-field>
+              <sprint-pill id="active-sprint"></sprint-pill>
+              <theme-toggle></theme-toggle>
+              <div class="rp-iconbtn-wrap">
+                <button class="rp-iconbtn" title="Notifications">
+                <icon-field icon="bi-bell"></icon-field><span class="rp-count-pill">5</span>
+              </button>
+            </div>
+            <user-profile></user-profile>
+          </div>
+        </div>
+        <menu-bar id="app-menu-bar">
+          <menu-items>
+            <menu-item name="Dashboard" href="/dashboard" icon="bi-speedometer2"></menu-item>
+              <menu-group name="Organisation" icon="bi-diagram-3">
+                <menu-section label="People">
+                  {% if "teams.view_team" in rp_permissions %}
+                    <menu-item name="Teams" href="/teams" icon="bi-people"></menu-item>
+                    {% endif %}
+                    {% if "auth.view_user" in rp_permissions %}
+                      <menu-item name="Members" href="/members/" icon="bi-person-lines-fill"></menu-item>
+                      {% endif %}
+                    </menu-section>
+                    <menu-section label="Configurations">
+                      {% if "skills.view_skill" in rp_permissions %}
+                        <menu-item name="Skills" href="/skills" icon="bi-tools"></menu-item>
+                        {% endif %}
+                        {% if "roles.view_role" in rp_permissions %}
+                          <menu-item name="Roles" href="/roles" icon="bi-person-badge"></menu-item>
+                          {% endif %}
+                          {% if "locations.view_location" in rp_permissions %}
+                            <menu-item name="Locations" href="/locations" icon="bi-geo-alt"></menu-item>
+                            {% endif %}
+                            {% if "employment_types.view_employmenttype" in rp_permissions %}
+                              <menu-item name="Employment Types" href="/emp-types" icon="bi-briefcase"></menu-item>
+                              {% endif %}
+                            </menu-section>
+                          </menu-group>
+                        </menu-items>
+                      </menu-bar>
+                    </header>
+                    <fy-flash-banner id="fy-banner" type="warning" link-label="Open Financial Years" link-href="#" dismissable open>
+                    <banner-message>
+                    Financial Year <strong>FY25–26</strong> expires in <strong>14 days</strong>. Close out
+                    sprints and create FY26–27 before <span class="rp-mono">30 May 2026</span>.
+                    </banner-message>
+                    </fy-flash-banner>
+                    <div class="rp-page">
+                      <div class="rp-stack-8 mb-3">
+                        <flash-banner id="page-flash"></flash-banner>
+                      </div>
+                      <div class="rp-page-head">
+                        <div id="page-head-left">
+                          <div class="rp-eyebrow mb-1" id="page-eyebrow">
+                            {% block page_eyebrow %}
+                            {% endblock page_eyebrow %}
+                          </div>
+                          <h1 class="rp-page-title" id="page-title">
+                            {% block page_title %}
+                              Dashboard
+                            {% endblock page_title %}
+                          </h1>
+                          <p class="rp-page-sub" id="page-sub">
+                            {% block page_sub %}
+                            {% endblock page_sub %}
+                          </p>
+                        </div>
+                        <div class="rp-page-actions" id="page-actions">
+                          {% block page_actions %}
+                          {% endblock page_actions %}
+                        </div>
+                      </div>
+                      {% block content %}
+                      {% endblock content %}
+                    </div>
+                  </main>
+                </div>
+              </body>
+            </html>

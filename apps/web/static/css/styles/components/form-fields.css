@@ -620,3 +620,105 @@ textarea.rp-input {
     background: transparent;
   }
 }
+
+.rp-multiselect {
+  min-height: 36px;
+  padding: 4px 32px 4px 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  background: var(--rp-surface);
+  border: 1px solid var(--rp-border-strong);
+  border-radius: var(--rp-r-6);
+  cursor: text;
+  position: relative;
+}
+.rp-multiselect:focus-within {
+  border-color: var(--rp-accent);
+  box-shadow: var(--rp-shadow-focus);
+}
+.rp-multiselect::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2364748b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='4,6 8,10 12,6'/></svg>")
+    center/contain no-repeat;
+}
+.rp-ms-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--rp-accent-soft);
+  color: var(--rp-accent-soft-text);
+  border-radius: var(--rp-r-4);
+  padding: 2px 6px;
+  font-size: var(--rp-fs-12);
+  font-weight: 600;
+}
+.rp-ms-chip button {
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+.rp-ms-input {
+  flex: 1;
+  min-width: 60px;
+  border: 0;
+  outline: none;
+  background: none;
+  height: 26px;
+  color: var(--rp-text);
+  font: inherit;
+  font-size: var(--rp-fs-14);
+}
+
+.rp-multiselect.is-invalid {
+  border-color: var(--rp-danger);
+}
+.rp-multiselect.is-invalid:focus-within {
+  box-shadow: 0 0 0 3px oklch(0.58 0.2 25 / 0.18);
+}
+
+.rp-ms-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  background: var(--rp-bg-elev);
+  border: 1px solid var(--rp-border-strong);
+  border-radius: var(--rp-r-8);
+  box-shadow: var(--rp-shadow-lg);
+  z-index: 100;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.rp-ms-option {
+  padding: 8px 12px;
+  font-size: var(--rp-fs-14);
+  color: var(--rp-text);
+  cursor: pointer;
+  transition: background 0.08s;
+}
+.rp-ms-option:hover,
+.rp-ms-option.is-highlighted {
+  background: var(--rp-surface-hover);
+}
+.rp-ms-option--create {
+  color: var(--rp-accent);
+  font-weight: 500;
+}
+.rp-ms-empty {
+  padding: 12px;
+  font-size: var(--rp-fs-13);
+  color: var(--rp-text-muted);
+  text-align: center;
+}

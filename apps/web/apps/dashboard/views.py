@@ -1,5 +1,5 @@
-from apps.core.views import BaseView
+from apps.core.views import ProtectedView
 
 
-class DashboardView(BaseView):
+class DashboardView(ProtectedView):
     template_name = "dashboard/index.html"

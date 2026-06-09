@@ -191,4 +191,10 @@ class OAuthFlowService(ContextService):
             sso_provider=provider,
             sso_uid=info.sso_uid,
         )
+
+        if info.picture_url:
+            from apps.users.services import UserAvatarService
+
+            UserAvatarService().sync_from_url(user, info.picture_url)
+
         return user

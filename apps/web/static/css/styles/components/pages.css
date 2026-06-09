@@ -1,0 +1,59 @@
+.rp-page {
+  padding: 24px;
+  max-width: 100%;
+}
+
+/* Hide page-head helper elements when blocks are not overridden */
+#page-eyebrow:empty {
+  display: none;
+}
+#page-sub:empty {
+  display: none;
+}
+.rp-page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.rp-page-head .rp-page-title {
+  font-size: var(--rp-fs-24);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.rp-page-head .rp-page-sub {
+  font-size: var(--rp-fs-14);
+  color: var(--rp-text-muted);
+  margin-top: 4px;
+}
+.rp-page-head .rp-page-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .rp-page {
+    padding: 16px 12px;
+  }
+  .rp-page-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .rp-page-head .rp-page-actions {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .rp-page-head .rp-page-title {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 640px) {
+  .rp-page-head .rp-page-actions .rp-segment {
+    display: none;
+  }
+}

@@ -131,6 +131,13 @@
   --b-bg-h: oklch(0.52 0.2 25);
 }
 
+.rp-btn-deactivate {
+  --b-bg: oklch(0.68 0.15 25);
+  --b-fg: #fff;
+  --b-bd: oklch(0.68 0.15 25);
+  --b-bg-h: oklch(0.63 0.15 25);
+}
+
 .rp-btn-activate {
   --b-bg: var(--rp-success);
   --b-fg: #052914;
@@ -140,6 +147,13 @@
 
 [data-theme="dark"] .rp-btn-engine,
 [data-theme="dark"] .rp-btn-activate {
+  --b-fg: #0b0f12;
+}
+
+[data-theme="dark"] .rp-btn-deactivate {
+  --b-bg: oklch(0.78 0.13 25);
+  --b-bd: oklch(0.78 0.13 25);
+  --b-bg-h: oklch(0.73 0.13 25);
   --b-fg: #0b0f12;
 }
 
@@ -198,9 +212,35 @@
   justify-content: center;
 }
 
-rp-button-primary.w-100 > button,
-rp-button-secondary.w-100 > button,
-rp-button-muted.w-100 > button,
-rp-button-engine.w-100 > button {
+primary-button.w-100 > button,
+secondary-button.w-100 > button,
+muted-button.w-100 > button,
+engine-button.w-100 > button {
   width: 100%;
+}
+
+.rp-splitbtn {
+  display: inline-flex;
+  align-items: stretch;
+}
+.rp-splitbtn > .rp-btn:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.rp-splitbtn > .rp-btn-split {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left-width: 0;
+  padding: 0 8px;
+  min-width: 30px;
+}
+
+.rp-splitbtn-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.rp-splitbtn-wrap > .rp-dd-panel {
+  top: 100%;
+  left: auto;
+  right: 0;
 }

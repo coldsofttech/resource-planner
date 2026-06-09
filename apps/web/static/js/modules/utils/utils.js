@@ -82,10 +82,11 @@ export async function apiFetch(url, options = {}) {
   const config = {
     ...defaults,
     ...rest,
-    headers: {
-      ...defaults.headers,
-      ...(rest.headers || {}),
-    },
+    headers: Object.fromEntries(
+      Object.entries({ ...defaults.headers, ...(rest.headers || {}) }).filter(
+        ([, v]) => v !== undefined,
+      ),
+    ),
   };
   const res = await fetch(url, config);
 
@@ -102,4 +103,26 @@ export async function apiFetch(url, options = {}) {
   if (res.status === 204) return null;
 
   return res.json();
+}
+
+/**
+ * Format an ISO date string ("YYYY-MM-DD") or ISO datetime string as a
+ * localised date. Date-only strings are parsed as local midnight to avoid
+ * timezone-driven day shifts.
+ */
+export function formatDate(iso) {
+  if (!iso) return "—";
+  const d = iso.includes("T") ? new Date(iso) : new Date(iso + "T00:00:00");
+  return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}
+
+/**
+ * Format the updated_at / updated_by fields into a drawer footer meta string.
+ * Expects a row object with `updated_at` (ISO datetime) and optional
+ * `updated_by.email`.
+ */
+export function formatMeta(row) {
+  if (!row.updated_at) return "";
+  const by = row.updated_by?.email ?? "—";
+  return `Updated ${formatDate(row.updated_at)} · ${by}`;
 }

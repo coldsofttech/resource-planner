@@ -1,6 +1,6 @@
 import { apiFetch, snapshotButton, setBusyButton, restoreButton, setLink } from "../utils/utils.js";
-import { rpToast } from "../utils/toast.js";
-import { rpStatusModal } from "../utils/modal.js";
+import { toast } from "../utils/toast.js";
+import { statusModal } from "../utils/modal.js";
 import { API_URLS, UI_URLS } from "../main/urls.js";
 import {
   isAwsAccessKeyId,
@@ -12,7 +12,7 @@ import {
   isValidAppNameHtml,
 } from "../utils/validators.js";
 
-const wizard = document.querySelector("rp-wizard");
+const wizard = document.querySelector("step-wizard");
 
 if (wizard) {
   wizard.addEventListener("rp:finish", handleFinish);
@@ -49,7 +49,7 @@ async function handleFinish() {
 
   if (finishBtn) finishBtn.setAttribute("disabled", "");
 
-  rpStatusModal.open({
+  statusModal.open({
     iconType: "info",
     title: "Setting up Resource Planner…",
     body: "Your instance is being configured. This may take a moment.",
@@ -73,7 +73,7 @@ async function handleFinish() {
         const r = await apiFetch(statusHref, { method: statusMethod });
         if (polling) {
           const d = r?.data ?? {};
-          rpStatusModal.update({
+          statusModal.update({
             additionalBody: renderSteps(d.steps, d.current_step, d.status),
           });
         }
@@ -102,10 +102,10 @@ async function handleFinish() {
     try {
       const r = await apiFetch(statusHref, { method: statusMethod });
       const d = r?.data ?? {};
-      rpStatusModal.update({ additionalBody: renderSteps(d.steps, null, "complete") });
+      statusModal.update({ additionalBody: renderSteps(d.steps, null, "complete") });
     } catch {}
 
-    rpStatusModal.update({
+    statusModal.update({
       iconType: "success",
       title: "Setup complete!",
       body: "Resource Planner is ready to use.",
@@ -121,7 +121,7 @@ async function handleFinish() {
     polling = false;
     if (finishBtn) finishBtn.removeAttribute("disabled");
 
-    rpStatusModal.update({
+    statusModal.update({
       iconType: "error",
       title: "Setup failed",
       body: err?.data?.message ?? "An error occurred. Please review your settings and try again.",
@@ -475,7 +475,7 @@ async function setupGenKeyButton() {
       restoreButton(btn, snapshot);
     } catch {
       restoreButton(btn, snapshot);
-      rpToast({ type: "error", title: "Key generation failed", message: "Please try again." });
+      toast({ type: "error", title: "Key generation failed", message: "Please try again." });
     }
   });
 }
@@ -545,10 +545,10 @@ async function handleDbTest() {
       suffixIcon: "bi-check-circle-fill",
     });
     setTimeout(() => restoreButton(btn, snapshot), 3000);
-    rpToast({ type: "success", title: "Connection successful", message: "Database is reachable." });
+    toast({ type: "success", title: "Connection successful", message: "Database is reachable." });
   } catch (err) {
     restoreButton(btn, snapshot);
-    rpToast({
+    toast({
       type: "error",
       title: "Connection failed",
       message: err?.data?.message ?? "Check your connection details and try again.",
@@ -756,14 +756,14 @@ async function handleEmailTest() {
       suffixIcon: "bi-check-circle-fill",
     });
     setTimeout(() => restoreButton(btn, snapshot), 3000);
-    rpToast({
+    toast({
       type: "success",
       title: "Test email sent",
       message: "Check your inbox or server console.",
     });
   } catch (err) {
     restoreButton(btn, snapshot);
-    rpToast({
+    toast({
       type: "error",
       title: "Test failed",
       message: err?.data?.message ?? "Check your SMTP settings and try again.",
@@ -801,14 +801,14 @@ async function handleSAMLTest() {
       suffixIcon: "bi-check-circle-fill",
     });
     setTimeout(() => restoreButton(btn, snapshot), 3000);
-    rpToast({
+    toast({
       type: "success",
       title: "Connection successful",
       message: "SAML IdP is reachable and the certificate is valid.",
     });
   } catch (err) {
     restoreButton(btn, snapshot);
-    rpToast({
+    toast({
       type: "error",
       title: "Connection failed",
       message: err?.data?.message ?? "Check your IdP SSO URL and certificate and try again.",
@@ -854,14 +854,14 @@ async function handleOAuthTest() {
       suffixIcon: "bi-check-circle-fill",
     });
     setTimeout(() => restoreButton(btn, snapshot), 3000);
-    rpToast({
+    toast({
       type: "success",
       title: "Connection successful",
       message: "OAuth endpoints are reachable.",
     });
   } catch (err) {
     restoreButton(btn, snapshot);
-    rpToast({
+    toast({
       type: "error",
       title: "Connection failed",
       message: err?.data?.message ?? "Check your endpoints and client credentials and try again.",

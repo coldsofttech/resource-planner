@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Skills
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/skills.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Configurations
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Skills
+{% endblock page_title %}
+{% block page_sub %}
+  Manage engineer skill sets for your organisation.
+{% endblock page_sub %}
+{% block page_actions %}
+  <secondary-button id="rp-skills-import-btn" label="Import" prefix-icon="bi-upload" hidden></secondary-button>
+  <secondary-button id="rp-skills-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+  <primary-button id="rp-skills-add-btn" label="Add Skill" prefix-icon="bi-plus-lg" hidden></primary-button>
+{% endblock page_actions %}
+{% block content %}
+  <list-view show-active-filters>
+  <filter-panel id="rp-skills-filter-panel">
+  <search-field id="rp-skills-search" name="search" placeholder="Search skills..." shortcut="/" show-label></search-field>
+  <is-active-field id="rp-skills-status" name="is_active" value="true" show-label></is-active-field>
+  </filter-panel>
+  <data-table id="rp-skills-table" url="/api/v1/skills/" paginated page-size="25" row-template="renderSkillsRow" empty-message="No skills found.">
+    <table-columns>
+      <table-column label="Skill" key="skill" sortable>
+      </table-column>
+      <table-column label="Code" key="code" mono width="130px" hide-mobile>
+      </table-column>
+      <table-column label="Description" key="description" hide-mobile>
+      </table-column>
+      <table-column label="Status" key="is_active">
+      </table-column>
+      <table-column label="Created" key="created_at" hide-mobile sortable>
+      </table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_skill %}
+        <table-action icon="bi-pencil" label="Edit" event="rp:skill:edit">
+        </table-action>
+        <table-action icon="bi-toggle-on" label="Toggle" event="rp:skill:toggle" color-key="is_active">
+        </table-action>
+      {% endif %}
+      {% if can_delete_skill %}
+        <table-action icon="bi-trash" label="Delete" event="rp:skill:delete" danger>
+        </table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </list-view>
+  <!-- Create drawer -->
+  <drawer-modal id="rp-skill-create-drawer" width="900">
+  <drawer-header eyebrow="New record" title="Create skill" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-new-skill-skill" col="col-12" label="Skill name" placeholder="e.g. Python" required maxlength="20" show-counter></text-field>
+    <text-field id="rp-new-skill-desc" col="col-12" label="Description" placeholder="Brief description of this skill" cols="3"></text-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Create skill" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <!-- Edit drawer -->
+  <drawer-modal id="rp-skill-edit-drawer" width="900">
+  <drawer-header eyebrow="Edit record" title="Edit skill" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-edit-skill-skill" col="col-12" label="Skill name" placeholder="e.g. Python" required maxlength="20" show-counter></text-field>
+    <text-field id="rp-edit-skill-desc" col="col-12" label="Description" placeholder="Brief description of this skill" cols="3"></text-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <!-- View drawer -->
+  <drawer-modal id="rp-skill-view-drawer" width="900">
+  <drawer-header eyebrow="Skill details" title="View skill" no-sizes></drawer-header>
+  <drawer-panel>
+  <view-field id="rp-view-skill-skill" label="Skill"></view-field>
+  <view-field id="rp-view-skill-code" label="Code" code></view-field>
+  <view-field id="rp-view-skill-status" label="Status"></view-field>
+  <view-field id="rp-view-skill-desc" label="Description" desc></view-field>
+  <view-field id="rp-view-skill-created" label="Created" meta></view-field>
+  <view-field id="rp-view-skill-created-by" label="Created by" meta></view-field>
+  </drawer-panel>
+  <drawer-footer close="Close"
+  {% if  can_change_skill %}primary="Edit skill"  primary-icon="bi-pencil"{% endif %}
+  ></drawer-footer>
+  </drawer-modal>
+  <delete-modal id="rp-skill-delete-modal" action-label="Delete skill"></delete-modal>
+  <activate-modal id="rp-skill-activate-modal"></activate-modal>
+  <deactivate-modal id="rp-skill-deactivate-modal"></deactivate-modal>
+  <import-view id="rp-skills-import-view" title="Import Skills" eyebrow="Skills"></import-view>
+  <export-view id="rp-skills-export-view" title="Export Skills" eyebrow="Skills" active-filter-id="rp-skills-filter-panel"></export-view>
+{% endblock content %}
