@@ -68,4 +68,9 @@ urlpatterns = [
         RoleViewSet.as_view({"post": "set_default"}),
         name="roles-set-default",
     ),
+    path(
+        "roles/<str:code>/members/",
+        RoleViewSet.as_view({"get": "members"}),
+        name="roles-members",
+    ),
 ]

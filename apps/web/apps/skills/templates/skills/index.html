@@ -75,21 +75,6 @@
   </drawer-panel>
   <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
   </drawer-modal>
-  <!-- View drawer -->
-  <drawer-modal id="rp-skill-view-drawer" width="900">
-  <drawer-header eyebrow="Skill details" title="View skill" no-sizes></drawer-header>
-  <drawer-panel>
-  <view-field id="rp-view-skill-skill" label="Skill"></view-field>
-  <view-field id="rp-view-skill-code" label="Code" code></view-field>
-  <view-field id="rp-view-skill-status" label="Status"></view-field>
-  <view-field id="rp-view-skill-desc" label="Description" desc></view-field>
-  <view-field id="rp-view-skill-created" label="Created" meta></view-field>
-  <view-field id="rp-view-skill-created-by" label="Created by" meta></view-field>
-  </drawer-panel>
-  <drawer-footer close="Close"
-  {% if  can_change_skill %}primary="Edit skill"  primary-icon="bi-pencil"{% endif %}
-  ></drawer-footer>
-  </drawer-modal>
   <delete-modal id="rp-skill-delete-modal" action-label="Delete skill"></delete-modal>
   <activate-modal id="rp-skill-activate-modal"></activate-modal>
   <deactivate-modal id="rp-skill-deactivate-modal"></deactivate-modal>

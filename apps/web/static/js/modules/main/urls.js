@@ -13,21 +13,35 @@ export const UI_URLS = {
   },
   teams: {
     list: () => "/teams/",
+    detail: (code) => `/teams/${code}/`,
   },
   skills: {
     list: () => "/skills/",
+    detail: (code) => `/skills/${code}/`,
   },
   roles: {
     list: () => "/roles/",
+    detail: (code) => `/roles/${code}/`,
   },
   locations: {
     list: () => "/locations/",
+    detail: (code) => `/locations/${code}/`,
   },
   empTypes: {
     list: () => "/emp-types/",
+    detail: (code) => `/emp-types/${code}/`,
+  },
+  holidays: {
+    list: () => "/holidays/",
+  },
+  leaves: {
+    list: () => "/leaves/",
   },
   members: {
     list: () => "/members/",
+  },
+  fy: {
+    list: () => "/fy/",
   },
 };
 
@@ -85,6 +99,7 @@ export const API_URLS = {
     import: () => ({ method: "POST", href: `${API_BASE}teams/import/` }),
     exportSpecs: () => ({ method: "GET", href: `${API_BASE}teams/export/specs/` }),
     export: () => ({ method: "GET", href: `${API_BASE}teams/export/` }),
+    members: (code) => ({ method: "GET", href: `${API_BASE}teams/${code}/members/` }),
   },
   skills: {
     list: () => ({ method: "GET", href: `${API_BASE}skills/` }),
@@ -101,6 +116,7 @@ export const API_URLS = {
     import: () => ({ method: "POST", href: `${API_BASE}skills/import/` }),
     exportSpecs: () => ({ method: "GET", href: `${API_BASE}skills/export/specs/` }),
     export: () => ({ method: "GET", href: `${API_BASE}skills/export/` }),
+    members: (code) => ({ method: "GET", href: `${API_BASE}skills/${code}/members/` }),
   },
   roles: {
     list: () => ({ method: "GET", href: `${API_BASE}roles/` }),
@@ -118,6 +134,7 @@ export const API_URLS = {
     import: () => ({ method: "POST", href: `${API_BASE}roles/import/` }),
     exportSpecs: () => ({ method: "GET", href: `${API_BASE}roles/export/specs/` }),
     export: () => ({ method: "GET", href: `${API_BASE}roles/export/` }),
+    members: (code) => ({ method: "GET", href: `${API_BASE}roles/${code}/members/` }),
   },
   locations: {
     list: () => ({ method: "GET", href: `${API_BASE}locations/` }),
@@ -135,6 +152,7 @@ export const API_URLS = {
     import: () => ({ method: "POST", href: `${API_BASE}locations/import/` }),
     exportSpecs: () => ({ method: "GET", href: `${API_BASE}locations/export/specs/` }),
     export: () => ({ method: "GET", href: `${API_BASE}locations/export/` }),
+    members: (code) => ({ method: "GET", href: `${API_BASE}locations/${code}/members/` }),
   },
   empTypes: {
     list: () => ({ method: "GET", href: `${API_BASE}emp-types/` }),
@@ -152,6 +170,34 @@ export const API_URLS = {
     import: () => ({ method: "POST", href: `${API_BASE}emp-types/import/` }),
     exportSpecs: () => ({ method: "GET", href: `${API_BASE}emp-types/export/specs/` }),
     export: () => ({ method: "GET", href: `${API_BASE}emp-types/export/` }),
+    members: (code) => ({ method: "GET", href: `${API_BASE}emp-types/${code}/members/` }),
+  },
+  holidays: {
+    list: () => ({ method: "GET", href: `${API_BASE}holidays/` }),
+    options: () => ({ method: "GET", href: `${API_BASE}holidays/options/` }),
+    create: () => ({ method: "POST", href: `${API_BASE}holidays/` }),
+    stats: () => ({ method: "GET", href: `${API_BASE}holidays/stats/` }),
+    detail: (code) => ({ method: "GET", href: `${API_BASE}holidays/${code}/` }),
+    update: (code) => ({ method: "PATCH", href: `${API_BASE}holidays/${code}/` }),
+    delete: (code) => ({ method: "DELETE", href: `${API_BASE}holidays/${code}/` }),
+    importSpecs: () => ({ method: "GET", href: `${API_BASE}holidays/import/specs/` }),
+    importSample: () => ({ method: "GET", href: `${API_BASE}holidays/import/sample/` }),
+    import: () => ({ method: "POST", href: `${API_BASE}holidays/import/` }),
+    exportSpecs: () => ({ method: "GET", href: `${API_BASE}holidays/export/specs/` }),
+    export: () => ({ method: "GET", href: `${API_BASE}holidays/export/` }),
+  },
+  leaves: {
+    list: () => ({ method: "GET", href: `${API_BASE}leaves/` }),
+    create: () => ({ method: "POST", href: `${API_BASE}leaves/` }),
+    stats: () => ({ method: "GET", href: `${API_BASE}leaves/stats/` }),
+    detail: (code) => ({ method: "GET", href: `${API_BASE}leaves/${code}/` }),
+    update: (code) => ({ method: "PATCH", href: `${API_BASE}leaves/${code}/` }),
+    delete: (code) => ({ method: "DELETE", href: `${API_BASE}leaves/${code}/` }),
+    importSpecs: () => ({ method: "GET", href: `${API_BASE}leaves/import/specs/` }),
+    importSample: () => ({ method: "GET", href: `${API_BASE}leaves/import/sample/` }),
+    import: () => ({ method: "POST", href: `${API_BASE}leaves/import/` }),
+    exportSpecs: () => ({ method: "GET", href: `${API_BASE}leaves/export/specs/` }),
+    export: () => ({ method: "GET", href: `${API_BASE}leaves/export/` }),
   },
   members: {
     list: () => ({ method: "GET", href: `${API_BASE}members/` }),
@@ -160,6 +206,25 @@ export const API_URLS = {
     update: (code) => ({ method: "PATCH", href: `${API_BASE}members/${code}/` }),
     exportSpecs: () => ({ method: "GET", href: `${API_BASE}members/export/specs/` }),
     export: () => ({ method: "GET", href: `${API_BASE}members/export/` }),
+    assignTeam: (code) => ({ method: "POST", href: `${API_BASE}members/${code}/assign-team/` }),
+  },
+  fy: {
+    list: () => ({ method: "GET", href: `${API_BASE}fy/` }),
+    create: () => ({ method: "POST", href: `${API_BASE}fy/` }),
+    stats: () => ({ method: "GET", href: `${API_BASE}fy/stats/` }),
+    options: () => ({ method: "GET", href: `${API_BASE}fy/options/` }),
+    active: () => ({ method: "GET", href: `${API_BASE}fy/active/` }),
+    detail: (code) => ({ method: "GET", href: `${API_BASE}fy/${code}/` }),
+    update: (code) => ({ method: "PATCH", href: `${API_BASE}fy/${code}/` }),
+    delete: (code) => ({ method: "DELETE", href: `${API_BASE}fy/${code}/` }),
+    activate: (code) => ({ method: "POST", href: `${API_BASE}fy/${code}/activate/` }),
+    deactivate: (code) => ({ method: "POST", href: `${API_BASE}fy/${code}/deactivate/` }),
+    setActive: (code) => ({ method: "POST", href: `${API_BASE}fy/${code}/set-active/` }),
+    importSpecs: () => ({ method: "GET", href: `${API_BASE}fy/import/specs/` }),
+    importSample: () => ({ method: "GET", href: `${API_BASE}fy/import/sample/` }),
+    import: () => ({ method: "POST", href: `${API_BASE}fy/import/` }),
+    exportSpecs: () => ({ method: "GET", href: `${API_BASE}fy/export/specs/` }),
+    export: () => ({ method: "GET", href: `${API_BASE}fy/export/` }),
   },
   setup: {
     defaults: () => ({ method: "GET", href: `${API_BASE}setup/` }),

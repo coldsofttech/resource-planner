@@ -16,6 +16,8 @@ from apps.employment_types.services import (
     EmploymentTypeImportService,
     EmploymentTypeService,
 )
+from apps.users.serializers import MemberMiniListSerializer
+from apps.users.services import MembersService
 
 
 class EmploymentTypeViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
@@ -83,6 +85,7 @@ class EmploymentTypeViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewS
             "import_bulk": "employment_types.import_employmenttype",
             "export_specs": "employment_types.export_employmenttype",
             "export": "employment_types.export_employmenttype",
+            "members": "employment_types.view_employmenttype",
         }
         perm = action_perms.get(self.action)
         if perm:
@@ -263,4 +266,24 @@ class EmploymentTypeViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewS
             data=data,
             message=self.get_set_default_custom_message(),
             status_code=self.get_set_default_status_code(),
+        )
+
+    @extend_schema(
+        summary="List employment type members",
+        description="Returns a paginated list of members with this employment type.",
+        responses={
+            200: MemberMiniListSerializer(many=True),
+            404: OpenApiResponse(description="Employment type not found."),
+        },
+    )
+    def members(self, request: Request, code=None):
+        """GET /emp-types/<code>/members/"""
+        self.service.get(code=code)
+        svc = MembersService(user=request.user, request=request)
+        params = self.get_list_params(request)
+        params.filters["employment_type"] = code
+        result = svc.list(params=params)
+        return self.paginated_response(
+            result=result,
+            serializer_class=MemberMiniListSerializer,
         )

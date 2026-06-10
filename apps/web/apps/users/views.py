@@ -21,4 +21,5 @@ class MembersView(ProtectedView):
         ctx["can_view_members"] = "auth.view_user" in perms
         ctx["can_change_workforce"] = "users.change_user_workforce" in perms
         ctx["can_export_members"] = "users.export_member" in perms
+        ctx["can_assign_team"] = "teams.assign_team" in perms
         return ctx

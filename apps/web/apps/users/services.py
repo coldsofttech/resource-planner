@@ -527,6 +527,8 @@ class UserProfileService(ContextService):
                 aws_secret_key=os.environ.get("AWS_SECRET_ACCESS_KEY", ""),
             )
             return data, content_type
+        except FileNotFoundError:
+            return None
         except Exception:
             logger.warning(
                 "Could not retrieve avatar for user %s.", self.user.pk, exc_info=True
@@ -566,6 +568,8 @@ class MembersService(FilterableQueryService):
         "role": "role__code",
         "employment_type": "employment_type__code",
         "location": "location__code",
+        "team": "user__team_assignments__team__code",
+        "skill": "skills__code",
     }
     search_fields: list[str] = [
         "user__first_name",
@@ -595,7 +599,10 @@ class MembersService(FilterableQueryService):
             qs = qs.filter(user__is_active=False)
         else:
             qs = qs.filter(user__is_active=True)
-        return super().apply_filters(qs, filters)
+        qs = super().apply_filters(qs, filters)
+        if filters.get("team") or filters.get("skill"):
+            qs = qs.distinct()
+        return qs
 
     def get(self, code: str) -> UserProfile:
         from apps.core.exceptions import NotFoundException

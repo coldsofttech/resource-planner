@@ -64,6 +64,7 @@ class Breadcrumbs extends HTMLElement {
     const labelOverrides = {
       "emp-types": "Employment Types",
       profile: "Profile",
+      fy: "Financial Years",
     };
 
     segments.forEach((seg, i) => {

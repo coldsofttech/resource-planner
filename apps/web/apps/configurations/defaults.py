@@ -219,6 +219,21 @@ _EMAIL_DEFAULTS = {
 }
 
 
+_FINANCIAL_YEAR_DEFAULTS = {
+    "FY_EXPIRY_WARNING_DAYS": {
+        "label": "FY Expiry Warning Days",
+        "value": "30",
+        "description": (
+            "Number of days before the active financial year's end date at which a "
+            "warning banner is shown at the top of every page."
+        ),
+        "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "financial_year",
+    },
+}
+
 _HOLIDAYS_DEFAULTS = {
     "DEFAULT_HOLIDAYS": {
         "label": "Default Holidays",
@@ -242,5 +257,6 @@ CONFIGURATION_DEFAULTS = {
     **_AUTH_DEFAULTS,
     **_INFRA_DEFAULTS,
     **_EMAIL_DEFAULTS,
+    **_FINANCIAL_YEAR_DEFAULTS,
     **_HOLIDAYS_DEFAULTS,
 }

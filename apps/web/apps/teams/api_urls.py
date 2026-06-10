@@ -63,4 +63,9 @@ urlpatterns = [
         TeamViewSet.as_view({"post": "deactivate"}),
         name="teams-deactivate",
     ),
+    path(
+        "teams/<str:code>/members/",
+        TeamViewSet.as_view({"get": "members"}),
+        name="teams-members",
+    ),
 ]

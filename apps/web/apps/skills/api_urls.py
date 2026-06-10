@@ -63,4 +63,9 @@ urlpatterns = [
         SkillViewSet.as_view({"post": "deactivate"}),
         name="skills-deactivate",
     ),
+    path(
+        "skills/<str:code>/members/",
+        SkillViewSet.as_view({"get": "members"}),
+        name="skills-members",
+    ),
 ]

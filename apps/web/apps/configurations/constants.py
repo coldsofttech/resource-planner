@@ -15,3 +15,4 @@ class Module(models.TextChoices):
     INFRA = "infra", "Infrastructure"
     EMAIL = "email", "Email"
     HOLIDAYS = "holidays", "Holidays"
+    FINANCIAL_YEAR = "financial_year", "Financial Year"

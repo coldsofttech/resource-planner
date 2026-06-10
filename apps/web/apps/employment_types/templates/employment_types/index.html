@@ -75,24 +75,6 @@
   </drawer-panel>
   <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
   </drawer-modal>
-  <!-- View drawer -->
-  <drawer-modal id="rp-emp-type-view-drawer" width="900">
-  <drawer-header eyebrow="Employment type details" title="View employment type" no-sizes>
-  <span id="rp-view-emp-type-default-badge"
-        class="rp-badge rp-badge-soft rp-badge-success"
-        hidden>Default</span>
-  </drawer-header>
-  <drawer-panel>
-  <view-field id="rp-view-emp-type-name" label="Name"></view-field>
-  <view-field id="rp-view-emp-type-code" label="Code" code></view-field>
-  <view-field id="rp-view-emp-type-status" label="Status"></view-field>
-  <view-field id="rp-view-emp-type-created" label="Created" meta></view-field>
-  <view-field id="rp-view-emp-type-created-by" label="Created by" meta></view-field>
-  </drawer-panel>
-  <drawer-footer close="Close"
-  {% if  can_change_employment_type %}primary="Edit employment type"  primary-icon="bi-pencil"{% endif %}
-  ></drawer-footer>
-  </drawer-modal>
   <delete-modal id="rp-emp-type-delete-modal" action-label="Delete employment type"></delete-modal>
   <activate-modal id="rp-emp-type-activate-modal"></activate-modal>
   <deactivate-modal id="rp-emp-type-deactivate-modal"></deactivate-modal>

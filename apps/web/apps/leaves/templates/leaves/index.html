@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Leaves
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/leaves.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Holidays
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Leaves
+{% endblock page_title %}
+{% block page_sub %}
+  Track and manage time-off records for members across your organisation.
+{% endblock page_sub %}
+{% block page_actions %}
+  <secondary-button id="rp-leaves-import-btn" label="Import" prefix-icon="bi-upload" hidden></secondary-button>
+  <secondary-button id="rp-leaves-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+  <primary-button id="rp-leaves-add-btn" label="Add Leave" prefix-icon="bi-plus-lg" hidden></primary-button>
+{% endblock page_actions %}
+{% block content %}
+  <list-view show-active-filters>
+  <filter-panel id="rp-leaves-filter-panel">
+  <search-field id="rp-leaves-search" name="search" placeholder="Search leaves..." shortcut="/" show-label></search-field>
+  <member-field id="rp-leaves-member" name="member" col="col-auto" allow-all show-label></member-field>
+  </filter-panel>
+  <data-table id="rp-leaves-table" url="/api/v1/leaves/" paginated page-size="25" row-template="renderLeavesRow" empty-message="No leaves found.">
+    <table-columns>
+      <table-column label="Member" key="member">
+      </table-column>
+      <table-column label="Start Date" key="start_date" sortable>
+      </table-column>
+      <table-column label="End Date" key="end_date" sortable hide-mobile>
+      </table-column>
+      <table-column label="Days" key="days" sortable width="90px" hide-mobile>
+      </table-column>
+      <table-column label="Type" key="is_half_day" hide-mobile>
+      </table-column>
+      <table-column label="Code" key="code" mono width="130px" hide-mobile>
+      </table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_leave %}
+        <table-action icon="bi-pencil" label="Edit" event="rp:leave:edit">
+        </table-action>
+      {% endif %}
+      {% if can_delete_leave %}
+        <table-action icon="bi-trash" label="Delete" event="rp:leave:delete" danger>
+        </table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </list-view>
+  <!-- Create drawer -->
+  <drawer-modal id="rp-leave-create-drawer" width="900">
+  <drawer-header eyebrow="New record" title="Add leave" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <member-field id="rp-new-leave-member" col="col-12" label="Member" required></member-field>
+    <date-field id="rp-new-leave-start-date" col="col-md-6" label="Start Date" required></date-field>
+    <date-field id="rp-new-leave-end-date" col="col-md-6" label="End Date" required></date-field>
+    <toggle-field id="rp-new-leave-is-half-day" col="col-12" label="Half Day"></toggle-field>
+    <dropdown-field id="rp-new-leave-half-day-period" col="col-md-6" label="Half Day Period" placeholder="Select period...">
+      <values-list>
+        <value id="AM" label="Morning (AM)">Morning (AM)</value>
+        <value id="PM" label="Afternoon (PM)">Afternoon (PM)</value>
+      </values-list>
+    </dropdown-field>
+    <text-field id="rp-new-leave-note" col="col-12" cols="3" label="Note" placeholder="Optional note..." maxlength="500" show-counter></text-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Add leave" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <!-- Edit drawer -->
+  <drawer-modal id="rp-leave-edit-drawer" width="900">
+  <drawer-header eyebrow="Edit record" title="Edit leave" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <view-field id="rp-edit-leave-member" col="col-12" label="Member"></view-field>
+    <date-field id="rp-edit-leave-start-date" col="col-md-6" label="Start Date" required></date-field>
+    <date-field id="rp-edit-leave-end-date" col="col-md-6" label="End Date" required></date-field>
+    <toggle-field id="rp-edit-leave-is-half-day" col="col-12" label="Half Day"></toggle-field>
+    <dropdown-field id="rp-edit-leave-half-day-period" col="col-md-6" label="Half Day Period" placeholder="Select period...">
+      <values-list>
+        <value id="AM" label="Morning (AM)"></value>
+        <value id="PM" label="Afternoon (PM)"></value>
+      </values-list>
+    </dropdown-field>
+    <text-field id="rp-edit-leave-note" col="col-12" cols="3" label="Note" placeholder="Optional note..." maxlength="500" show-counter></text-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <!-- View drawer -->
+  <drawer-modal id="rp-leave-view-drawer" width="900">
+  <drawer-header eyebrow="Leave" title="Leave" no-sizes></drawer-header>
+  <drawer-panel>
+  <view-field id="rp-view-leave-member" label="Member"></view-field>
+  <view-field id="rp-view-leave-start-date" label="Start Date"></view-field>
+  <view-field id="rp-view-leave-end-date" label="End Date"></view-field>
+  <view-field id="rp-view-leave-days" label="Days"></view-field>
+  <view-field id="rp-view-leave-type" label="Type"></view-field>
+  <view-field id="rp-view-leave-note" label="Note"></view-field>
+  <view-field id="rp-view-leave-code" label="Code" code></view-field>
+  <view-field id="rp-view-leave-created" label="Created" meta></view-field>
+  <view-field id="rp-view-leave-created-by" label="Created by" meta></view-field>
+  </drawer-panel>
+  <drawer-footer close="Close"
+  {% if can_change_leave %}primary="Edit leave" primary-icon="bi-pencil"{% endif %}
+  ></drawer-footer>
+  </drawer-modal>
+  <delete-modal id="rp-leave-delete-modal" action-label="Delete leave"></delete-modal>
+  <import-view id="rp-leaves-import-view" title="Import Leaves" eyebrow="Leaves"></import-view>
+  <export-view id="rp-leaves-export-view" title="Export Leaves" eyebrow="Leaves" active-filter-id="rp-leaves-filter-panel"></export-view>
+{% endblock content %}

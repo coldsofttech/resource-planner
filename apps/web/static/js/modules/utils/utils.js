@@ -117,6 +117,21 @@ export function formatDate(iso) {
 }
 
 /**
+ * Format an ISO datetime string as a localised date + time (medium date, short time).
+ */
+export function formatDateTime(iso) {
+  if (!iso) return "—";
+  try {
+    return new Intl.DateTimeFormat(undefined, {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(new Date(iso));
+  } catch {
+    return iso;
+  }
+}
+
+/**
  * Format the updated_at / updated_by fields into a drawer footer meta string.
  * Expects a row object with `updated_at` (ISO datetime) and optional
  * `updated_by.email`.

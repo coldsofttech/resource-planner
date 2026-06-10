@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Role
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/role-detail.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Role
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <span id="rp-role-detail-title">Role</span>
+{% endblock page_title %}
+{% block content %}
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <section-panel>
+        <panel-body>
+          <view-field id="rp-role-detail-name" label="Role Name"></view-field>
+          <view-field id="rp-role-detail-code" label="Code" code></view-field>
+          <view-field id="rp-role-detail-status" label="Status"></view-field>
+          <view-field id="rp-role-detail-assignable" label="Assignable"></view-field>
+          <view-field id="rp-role-detail-leadership" label="Leadership"></view-field>
+          <view-field id="rp-role-detail-created" label="Created" meta></view-field>
+          <view-field id="rp-role-detail-created-by" label="Created by" meta></view-field>
+        </panel-body>
+      </section-panel>
+    </div>
+    <div id="rp-role-members-col" class="col-lg-8" hidden>
+      <section-panel>
+        <panel-title>Members</panel-title>
+        <panel-body>
+          <data-table id="rp-role-members-table"
+                      url="/api/v1/roles/{{ role_code }}/members/"
+                      paginated
+                      page-size="25"
+                      row-template="renderRoleMembersRow"
+                      empty-message="No members are assigned to this role.">
+            <table-columns>
+              <table-column width="44px">
+              </table-column>
+              <table-column label="Name" key="display_name" sortable>
+              </table-column>
+              <table-column label="Email" key="email" hide-mobile sortable>
+              </table-column>
+              <table-column label="Location" key="location" hide-mobile>
+              </table-column>
+              <table-column label="Employment Type" key="employment_type" hide-mobile>
+              </table-column>
+            </table-columns>
+          </data-table>
+        </panel-body>
+      </section-panel>
+    </div>
+  </div>
+{% endblock content %}

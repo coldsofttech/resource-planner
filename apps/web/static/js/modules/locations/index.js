@@ -1,1 +1,2 @@
-import "./locations.js";
+import "./detail.js";
+import "./list.js";

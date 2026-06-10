@@ -12,6 +12,8 @@ from apps.teams.serializers import (
     TeamUpdateSerializer,
 )
 from apps.teams.services import TeamExportService, TeamImportService, TeamService
+from apps.users.serializers import MemberMiniListSerializer
+from apps.users.services import MembersService
 
 
 class TeamViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
@@ -68,6 +70,7 @@ class TeamViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
         action_perms = {
             "list": "teams.view_team",
             "retrieve": "teams.view_team",
+            "members": "teams.view_team",
             "create": "teams.add_team",
             "partial_update": "teams.change_team",
             "destroy": "teams.delete_team",
@@ -227,4 +230,24 @@ class TeamViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
             data=data,
             message=self.get_deactivate_custom_message(),
             status_code=self.get_deactivate_status_code(),
+        )
+
+    @extend_schema(
+        summary="List team members",
+        description="Returns a paginated list of members assigned to the team.",
+        responses={
+            200: MemberMiniListSerializer(many=True),
+            404: OpenApiResponse(description="Team not found."),
+        },
+    )
+    def members(self, request: Request, code=None):
+        """GET /teams/<code>/members/"""
+        self.service.get(code=code)
+        svc = MembersService(user=request.user, request=request)
+        params = self.get_list_params(request)
+        params.filters["team"] = code
+        result = svc.list(params=params)
+        return self.paginated_response(
+            result=result,
+            serializer_class=MemberMiniListSerializer,
         )

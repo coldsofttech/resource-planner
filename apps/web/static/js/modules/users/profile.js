@@ -1,23 +1,17 @@
 "use strict";
 
-import { apiFetch, snapshotButton, setBusyButton, restoreButton } from "../utils/utils.js";
+import {
+  apiFetch,
+  snapshotButton,
+  setBusyButton,
+  restoreButton,
+  formatDateTime,
+} from "../utils/utils.js";
 import { toast } from "../utils/toast.js";
 import { API_URLS } from "../main/urls.js";
 import { esc } from "../../components/utils.js";
 
 let profileData = null;
-
-function formatDateTime(iso) {
-  if (!iso) return "—";
-  try {
-    return new Intl.DateTimeFormat(undefined, {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }).format(new Date(iso));
-  } catch {
-    return iso;
-  }
-}
 
 function setFieldValue(id, value) {
   const el = document.getElementById(id);

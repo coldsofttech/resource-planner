@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Financial Years
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/financial-years.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Planning
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Financial Years
+{% endblock page_title %}
+{% block page_sub %}
+  Manage financial year periods and their lifecycle status.
+{% endblock page_sub %}
+{% block page_actions %}
+  <secondary-button id="rp-fys-import-btn" label="Import" prefix-icon="bi-upload" hidden></secondary-button>
+  <secondary-button id="rp-fys-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+  <primary-button id="rp-fys-add-btn" label="Add Financial Year" prefix-icon="bi-plus-lg" hidden></primary-button>
+{% endblock page_actions %}
+{% block content %}
+  <list-view show-active-filters>
+  <filter-panel id="rp-fys-filter-panel">
+  <search-field id="rp-fys-search" name="search" placeholder="Search financial years..." shortcut="/" show-label></search-field>
+  <fy-status-field id="rp-fys-status" col="col-auto" name="status" label="Status" allow-all show-label></fy-status-field>
+  <is-active-field id="rp-fys-active" col="col-auto" name="is_active" value="true" show-label></is-active-field>
+  </filter-panel>
+  <data-table id="rp-fys-table" url="/api/v1/fy/" paginated page-size="25" row-template="renderFinancialYearsRow" empty-message="No financial years found.">
+    <table-columns>
+      <table-column label="Financial Year" key="long_fy" sortable>
+      </table-column>
+      <table-column label="Short" key="short_fy" hide-mobile>
+      </table-column>
+      <table-column label="Code" key="code" mono width="110px" hide-mobile>
+      </table-column>
+      <table-column label="Start Date" key="start_date" sortable hide-mobile>
+      </table-column>
+      <table-column label="End Date" key="end_date" sortable hide-mobile>
+      </table-column>
+      <table-column label="Span (Days)" key="span_days" sortable hide-mobile>
+      </table-column>
+      <table-column label="Status" key="status">
+      </table-column>
+      <table-column label="Active" key="is_active" hide-mobile>
+      </table-column>
+      <table-column label="Created" key="created_at" hide-mobile sortable>
+      </table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_fy %}
+        <table-action icon="bi-pencil" label="Edit" event="rp:fy:edit">
+        </table-action>
+        <table-action icon="bi-toggle-on" label="Toggle Active" event="rp:fy:toggle" color-key="is_active">
+        </table-action>
+        <table-action icon="bi-play-circle" label="Set Active" event="rp:fy:set-active" hidden-key="is_in_progress">
+        </table-action>
+      {% endif %}
+      {% if can_delete_fy %}
+        <table-action icon="bi-trash" label="Delete" event="rp:fy:delete" danger>
+        </table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </list-view>
+  <!-- Create drawer -->
+  <drawer-modal id="rp-fy-create-drawer" width="900">
+  <drawer-header eyebrow="New record" title="Create Financial Year" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <date-field id="rp-new-fy-start-date" col="col-12 col-md-6" label="Start Date" required></date-field>
+    <date-field id="rp-new-fy-end-date" col="col-12 col-md-6" label="End Date" required></date-field>
+    <text-field id="rp-new-fy-note" col="col-12" label="Note" placeholder="Optional note..." cols="3"></text-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Create Financial Year" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <!-- Edit drawer -->
+  <drawer-modal id="rp-fy-edit-drawer" width="900">
+  <drawer-header eyebrow="Edit record" title="Edit Financial Year" no-sizes></drawer-header>
+  <drawer-panel>
+  <view-field id="rp-edit-fy-long" col="col-12 col-md-6" label="Financial Year"></view-field>
+  <view-field id="rp-edit-fy-short" col="col-12 col-md-6" label="Short Form"></view-field>
+  <div class="row g-3 mt-2">
+    <date-field id="rp-edit-fy-start-date" col="col-12 col-md-6" label="Start Date" required></date-field>
+    <date-field id="rp-edit-fy-end-date" col="col-12 col-md-6" label="End Date" required></date-field>
+    <text-field id="rp-edit-fy-note" col="col-12" label="Note" placeholder="Optional note..." cols="3"></text-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <!-- View drawer -->
+  <drawer-modal id="rp-fy-view-drawer" width="900">
+  <drawer-header eyebrow="Financial Year" title="View Financial Year" no-sizes></drawer-header>
+  <drawer-panel>
+  <view-field id="rp-view-fy-long" col="col-12 col-md-6" label="Financial Year (Long)"></view-field>
+  <view-field id="rp-view-fy-short" col="col-12 col-md-6" label="Financial Year (Short)"></view-field>
+  <view-field id="rp-view-fy-code" col="col-12 col-md-6" label="Code" code></view-field>
+  <view-field id="rp-view-fy-start" col="col-12 col-md-6" label="Start Date"></view-field>
+  <view-field id="rp-view-fy-end" col="col-12 col-md-6" label="End Date"></view-field>
+  <view-field id="rp-view-fy-span" col="col-12 col-md-6" label="Span (Days)"></view-field>
+  <view-field id="rp-view-fy-status" col="col-12 col-md-6" label="Status"></view-field>
+  <view-field id="rp-view-fy-note" col="col-12" label="Note"></view-field>
+  <view-field id="rp-view-fy-created" col="col-12 col-md-6" label="Created" meta></view-field>
+  <view-field id="rp-view-fy-created-by" col="col-12 col-md-6" label="Created by" meta></view-field>
+  </drawer-panel>
+  <drawer-footer close="Close" primary="Edit Financial Year" primary-icon="bi-pencil"></drawer-footer>
+  </drawer-modal>
+  <delete-modal id="rp-fy-delete-modal" action-label="Delete financial year"></delete-modal>
+  <activate-modal id="rp-fy-activate-modal"></activate-modal>
+  <deactivate-modal id="rp-fy-deactivate-modal"></deactivate-modal>
+  <import-view id="rp-fys-import-view" title="Import Financial Years" eyebrow="Financial Years"></import-view>
+  <export-view id="rp-fys-export-view" title="Export Financial Years" eyebrow="Financial Years" active-filter-id="rp-fys-filter-panel"></export-view>
+{% endblock content %}

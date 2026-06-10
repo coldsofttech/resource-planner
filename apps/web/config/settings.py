@@ -72,6 +72,9 @@ INSTALLED_APPS = [
     "apps.locations.apps.LocationConfig",
     "apps.employment_types.apps.EmploymentTypeConfig",
     "apps.roles.apps.RoleConfig",
+    "apps.financial_years.apps.FinancialYearConfig",
+    "apps.holidays.apps.HolidayConfig",
+    "apps.leaves.apps.LeaveConfig",
     "apps.dashboard.apps.DashboardConfig",
 ]
 

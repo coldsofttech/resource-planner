@@ -211,6 +211,7 @@ class UserProfile extends HTMLElement {
     } catch {
       // Proceed to redirect regardless of API response.
     }
+    window.dispatchEvent(new CustomEvent("rp:signout"));
     window.location.href = UI_URLS.auth.login();
   }
 }

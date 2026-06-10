@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Holidays
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/holidays.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Holidays
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Holidays
+{% endblock page_title %}
+{% block page_sub %}
+  Manage public and bank holidays across locations for your organisation.
+{% endblock page_sub %}
+{% block page_actions %}
+  <secondary-button id="rp-holidays-import-btn" label="Import" prefix-icon="bi-upload" hidden></secondary-button>
+  <secondary-button id="rp-holidays-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+  <primary-button id="rp-holidays-add-btn" label="Add Holiday" prefix-icon="bi-plus-lg" hidden></primary-button>
+{% endblock page_actions %}
+{% block content %}
+  <list-view show-active-filters>
+  <filter-panel id="rp-holidays-filter-panel">
+  <search-field id="rp-holidays-search" name="search" placeholder="Search holidays..." shortcut="/" show-label></search-field>
+  <location-field id="rp-holidays-location" name="location" col="col-auto" allow-all show-label></location-field>
+  <year-field id="rp-holidays-year" name="year" col="col-auto" allow-all show-label label="Year"></year-field>
+  </filter-panel>
+  <data-table id="rp-holidays-table" url="/api/v1/holidays/" paginated page-size="25" row-template="renderHolidaysRow" empty-message="No holidays found.">
+    <table-columns>
+      <table-column label="Name" key="name" sortable>
+      </table-column>
+      <table-column label="Date" key="date" sortable>
+      </table-column>
+      <table-column label="Location" key="location" hide-mobile>
+      </table-column>
+      <table-column label="Code" key="code" mono width="130px" hide-mobile>
+      </table-column>
+      <table-column label="Created" key="created_at" hide-mobile sortable>
+      </table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_holiday %}
+        <table-action icon="bi-pencil" label="Edit" event="rp:holiday:edit">
+        </table-action>
+      {% endif %}
+      {% if can_delete_holiday %}
+        <table-action icon="bi-trash" label="Delete" event="rp:holiday:delete" danger>
+        </table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </list-view>
+  <!-- Create drawer -->
+  <drawer-modal id="rp-holiday-create-drawer" width="900">
+  <drawer-header eyebrow="New record" title="Create holiday" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-new-holiday-name" col="col-12" label="Name" placeholder="e.g. Christmas Day" required maxlength="120" show-counter></text-field>
+    <date-field id="rp-new-holiday-date" col="col-md-6" label="Date" required></date-field>
+    <location-field id="rp-new-holiday-location" col="col-md-6" label="Location" required></location-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Create holiday" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <!-- Edit drawer -->
+  <drawer-modal id="rp-holiday-edit-drawer" width="900">
+  <drawer-header eyebrow="Edit record" title="Edit holiday" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-edit-holiday-name" col="col-12" label="Name" placeholder="e.g. Christmas Day" required maxlength="120" show-counter></text-field>
+    <date-field id="rp-edit-holiday-date" col="col-md-6" label="Date" required></date-field>
+    <location-field id="rp-edit-holiday-location" col="col-md-6" label="Location" required></location-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <!-- View drawer -->
+  <drawer-modal id="rp-holiday-view-drawer" width="900">
+  <drawer-header eyebrow="Holiday" title="Holiday" no-sizes></drawer-header>
+  <drawer-panel>
+  <view-field id="rp-view-holiday-name" label="Name"></view-field>
+  <view-field id="rp-view-holiday-date" label="Date"></view-field>
+  <view-field id="rp-view-holiday-location" label="Location"></view-field>
+  <view-field id="rp-view-holiday-code" label="Code" code></view-field>
+  <view-field id="rp-view-holiday-created" label="Created" meta></view-field>
+  <view-field id="rp-view-holiday-created-by" label="Created by" meta></view-field>
+  </drawer-panel>
+  <drawer-footer close="Close"
+  {% if can_change_holiday %}primary="Edit holiday" primary-icon="bi-pencil"{% endif %}
+  ></drawer-footer>
+  </drawer-modal>
+  <delete-modal id="rp-holiday-delete-modal" action-label="Delete holiday"></delete-modal>
+  <import-view id="rp-holidays-import-view" title="Import Holidays" eyebrow="Holidays"></import-view>
+  <export-view id="rp-holidays-export-view" title="Export Holidays" eyebrow="Holidays" active-filter-id="rp-holidays-filter-panel"></export-view>
+{% endblock content %}
