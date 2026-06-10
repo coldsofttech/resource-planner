@@ -95,8 +95,8 @@ class ModuleLabelsTest(SimpleTestCase):
 
 
 class ModuleChoicesTest(SimpleTestCase):
-    def test_choices_has_six_entries(self):
-        self.assertEqual(len(Module.choices), 6)
+    def test_choices_has_seven_entries(self):
+        self.assertEqual(len(Module.choices), 7)
 
     def test_choices_contains_all_values(self):
         values = [v for v, _ in Module.choices]

@@ -158,3 +158,9 @@ class Holidays:
     @staticmethod
     def get_default_holidays() -> int:
         return int(get_config_value("DEFAULT_HOLIDAYS"))
+
+
+class FinancialYear:
+    @staticmethod
+    def get_fy_expiry_warning_days() -> int:
+        return int(get_config_value("FY_EXPIRY_WARNING_DAYS"))

@@ -71,59 +71,69 @@
                       <menu-item name="Members" href="/members/" icon="bi-person-lines-fill"></menu-item>
                       {% endif %}
                     </menu-section>
-                    <menu-section label="Configurations">
-                      {% if "skills.view_skill" in rp_permissions %}
-                        <menu-item name="Skills" href="/skills" icon="bi-tools"></menu-item>
+                    <menu-section label="Holidays">
+                      {% if "holidays.view_holiday" in rp_permissions %}
+                        <menu-item name="Holidays" href="/holidays" icon="bi-calendar-check"></menu-item>
                         {% endif %}
-                        {% if "roles.view_role" in rp_permissions %}
-                          <menu-item name="Roles" href="/roles" icon="bi-person-badge"></menu-item>
+                        {% if "leaves.view_leave" in rp_permissions %}
+                          <menu-item name="Leaves" href="/leaves" icon="bi-calendar-minus"></menu-item>
                           {% endif %}
-                          {% if "locations.view_location" in rp_permissions %}
-                            <menu-item name="Locations" href="/locations" icon="bi-geo-alt"></menu-item>
+                        </menu-section>
+                        <menu-section label="Configurations">
+                          {% if "skills.view_skill" in rp_permissions %}
+                            <menu-item name="Skills" href="/skills" icon="bi-tools"></menu-item>
                             {% endif %}
-                            {% if "employment_types.view_employmenttype" in rp_permissions %}
-                              <menu-item name="Employment Types" href="/emp-types" icon="bi-briefcase"></menu-item>
+                            {% if "roles.view_role" in rp_permissions %}
+                              <menu-item name="Roles" href="/roles" icon="bi-person-badge"></menu-item>
                               {% endif %}
-                            </menu-section>
-                          </menu-group>
-                        </menu-items>
-                      </menu-bar>
-                    </header>
-                    <fy-flash-banner id="fy-banner" type="warning" link-label="Open Financial Years" link-href="#" dismissable open>
-                    <banner-message>
-                    Financial Year <strong>FY25–26</strong> expires in <strong>14 days</strong>. Close out
-                    sprints and create FY26–27 before <span class="rp-mono">30 May 2026</span>.
-                    </banner-message>
-                    </fy-flash-banner>
-                    <div class="rp-page">
-                      <div class="rp-stack-8 mb-3">
-                        <flash-banner id="page-flash"></flash-banner>
-                      </div>
-                      <div class="rp-page-head">
-                        <div id="page-head-left">
-                          <div class="rp-eyebrow mb-1" id="page-eyebrow">
-                            {% block page_eyebrow %}
-                            {% endblock page_eyebrow %}
+                              {% if "locations.view_location" in rp_permissions %}
+                                <menu-item name="Locations" href="/locations" icon="bi-geo-alt"></menu-item>
+                                {% endif %}
+                                {% if "employment_types.view_employmenttype" in rp_permissions %}
+                                  <menu-item name="Employment Types" href="/emp-types" icon="bi-briefcase"></menu-item>
+                                  {% endif %}
+                                </menu-section>
+                              </menu-group>
+                              {% if "financial_years.view_financialyear" in rp_permissions %}
+                                <menu-group name="Administration" icon="bi-calendar2-range">
+                                  <menu-section label="Planning">
+                                    <menu-item name="Financial Years" href="/fy/" icon="bi-calendar2-range"></menu-item>
+                                    </menu-section>
+                                  </menu-group>
+                                {% endif %}
+                              </menu-items>
+                            </menu-bar>
+                          </header>
+                          <fy-flash-banner id="fy-banner" type="warning" link-label="Open Financial Years" link-href="/fy/" dismissable></fy-flash-banner>
+                          <div class="rp-page">
+                            <div class="rp-stack-8 mb-3">
+                              <flash-banner id="page-flash"></flash-banner>
+                            </div>
+                            <div class="rp-page-head">
+                              <div id="page-head-left">
+                                <div class="rp-eyebrow mb-1" id="page-eyebrow">
+                                  {% block page_eyebrow %}
+                                  {% endblock page_eyebrow %}
+                                </div>
+                                <h1 class="rp-page-title" id="page-title">
+                                  {% block page_title %}
+                                    Dashboard
+                                  {% endblock page_title %}
+                                </h1>
+                                <p class="rp-page-sub" id="page-sub">
+                                  {% block page_sub %}
+                                  {% endblock page_sub %}
+                                </p>
+                              </div>
+                              <div class="rp-page-actions" id="page-actions">
+                                {% block page_actions %}
+                                {% endblock page_actions %}
+                              </div>
+                            </div>
+                            {% block content %}
+                            {% endblock content %}
                           </div>
-                          <h1 class="rp-page-title" id="page-title">
-                            {% block page_title %}
-                              Dashboard
-                            {% endblock page_title %}
-                          </h1>
-                          <p class="rp-page-sub" id="page-sub">
-                            {% block page_sub %}
-                            {% endblock page_sub %}
-                          </p>
-                        </div>
-                        <div class="rp-page-actions" id="page-actions">
-                          {% block page_actions %}
-                          {% endblock page_actions %}
-                        </div>
+                        </main>
                       </div>
-                      {% block content %}
-                      {% endblock content %}
-                    </div>
-                  </main>
-                </div>
-              </body>
-            </html>
+                    </body>
+                  </html>
