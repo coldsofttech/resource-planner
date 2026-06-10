@@ -1,6 +1,6 @@
 from django.db.models import Count, Q, QuerySet
 
-from apps.teams.models import Team
+from apps.teams.models import Assignment, Team
 
 
 def get_all_teams() -> QuerySet[Team]:
@@ -33,3 +33,21 @@ def get_team_stats() -> dict:
         active=Count("id", filter=Q(is_active=True)),
         inactive=Count("id", filter=Q(is_active=False)),
     )
+
+
+def get_active_team_by_code(code: str) -> Team | None:
+    try:
+        return Team.objects.get(code=code, is_active=True)
+    except Team.DoesNotExist:
+        return None
+
+
+def get_assignments_for_member(user_pk: int) -> QuerySet[Assignment]:
+    return Assignment.objects.select_related("team").filter(member_id=user_pk)
+
+
+def get_assignment(member_pk: int, team_pk: int) -> Assignment | None:
+    try:
+        return Assignment.objects.get(member_id=member_pk, team_id=team_pk)
+    except Assignment.DoesNotExist:
+        return None

@@ -10,7 +10,7 @@ import {
   restoreButton,
 } from "../utils/utils.js";
 import { toast } from "../utils/toast.js";
-import { API_URLS } from "../main/urls.js";
+import { API_URLS, UI_URLS } from "../main/urls.js";
 import { hasPermission } from "../utils/index.js";
 
 let pendingRow = null;
@@ -203,51 +203,7 @@ function initEditDrawer(table) {
   });
 }
 
-function openViewDrawer(row) {
-  const drawer = document.getElementById("rp-team-view-drawer");
-  if (!drawer) return;
-
-  pendingRow = row;
-
-  document.getElementById("rp-view-team-identicon")?.setAttribute("name", row.name);
-  document.getElementById("rp-view-team-identicon")?.setAttribute("variant", "monogram");
-
-  const nameEl = document.getElementById("rp-view-team-name");
-  if (nameEl) nameEl.value = esc(row.name);
-
-  // code attribute on the element handles monospace wrapping
-  const codeEl = document.getElementById("rp-view-team-code");
-  if (codeEl) codeEl.value = esc(row.code);
-
-  // badge class is state-dependent so set it dynamically
-  const badgeClass = row.is_active
-    ? "rp-badge rp-badge-soft rp-badge-success"
-    : "rp-badge rp-badge-soft";
-  const statusEl = document.getElementById("rp-view-team-status");
-  if (statusEl) {
-    statusEl.setAttribute("badge", badgeClass);
-    statusEl.value = row.is_active ? "Active" : "Inactive";
-  }
-
-  const descEl = document.getElementById("rp-view-team-desc");
-  if (descEl) descEl.value = esc(row.description || "—");
-
-  const createdEl = document.getElementById("rp-view-team-created");
-  if (createdEl) createdEl.value = esc(formatDate(row.created_at));
-
-  const createdByEl = document.getElementById("rp-view-team-created-by");
-  if (createdByEl) createdByEl.value = esc(row.created_by?.email ?? "—");
-
-  const metaEl = drawer.querySelector(".rp-rdrawer-foot-meta");
-  if (metaEl) metaEl.textContent = formatMeta(row);
-
-  drawer.show();
-}
-
-function initViewDrawer(table) {
-  const drawer = document.getElementById("rp-team-view-drawer");
-  if (!drawer) return;
-
+function initRowNavigation(table) {
   table.addEventListener("click", (e) => {
     if (e.target.closest("[data-rp-action]") || e.target.closest(".rp-table-more-btn")) return;
     const tr = e.target.closest("tr[data-rp-row]");
@@ -255,13 +211,7 @@ function initViewDrawer(table) {
     const idx = parseInt(tr.getAttribute("data-rp-row"), 10);
     const row = table.rows[idx];
     if (!row) return;
-    openViewDrawer(row);
-  });
-
-  drawer.addEventListener("rp:footer-primary", () => {
-    if (!pendingRow) return;
-    drawer.hide();
-    openEditDrawer(pendingRow);
+    window.location.href = UI_URLS.teams.detail(row.code);
   });
 }
 
@@ -367,7 +317,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!table) return;
 
   initActions(table);
-  initViewDrawer(table);
+  initRowNavigation(table);
 
   if (hasPermission("teams.add_team")) {
     document.getElementById("rp-teams-add-btn")?.removeAttribute("hidden");

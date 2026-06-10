@@ -20,7 +20,8 @@ from apps.core.services import (
     ImportService,
 )
 from apps.teams import selectors
-from apps.teams.models import Team
+from apps.teams.constants import AssignmentAction
+from apps.teams.models import Assignment, AssignmentHistory, Team
 
 
 class TeamService(AuditableService, FilterableQueryService):
@@ -172,6 +173,191 @@ class TeamService(AuditableService, FilterableQueryService):
 
     def options(self) -> list[dict]:
         return [{"code": t.code, "name": t.name} for t in selectors.get_active_teams()]
+
+
+class AssignmentService(AuditableService):
+    _MODULE = "teams"
+    _RESOURCE_TYPE = "assignment"
+
+    @transaction.atomic
+    def assign(self, *, member_code: str, teams: list[str], note: str = "") -> None:
+        from apps.users.selectors import get_member_by_code
+
+        profile = get_member_by_code(member_code)
+        if profile is None:
+            raise NotFoundException(
+                resource="Member", lookup_field="code", lookup_value=member_code
+            )
+
+        member = profile.user
+        is_leadership = profile.role.is_leadership if profile.role else False
+
+        existing = list(selectors.get_assignments_for_member(member.pk))
+        existing_by_code: dict[str, Assignment] = {a.team.code: a for a in existing}
+
+        target_codes = list(dict.fromkeys(teams))  # deduplicate, preserve order
+
+        if not is_leadership:
+            if len(target_codes) > 1:
+                raise ValidationException(
+                    "Non-leadership members can only be assigned to one team at a time."
+                )
+
+            if not target_codes:
+                for assignment in existing:
+                    AssignmentHistory.objects.create(
+                        member=member,
+                        from_team=assignment.team,
+                        to_team=None,
+                        action=AssignmentAction.UNASSIGN,
+                        actor=self.user,
+                    )
+                    AuditService.log(
+                        module=self._MODULE,
+                        resource_type=self._RESOURCE_TYPE,
+                        resource_code=assignment.team.code,
+                        action="unassign",
+                        before={"member": member_code, "team": assignment.team.code},
+                        actor=self.user,
+                    )
+                    assignment.delete()
+            else:
+                target_code = target_codes[0]
+                if target_code in existing_by_code:
+                    assignment = existing_by_code[target_code]
+                    if note != assignment.note:
+                        assignment.note = note
+                        assignment.updated_by = self.user
+                        assignment.save(
+                            update_fields=["note", "updated_by", "updated_at"]
+                        )
+                    return
+
+                target_team = selectors.get_active_team_by_code(target_code)
+                if target_team is None:
+                    raise NotFoundException(
+                        resource="Team", lookup_field="code", lookup_value=target_code
+                    )
+
+                if existing:
+                    old = existing[0]
+                    old_team = old.team
+                    old.delete()
+                    Assignment.objects.create(
+                        team=target_team,
+                        member=member,
+                        note=note,
+                        created_by=self.user,
+                        updated_by=self.user,
+                    )
+                    AssignmentHistory.objects.create(
+                        member=member,
+                        from_team=old_team,
+                        to_team=target_team,
+                        action=AssignmentAction.MOVE,
+                        actor=self.user,
+                    )
+                    AuditService.log(
+                        module=self._MODULE,
+                        resource_type=self._RESOURCE_TYPE,
+                        resource_code=target_team.code,
+                        action="assign",
+                        before={"member": member_code, "team": old_team.code},
+                        after={
+                            "member": member_code,
+                            "team": target_team.code,
+                            "note": note,
+                        },
+                        actor=self.user,
+                    )
+                else:
+                    Assignment.objects.create(
+                        team=target_team,
+                        member=member,
+                        note=note,
+                        created_by=self.user,
+                        updated_by=self.user,
+                    )
+                    AssignmentHistory.objects.create(
+                        member=member,
+                        from_team=None,
+                        to_team=target_team,
+                        action=AssignmentAction.ASSIGN,
+                        actor=self.user,
+                    )
+                    AuditService.log(
+                        module=self._MODULE,
+                        resource_type=self._RESOURCE_TYPE,
+                        resource_code=target_team.code,
+                        action="assign",
+                        before=None,
+                        after={
+                            "member": member_code,
+                            "team": target_team.code,
+                            "note": note,
+                        },
+                        actor=self.user,
+                    )
+        else:
+            existing_codes = set(existing_by_code.keys())
+            new_codes = set(target_codes)
+            to_add = new_codes - existing_codes
+            to_remove = existing_codes - new_codes
+
+            for code in to_add:
+                target_team = selectors.get_active_team_by_code(code)
+                if target_team is None:
+                    raise NotFoundException(
+                        resource="Team", lookup_field="code", lookup_value=code
+                    )
+                Assignment.objects.create(
+                    team=target_team,
+                    member=member,
+                    note=note,
+                    created_by=self.user,
+                    updated_by=self.user,
+                )
+                AssignmentHistory.objects.create(
+                    member=member,
+                    from_team=None,
+                    to_team=target_team,
+                    action=AssignmentAction.ASSIGN,
+                    actor=self.user,
+                )
+                AuditService.log(
+                    module=self._MODULE,
+                    resource_type=self._RESOURCE_TYPE,
+                    resource_code=target_team.code,
+                    action="assign",
+                    before=None,
+                    after={
+                        "member": member_code,
+                        "team": target_team.code,
+                        "note": note,
+                    },
+                    actor=self.user,
+                )
+
+            for code in to_remove:
+                assignment = existing_by_code[code]
+                team = assignment.team
+                assignment.delete()
+                AssignmentHistory.objects.create(
+                    member=member,
+                    from_team=team,
+                    to_team=None,
+                    action=AssignmentAction.UNASSIGN,
+                    actor=self.user,
+                )
+                AuditService.log(
+                    module=self._MODULE,
+                    resource_type=self._RESOURCE_TYPE,
+                    resource_code=team.code,
+                    action="unassign",
+                    before={"member": member_code, "team": team.code},
+                    after=None,
+                    actor=self.user,
+                )
 
 
 class TeamImportService(ImportService):

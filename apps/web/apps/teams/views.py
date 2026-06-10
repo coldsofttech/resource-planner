@@ -14,3 +14,14 @@ class TeamsListView(ProtectedView):
         ctx["can_import_team"] = "teams.import_team" in perms
         ctx["can_export_team"] = "teams.export_team" in perms
         return ctx
+
+
+class TeamDetailView(ProtectedView):
+    template_name = "teams/detail.html"
+
+    def get_context_data(self, **kwargs: object) -> dict[str, object]:
+        ctx = super().get_context_data(**kwargs)
+        ctx["team_code"] = self.kwargs["code"]
+        perms = get_user_permissions(self.request.user)
+        ctx["can_change_team"] = "teams.change_team" in perms
+        return ctx

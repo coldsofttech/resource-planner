@@ -7,7 +7,7 @@
   <script type="module" src="{% static 'js/dist/teams.min.js' %}"></script>
 {% endblock scripts %}
 {% block page_eyebrow %}
-  Organisation
+  People
 {% endblock page_eyebrow %}
 {% block page_title %}
   Teams
@@ -15,8 +15,7 @@
 {% block page_sub %}
   Manage your organisation's teams.
 {% endblock page_sub %}
-{% block
-  page_actions %}
+{% block page_actions %}
   <secondary-button id="rp-teams-import-btn" label="Import" prefix-icon="bi-upload" hidden></secondary-button>
   <secondary-button id="rp-teams-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
   <primary-button id="rp-teams-add-btn" label="Add Team" prefix-icon="bi-plus-lg" hidden></primary-button>
@@ -79,24 +78,6 @@
   </div>
   </drawer-panel>
   <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"> </drawer-footer>
-  </drawer-modal>
-  <!-- View drawer -->
-  <drawer-modal id="rp-team-view-drawer" width="900">
-  <drawer-header eyebrow="Team details" title="View team" no-sizes>
-  <identicon-field id="rp-view-team-identicon" size="lg"></identicon-field>
-  </drawer-header>
-  <drawer-panel>
-  <view-field id="rp-view-team-name" label="Name"></view-field>
-  <view-field id="rp-view-team-code" label="Code" code></view-field>
-  <view-field id="rp-view-team-status" label="Status"></view-field>
-  <view-field id="rp-view-team-desc" label="Description" desc></view-field>
-  <view-field id="rp-view-team-created" label="Created" meta></view-field>
-  <view-field id="rp-view-team-created-by" label="Created by" meta></view-field>
-  </drawer-panel>
-  <drawer-footer close="Close"
-  {% if can_change_team %}primary="Edit team" primary-icon="bi-pencil"{% endif %}
-  >
-  </drawer-footer>
   </drawer-modal>
   <delete-modal id="rp-team-delete-modal" action-label="Delete team"></delete-modal>
   <activate-modal id="rp-team-activate-modal"></activate-modal>

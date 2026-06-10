@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Team
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/team-detail.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Team
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <span id="rp-team-detail-title">Team</span>
+{% endblock page_title %}
+{% block content %}
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <section-panel>
+        <panel-body>
+          <view-field id="rp-team-detail-name" label="Name"></view-field>
+          <view-field id="rp-team-detail-code" label="Code" code></view-field>
+          <view-field id="rp-team-detail-status" label="Status"></view-field>
+          <view-field id="rp-team-detail-desc" label="Description" desc></view-field>
+          <view-field id="rp-team-detail-created" label="Created" meta></view-field>
+          <view-field id="rp-team-detail-created-by" label="Created by" meta></view-field>
+        </panel-body>
+      </section-panel>
+    </div>
+    <div id="rp-team-members-col" class="col-lg-8" hidden>
+      <section-panel>
+        <panel-title>Members</panel-title>
+        <panel-body>
+          <data-table id="rp-team-members-table"
+                      url="/api/v1/teams/{{ team_code }}/members/"
+                      paginated
+                      page-size="25"
+                      row-template="renderTeamMembersRow"
+                      empty-message="No members assigned to this team.">
+            <table-columns>
+              <table-column width="44px">
+              </table-column>
+              <table-column label="Name" key="display_name" sortable>
+              </table-column>
+              <table-column label="Email" key="email" hide-mobile sortable>
+              </table-column>
+              <table-column label="Role" key="role" hide-mobile>
+              </table-column>
+              <table-column label="Status" key="is_active" hide-mobile>
+              </table-column>
+            </table-columns>
+          </data-table>
+        </panel-body>
+      </section-panel>
+    </div>
+  </div>
+{% endblock content %}
