@@ -10,7 +10,7 @@ import {
   restoreButton,
 } from "../utils/utils.js";
 import { toast } from "../utils/toast.js";
-import { API_URLS } from "../main/urls.js";
+import { API_URLS, UI_URLS } from "../main/urls.js";
 import { hasPermission } from "../utils/index.js";
 
 let pendingRow = null;
@@ -199,44 +199,7 @@ function initEditDrawer(table) {
   });
 }
 
-function openViewDrawer(row) {
-  const drawer = document.getElementById("rp-skill-view-drawer");
-  if (!drawer) return;
-
-  pendingRow = row;
-
-  const statusEl = document.getElementById("rp-view-skill-status");
-  if (statusEl) {
-    statusEl.setAttribute(
-      "badge",
-      `rp-badge rp-badge-soft${row.is_active ? " rp-badge-success" : ""}`,
-    );
-    statusEl.value = row.is_active ? "Active" : "Inactive";
-  }
-
-  const fields = {
-    "rp-view-skill-skill": esc(row.skill),
-    "rp-view-skill-code": esc(row.code),
-    "rp-view-skill-desc": esc(row.description || "—"),
-    "rp-view-skill-created": esc(formatDate(row.created_at)),
-    "rp-view-skill-created-by": esc(row.created_by?.email ?? "—"),
-  };
-
-  Object.entries(fields).forEach(([id, html]) => {
-    const el = document.getElementById(id);
-    if (el) el.value = html;
-  });
-
-  const metaEl = drawer.querySelector(".rp-rdrawer-foot-meta");
-  if (metaEl) metaEl.textContent = formatMeta(row);
-
-  drawer.show();
-}
-
-function initViewDrawer(table) {
-  const drawer = document.getElementById("rp-skill-view-drawer");
-  if (!drawer) return;
-
+function initRowNavigation(table) {
   table.addEventListener("click", (e) => {
     if (e.target.closest("[data-rp-action]") || e.target.closest(".rp-table-more-btn")) return;
     const tr = e.target.closest("tr[data-rp-row]");
@@ -244,13 +207,7 @@ function initViewDrawer(table) {
     const idx = parseInt(tr.getAttribute("data-rp-row"), 10);
     const row = table.rows[idx];
     if (!row) return;
-    openViewDrawer(row);
-  });
-
-  drawer.addEventListener("rp:footer-primary", () => {
-    if (!pendingRow) return;
-    drawer.hide();
-    openEditDrawer(pendingRow);
+    window.location.href = UI_URLS.skills.detail(row.code);
   });
 }
 
@@ -356,7 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!table) return;
 
   initActions(table);
-  initViewDrawer(table);
+  initRowNavigation(table);
 
   if (hasPermission("skills.add_skill")) {
     document.getElementById("rp-skills-add-btn")?.removeAttribute("hidden");

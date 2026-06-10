@@ -10,7 +10,7 @@ import {
   restoreButton,
 } from "../utils/utils.js";
 import { toast } from "../utils/toast.js";
-import { API_URLS } from "../main/urls.js";
+import { API_URLS, UI_URLS } from "../main/urls.js";
 import { hasPermission } from "../utils/index.js";
 
 let pendingRow = null;
@@ -214,64 +214,7 @@ function initEditDrawer(table) {
   });
 }
 
-function openViewDrawer(row) {
-  const drawer = document.getElementById("rp-role-view-drawer");
-  if (!drawer) return;
-
-  pendingRow = row;
-
-  const defaultBadge = document.getElementById("rp-view-role-default-badge");
-  if (defaultBadge) defaultBadge.hidden = !row.is_default;
-
-  const statusEl = document.getElementById("rp-view-role-status");
-  if (statusEl) {
-    statusEl.setAttribute(
-      "badge",
-      `rp-badge rp-badge-soft${row.is_active ? " rp-badge-success" : ""}`,
-    );
-    statusEl.value = row.is_active ? "Active" : "Inactive";
-  }
-
-  const assignableEl = document.getElementById("rp-view-role-assignable");
-  if (assignableEl) {
-    assignableEl.setAttribute(
-      "badge",
-      `rp-badge rp-badge-soft${row.is_assignable ? " rp-badge-success" : ""}`,
-    );
-    assignableEl.value = row.is_assignable ? "Yes" : "No";
-  }
-
-  const leadershipEl = document.getElementById("rp-view-role-leadership");
-  if (leadershipEl) {
-    leadershipEl.setAttribute(
-      "badge",
-      `rp-badge rp-badge-soft${row.is_leadership ? " rp-badge-success" : ""}`,
-    );
-    leadershipEl.value = row.is_leadership ? "Yes" : "No";
-  }
-
-  const fields = {
-    "rp-view-role-name": esc(row.role),
-    "rp-view-role-code": esc(row.code),
-    "rp-view-role-created": esc(formatDate(row.created_at)),
-    "rp-view-role-created-by": esc(row.created_by?.email ?? "—"),
-  };
-
-  Object.entries(fields).forEach(([id, html]) => {
-    const el = document.getElementById(id);
-    if (el) el.value = html;
-  });
-
-  const metaEl = drawer.querySelector(".rp-rdrawer-foot-meta");
-  if (metaEl) metaEl.textContent = formatMeta(row);
-
-  drawer.show();
-}
-
-function initViewDrawer(table) {
-  const drawer = document.getElementById("rp-role-view-drawer");
-  if (!drawer) return;
-
+function initRowNavigation(table) {
   table.addEventListener("click", (e) => {
     if (e.target.closest("[data-rp-action]") || e.target.closest(".rp-table-more-btn")) return;
     const tr = e.target.closest("tr[data-rp-row]");
@@ -279,13 +222,7 @@ function initViewDrawer(table) {
     const idx = parseInt(tr.getAttribute("data-rp-row"), 10);
     const row = table.rows[idx];
     if (!row) return;
-    openViewDrawer(row);
-  });
-
-  drawer.addEventListener("rp:footer-primary", () => {
-    if (!pendingRow) return;
-    drawer.hide();
-    openEditDrawer(pendingRow);
+    window.location.href = UI_URLS.roles.detail(row.code);
   });
 }
 
@@ -433,7 +370,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!table) return;
 
   initActions(table);
-  initViewDrawer(table);
+  initRowNavigation(table);
 
   if (hasPermission("roles.add_role")) {
     document.getElementById("rp-roles-add-btn")?.removeAttribute("hidden");

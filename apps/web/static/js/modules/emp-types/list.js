@@ -10,7 +10,7 @@ import {
   restoreButton,
 } from "../utils/utils.js";
 import { toast } from "../utils/toast.js";
-import { API_URLS } from "../main/urls.js";
+import { API_URLS, UI_URLS } from "../main/urls.js";
 import { hasPermission } from "../utils/index.js";
 
 /* ── Shared state ─────────────────────────────────────────────────────── */
@@ -256,48 +256,9 @@ function initEditDrawer(table) {
   });
 }
 
-/* ── View drawer ──────────────────────────────────────────────────────── */
+/* ── Row navigation ───────────────────────────────────────────────────── */
 
-function openViewDrawer(row) {
-  const drawer = document.getElementById("rp-emp-type-view-drawer");
-  if (!drawer) return;
-
-  pendingRow = row;
-
-  const defaultBadge = document.getElementById("rp-view-emp-type-default-badge");
-  if (defaultBadge) defaultBadge.hidden = !row.is_default;
-
-  const statusEl = document.getElementById("rp-view-emp-type-status");
-  if (statusEl) {
-    statusEl.setAttribute(
-      "badge",
-      `rp-badge rp-badge-soft${row.is_active ? " rp-badge-success" : ""}`,
-    );
-    statusEl.value = row.is_active ? "Active" : "Inactive";
-  }
-
-  const fields = {
-    "rp-view-emp-type-name": esc(row.name),
-    "rp-view-emp-type-code": esc(row.code),
-    "rp-view-emp-type-created": esc(formatDate(row.created_at)),
-    "rp-view-emp-type-created-by": esc(row.created_by?.email ?? "—"),
-  };
-
-  Object.entries(fields).forEach(([id, html]) => {
-    const el = document.getElementById(id);
-    if (el) el.value = html;
-  });
-
-  const metaEl = drawer.querySelector(".rp-rdrawer-foot-meta");
-  if (metaEl) metaEl.textContent = formatMeta(row);
-
-  drawer.show();
-}
-
-function initViewDrawer(table) {
-  const drawer = document.getElementById("rp-emp-type-view-drawer");
-  if (!drawer) return;
-
+function initRowNavigation(table) {
   table.addEventListener("click", (e) => {
     if (e.target.closest("[data-rp-action]") || e.target.closest(".rp-table-more-btn")) return;
     const tr = e.target.closest("tr[data-rp-row]");
@@ -305,13 +266,7 @@ function initViewDrawer(table) {
     const idx = parseInt(tr.getAttribute("data-rp-row"), 10);
     const row = table.rows[idx];
     if (!row) return;
-    openViewDrawer(row);
-  });
-
-  drawer.addEventListener("rp:footer-primary", () => {
-    if (!pendingRow) return;
-    drawer.hide();
-    openEditDrawer(pendingRow);
+    window.location.href = UI_URLS.empTypes.detail(row.code);
   });
 }
 
@@ -423,7 +378,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!table) return;
 
   initActions(table);
-  initViewDrawer(table);
+  initRowNavigation(table);
 
   if (hasPermission("employment_types.add_employmenttype")) {
     document.getElementById("rp-emp-types-add-btn")?.removeAttribute("hidden");

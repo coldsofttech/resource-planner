@@ -16,6 +16,8 @@ from apps.roles.services import (
     RoleImportService,
     RoleService,
 )
+from apps.users.serializers import MemberMiniListSerializer
+from apps.users.services import MembersService
 
 
 class RoleViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
@@ -99,6 +101,7 @@ class RoleViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
             "import_bulk": "roles.import_role",
             "export_specs": "roles.export_role",
             "export": "roles.export_role",
+            "members": "roles.view_role",
         }
         perm = action_perms.get(self.action)
         if perm:
@@ -263,4 +266,24 @@ class RoleViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
             data=data,
             message=self.get_set_default_custom_message(),
             status_code=self.get_set_default_status_code(),
+        )
+
+    @extend_schema(
+        summary="List role members",
+        description="Returns a paginated list of members assigned to this role.",
+        responses={
+            200: MemberMiniListSerializer(many=True),
+            404: OpenApiResponse(description="Role not found."),
+        },
+    )
+    def members(self, request: Request, code=None):
+        """GET /roles/<code>/members/"""
+        self.service.get(code=code)
+        svc = MembersService(user=request.user, request=request)
+        params = self.get_list_params(request)
+        params.filters["role"] = code
+        result = svc.list(params=params)
+        return self.paginated_response(
+            result=result,
+            serializer_class=MemberMiniListSerializer,
         )

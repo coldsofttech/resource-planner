@@ -12,6 +12,8 @@ from apps.skills.serializers import (
     SkillUpdateSerializer,
 )
 from apps.skills.services import SkillExportService, SkillImportService, SkillService
+from apps.users.serializers import MemberMiniListSerializer
+from apps.users.services import MembersService
 
 
 class SkillViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
@@ -80,6 +82,7 @@ class SkillViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
             "import_bulk": "skills.import_skill",
             "export_specs": "skills.export_skill",
             "export": "skills.export_skill",
+            "members": "skills.view_skill",
         }
         perm = action_perms.get(self.action)
         if perm:
@@ -233,4 +236,24 @@ class SkillViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
             data=data,
             message=self.get_deactivate_custom_message(),
             status_code=self.get_deactivate_status_code(),
+        )
+
+    @extend_schema(
+        summary="List skill members",
+        description="Returns a paginated list of members who have this skill.",
+        responses={
+            200: MemberMiniListSerializer(many=True),
+            404: OpenApiResponse(description="Skill not found."),
+        },
+    )
+    def members(self, request: Request, code=None):
+        """GET /skills/<code>/members/"""
+        self.service.get(code=code)
+        svc = MembersService(user=request.user, request=request)
+        params = self.get_list_params(request)
+        params.filters["skill"] = code
+        result = svc.list(params=params)
+        return self.paginated_response(
+            result=result,
+            serializer_class=MemberMiniListSerializer,
         )

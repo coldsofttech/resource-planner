@@ -68,4 +68,9 @@ urlpatterns = [
         EmploymentTypeViewSet.as_view({"post": "set_default"}),
         name="emp-types-set-default",
     ),
+    path(
+        "emp-types/<str:code>/members/",
+        EmploymentTypeViewSet.as_view({"get": "members"}),
+        name="emp-types-members",
+    ),
 ]

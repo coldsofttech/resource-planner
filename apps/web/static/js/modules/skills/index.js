@@ -1,1 +1,2 @@
-import "./skills.js";
+import "./list.js";
+import "./detail.js";

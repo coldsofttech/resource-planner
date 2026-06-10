@@ -14,3 +14,14 @@ class LocationsListView(ProtectedView):
         ctx["can_import_location"] = "locations.import_location" in perms
         ctx["can_export_location"] = "locations.export_location" in perms
         return ctx
+
+
+class LocationDetailView(ProtectedView):
+    template_name = "locations/detail.html"
+
+    def get_context_data(self, **kwargs: object) -> dict[str, object]:
+        ctx = super().get_context_data(**kwargs)
+        ctx["location_code"] = self.kwargs["code"]
+        perms = get_user_permissions(self.request.user)
+        ctx["can_change_location"] = "locations.change_location" in perms
+        return ctx

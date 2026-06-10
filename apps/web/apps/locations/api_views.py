@@ -16,6 +16,8 @@ from apps.locations.services import (
     LocationImportService,
     LocationService,
 )
+from apps.users.serializers import MemberMiniListSerializer
+from apps.users.services import MembersService
 
 
 class LocationViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
@@ -94,6 +96,7 @@ class LocationViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
             "import_bulk": "locations.import_location",
             "export_specs": "locations.export_location",
             "export": "locations.export_location",
+            "members": "locations.view_location",
         }
         perm = action_perms.get(self.action)
         if perm:
@@ -278,4 +281,24 @@ class LocationViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
             data=data,
             message=self.get_set_default_custom_message(),
             status_code=self.get_set_default_status_code(),
+        )
+
+    @extend_schema(
+        summary="List location members",
+        description="Returns a paginated list of members based at this location.",
+        responses={
+            200: MemberMiniListSerializer(many=True),
+            404: OpenApiResponse(description="Location not found."),
+        },
+    )
+    def members(self, request: Request, code=None):
+        """GET /locations/<code>/members/"""
+        self.service.get(code=code)
+        svc = MembersService(user=request.user, request=request)
+        params = self.get_list_params(request)
+        params.filters["location"] = code
+        result = svc.list(params=params)
+        return self.paginated_response(
+            result=result,
+            serializer_class=MemberMiniListSerializer,
         )

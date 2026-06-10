@@ -68,4 +68,9 @@ urlpatterns = [
         LocationViewSet.as_view({"post": "set_default"}),
         name="locations-set-default",
     ),
+    path(
+        "locations/<str:code>/members/",
+        LocationViewSet.as_view({"get": "members"}),
+        name="locations-members",
+    ),
 ]

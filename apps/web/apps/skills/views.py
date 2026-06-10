@@ -14,3 +14,14 @@ class SkillsListView(ProtectedView):
         ctx["can_import_skill"] = "skills.import_skill" in perms
         ctx["can_export_skill"] = "skills.export_skill" in perms
         return ctx
+
+
+class SkillDetailView(ProtectedView):
+    template_name = "skills/detail.html"
+
+    def get_context_data(self, **kwargs: object) -> dict[str, object]:
+        ctx = super().get_context_data(**kwargs)
+        ctx["skill_code"] = self.kwargs["code"]
+        perms = get_user_permissions(self.request.user)
+        ctx["can_change_skill"] = "skills.change_skill" in perms
+        return ctx

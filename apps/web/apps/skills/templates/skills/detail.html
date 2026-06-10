@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Skill
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/skill-detail.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Skill
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <span id="rp-skill-detail-title">Skill</span>
+{% endblock page_title %}
+{% block content %}
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <section-panel>
+        <panel-body>
+          <view-field id="rp-skill-detail-name" label="Skill"></view-field>
+          <view-field id="rp-skill-detail-code" label="Code" code></view-field>
+          <view-field id="rp-skill-detail-status" label="Status"></view-field>
+          <view-field id="rp-skill-detail-desc" label="Description" desc></view-field>
+          <view-field id="rp-skill-detail-created" label="Created" meta></view-field>
+          <view-field id="rp-skill-detail-created-by" label="Created by" meta></view-field>
+        </panel-body>
+      </section-panel>
+    </div>
+    <div id="rp-skill-members-col" class="col-lg-8" hidden>
+      <section-panel>
+        <panel-title>Members</panel-title>
+        <panel-body>
+          <data-table id="rp-skill-members-table"
+                      url="/api/v1/skills/{{ skill_code }}/members/"
+                      paginated
+                      page-size="25"
+                      row-template="renderSkillMembersRow"
+                      empty-message="No members have this skill.">
+            <table-columns>
+              <table-column width="44px">
+              </table-column>
+              <table-column label="Name" key="display_name" sortable>
+              </table-column>
+              <table-column label="Email" key="email" hide-mobile sortable>
+              </table-column>
+              <table-column label="Role" key="role" hide-mobile>
+              </table-column>
+              <table-column label="Location" key="location" hide-mobile>
+              </table-column>
+            </table-columns>
+          </data-table>
+        </panel-body>
+      </section-panel>
+    </div>
+  </div>
+{% endblock content %}

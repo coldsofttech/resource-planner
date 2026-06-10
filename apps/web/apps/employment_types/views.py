@@ -22,3 +22,16 @@ class EmploymentTypesListView(ProtectedView):
             "employment_types.export_employmenttype" in perms
         )
         return ctx
+
+
+class EmploymentTypeDetailView(ProtectedView):
+    template_name = "employment_types/detail.html"
+
+    def get_context_data(self, **kwargs: object) -> dict[str, object]:
+        ctx = super().get_context_data(**kwargs)
+        ctx["emp_type_code"] = self.kwargs["code"]
+        perms = get_user_permissions(self.request.user)
+        ctx["can_change_employment_type"] = (
+            "employment_types.change_employmenttype" in perms
+        )
+        return ctx
