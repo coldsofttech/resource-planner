@@ -7,7 +7,8 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
 
     steps:
@@ -42,28 +43,74 @@ jobs:
       - name: mypy
         run: mypy packages
 
-      - name: pytest (integration)
-        run: |
-          mkdir -p .pytest-reports
-          pytest -n auto --dist=loadfile -m integration -p no:django --override-ini=addopts= --import-mode=importlib --junit-xml=.pytest-reports/junit.xml --html=.pytest-reports/test-report.html --self-contained-html packages/awscore/tests/ packages/emailcore/tests/ packages/pycore/tests/ packages/otpcore/tests/ packages/exportcore/tests/ packages/storagecore/tests/ || [ $? -eq 5 ]
-
-      - name: Upload test report
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: packages-test-report
-          path: .pytest-reports/
-
-      - name: Build Validation
-        run: |
-          python -m build packages/awscore
-          python -m build packages/pycore
-          python -m build packages/emailcore
-          python -m build packages/otpcore
-          python -m build packages/storagecore
-
       - name: Bandit
         run: bandit -r packages --configfile pyproject.toml
 
       - name: pip-audit
         run: pip-audit --skip-editable
+
+  test:
+    name: Test (${{ matrix.package }})
+    needs: lint
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - awscore
+          - pycore
+          - emailcore
+          - otpcore
+          - exportcore
+          - storagecore
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements/base.txt
+          pip install -r requirements/dev.txt
+          pip install build
+
+      - name: Install packages
+        run: |
+          pip install -e packages/awscore
+          pip install -e packages/pycore
+          pip install -e packages/emailcore
+          pip install -e packages/otpcore
+          pip install -e packages/exportcore
+          pip install -e packages/storagecore
+
+      - name: pytest (${{ matrix.package }})
+        run: |
+          mkdir -p .pytest-reports
+          set +e
+          pytest -n auto --dist=loadfile -m integration -p no:django --override-ini=addopts= --import-mode=importlib \
+            --junit-xml=.pytest-reports/junit-${{ matrix.package }}.xml \
+            --html=.pytest-reports/test-report-${{ matrix.package }}.html \
+            --self-contained-html \
+            packages/${{ matrix.package }}/tests/
+          EXIT_CODE=$?
+          set -e
+          if [ $EXIT_CODE -eq 5 ]; then
+            printf '<?xml version="1.0" encoding="utf-8"?>\n<testsuites/>\n' > .pytest-reports/junit-${{ matrix.package }}.xml
+            printf '<!DOCTYPE html><html><body><p>No integration tests collected for ${{ matrix.package }}.</p></body></html>\n' > .pytest-reports/test-report-${{ matrix.package }}.html
+          elif [ $EXIT_CODE -ne 0 ]; then
+            exit $EXIT_CODE
+          fi
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: packages-test-report-${{ matrix.package }}
+          path: .pytest-reports/
+
+      - name: Build Validation
+        run: python -m build packages/${{ matrix.package }}

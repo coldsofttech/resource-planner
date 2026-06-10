@@ -46,6 +46,9 @@ jobs:
           test -f apps/web/static/js/dist/auth.min.js
           test -f apps/web/static/js/dist/components.min.js
           test -f apps/web/static/js/dist/emp-types.min.js
+          test -f apps/web/static/js/dist/financial-years.min.js
+          test -f apps/web/static/js/dist/holidays.min.js
+          test -f apps/web/static/js/dist/leaves.min.js
           test -f apps/web/static/js/dist/locations.min.js
           test -f apps/web/static/js/dist/main.min.js
           test -f apps/web/static/js/dist/roles.min.js
@@ -88,6 +91,9 @@ jobs:
           - auth
           - configurations
           - employment_types
+          - financial_years
+          - holidays
+          - leaves
           - locations
           - meta
           - oauth
@@ -114,11 +120,20 @@ jobs:
       - name: pytest (integration — ${{ matrix.app }})
         run: |
           mkdir -p .pytest-reports
+          set +e
           pytest --override-ini=addopts= -m integration \
             --junit-xml=.pytest-reports/junit-${{ matrix.app }}.xml \
             --html=.pytest-reports/test-report-${{ matrix.app }}.html \
             --self-contained-html \
-            apps/web/apps/${{ matrix.app }}/tests/ || [ $? -eq 5 ]
+            apps/web/apps/${{ matrix.app }}/tests/
+          EXIT_CODE=$?
+          set -e
+          if [ $EXIT_CODE -eq 5 ]; then
+            printf '<?xml version="1.0" encoding="utf-8"?>\n<testsuites/>\n' > .pytest-reports/junit-${{ matrix.app }}.xml
+            printf '<!DOCTYPE html><html><body><p>No integration tests collected for ${{ matrix.app }}.</p></body></html>\n' > .pytest-reports/test-report-${{ matrix.app }}.html
+          elif [ $EXIT_CODE -ne 0 ]; then
+            exit $EXIT_CODE
+          fi
 
       - name: Upload test report
         if: always()

@@ -229,6 +229,7 @@ apps/web/media/user_avatars/
 .pytest-reports/
 .dev-cache/
 .temp/
+docs/samples
 
 # Test tracker database and SQLite WAL files
 tools/test-tracker/tracker.db

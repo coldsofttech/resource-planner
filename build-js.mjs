@@ -1,16 +1,19 @@
 import esbuild from "esbuild";
 
 const esmModules = [
-  "utils",
-  "main",
-  "setup",
   "auth",
-  "teams",
-  "skills",
-  "roles",
-  "locations",
   "emp-types",
+  "financial-years",
+  "holidays",
+  "leaves",
+  "locations",
+  "main",
+  "roles",
+  "setup",
+  "skills",
+  "teams",
   "users",
+  "utils",
 ];
 
 const buildConfigs = [
