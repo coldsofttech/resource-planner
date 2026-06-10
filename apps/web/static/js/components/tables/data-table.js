@@ -88,8 +88,6 @@ class DataTable extends HTMLElement {
     if (this._onDocClick) document.removeEventListener("click", this._onDocClick);
   }
 
-  /* ── Attribute accessors ─────────────────────────────────────────────── */
-
   get _title() {
     return this.getAttribute("title") || "";
   }
@@ -114,8 +112,6 @@ class DataTable extends HTMLElement {
   get _emptyMsg() {
     return this.getAttribute("empty-message") || "No records found.";
   }
-
-  /* ── Config reading (before innerHTML is replaced) ───────────────────── */
 
   _readConfig() {
     this._columns = Array.from(this.querySelectorAll("table-column")).map((el) => ({
@@ -150,8 +146,6 @@ class DataTable extends HTMLElement {
       return null;
     }
   }
-
-  /* ── Initial render ──────────────────────────────────────────────────── */
 
   _render() {
     const headHTML = this._buildCardHead();
@@ -222,8 +216,6 @@ class DataTable extends HTMLElement {
     return (inline + (hasMore ? 1 : 0)) * 34 + 12;
   }
 
-  /* ── Card-head sync after attribute change ───────────────────────────── */
-
   _syncCardHead() {
     const wrap = this.querySelector(".rp-table-wrap");
     if (!wrap) return;
@@ -252,8 +244,6 @@ class DataTable extends HTMLElement {
       wrap.prepend(div);
     }
   }
-
-  /* ── Data loading ────────────────────────────────────────────────────── */
 
   async _loadData(page = 1) {
     this._currentPage = page;
@@ -296,14 +286,18 @@ class DataTable extends HTMLElement {
     }
   }
 
-  /* ── Row application ─────────────────────────────────────────────────── */
-
   _applyRows(rows, pagination) {
     this._rows = rows ?? [];
     this._pagination = pagination ?? null;
 
     if (this._rows.length === 0) {
       this._showState("empty");
+      this.dispatchEvent(
+        new CustomEvent("rp:data:loaded", {
+          bubbles: true,
+          detail: { rows: this._rows, pagination: this._pagination },
+        }),
+      );
       return;
     }
 
@@ -313,9 +307,14 @@ class DataTable extends HTMLElement {
     if (this._isPaginated && this._pagination) {
       this._renderPagination(this._pagination);
     }
-  }
 
-  /* ── Row rendering ───────────────────────────────────────────────────── */
+    this.dispatchEvent(
+      new CustomEvent("rp:data:loaded", {
+        bubbles: true,
+        detail: { rows: this._rows, pagination: this._pagination },
+      }),
+    );
+  }
 
   _renderRows() {
     const tbody = this.querySelector("[data-rp-tbody]");
@@ -436,8 +435,6 @@ class DataTable extends HTMLElement {
     return href.replace(/\{(\w+)\}/g, (_, key) => esc(String(row[key] ?? "")));
   }
 
-  /* ── Pagination ──────────────────────────────────────────────────────── */
-
   _renderPagination(p) {
     const container = this.querySelector("[data-rp-pagination]");
     if (!container) return;
@@ -497,8 +494,6 @@ class DataTable extends HTMLElement {
     return out.join("");
   }
 
-  /* ── State management ────────────────────────────────────────────────── */
-
   _showState(state, errMsg) {
     ["loading", "empty", "error"].forEach((s) => {
       const el = this.querySelector(`[data-rp-state="${s}"]`);
@@ -518,8 +513,6 @@ class DataTable extends HTMLElement {
     }
   }
 
-  /* ── Sort icons ──────────────────────────────────────────────────────── */
-
   _updateSortIcons() {
     this.querySelectorAll("[data-rp-sort-icon]").forEach((icon) => {
       const key = icon.getAttribute("data-rp-sort-icon");
@@ -530,8 +523,6 @@ class DataTable extends HTMLElement {
       }
     });
   }
-
-  /* ── Event binding ───────────────────────────────────────────────────── */
 
   _bindEvents() {
     const wrap = this.querySelector(".rp-table-wrap");
@@ -609,8 +600,6 @@ class DataTable extends HTMLElement {
       m.style.left = "";
     });
   }
-
-  /* ── Public API ──────────────────────────────────────────────────────── */
 
   set rows(data) {
     this._applyRows(Array.isArray(data) ? data : [], null);

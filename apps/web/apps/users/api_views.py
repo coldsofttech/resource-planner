@@ -9,6 +9,7 @@ from rest_framework.request import Request
 from apps.core.exceptions import ValidationException
 from apps.core.viewsets import BaseViewSet, ExportMixin
 from apps.users.serializers import (
+    AssignMemberSerializer,
     ChangePasswordSerializer,
     MemberListSerializer,
     MemberUpdateSerializer,
@@ -298,6 +299,8 @@ class MembersViewSet(ExportMixin, BaseViewSet):
             return [HasPermission("users.view_user")]
         if self.action in ("export_specs", "export"):
             return [HasPermission("users.export_member")]
+        if self.action == "assign_team":
+            return [HasPermission("teams.assign_team")]
         return [HasPermission("users.change_user_workforce")]
 
     @extend_schema(
@@ -372,3 +375,48 @@ class MembersViewSet(ExportMixin, BaseViewSet):
         except Exception:
             default_holidays = None
         return self.response(data={"default_holidays": default_holidays})
+
+    @extend_schema(
+        summary="Assign member to team(s)",
+        description=(
+            "Assigns a member to one or more teams. "
+            "Non-leadership members may only be assigned to one team at a time. "
+            "Pass an empty teams list to unassign from all teams "
+            "(requires unassign_team permission)."
+        ),
+        request=AssignMemberSerializer,
+        responses={
+            200: OpenApiResponse(description="Assignment updated."),
+            400: OpenApiResponse(description="Validation error."),
+            401: OpenApiResponse(description="Authentication required."),
+            403: OpenApiResponse(description="Permission denied."),
+            404: OpenApiResponse(description="Member or team not found."),
+        },
+    )
+    def assign_team(self, request: Request, code: str = ""):
+        """POST /members/<code>/assign-team/"""
+        from apps.core.exceptions import PermissionException
+        from apps.teams.services import AssignmentService
+
+        serializer = AssignMemberSerializer(
+            data=request.data, context=self.get_serializer_context()
+        )
+        serializer.is_valid(raise_exception=True)
+        teams = serializer.validated_data["teams"]
+
+        # Unassigning (empty teams) requires the separate unassign_team permission.
+        if not teams and not request.user.has_perm("teams.unassign_team"):
+            raise PermissionException()
+
+        AssignmentService(user=request.user).assign(
+            member_code=code,
+            teams=teams,
+            note=serializer.validated_data.get("note", ""),
+        )
+        obj = self._members_service().get(code=code)
+        response_serializer = MemberListSerializer(
+            obj, context=self.get_serializer_context()
+        )
+        return self.response(
+            data=response_serializer.data, message="Team assignment updated."
+        )

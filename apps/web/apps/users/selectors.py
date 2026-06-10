@@ -53,7 +53,7 @@ def get_all_members() -> QuerySet[UserProfile]:
             "created_by",
             "updated_by",
         )
-        .prefetch_related("skills", "user__avatars")
+        .prefetch_related("skills", "user__avatars", "user__team_assignments__team")
         .order_by("user__last_name", "user__first_name")
     )
 
@@ -69,7 +69,7 @@ def get_member_by_code(code: str) -> UserProfile | None:
                 "created_by",
                 "updated_by",
             )
-            .prefetch_related("user__avatars")
+            .prefetch_related("user__avatars", "user__team_assignments__team")
             .get(code=code)
         )
     except UserProfile.DoesNotExist:

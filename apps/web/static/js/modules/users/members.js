@@ -25,6 +25,12 @@ window.renderMembersRow = function renderMembersRow(row) {
     ? `<span class="rp-badge rp-badge-success">Active</span>`
     : `<span class="rp-badge rp-badge-soft">Inactive</span>`;
 
+  const teams = row.teams ?? [];
+  const teamsCell =
+    teams.length === 0
+      ? `<span style="color:var(--rp-text-muted)">—</span>`
+      : teams.map((t) => `<span class="rp-badge rp-badge-soft">${esc(t.name)}</span>`).join(" ");
+
   return `
     <td><user-avatar avatar-url="${esc(row.avatar_url || "")}" name="${esc(name)}" size="sm"></user-avatar></td>
     <td class="fw-medium">${esc(name)}</td>
@@ -33,6 +39,7 @@ window.renderMembersRow = function renderMembersRow(row) {
     <td style="color:var(--rp-text-muted)">${esc(empType)}</td>
     <td style="color:var(--rp-text-muted)">${esc(role)}</td>
     <td>${statusBadge}</td>
+    <td>${teamsCell}</td>
     <td style="color:var(--rp-text-muted)">${formatDate(row.joined_date)}</td>
   `;
 };
@@ -197,6 +204,9 @@ function openViewDrawer(row) {
   const skillsEl = document.getElementById("rp-view-member-skills");
   if (skillsEl) skillsEl.value = row.skills?.map((s) => s.skill) ?? [];
 
+  const teamsEl = document.getElementById("rp-view-member-teams");
+  if (teamsEl) teamsEl.value = row.teams?.map((t) => t.name) ?? [];
+
   const metaEl = drawer.querySelector(".rp-rdrawer-foot-meta");
   if (metaEl) metaEl.textContent = formatMeta(row);
 
@@ -224,8 +234,98 @@ function initViewDrawer(table) {
   });
 }
 
+function openAssignTeamDrawer(row) {
+  const drawer = document.getElementById("rp-member-assign-team-drawer");
+  if (!drawer) return;
+
+  pendingRow = row;
+
+  const name =
+    row.display_name || [row.first_name, row.last_name].filter(Boolean).join(" ") || row.email;
+
+  drawer
+    .querySelector("#rp-assign-team-member-avatar")
+    ?.setAttribute("avatar-url", row.avatar_url || "");
+  drawer.querySelector("#rp-assign-team-member-avatar")?.setAttribute("name", name);
+  drawer.setTitle(name);
+
+  const isLeadership = row.role?.is_leadership ?? false;
+  const currentTeams = row.teams ?? [];
+  const teamField = document.getElementById("rp-assign-team-field");
+
+  if (teamField) {
+    if (isLeadership) {
+      teamField.setAttribute("multi-select", "");
+      teamField.setAttribute("label", "Teams");
+      teamField.removeAttribute("unassign");
+      teamField.value = currentTeams.map((t) => t.code);
+    } else {
+      teamField.removeAttribute("multi-select");
+      teamField.setAttribute("label", "Team");
+      if (currentTeams.length > 0) {
+        teamField.setAttribute("unassign", "");
+      } else {
+        teamField.removeAttribute("unassign");
+      }
+      teamField.value = currentTeams[0]?.code ?? "";
+    }
+  }
+
+  const noteInput = document.getElementById("rp-assign-team-note");
+  if (noteInput) noteInput.value = "";
+
+  drawer.show();
+}
+
+function initAssignTeamDrawer(table) {
+  const drawer = document.getElementById("rp-member-assign-team-drawer");
+  if (!drawer) return;
+
+  drawer.addEventListener("rp:footer-primary", async () => {
+    if (!pendingRow) return;
+
+    const submitBtn = drawer.querySelector("[data-footer-primary]");
+    const snap = snapshotButton(submitBtn);
+    setBusyButton(submitBtn, "Saving…");
+
+    const isLeadership = pendingRow.role?.is_leadership ?? false;
+    const teamField = document.getElementById("rp-assign-team-field");
+    let teams = [];
+
+    if (isLeadership) {
+      teams = teamField ? teamField.values.map((v) => v.value) : [];
+    } else {
+      const val = teamField?.value || "";
+      teams = val ? [val] : [];
+    }
+
+    const noteInput = document.getElementById("rp-assign-team-note");
+    const note = noteInput?.value?.trim() ?? "";
+
+    const { href, method } = API_URLS.members.assignTeam(pendingRow.code);
+    try {
+      await apiFetch(href, { method, body: JSON.stringify({ teams, note }) });
+      restoreButton(submitBtn, snap);
+      drawer.hide();
+      table.refresh();
+      toast({
+        type: "success",
+        title: "Team assignment updated",
+        message: "Changes have been saved.",
+      });
+      pendingRow = null;
+    } catch (err) {
+      restoreButton(submitBtn, snap);
+      const msg =
+        err?.data?.error?.message ?? "Failed to update team assignment. Please try again.";
+      toast({ type: "error", title: "Error", message: msg });
+    }
+  });
+}
+
 function initActions(table) {
   table.addEventListener("rp:member:edit", (e) => openEditDrawer(e.detail.row));
+  table.addEventListener("rp:member:assign-team", (e) => openAssignTeamDrawer(e.detail.row));
 }
 
 function initExportView() {
@@ -258,19 +358,7 @@ async function initHolidaysFieldMeta() {
   }
 }
 
-function initBreadcrumbs() {
-  const crumbs = document.getElementById("app-breadcrumbs");
-  if (crumbs?.setCrumbs) {
-    crumbs.setCrumbs([
-      { label: "Home", href: "/dashboard" },
-      { label: "Members", href: "/members/" },
-    ]);
-  }
-}
-
 document.addEventListener("DOMContentLoaded", () => {
-  initBreadcrumbs();
-
   const table = document.getElementById("rp-members-table");
   if (!table) return;
 
@@ -284,5 +372,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (hasPermission("users.export_member")) {
     document.getElementById("rp-members-export-btn")?.removeAttribute("hidden");
     initExportView();
+  }
+  if (hasPermission("teams.assign_team")) {
+    initAssignTeamDrawer(table);
   }
 });

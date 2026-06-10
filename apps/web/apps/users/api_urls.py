@@ -72,6 +72,11 @@ urlpatterns = [
         name="members-export",
     ),
     path(
+        "members/<str:code>/assign-team/",
+        MembersViewSet.as_view({"post": "assign_team"}),
+        name="members-assign-team",
+    ),
+    path(
         "members/<str:code>/",
         MembersViewSet.as_view({"get": "retrieve", "patch": "partial_update"}),
         name="members-detail",

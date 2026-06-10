@@ -7,7 +7,7 @@
   <script type="module" src="{% static 'js/dist/users.min.js' %}"></script>
 {% endblock scripts %}
 {% block page_eyebrow %}
-  Organisation
+  People
 {% endblock page_eyebrow %}
 {% block page_title %}
   Members
@@ -21,11 +21,12 @@
 {% block content %}
   <list-view show-active-filters>
   <filter-panel id="rp-members-filter-panel">
-  <search-field id="rp-members-search" name="search" placeholder="Search members..." shortcut="/" show-label></search-field>
-  <is-active-field id="rp-members-filter-active" name="is_active" value="true" show-label></is-active-field>
+  <search-field id="rp-members-search" name="search" placeholder="Search members..." shortcut="/" col="col-auto" show-label></search-field>
+  <is-active-field id="rp-members-filter-active" name="is_active" value="true" col="col-auto" show-label></is-active-field>
   <role-field id="rp-members-filter-role" name="role" col="col-auto" allow-all show-label></role-field>
   <employment-type-field id="rp-members-filter-emp-type" name="employment_type" col="col-auto" allow-all show-label></employment-type-field>
   <location-field id="rp-members-filter-location" name="location" col="col-auto" allow-all show-label></location-field>
+  <team-field id="rp-members-filter-team" name="team" col="col-auto" allow-all show-label></team-field>
   </filter-panel>
   <data-table id="rp-members-table" url="/api/v1/members/" paginated page-size="25" row-template="renderMembersRow" empty-message="No members found.">
     <table-columns>
@@ -43,12 +44,18 @@
       </table-column>
       <table-column label="Status" key="is_active" hide-mobile>
       </table-column>
+      <table-column label="Team" key="teams" hide-mobile>
+      </table-column>
       <table-column label="Joined" key="joined_date" hide-mobile sortable>
       </table-column>
     </table-columns>
     <table-actions>
       {% if can_change_workforce %}
         <table-action icon="bi-pencil" label="Edit" event="rp:member:edit">
+        </table-action>
+      {% endif %}
+      {% if can_assign_team %}
+        <table-action icon="bi-people" label="Assign Team" event="rp:member:assign-team">
         </table-action>
       {% endif %}
     </table-actions>
@@ -79,6 +86,25 @@
   <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
   </drawer-modal>
   <export-view id="rp-members-export-view" title="Export Members" eyebrow="Members" active-filter-id="rp-members-filter-panel"></export-view>
+  <!-- Assign Team drawer -->
+  <drawer-modal id="rp-member-assign-team-drawer" width="900">
+  <drawer-header eyebrow="Assign Team" title="Member" no-sizes>
+  <user-avatar id="rp-assign-team-member-avatar" size="lg"></user-avatar>
+  </drawer-header>
+  <drawer-panel>
+  <div class="alert alert-info d-flex gap-2 mb-3 py-2 px-3"
+       style="font-size: 0.85rem"
+       role="alert">
+    <i class="bi bi-info-circle"></i>
+    <span>Leadership members can be assigned to multiple teams. Other members can only be in one team at a time.</span>
+  </div>
+  <div class="row g-3">
+    <team-field id="rp-assign-team-field" col="col-12" label="Team"></team-field>
+    <text-field id="rp-assign-team-note" col="col-12" label="Note" placeholder="Optional reason or note..." cols="3"></text-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
   <!-- View drawer -->
   <drawer-modal id="rp-member-view-drawer" width="900">
   <drawer-header eyebrow="Member" title="Member" no-sizes>
@@ -98,6 +124,7 @@
   <view-field id="rp-view-member-leaving" label="Leaving date"></view-field>
   <view-field id="rp-view-member-holidays" label="Default holidays"></view-field>
   <view-field id="rp-view-member-skills" label="Skills" tags="rp-badge rp-badge-soft"></view-field>
+  <view-field id="rp-view-member-teams" label="Teams" tags="rp-badge rp-badge-soft"></view-field>
   <view-field id="rp-view-member-created" label="Created" meta></view-field>
   <view-field id="rp-view-member-created-by" label="Created by" meta></view-field>
   </drawer-panel>
