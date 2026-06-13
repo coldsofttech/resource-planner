@@ -164,3 +164,21 @@ class FinancialYear:
     @staticmethod
     def get_fy_expiry_warning_days() -> int:
         return int(get_config_value("FY_EXPIRY_WARNING_DAYS"))
+
+
+class Sprint:
+    @staticmethod
+    def get_sprint_name_prefix() -> str:
+        return get_config_value("SPRINT_NAME_PREFIX")
+
+    @staticmethod
+    def get_sprint_start_number() -> int:
+        return int(get_config_value("SPRINT_START_NUMBER"))
+
+    @staticmethod
+    def get_sprint_duration_days() -> int:
+        return int(get_config_value("SPRINT_DURATION_DAYS"))
+
+    @staticmethod
+    def get_sprint_point_price() -> int:
+        return int(get_config_value("SPRINT_POINT_PRICE"))

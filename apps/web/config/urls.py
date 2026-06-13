@@ -34,6 +34,8 @@ urlpatterns = [
     path("", include("apps.financial_years.urls")),
     path("", include("apps.holidays.urls")),
     path("", include("apps.leaves.urls")),
+    path("", include("apps.sprints.urls")),
+    path("", include("apps.projects.urls")),
     path("api/v1/", include("apps.setup.api_urls")),
     path("api/v1/", include("apps.meta.api_urls")),
     path("api/v1/", include("apps.auth.api_urls")),
@@ -49,4 +51,6 @@ urlpatterns = [
     path("api/v1/", include("apps.financial_years.api_urls")),
     path("api/v1/", include("apps.holidays.api_urls")),
     path("api/v1/", include("apps.leaves.api_urls")),
+    path("api/v1/", include("apps.sprints.api_urls")),
+    path("api/v1/", include("apps.projects.api_urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

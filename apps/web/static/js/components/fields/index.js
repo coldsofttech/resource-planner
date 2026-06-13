@@ -9,6 +9,7 @@ import "./multi-select-field.js";
 import "./number-field.js";
 import "./otp-field.js";
 import "./password-field.js";
+import "./progress-bar.js";
 import "./search-field.js";
 import "./secret-field.js";
 import "./text-field.js";

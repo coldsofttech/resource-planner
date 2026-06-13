@@ -94,6 +94,30 @@
                                   {% endif %}
                                 </menu-section>
                               </menu-group>
+                              {% if "sprints.view_sprint" in rp_permissions or "projects.view_programme" in rp_permissions or "projects.view_projecttype" in rp_permissions or "projects.view_projectstatus" in rp_permissions %}
+                                <menu-group name="Project" icon="bi-kanban">
+                                  {% if "projects.view_programme" in rp_permissions %}
+                                    <menu-section label="Projects">
+                                      <menu-item name="Programmes" href="/programmes/" icon="bi-collection"></menu-item>
+                                    </menu-section>
+                                  {% endif %}
+                                  {% if "sprints.view_sprint" in rp_permissions %}
+                                    <menu-section label="Planning">
+                                      <menu-item name="Sprints" href="/sprints/" icon="bi-lightning"></menu-item>
+                                    </menu-section>
+                                  {% endif %}
+                                  {% if "projects.view_projecttype" in rp_permissions or "projects.view_projectstatus" in rp_permissions %}
+                                    <menu-section label="Configurations">
+                                      {% if "projects.view_projecttype" in rp_permissions %}
+                                        <menu-item name="Project Types" href="/projects/types/" icon="bi-tag"></menu-item>
+                                      {% endif %}
+                                      {% if "projects.view_projectstatus" in rp_permissions %}
+                                        <menu-item name="Project Statuses" href="/projects/statuses/" icon="bi-flag"></menu-item>
+                                      {% endif %}
+                                    </menu-section>
+                                  {% endif %}
+                                </menu-group>
+                              {% endif %}
                               {% if "financial_years.view_financialyear" in rp_permissions %}
                                 <menu-group name="Administration" icon="bi-calendar2-range">
                                   <menu-section label="Planning">

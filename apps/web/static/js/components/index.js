@@ -1,3 +1,4 @@
+import "./accordions/index.js";
 import "./banners/index.js";
 import "./breadcrumbs/index.js";
 import "./buttons/index.js";

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Project Statuses
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/project-statuses.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Projects / Configurations
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Project Statuses
+{% endblock page_title %}
+{% block page_sub %}
+  Manage project statuses and their sub-statuses across your organisation.
+{% endblock page_sub %}
+{% block page_actions %}
+  <secondary-button id="rp-substatus-import-btn" label="Import" prefix-icon="bi-upload" hidden></secondary-button>
+  <secondary-button id="rp-substatus-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+  <secondary-button id="rp-substatus-add-btn" label="Add Sub-Status" prefix-icon="bi-plus-lg" hidden></secondary-button>
+{% endblock page_actions %}
+{% block content %}
+  <div id="rp-statuses-loading" class="text-center py-5">
+    <span class="spinner-border spinner-border-sm text-muted"></span>
+  </div>
+  <div id="rp-statuses-container"></div>
+
+  <!-- Sub-status create drawer -->
+  <drawer-modal id="rp-substatus-create-drawer" width="900">
+    <drawer-header eyebrow="New record" title="Add Sub-Status" no-sizes></drawer-header>
+    <drawer-panel>
+      <div class="row g-3">
+        <project-status-field id="rp-new-substatus-status" col="col-12" required show-label></project-status-field>
+        <text-field id="rp-new-substatus-name" col="col-12" label="Sub-Status Name" placeholder="e.g. Draft" required maxlength="100" show-counter></text-field>
+      </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Add Sub-Status" primary-icon="bi-check2" data-footer-primary></drawer-footer>
+  </drawer-modal>
+
+  <!-- Sub-status edit drawer -->
+  <drawer-modal id="rp-substatus-edit-drawer" width="900">
+    <drawer-header eyebrow="Edit record" title="Edit Sub-Status" no-sizes></drawer-header>
+    <drawer-panel>
+      <div class="row g-3">
+        <view-field id="rp-edit-substatus-status" col="col-12" label="Main Status"></view-field>
+        <text-field id="rp-edit-substatus-name" col="col-12" label="Sub-Status Name" placeholder="e.g. Draft" required maxlength="100" show-counter></text-field>
+      </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2" data-footer-primary></drawer-footer>
+  </drawer-modal>
+
+  <!-- Sub-status delete / activate / deactivate modals -->
+  <delete-modal id="rp-substatus-delete-modal" action-label="Delete sub-status"></delete-modal>
+  <activate-modal id="rp-substatus-activate-modal"></activate-modal>
+  <deactivate-modal id="rp-substatus-deactivate-modal"></deactivate-modal>
+
+  <!-- Sub-status import / export views -->
+  <import-view id="rp-substatus-import-view" title="Import Sub-Statuses" eyebrow="Sub-Statuses"></import-view>
+  <export-view id="rp-substatus-export-view" title="Export Sub-Statuses" eyebrow="Sub-Statuses"></export-view>
+{% endblock content %}

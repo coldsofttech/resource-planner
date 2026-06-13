@@ -119,4 +119,10 @@
   .rp-profile-trigger .bi-chevron-down {
     display: none;
   }
+  .rp-top-actions > .rp-sprint-pill .rp-sprint-name {
+    display: none;
+  }
+  .rp-top-actions > .rp-sprint-pill .rp-sprint-time {
+    display: inline;
+  }
 }

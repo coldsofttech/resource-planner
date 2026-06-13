@@ -154,6 +154,13 @@ class TeamField extends DropdownField {
         if (select) select.disabled = true;
       }
       this._fetchOptions(this._loadId);
+    } else if (!this._isMultiSelect && this._teamOptions === undefined) {
+      // Reconnect after a DOM move (e.g. section-panel relocating panel-body children)
+      // invalidated the in-flight fetch via disconnectedCallback. Re-issue the fetch.
+      this._loadId = Symbol();
+      const select = this.querySelector(".rp-input");
+      if (select) select.disabled = true;
+      this._fetchOptions(this._loadId);
     }
   }
 

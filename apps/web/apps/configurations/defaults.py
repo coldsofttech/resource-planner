@@ -251,6 +251,57 @@ _HOLIDAYS_DEFAULTS = {
 }
 
 
+_SPRINT_DEFAULTS = {
+    "SPRINT_NAME_PREFIX": {
+        "label": "Sprint Name Prefix",
+        "value": "Sprint",
+        "description": (
+            "Prefix used when auto-generating sprint names. "
+            "For example, 'Sprint', 'SP', etc."
+        ),
+        "data_type": "string",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "sprints",
+    },
+    "SPRINT_START_NUMBER": {
+        "label": "Sprint Start Number",
+        "value": "1",
+        "description": (
+            "The starting number used when generating the first sprint of "
+            "a financial year if no existing sprints are found."
+        ),
+        "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "sprints",
+    },
+    "SPRINT_DURATION_DAYS": {
+        "label": "Sprint Duration (days)",
+        "value": "14",
+        "description": (
+            "Number of calendar days in a sprint. Typically set to 14 days (2 weeks)."
+        ),
+        "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "sprints",
+    },
+    "SPRINT_POINT_PRICE": {
+        "label": "Sprint Point Price (£)",
+        "value": "1150",
+        "description": (
+            "Day rate in GBP (£) used for calculating sprint cost "
+            "based on story points. "
+        ),
+        "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "sprints",
+    },
+}
+
+
 CONFIGURATION_DEFAULTS = {
     **_SETUP_DEFAULTS,
     **_GENERAL_DEFAULTS,
@@ -259,4 +310,5 @@ CONFIGURATION_DEFAULTS = {
     **_EMAIL_DEFAULTS,
     **_FINANCIAL_YEAR_DEFAULTS,
     **_HOLIDAYS_DEFAULTS,
+    **_SPRINT_DEFAULTS,
 }

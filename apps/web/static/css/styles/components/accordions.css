@@ -1,3 +1,50 @@
+/* ── accordion-panel component ─────────────────────────────────────────────── */
+
+accordion-panel {
+  display: block;
+  border: 1px solid var(--rp-border);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.rp-acc-panel-hd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+
+.rp-acc-panel-hd:hover {
+  background: var(--rp-bg-hover, rgba(0, 0, 0, 0.04));
+}
+
+.rp-acc-panel-hd:focus-visible {
+  outline: 2px solid var(--rp-primary);
+  outline-offset: -2px;
+}
+
+.rp-acc-chevron {
+  transition: transform 0.2s;
+  font-size: 12px;
+  color: var(--rp-text-muted);
+  flex-shrink: 0;
+}
+
+accordion-panel[data-open="true"] .rp-acc-chevron {
+  transform: rotate(90deg);
+}
+
+.rp-acc-panel-bd {
+  border-top: 1px solid var(--rp-border);
+  padding: 12px 16px 16px;
+}
+
+/* ── legacy rp-accordion-* (existing usage) ─────────────────────────────── */
+
 .rp-accordion-item {
   border-bottom: 1px solid var(--rp-divider);
 }

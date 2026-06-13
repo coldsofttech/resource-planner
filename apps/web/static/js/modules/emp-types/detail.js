@@ -1,6 +1,6 @@
 "use strict";
 
-import { esc } from "../../components/utils.js";
+import { esc, setBreadcrumbs } from "../../components/utils.js";
 import { apiFetch, formatDate } from "../utils/utils.js";
 import { toast } from "../utils/toast.js";
 import { API_URLS, UI_URLS } from "../main/urls.js";
@@ -32,13 +32,12 @@ async function loadEmpTypeDetails() {
     const titleEl = document.getElementById("rp-emp-type-detail-title");
     if (titleEl) titleEl.textContent = empType.name;
 
-    const breadcrumbs = document.getElementById("app-breadcrumbs");
-    if (breadcrumbs?.setCrumbs) {
-      breadcrumbs.setCrumbs([
-        { label: "Employment Types", href: UI_URLS.empTypes.list() },
-        { label: empType.name },
-      ]);
-    }
+    setBreadcrumbs([
+      { label: "Organisation" },
+      { label: "Configurations" },
+      { label: "Employment Types", href: UI_URLS.empTypes.list() },
+      { label: empType.name },
+    ]);
 
     const setView = (id, val) => {
       const el = document.getElementById(id);
@@ -69,6 +68,7 @@ async function loadEmpTypeDetails() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  if (!empTypeCode) return;
   loadEmpTypeDetails();
   if (hasPermission("auth.view_user")) {
     document.getElementById("rp-emp-type-members-col")?.removeAttribute("hidden");

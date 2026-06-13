@@ -51,9 +51,13 @@ jobs:
           test -f apps/web/static/js/dist/leaves.min.js
           test -f apps/web/static/js/dist/locations.min.js
           test -f apps/web/static/js/dist/main.min.js
+          test -f apps/web/static/js/dist/programmes.min.js
+          test -f apps/web/static/js/dist/project-statuses.min.js
+          test -f apps/web/static/js/dist/project-types.min.js
           test -f apps/web/static/js/dist/roles.min.js
           test -f apps/web/static/js/dist/setup.min.js
           test -f apps/web/static/js/dist/skills.min.js
+          test -f apps/web/static/js/dist/sprints.min.js
           test -f apps/web/static/js/dist/teams.min.js
           test -f apps/web/static/js/dist/theme-init.min.js
           test -f apps/web/static/js/dist/users.min.js
@@ -98,9 +102,12 @@ jobs:
           - meta
           - oauth
           - permissions
+          - projects
+          - roles
           - saml
           - setup
           - skills
+          - sprints
           - teams
           - users
 

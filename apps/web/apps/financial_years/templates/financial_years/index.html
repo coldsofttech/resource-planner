@@ -101,11 +101,13 @@
   <view-field id="rp-view-fy-end" col="col-12 col-md-6" label="End Date"></view-field>
   <view-field id="rp-view-fy-span" col="col-12 col-md-6" label="Span (Days)"></view-field>
   <view-field id="rp-view-fy-status" col="col-12 col-md-6" label="Status"></view-field>
-  <view-field id="rp-view-fy-note" col="col-12" label="Note"></view-field>
+  <view-field id="rp-view-fy-note" col="col-12" label="Note" desc></view-field>
   <view-field id="rp-view-fy-created" col="col-12 col-md-6" label="Created" meta></view-field>
   <view-field id="rp-view-fy-created-by" col="col-12 col-md-6" label="Created by" meta></view-field>
   </drawer-panel>
-  <drawer-footer close="Close" primary="Edit Financial Year" primary-icon="bi-pencil"></drawer-footer>
+  <drawer-footer close="Close"
+  {% if can_change_fy %}primary="Edit Financial Year" primary-icon="bi-pencil"{% endif %}
+  ></drawer-footer>
   </drawer-modal>
   <delete-modal id="rp-fy-delete-modal" action-label="Delete financial year"></delete-modal>
   <activate-modal id="rp-fy-activate-modal"></activate-modal>

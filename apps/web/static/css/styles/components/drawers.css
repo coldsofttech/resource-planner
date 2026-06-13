@@ -230,6 +230,8 @@ view-field > dd {
   font-size: 14px;
   color: var(--rp-text);
   margin: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 @media (max-width: 480px) {
   .rp-view-field,

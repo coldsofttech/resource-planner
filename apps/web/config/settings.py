@@ -75,6 +75,8 @@ INSTALLED_APPS = [
     "apps.financial_years.apps.FinancialYearConfig",
     "apps.holidays.apps.HolidayConfig",
     "apps.leaves.apps.LeaveConfig",
+    "apps.sprints.apps.SprintConfig",
+    "apps.projects.apps.ProjectConfig",
     "apps.dashboard.apps.DashboardConfig",
 ]
 

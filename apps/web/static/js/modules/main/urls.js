@@ -43,6 +43,19 @@ export const UI_URLS = {
   fy: {
     list: () => "/fy/",
   },
+  sprints: {
+    list: () => "/sprints/",
+    detail: (code) => `/sprints/${code}/`,
+  },
+  programmes: {
+    list: () => "/programmes/",
+  },
+  projectTypes: {
+    list: () => "/projects/types/",
+  },
+  projectStatuses: {
+    list: () => "/projects/statuses/",
+  },
 };
 
 export const API_URLS = {
@@ -225,6 +238,142 @@ export const API_URLS = {
     import: () => ({ method: "POST", href: `${API_BASE}fy/import/` }),
     exportSpecs: () => ({ method: "GET", href: `${API_BASE}fy/export/specs/` }),
     export: () => ({ method: "GET", href: `${API_BASE}fy/export/` }),
+  },
+  sprints: {
+    list: () => ({ method: "GET", href: `${API_BASE}sprints/` }),
+    create: () => ({ method: "POST", href: `${API_BASE}sprints/` }),
+    stats: () => ({ method: "GET", href: `${API_BASE}sprints/stats/` }),
+    options: () => ({ method: "GET", href: `${API_BASE}sprints/options/` }),
+    active: () => ({ method: "GET", href: `${API_BASE}sprints/active/` }),
+    generate: () => ({ method: "POST", href: `${API_BASE}sprints/generate/` }),
+    detail: (code) => ({ method: "GET", href: `${API_BASE}sprints/${code}/` }),
+    update: (code) => ({ method: "PATCH", href: `${API_BASE}sprints/${code}/` }),
+    delete: (code) => ({ method: "DELETE", href: `${API_BASE}sprints/${code}/` }),
+    activate: (code) => ({ method: "POST", href: `${API_BASE}sprints/${code}/activate/` }),
+    deactivate: (code) => ({ method: "POST", href: `${API_BASE}sprints/${code}/deactivate/` }),
+    setActive: (code) => ({ method: "POST", href: `${API_BASE}sprints/${code}/set-active/` }),
+    close: (code) => ({ method: "POST", href: `${API_BASE}sprints/${code}/close/` }),
+    capacity: (code) => ({ method: "GET", href: `${API_BASE}sprints/${code}/capacity/` }),
+    capacityRebuild: (code) => ({
+      method: "POST",
+      href: `${API_BASE}sprints/${code}/capacity/rebuild/`,
+    }),
+    importSpecs: () => ({ method: "GET", href: `${API_BASE}sprints/import/specs/` }),
+    importSample: () => ({ method: "GET", href: `${API_BASE}sprints/import/sample/` }),
+    import: () => ({ method: "POST", href: `${API_BASE}sprints/import/` }),
+    exportSpecs: () => ({ method: "GET", href: `${API_BASE}sprints/export/specs/` }),
+    export: () => ({ method: "GET", href: `${API_BASE}sprints/export/` }),
+  },
+  projectTypes: {
+    list: () => ({ method: "GET", href: `${API_BASE}projects/types/` }),
+    create: () => ({ method: "POST", href: `${API_BASE}projects/types/` }),
+    stats: () => ({ method: "GET", href: `${API_BASE}projects/types/stats/` }),
+    options: () => ({ method: "GET", href: `${API_BASE}projects/types/options/` }),
+    detail: (code) => ({ method: "GET", href: `${API_BASE}projects/types/${code}/` }),
+    update: (code) => ({ method: "PATCH", href: `${API_BASE}projects/types/${code}/` }),
+    delete: (code) => ({ method: "DELETE", href: `${API_BASE}projects/types/${code}/` }),
+    activate: (code) => ({ method: "POST", href: `${API_BASE}projects/types/${code}/activate/` }),
+    deactivate: (code) => ({
+      method: "POST",
+      href: `${API_BASE}projects/types/${code}/deactivate/`,
+    }),
+    importSpecs: () => ({ method: "GET", href: `${API_BASE}projects/types/import/specs/` }),
+    importSample: () => ({ method: "GET", href: `${API_BASE}projects/types/import/sample/` }),
+    import: () => ({ method: "POST", href: `${API_BASE}projects/types/import/` }),
+    exportSpecs: () => ({ method: "GET", href: `${API_BASE}projects/types/export/specs/` }),
+    export: () => ({ method: "GET", href: `${API_BASE}projects/types/export/` }),
+  },
+  projectStatuses: {
+    list: () => ({ method: "GET", href: `${API_BASE}projects/statuses/` }),
+    stats: () => ({ method: "GET", href: `${API_BASE}projects/statuses/stats/` }),
+    options: () => ({ method: "GET", href: `${API_BASE}projects/statuses/options/` }),
+    detail: (code) => ({ method: "GET", href: `${API_BASE}projects/statuses/${code}/` }),
+    exportSpecs: () => ({ method: "GET", href: `${API_BASE}projects/statuses/export/specs/` }),
+    export: () => ({ method: "GET", href: `${API_BASE}projects/statuses/export/` }),
+  },
+  projectSubStatuses: {
+    list: (sc) => ({ method: "GET", href: `${API_BASE}projects/statuses/${sc}/substatus/` }),
+    create: (sc) => ({ method: "POST", href: `${API_BASE}projects/statuses/${sc}/substatus/` }),
+    stats: (sc) => ({ method: "GET", href: `${API_BASE}projects/statuses/${sc}/substatus/stats/` }),
+    options: (sc) => ({
+      method: "GET",
+      href: `${API_BASE}projects/statuses/${sc}/substatus/options/`,
+    }),
+    allOptions: () => ({ method: "GET", href: `${API_BASE}projects/sub-statuses/options/` }),
+    detail: (sc, code) => ({
+      method: "GET",
+      href: `${API_BASE}projects/statuses/${sc}/substatus/${code}/`,
+    }),
+    update: (sc, code) => ({
+      method: "PATCH",
+      href: `${API_BASE}projects/statuses/${sc}/substatus/${code}/`,
+    }),
+    delete: (sc, code) => ({
+      method: "DELETE",
+      href: `${API_BASE}projects/statuses/${sc}/substatus/${code}/`,
+    }),
+    activate: (sc, code) => ({
+      method: "POST",
+      href: `${API_BASE}projects/statuses/${sc}/substatus/${code}/activate/`,
+    }),
+    deactivate: (sc, code) => ({
+      method: "POST",
+      href: `${API_BASE}projects/statuses/${sc}/substatus/${code}/deactivate/`,
+    }),
+    reorder: (sc) => ({
+      method: "POST",
+      href: `${API_BASE}projects/statuses/${sc}/substatus/reorder/`,
+    }),
+    importSpecs: (sc) => ({
+      method: "GET",
+      href: `${API_BASE}projects/statuses/${sc}/substatus/import/specs/`,
+    }),
+    importSample: (sc) => ({
+      method: "GET",
+      href: `${API_BASE}projects/statuses/${sc}/substatus/import/sample/`,
+    }),
+    import: (sc) => ({
+      method: "POST",
+      href: `${API_BASE}projects/statuses/${sc}/substatus/import/`,
+    }),
+    exportSpecs: (sc) => ({
+      method: "GET",
+      href: `${API_BASE}projects/statuses/${sc}/substatus/export/specs/`,
+    }),
+    export: (sc) => ({
+      method: "GET",
+      href: `${API_BASE}projects/statuses/${sc}/substatus/export/`,
+    }),
+    importAllSpecs: () => ({
+      method: "GET",
+      href: `${API_BASE}projects/sub-statuses/import/specs/`,
+    }),
+    importAllSample: () => ({
+      method: "GET",
+      href: `${API_BASE}projects/sub-statuses/import/sample/`,
+    }),
+    importAll: () => ({ method: "POST", href: `${API_BASE}projects/sub-statuses/import/` }),
+    exportAllSpecs: () => ({
+      method: "GET",
+      href: `${API_BASE}projects/sub-statuses/export/specs/`,
+    }),
+    exportAll: () => ({ method: "GET", href: `${API_BASE}projects/sub-statuses/export/` }),
+  },
+  programmes: {
+    list: () => ({ method: "GET", href: `${API_BASE}programmes/` }),
+    create: () => ({ method: "POST", href: `${API_BASE}programmes/` }),
+    stats: () => ({ method: "GET", href: `${API_BASE}programmes/stats/` }),
+    options: () => ({ method: "GET", href: `${API_BASE}programmes/options/` }),
+    detail: (code) => ({ method: "GET", href: `${API_BASE}programmes/${code}/` }),
+    update: (code) => ({ method: "PATCH", href: `${API_BASE}programmes/${code}/` }),
+    delete: (code) => ({ method: "DELETE", href: `${API_BASE}programmes/${code}/` }),
+    activate: (code) => ({ method: "POST", href: `${API_BASE}programmes/${code}/activate/` }),
+    deactivate: (code) => ({ method: "POST", href: `${API_BASE}programmes/${code}/deactivate/` }),
+    importSpecs: () => ({ method: "GET", href: `${API_BASE}programmes/import/specs/` }),
+    importSample: () => ({ method: "GET", href: `${API_BASE}programmes/import/sample/` }),
+    import: () => ({ method: "POST", href: `${API_BASE}programmes/import/` }),
+    exportSpecs: () => ({ method: "GET", href: `${API_BASE}programmes/export/specs/` }),
+    export: () => ({ method: "GET", href: `${API_BASE}programmes/export/` }),
   },
   setup: {
     defaults: () => ({ method: "GET", href: `${API_BASE}setup/` }),

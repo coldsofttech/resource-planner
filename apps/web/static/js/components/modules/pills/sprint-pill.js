@@ -1,64 +1,70 @@
 import { esc } from "../../utils.js";
+import { apiFetch } from "../../../modules/utils/utils.js";
+import { API_URLS } from "../../../modules/main/urls.js";
 
 /* SprintPill: <sprint-pill>
  *
- * Displays the active sprint name and a live countdown to its end date.
- * The element itself carries the .rp-sprint-pill CSS class.
+ * Displays the active (In Progress) sprint name and a live countdown to its
+ * end date. Fetches GET /api/v1/sprints/active/ on every connect — no external
+ * attributes required. The element hides itself when there is no active sprint
+ * or when the request fails.
  *
- * Attributes:
- *   name    – sprint label (e.g. "S24.10"); element hides when omitted
- *   end     – ISO-8601 datetime of the sprint end (e.g. "2026-05-30T17:00:00")
- *   status  – "active" (default) | "warning" | "inactive" — controls dot colour
+ * The dot colour reflects sprint health:
+ *   green  – in progress, more than 3 days remaining
+ *   amber  – in progress, 3 days or fewer remaining
+ *   muted  – sprint not in progress (should not normally be visible)
  *
  * Example:
- *   <sprint-pill name="S24.10" end="2026-05-30T17:00:00" status="active"></sprint-pill>
+ *   <sprint-pill id="active-sprint"></sprint-pill>
  */
 class SprintPill extends HTMLElement {
-  static get observedAttributes() {
-    return ["name", "end", "status"];
-  }
-
   connectedCallback() {
     this._connected = true;
-    this._render();
+    this.style.display = "none";
+    this._loadId = Symbol();
+    this._fetchActive(this._loadId);
     this._startTimer();
   }
 
   disconnectedCallback() {
+    this._connected = false;
+    this._loadId = Symbol();
     this._stopTimer();
   }
 
-  attributeChangedCallback(name, oldVal, newVal) {
-    if (this._connected && oldVal !== newVal) {
-      this._stopTimer();
+  async _fetchActive(id) {
+    try {
+      const { href, method } = API_URLS.sprints.active();
+      const res = await apiFetch(href, { method });
+      if (!this._connected || this._loadId !== id) return;
+      const sprint = res?.data;
+      if (!sprint) {
+        this._hide();
+        return;
+      }
+      this._sprintData = {
+        name: sprint.name,
+        end: sprint.end_date,
+        statusKey: sprint.status,
+      };
       this._render();
-      this._startTimer();
+    } catch {
+      if (!this._connected || this._loadId !== id) return;
+      this._hide();
     }
   }
 
-  get _sprintName() {
-    return this.getAttribute("name") || "";
-  }
-  get _end() {
-    return this.getAttribute("end") || "";
-  }
-  get _status() {
-    return this.getAttribute("status") || "active";
-  }
-
   _dotColor() {
-    return (
-      {
-        active: "var(--rp-success)",
-        warning: "var(--rp-warning)",
-        inactive: "var(--rp-text-subtle)",
-      }[this._status] ?? "var(--rp-success)"
-    );
+    const { statusKey, end } = this._sprintData ?? {};
+    if (statusKey !== "in_progress") return "var(--rp-text-subtle)";
+    const daysLeft = (new Date(end).getTime() - Date.now()) / 86400000;
+    return daysLeft <= 3 ? "var(--rp-warning)" : "var(--rp-success)";
   }
 
   _countdown() {
-    if (!this._end) return "";
-    const diff = new Date(this._end).getTime() - Date.now();
+    const end = this._sprintData?.end;
+    if (!end) return "";
+    const diff = new Date(end).getTime() - Date.now();
     if (diff <= 0) return "Ended";
     const days = Math.floor(diff / 86400000);
     const hours = Math.floor((diff % 86400000) / 3600000);
@@ -68,20 +74,24 @@ class SprintPill extends HTMLElement {
   }
 
   _render() {
-    if (!this._sprintName) {
-      this.style.display = "none";
-      this.innerHTML = "";
+    const name = this._sprintData?.name;
+    if (!name) {
+      this._hide();
       return;
     }
-
     this.style.display = "";
     this.className = "rp-sprint-pill";
-
+    const end = this._sprintData?.end;
     this.innerHTML = `
       <span class="rp-sprint-dot" style="background:${this._dotColor()}"></span>
-      <span class="rp-sprint-name">${esc(this._sprintName)}</span>
-      ${this._end ? `<span class="rp-sprint-time" data-sprint-time>${this._countdown()}</span>` : ""}
+      <span class="rp-sprint-name">${esc(name)}</span>
+      ${end ? `<span class="rp-sprint-time" data-sprint-time>${this._countdown()}</span>` : ""}
     `;
+  }
+
+  _hide() {
+    this.style.display = "none";
+    this.innerHTML = "";
   }
 
   _tick() {
@@ -90,7 +100,6 @@ class SprintPill extends HTMLElement {
   }
 
   _startTimer() {
-    if (!this._end || !this._sprintName) return;
     this._timer = setInterval(() => this._tick(), 60000);
   }
 

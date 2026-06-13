@@ -1,0 +1,18 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/requirements"
+    schedule:
+      interval: "weekly"
+    ignore:
+      - dependency-name: "pycore"
+      - dependency-name: "awscore"
+      - dependency-name: "emailcore"
+      - dependency-name: "otpcore"
+      - dependency-name: "exportcore"
+      - dependency-name: "storagecore"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

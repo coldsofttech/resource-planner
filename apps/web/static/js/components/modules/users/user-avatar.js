@@ -36,9 +36,19 @@ function _initials(name) {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
+function _initialsFromSeed(seed) {
+  const parts = String(seed || "")
+    .trim()
+    .split(/[\s@._-]+/)
+    .filter(Boolean);
+  if (!parts.length) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
 class UserAvatar extends HTMLElement {
   static get observedAttributes() {
-    return ["avatar-url", "name", "size"];
+    return ["avatar-url", "name", "size", "seed"];
   }
 
   connectedCallback() {
@@ -53,18 +63,21 @@ class UserAvatar extends HTMLElement {
   _render() {
     const avatarUrl = this.getAttribute("avatar-url") || "";
     const name = this.getAttribute("name") || "";
+    const seed = this.getAttribute("seed") || "";
     const size = this.getAttribute("size") || "md";
 
     const sizeClass = _SIZE_CLASS[size] || null;
     this.className = sizeClass ? `rp-avatar ${sizeClass}` : "rp-avatar";
 
+    const fallbackInitials = seed ? _initialsFromSeed(seed) : _initials(name);
+
     if (avatarUrl) {
       this.innerHTML = `<img src="${esc(avatarUrl)}" alt="${esc(name)}" style="width:100%;height:100%;object-fit:cover;display:block;" data-ua-img />`;
       this.querySelector("[data-ua-img]")?.addEventListener("error", () => {
-        this.textContent = _initials(name);
+        this.textContent = fallbackInitials;
       });
     } else {
-      this.textContent = _initials(name);
+      this.textContent = fallbackInitials;
     }
 
     this._rendered = true;

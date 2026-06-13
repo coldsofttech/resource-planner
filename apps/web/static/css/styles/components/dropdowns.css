@@ -43,6 +43,13 @@
 .rp-dd-panel button.rp-dd-link:hover {
   background: var(--rp-surface-hover);
 }
+.rp-dd-panel a.is-active {
+  background: var(--rp-accent-soft);
+  color: var(--rp-accent-soft-text);
+}
+.rp-dd-panel a.is-active .bi {
+  color: var(--rp-accent-soft-text);
+}
 .rp-dd-panel a .bi,
 .rp-dd-panel button.rp-dd-link .bi {
   width: 16px;

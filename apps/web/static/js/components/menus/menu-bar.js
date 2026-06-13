@@ -81,7 +81,11 @@ class MenuBar extends HTMLElement {
   _isActive(href) {
     if (!href || href === "#") return false;
     const path = window.location.pathname;
-    return href === path || (href !== "/" && path.startsWith(href + "/"));
+    if (href === path) return true;
+    if (href === "/") return false;
+    // Normalise so prefix check works whether or not href has a trailing slash
+    const prefix = href.endsWith("/") ? href : href + "/";
+    return path.startsWith(prefix);
   }
 
   _panelId(group) {
@@ -111,7 +115,8 @@ class MenuBar extends HTMLElement {
   _renderPanel(group) {
     const isMega = group.cols > 1 || group.sections.length > 1;
     const panelClass = isMega ? "rp-dd-panel mega" : "rp-dd-panel";
-    const colsStyle = isMega ? ` style="--cols:${group.cols}"` : "";
+    const numCols = Math.max(group.cols, group.sections.length);
+    const colsStyle = isMega ? ` style="--cols:${numCols}"` : "";
     const panelId = this._panelId(group);
 
     const sectionsHtml = group.sections
@@ -121,7 +126,8 @@ class MenuBar extends HTMLElement {
           .map((si) => {
             const siId = si.id ? ` id="${esc(si.id)}"` : "";
             const siIcon = si.icon ? `<i class="bi ${esc(si.icon)}"></i>` : "";
-            return `<a href="${esc(si.href)}"${siId}>${siIcon}${esc(si.name)}</a>`;
+            const siActive = this._isActive(si.href) ? ' class="is-active"' : "";
+            return `<a href="${esc(si.href)}"${siId}${siActive}>${siIcon}${esc(si.name)}</a>`;
           })
           .join("");
         return `<div class="rp-mega-col">${labelHtml}${itemsHtml}</div>`;
@@ -174,11 +180,14 @@ class MenuBar extends HTMLElement {
       const isOpen = panel.classList.contains("rp-dd-open");
       this._closeAll();
       if (!isOpen) {
-        // On desktop, align panel with trigger's left edge
         if (window.innerWidth > 640) {
+          // Desktop: float panel absolutely, aligned with trigger's left edge
           const triggerRect = trigger.getBoundingClientRect();
           const barRect = this.getBoundingClientRect();
           panel.style.left = `${triggerRect.left - barRect.left}px`;
+        } else {
+          // Mobile: move panel inline immediately after its trigger so it appears below it
+          trigger.insertAdjacentElement("afterend", panel);
         }
         panel.classList.add("rp-dd-open");
         trigger.setAttribute("aria-expanded", "true");
@@ -224,6 +233,10 @@ class MenuBar extends HTMLElement {
       if (p.id) {
         this.querySelector(`[data-panel="${p.id}"]`)?.setAttribute("aria-expanded", "false");
       }
+    });
+    // Return any panels that were moved inline (mobile) back to the bar root
+    this.querySelectorAll(".rp-menubar-nav .rp-dd-panel").forEach((p) => {
+      this.appendChild(p);
     });
   }
 

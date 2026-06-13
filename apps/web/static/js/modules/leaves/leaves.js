@@ -1,6 +1,6 @@
 "use strict";
 
-import { esc } from "../../components/utils.js";
+import { esc, setBreadcrumbs } from "../../components/utils.js";
 import {
   apiFetch,
   formatDate,
@@ -10,7 +10,7 @@ import {
   restoreButton,
 } from "../utils/utils.js";
 import { toast } from "../utils/toast.js";
-import { API_URLS } from "../main/urls.js";
+import { API_URLS, UI_URLS } from "../main/urls.js";
 import { hasPermission } from "../utils/index.js";
 
 let pendingRow = null;
@@ -354,6 +354,12 @@ function initExportView() {
 document.addEventListener("DOMContentLoaded", () => {
   const table = document.getElementById("rp-leaves-table");
   if (!table) return;
+
+  setBreadcrumbs([
+    { label: "Organisation" },
+    { label: "Holidays" },
+    { label: "Leaves", href: UI_URLS.leaves.list() },
+  ]);
 
   initActions(table);
   initViewDrawer(table);

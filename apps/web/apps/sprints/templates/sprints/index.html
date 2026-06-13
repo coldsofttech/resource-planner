@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Sprints
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/sprints.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Planning
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Sprints
+{% endblock page_title %}
+{% block page_sub %}
+  Manage sprint periods, their status, and lifecycle within each financial year.
+{% endblock page_sub %}
+{% block page_actions %}
+  <secondary-button id="rp-sprints-import-btn" label="Import" prefix-icon="bi-upload" hidden></secondary-button>
+  <secondary-button id="rp-sprints-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+  {% if can_generate_sprint %}
+    <engine-button id="rp-sprints-generate-btn" label="Generate Sprints" prefix-icon="bi-lightning" hidden></engine-button>
+  {% endif %}
+  <primary-button id="rp-sprints-add-btn" label="Add Sprint" prefix-icon="bi-plus-lg" hidden></primary-button>
+{% endblock page_actions %}
+{% block content %}
+  <list-view show-active-filters>
+  <filter-panel id="rp-sprints-filter-panel">
+  <search-field id="rp-sprints-search" name="search" placeholder="Search sprints..." shortcut="/" show-label></search-field>
+  <sprint-status-field id="rp-sprints-status" col="col-auto" name="status" label="Status" allow-all show-label></sprint-status-field>
+  <financial-year-field id="rp-sprints-fy" col="col-auto" name="financial_year" label="Financial Year" allow-all show-label></financial-year-field>
+  <is-active-field id="rp-sprints-active" col="col-auto" name="is_active" value="true" show-label></is-active-field>
+  </filter-panel>
+  <data-table id="rp-sprints-table" url="/api/v1/sprints/" paginated page-size="25" row-template="renderSprintsRow" empty-message="No sprints found.">
+    <table-columns>
+      <table-column label="Name" key="name" sortable>
+      </table-column>
+      <table-column label="Financial Year" key="financial_year" hide-mobile>
+      </table-column>
+      <table-column label="Code" key="code" mono width="110px" hide-mobile>
+      </table-column>
+      <table-column label="Start Date" key="start_date" sortable hide-mobile>
+      </table-column>
+      <table-column label="End Date" key="end_date" sortable hide-mobile>
+      </table-column>
+      <table-column label="Month" key="month" sortable hide-mobile>
+      </table-column>
+      <table-column label="Status" key="status">
+      </table-column>
+      <table-column label="Closed" key="is_closed" hide-mobile>
+      </table-column>
+      <table-column label="Active" key="is_active" hide-mobile>
+      </table-column>
+      <table-column label="Created" key="created_at" hide-mobile sortable>
+      </table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_sprint %}
+        <table-action icon="bi-pencil" label="Edit" event="rp:sprint:edit">
+        </table-action>
+        <table-action icon="bi-toggle-on" label="Toggle Active" event="rp:sprint:toggle" color-key="is_active">
+        </table-action>
+        <table-action icon="bi-play-circle" label="Set Active" event="rp:sprint:set-active" hidden-key="is_in_progress">
+        </table-action>
+      {% endif %}
+      {% if can_close_sprint %}
+        <table-action icon="bi-lock" label="Lock / Unlock" event="rp:sprint:close">
+        </table-action>
+      {% endif %}
+      {% if can_delete_sprint %}
+        <table-action icon="bi-trash" label="Delete" event="rp:sprint:delete" danger>
+        </table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </list-view>
+  <!-- Generate drawer -->
+  {% if can_generate_sprint %}
+  <drawer-modal id="rp-sprint-generate-drawer" width="900">
+  <drawer-header eyebrow="Engine" title="Generate Sprints" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <financial-year-field id="rp-generate-sprint-fy" col="col-12" label="Financial Year" placeholder="Select financial year…" show-label required></financial-year-field>
+    <hint-field>Sprints are auto-generated based on the configured sprint duration. The selected financial year must have no existing sprints.</hint-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Generate Sprints" primary-icon="bi-lightning"></drawer-footer>
+  </drawer-modal>
+  {% endif %}
+  <!-- Create drawer -->
+  <drawer-modal id="rp-sprint-create-drawer" width="900">
+  <drawer-header eyebrow="New record" title="Create Sprint" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <financial-year-field id="rp-new-sprint-fy-code" col="col-12 col-md-6" label="Financial Year" show-label required></financial-year-field>
+    <number-field id="rp-new-sprint-number" col="col-12 col-md-6" label="Sprint Number" placeholder="e.g. 1" required></number-field>
+    <text-field id="rp-new-sprint-name" col="col-12" label="Name" placeholder="Auto-generated if blank..."></text-field>
+    <date-field id="rp-new-sprint-start-date" col="col-12 col-md-6" label="Start Date" required></date-field>
+    <date-field id="rp-new-sprint-end-date" col="col-12 col-md-6" label="End Date" required></date-field>
+    <text-field id="rp-new-sprint-note" col="col-12" label="Note" placeholder="Optional note..." cols="3"></text-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Create Sprint" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <!-- Edit drawer -->
+  <drawer-modal id="rp-sprint-edit-drawer" width="900">
+  <drawer-header eyebrow="Edit record" title="Edit Sprint" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-edit-sprint-name" col="col-12" label="Name" required></text-field>
+    <date-field id="rp-edit-sprint-start-date" col="col-12 col-md-6" label="Start Date" required></date-field>
+    <date-field id="rp-edit-sprint-end-date" col="col-12 col-md-6" label="End Date" required></date-field>
+    <text-field id="rp-edit-sprint-note" col="col-12" label="Note" placeholder="Optional note..." cols="3"></text-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <delete-modal id="rp-sprint-delete-modal" action-label="Delete sprint"></delete-modal>
+  <activate-modal id="rp-sprint-activate-modal"></activate-modal>
+  <deactivate-modal id="rp-sprint-deactivate-modal"></deactivate-modal>
+  <import-view id="rp-sprints-import-view" title="Import Sprints" eyebrow="Sprints"></import-view>
+  <export-view id="rp-sprints-export-view" title="Export Sprints" eyebrow="Sprints" active-filter-id="rp-sprints-filter-panel"></export-view>
+{% endblock content %}
