@@ -80,6 +80,11 @@ class _SlowTestReporter:
         )
 
 
+@pytest.fixture(autouse=True)
+def _fast_password_hasher(settings) -> None:
+    settings.PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+
+
 def pytest_configure(config: pytest.Config) -> None:
     config.pluginmanager.register(_SlowTestReporter(), "rp_slow_test_reporter")
 
