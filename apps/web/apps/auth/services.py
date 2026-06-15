@@ -6,6 +6,10 @@ from datetime import timedelta
 
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
+from django.contrib.auth.password_validation import (
+    validate_password as _validate_password,
+)
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils import timezone
 from otpcore import generate_otp, hash_otp
 
@@ -197,6 +201,16 @@ class ForgotPasswordService(ContextService):
                 "New password must be different from your current password."
             )
 
+        try:
+            _validate_password(new_password, token.user)
+        except DjangoValidationError as exc:
+            msg = (
+                exc.messages[0]
+                if exc.messages
+                else "Password does not meet requirements."
+            )
+            raise ValidationException(msg) from exc
+
         token.is_used = True
         token.save(update_fields=["is_used", "updated_at"])
 
@@ -270,6 +284,16 @@ class AdminPasswordResetService:
             raise ValidationException("Invalid or expired reset link.")
 
         user = token.user
+        try:
+            _validate_password(new_password, user)
+        except DjangoValidationError as exc:
+            msg = (
+                exc.messages[0]
+                if exc.messages
+                else "Password does not meet requirements."
+            )
+            raise ValidationException(msg) from exc
+
         token.is_used = True
         token.save(update_fields=["is_used", "updated_at"])
 

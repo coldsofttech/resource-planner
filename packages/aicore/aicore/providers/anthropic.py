@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import anthropic
+from anthropic.types import TextBlock
 
 
 class AnthropicProvider:
@@ -14,4 +15,5 @@ class AnthropicProvider:
             max_tokens=max_tokens,
             messages=[{"role": "user", "content": prompt}],
         )
-        return message.content[0].text.strip()
+        block = next((b for b in message.content if isinstance(b, TextBlock)), None)
+        return block.text.strip() if block is not None else ""
