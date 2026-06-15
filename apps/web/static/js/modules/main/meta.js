@@ -4,9 +4,8 @@ import { API_URLS } from "./urls.js";
 const META_KEY = "rp-meta";
 
 function htmlToText(html) {
-  const el = document.createElement("div");
-  el.innerHTML = html;
-  return (el.textContent || el.innerText || "").replace(/\s+/g, " ").trim();
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return (doc.body.textContent || "").replace(/\s+/g, " ").trim();
 }
 
 function toInitials(name) {

@@ -1,0 +1,938 @@
+{
+  "module": {
+    "slug": "employment-types",
+    "name": "Employment Types",
+    "sort_order": 50,
+    "parent": {
+      "slug": "organisation",
+      "name": "Organisation",
+      "sort_order": 1
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-ET-100",
+      "name": "Page Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-ET-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user is redirected away from the Employment Types page",
+          "steps": "1. Open a browser with no active session.\n2. Navigate directly to /employment-types/.",
+          "expected": "The user is redirected to the login page and the Employment Types page is not shown."
+        },
+        {
+          "id": "TC-ET-102",
+          "severity": "P0",
+          "scenario": "Authenticated user with view permission can access the Employment Types page",
+          "steps": "1. Log in as a user who has permission to view employment types.\n2. Navigate to Configurations > Employment Types.",
+          "expected": "The Employment Types page loads successfully showing the title 'Employment Types', eyebrow 'Configurations', and the data table."
+        },
+        {
+          "id": "TC-ET-103",
+          "severity": "P1",
+          "scenario": "Add Employment Type button is hidden for users without create permission",
+          "steps": "1. Log in as a user who does NOT have permission to create employment types.\n2. Navigate to the Employment Types page.",
+          "expected": "The 'Add Employment Type' button is not visible on the page."
+        },
+        {
+          "id": "TC-ET-104",
+          "severity": "P1",
+          "scenario": "Add Employment Type button is visible for users with create permission",
+          "steps": "1. Log in as a user who has permission to create employment types.\n2. Navigate to the Employment Types page.",
+          "expected": "The 'Add Employment Type' button is visible in the top-right action area."
+        },
+        {
+          "id": "TC-ET-105",
+          "severity": "P1",
+          "scenario": "Edit and Toggle actions are hidden for users without change permission",
+          "steps": "1. Log in as a user who does NOT have permission to change employment types.\n2. Navigate to the Employment Types page.\n3. Observe the row action buttons.",
+          "expected": "The Edit (pencil) and Toggle (activate/deactivate) action buttons are not shown on any row."
+        },
+        {
+          "id": "TC-ET-106",
+          "severity": "P1",
+          "scenario": "Delete action is hidden for users without delete permission",
+          "steps": "1. Log in as a user who does NOT have permission to delete employment types.\n2. Navigate to the Employment Types page.\n3. Observe the row action buttons.",
+          "expected": "The Delete (bin) action button is not visible on any row."
+        },
+        {
+          "id": "TC-ET-107",
+          "severity": "P1",
+          "scenario": "Import and Export buttons are hidden for users without the relevant permission",
+          "steps": "1. Log in as a user without import or export permissions.\n2. Navigate to the Employment Types page.",
+          "expected": "The Import and Export buttons are not visible in the page header."
+        },
+        {
+          "id": "TC-ET-108",
+          "severity": "P2",
+          "scenario": "Page subtitle is correct",
+          "steps": "1. Log in and navigate to the Employment Types page.",
+          "expected": "The subtitle reads 'Manage employment types used across your organisation.'"
+        }
+      ]
+    },
+    {
+      "id": "TC-ET-200",
+      "name": "Browsing & Discovering Employment Types",
+      "test_cases": [
+        {
+          "id": "TC-ET-201",
+          "severity": "P1",
+          "scenario": "Employment types list loads with active types shown by default",
+          "steps": "1. Navigate to the Employment Types page.\n2. Observe the table on first load.",
+          "expected": "The table displays active employment types by default. The Status filter is pre-set to 'Active'."
+        },
+        {
+          "id": "TC-ET-202",
+          "severity": "P1",
+          "scenario": "Employment types table shows the correct columns",
+          "steps": "1. Navigate to the Employment Types page.\n2. Observe the column headers in the table.",
+          "expected": "The table displays columns: Name, Code, Default, Status, Created."
+        },
+        {
+          "id": "TC-ET-203",
+          "severity": "P1",
+          "scenario": "Searching for an employment type by name filters the table",
+          "steps": "1. Navigate to the Employment Types page.\n2. Type a partial name (e.g. 'Full') into the search field.\n3. Wait for the table to update.",
+          "expected": "The table updates to show only employment types whose name matches the search term."
+        },
+        {
+          "id": "TC-ET-204",
+          "severity": "P2",
+          "scenario": "Search field can be focused with the / shortcut key",
+          "steps": "1. Navigate to the Employment Types page.\n2. Press the '/' key on the keyboard.",
+          "expected": "The search input field receives focus automatically."
+        },
+        {
+          "id": "TC-ET-205",
+          "severity": "P1",
+          "scenario": "Status filter shows all employment types when set to 'All'",
+          "steps": "1. Navigate to the Employment Types page.\n2. Change the Status filter to 'All'.",
+          "expected": "The table displays both active and inactive employment types."
+        },
+        {
+          "id": "TC-ET-206",
+          "severity": "P1",
+          "scenario": "Status filter shows only inactive employment types when set to 'Inactive'",
+          "steps": "1. Navigate to the Employment Types page.\n2. Change the Status filter to 'Inactive'.",
+          "expected": "The table displays only inactive employment types."
+        },
+        {
+          "id": "TC-ET-207",
+          "severity": "P2",
+          "scenario": "Searching for a name with no matches shows the empty state",
+          "steps": "1. Navigate to the Employment Types page.\n2. Type a search term that matches no employment types (e.g. 'zzznomatch').",
+          "expected": "The table shows the empty message 'No employment types found.' and no data rows are displayed."
+        },
+        {
+          "id": "TC-ET-208",
+          "severity": "P2",
+          "scenario": "Clicking an employment type row opens the view drawer",
+          "steps": "1. Navigate to the Employment Types page.\n2. Click on an employment type row (not on an action button).",
+          "expected": "A view drawer slides in from the right showing the employment type's details."
+        },
+        {
+          "id": "TC-ET-209",
+          "severity": "P2",
+          "scenario": "Table is sortable by Name column",
+          "steps": "1. Navigate to the Employment Types page.\n2. Click the 'Name' column header.",
+          "expected": "The table re-sorts rows alphabetically by name. Clicking again reverses the sort order."
+        }
+      ]
+    },
+    {
+      "id": "TC-ET-300",
+      "name": "Creating an Employment Type",
+      "test_cases": [
+        {
+          "id": "TC-ET-301",
+          "severity": "P1",
+          "scenario": "Clicking Add Employment Type opens the create drawer",
+          "steps": "1. Navigate to the Employment Types page.\n2. Click the 'Add Employment Type' button.",
+          "expected": "The Create employment type drawer slides in from the right with the title 'Create employment type' and eyebrow 'New record'."
+        },
+        {
+          "id": "TC-ET-302",
+          "severity": "P0",
+          "scenario": "An employment type can be created with a name",
+          "steps": "1. Open the Create employment type drawer.\n2. Enter a unique name (e.g. 'Full-time') in the Name field.\n3. Click 'Create employment type'.",
+          "expected": "The drawer closes, a success toast appears, and the new employment type appears in the table."
+        },
+        {
+          "id": "TC-ET-303",
+          "severity": "P1",
+          "scenario": "Name is a required field",
+          "steps": "1. Open the Create employment type drawer.\n2. Leave the Name field empty.\n3. Click 'Create employment type'.",
+          "expected": "An inline validation error appears below the Name field. The drawer remains open and the employment type is not created."
+        },
+        {
+          "id": "TC-ET-304",
+          "severity": "P1",
+          "scenario": "Name field enforces a maximum length of 100 characters",
+          "steps": "1. Open the Create employment type drawer.\n2. Type or paste a string of 101 characters into the Name field.",
+          "expected": "The field does not accept more than 100 characters. The character counter shows '100/100' at the limit."
+        },
+        {
+          "id": "TC-ET-305",
+          "severity": "P2",
+          "scenario": "Character counter updates in real time as the user types the name",
+          "steps": "1. Open the Create employment type drawer.\n2. Type a 9-character name (e.g. 'Full-time') into the Name field.",
+          "expected": "The character counter below the field updates to show '9/100' as each character is typed."
+        },
+        {
+          "id": "TC-ET-306",
+          "severity": "P1",
+          "scenario": "Duplicate employment type name is rejected",
+          "steps": "1. Open the Create employment type drawer.\n2. Enter a name that already exists in the system.\n3. Click 'Create employment type'.",
+          "expected": "An error message is shown indicating the name already exists. The employment type is not created."
+        },
+        {
+          "id": "TC-ET-307",
+          "severity": "P2",
+          "scenario": "Duplicate name check is case-insensitive",
+          "steps": "1. Ensure an employment type named 'Full-time' already exists.\n2. Open the Create employment type drawer.\n3. Enter 'FULL-TIME' as the name.\n4. Click 'Create employment type'.",
+          "expected": "An error message is shown indicating a duplicate name. The employment type is not created."
+        },
+        {
+          "id": "TC-ET-308",
+          "severity": "P2",
+          "scenario": "Newly created employment type is assigned a unique Code automatically",
+          "steps": "1. Create a new employment type with a valid name.\n2. Observe the Code column in the table for the new row.",
+          "expected": "The new employment type has a system-generated code shown in the Code column."
+        },
+        {
+          "id": "TC-ET-309",
+          "severity": "P2",
+          "scenario": "Clicking Cancel on the create drawer discards the form",
+          "steps": "1. Open the Create employment type drawer.\n2. Enter a name.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. No employment type is created. The table is unchanged."
+        },
+        {
+          "id": "TC-ET-310",
+          "severity": "P2",
+          "scenario": "Newly created employment type is active by default",
+          "steps": "1. Create a new employment type.\n2. Observe the Status column in the table.",
+          "expected": "The new employment type shows an 'Active' status badge."
+        },
+        {
+          "id": "TC-ET-311",
+          "severity": "P2",
+          "scenario": "Short names like 'PT' or 'FT' are accepted",
+          "steps": "1. Open the Create employment type drawer.\n2. Enter 'PT' as the name.\n3. Click 'Create employment type'.",
+          "expected": "The employment type is created successfully. No minimum-length error is shown."
+        },
+        {
+          "id": "TC-ET-312",
+          "severity": "P2",
+          "scenario": "Names with hyphens and special characters are accepted",
+          "steps": "1. Open the Create employment type drawer.\n2. Enter 'Part-time (Casual)' as the name.\n3. Click 'Create employment type'.",
+          "expected": "The employment type is created successfully with the special characters preserved."
+        },
+        {
+          "id": "TC-ET-313",
+          "severity": "P2",
+          "scenario": "Create employment type button shows a loading state during submission",
+          "steps": "1. Open the Create employment type drawer.\n2. Enter a valid name.\n3. Click 'Create employment type' and immediately observe the button.",
+          "expected": "The 'Create employment type' button shows a loading indicator and is disabled while the request is in progress."
+        }
+      ]
+    },
+    {
+      "id": "TC-ET-400",
+      "name": "Employment Type Detail Page",
+      "test_cases": [
+        {
+          "id": "TC-ET-401",
+          "severity": "P1",
+          "scenario": "Clicking an employment type row navigates to the detail page",
+          "steps": "1. Navigate to the Employment Types page.\n2. Click on an employment type name or row.",
+          "expected": "The browser navigates to /employment-types/<code>/ and the detail page for that employment type is displayed."
+        },
+        {
+          "id": "TC-ET-402",
+          "severity": "P1",
+          "scenario": "Employment type detail page displays the correct information panel",
+          "steps": "1. Navigate to an employment type's detail page.",
+          "expected": "The left panel shows: Name, Code (code style), Status, Created date, and Created by."
+        },
+        {
+          "id": "TC-ET-403",
+          "severity": "P1",
+          "scenario": "Detail page shows members who have this employment type",
+          "steps": "1. Navigate to the detail page of an employment type that has members assigned.\n2. Observe the right-hand Members panel.",
+          "expected": "A 'Members' panel is shown on the right with a table listing people with this employment type."
+        },
+        {
+          "id": "TC-ET-404",
+          "severity": "P1",
+          "scenario": "Members table shows correct columns on the detail page",
+          "steps": "1. Navigate to an employment type detail page that has at least one member.\n2. Observe the members table column headers.",
+          "expected": "The members table shows columns: Name, Email, Role, and Location."
+        },
+        {
+          "id": "TC-ET-405",
+          "severity": "P2",
+          "scenario": "Members panel is hidden when no members have this employment type",
+          "steps": "1. Navigate to the detail page of an employment type with no assigned members.",
+          "expected": "The Members panel is not displayed. Only the left information panel is visible."
+        },
+        {
+          "id": "TC-ET-406",
+          "severity": "P2",
+          "scenario": "Empty state message shown when members panel has no results",
+          "steps": "1. Navigate to an employment type detail page where the members API returns no results.",
+          "expected": "The members table shows the message 'No members have this employment type.'"
+        },
+        {
+          "id": "TC-ET-407",
+          "severity": "P2",
+          "scenario": "Members table can be sorted by Name on the detail page",
+          "steps": "1. Navigate to an employment type detail page with multiple members.\n2. Click the 'Name' column header.",
+          "expected": "The members table re-sorts alphabetically by name. Clicking again reverses the order."
+        },
+        {
+          "id": "TC-ET-408",
+          "severity": "P2",
+          "scenario": "Page title on detail page reflects the employment type name",
+          "steps": "1. Navigate to the detail page of an employment type named 'Full-time'.",
+          "expected": "The page title updates to 'Full-time' after the employment type data loads."
+        },
+        {
+          "id": "TC-ET-409",
+          "severity": "P2",
+          "scenario": "Members can be paginated on the detail page members table",
+          "steps": "1. Navigate to an employment type detail page that has more than 25 assigned members.\n2. Observe the pagination controls below the members table.",
+          "expected": "Pagination controls appear and allow the user to navigate through pages of members."
+        }
+      ]
+    },
+    {
+      "id": "TC-ET-500",
+      "name": "Editing an Employment Type",
+      "test_cases": [
+        {
+          "id": "TC-ET-501",
+          "severity": "P1",
+          "scenario": "Clicking the Edit action opens the edit drawer pre-populated",
+          "steps": "1. Navigate to the Employment Types page.\n2. Click the Edit (pencil) action on an employment type row.",
+          "expected": "The edit drawer slides in pre-populated with that employment type's current name."
+        },
+        {
+          "id": "TC-ET-502",
+          "severity": "P0",
+          "scenario": "Employment type name can be updated successfully",
+          "steps": "1. Open the edit drawer for an existing employment type.\n2. Clear the Name field and enter a new name.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes, a success toast appears, and the updated name is shown in the table row."
+        },
+        {
+          "id": "TC-ET-503",
+          "severity": "P1",
+          "scenario": "Clearing the Name field and saving shows a validation error",
+          "steps": "1. Open the edit drawer for an existing employment type.\n2. Clear the Name field completely.\n3. Click 'Save changes'.",
+          "expected": "An inline error appears below the Name field. The change is not saved."
+        },
+        {
+          "id": "TC-ET-504",
+          "severity": "P1",
+          "scenario": "Renaming to an existing name shows a conflict error",
+          "steps": "1. Open the edit drawer for Employment Type A.\n2. Change the name to match the existing name of Employment Type B.\n3. Click 'Save changes'.",
+          "expected": "An error message is shown indicating the name is already in use. The change is not saved."
+        },
+        {
+          "id": "TC-ET-505",
+          "severity": "P2",
+          "scenario": "Saving with the same name does not cause a conflict error",
+          "steps": "1. Open the edit drawer for an employment type.\n2. Do not change the name.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes with a success toast. No conflict error is shown."
+        },
+        {
+          "id": "TC-ET-506",
+          "severity": "P1",
+          "scenario": "Name field enforces 100-character limit in the edit drawer",
+          "steps": "1. Open the edit drawer for an existing employment type.\n2. Clear the name and paste a string of 101 characters.",
+          "expected": "The field does not accept more than 100 characters. The counter shows '100/100'."
+        },
+        {
+          "id": "TC-ET-507",
+          "severity": "P2",
+          "scenario": "Clicking Cancel on the edit drawer discards changes",
+          "steps": "1. Open the edit drawer for an employment type.\n2. Modify the name.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. The employment type name in the table is unchanged."
+        },
+        {
+          "id": "TC-ET-508",
+          "severity": "P2",
+          "scenario": "Save changes button shows a loading state during submission",
+          "steps": "1. Open the edit drawer for an employment type.\n2. Change the name.\n3. Click 'Save changes' and observe the button.",
+          "expected": "The 'Save changes' button shows a loading indicator and is disabled while the request is processing."
+        }
+      ]
+    },
+    {
+      "id": "TC-ET-600",
+      "name": "Activating & Deactivating an Employment Type",
+      "test_cases": [
+        {
+          "id": "TC-ET-601",
+          "severity": "P1",
+          "scenario": "An active employment type can be deactivated via the Toggle action",
+          "steps": "1. Navigate to the Employment Types page.\n2. Find an active employment type.\n3. Click the Toggle action on that row.",
+          "expected": "A deactivate confirmation modal appears asking the user to confirm deactivation."
+        },
+        {
+          "id": "TC-ET-602",
+          "severity": "P0",
+          "scenario": "Confirming deactivation changes the employment type status to Inactive",
+          "steps": "1. Click the Toggle action on an active employment type.\n2. In the deactivate modal, click the confirm button.",
+          "expected": "The modal closes, a success toast appears, and the employment type's status badge changes to 'Inactive'."
+        },
+        {
+          "id": "TC-ET-603",
+          "severity": "P2",
+          "scenario": "Cancelling the deactivate modal leaves the employment type active",
+          "steps": "1. Click the Toggle action on an active employment type.\n2. Click 'Cancel' in the deactivate modal.",
+          "expected": "The modal closes. The employment type remains active and unchanged."
+        },
+        {
+          "id": "TC-ET-604",
+          "severity": "P1",
+          "scenario": "An inactive employment type can be activated via the Toggle action",
+          "steps": "1. Navigate to the Employment Types page (Status filter set to All or Inactive).\n2. Find an inactive employment type.\n3. Click the Toggle action on that row.",
+          "expected": "An activate confirmation modal appears asking the user to confirm activation."
+        },
+        {
+          "id": "TC-ET-605",
+          "severity": "P0",
+          "scenario": "Confirming activation changes the employment type status to Active",
+          "steps": "1. Click the Toggle action on an inactive employment type.\n2. In the activate modal, click the confirm button.",
+          "expected": "The modal closes, a success toast appears, and the employment type's status badge changes to 'Active'."
+        },
+        {
+          "id": "TC-ET-606",
+          "severity": "P2",
+          "scenario": "Cancelling the activate modal leaves the employment type inactive",
+          "steps": "1. Click the Toggle action on an inactive employment type.\n2. Click 'Cancel' in the activate modal.",
+          "expected": "The modal closes. The employment type remains inactive and unchanged."
+        },
+        {
+          "id": "TC-ET-607",
+          "severity": "P2",
+          "scenario": "Deactivating an employment type removes it from the default Active filter view",
+          "steps": "1. Ensure the Status filter is set to 'Active'.\n2. Deactivate an employment type currently shown in the table.\n3. Confirm deactivation.",
+          "expected": "After deactivation, the employment type disappears from the table since it is no longer active."
+        },
+        {
+          "id": "TC-ET-608",
+          "severity": "P2",
+          "scenario": "Toggle action icon reflects the current active state",
+          "steps": "1. Navigate to the Employment Types page with Status filter set to 'All'.\n2. Observe the Toggle action icon for active vs inactive employment types.",
+          "expected": "The toggle icon appears in a different colour or style depending on whether the employment type is active or inactive."
+        }
+      ]
+    },
+    {
+      "id": "TC-ET-700",
+      "name": "Set as Default Employment Type",
+      "test_cases": [
+        {
+          "id": "TC-ET-701",
+          "severity": "P1",
+          "scenario": "'Set as Default' action is visible only for non-default employment types",
+          "steps": "1. Navigate to the Employment Types page.\n2. Observe the action buttons for an employment type that is NOT the current default.\n3. Observe the action buttons for the current default employment type.",
+          "expected": "The 'Set as Default' (star) action is shown for non-default employment types and hidden for the one already set as default."
+        },
+        {
+          "id": "TC-ET-702",
+          "severity": "P0",
+          "scenario": "Clicking Set as Default opens a confirmation modal",
+          "steps": "1. Find a non-default employment type.\n2. Click the 'Set as Default' (star) action on that row.",
+          "expected": "A confirmation modal appears asking the user to confirm setting this employment type as the default."
+        },
+        {
+          "id": "TC-ET-703",
+          "severity": "P0",
+          "scenario": "Confirming Set as Default updates the Default column",
+          "steps": "1. Click 'Set as Default' on a non-default employment type.\n2. Confirm in the modal.",
+          "expected": "The modal closes, a success toast appears, and the 'Default' column for that employment type shows a positive indicator. The previously default type reverts."
+        },
+        {
+          "id": "TC-ET-704",
+          "severity": "P2",
+          "scenario": "Cancelling the Set as Default modal makes no change",
+          "steps": "1. Click 'Set as Default' on a non-default employment type.\n2. Click 'Cancel' in the confirmation modal.",
+          "expected": "The modal closes. The default employment type is unchanged."
+        },
+        {
+          "id": "TC-ET-705",
+          "severity": "P1",
+          "scenario": "Only one employment type can be the default at a time",
+          "steps": "1. Set Employment Type A as the default.\n2. Then set Employment Type B as the default.\n3. Observe the Default column for both.",
+          "expected": "Employment Type B is now marked as default and Employment Type A's default marker is removed."
+        },
+        {
+          "id": "TC-ET-706",
+          "severity": "P2",
+          "scenario": "Set as Default confirmation modal displays the employment type name",
+          "steps": "1. Click 'Set as Default' on an employment type named 'Full-time'.\n2. Read the confirmation modal text.",
+          "expected": "The modal title or body includes 'Full-time' so the user can confirm the correct employment type."
+        },
+        {
+          "id": "TC-ET-707",
+          "severity": "P2",
+          "scenario": "Default indicator is visible in the table Default column",
+          "steps": "1. Navigate to the Employment Types page.\n2. Observe the Default column for the current default employment type.",
+          "expected": "The default employment type displays a clear visual indicator (e.g. checkmark, badge) in the Default column."
+        },
+        {
+          "id": "TC-ET-708",
+          "severity": "P3",
+          "scenario": "The default employment type pre-fills when adding a new member",
+          "steps": "1. Set an employment type as the default.\n2. Navigate to the People or Team Members module.\n3. Open the form to add a new member.",
+          "expected": "The employment type field in the add member form defaults to the employment type marked as Default."
+        }
+      ]
+    },
+    {
+      "id": "TC-ET-800",
+      "name": "Deleting an Employment Type",
+      "test_cases": [
+        {
+          "id": "TC-ET-801",
+          "severity": "P1",
+          "scenario": "Clicking the Delete action opens a confirmation modal",
+          "steps": "1. Navigate to the Employment Types page.\n2. Click the Delete (bin) action on an employment type row.",
+          "expected": "A delete confirmation modal appears with the employment type name and a typed-confirmation input field."
+        },
+        {
+          "id": "TC-ET-802",
+          "severity": "P0",
+          "scenario": "An employment type is permanently deleted after typed confirmation",
+          "steps": "1. Click Delete on an employment type.\n2. Type the employment type name exactly as shown.\n3. Click 'Delete employment type'.",
+          "expected": "The modal closes, a success toast appears, and the employment type is removed from the table."
+        },
+        {
+          "id": "TC-ET-803",
+          "severity": "P1",
+          "scenario": "Delete button is disabled until the correct name is typed",
+          "steps": "1. Click Delete on an employment type.\n2. Leave the confirmation field empty or type an incorrect value.\n3. Observe the 'Delete employment type' button.",
+          "expected": "The 'Delete employment type' button remains disabled until the exact name is typed into the confirmation field."
+        },
+        {
+          "id": "TC-ET-804",
+          "severity": "P2",
+          "scenario": "Cancelling the delete modal leaves the employment type intact",
+          "steps": "1. Click Delete on an employment type.\n2. Click 'Cancel' in the confirmation modal.",
+          "expected": "The modal closes. The employment type remains in the table and is not deleted."
+        },
+        {
+          "id": "TC-ET-805",
+          "severity": "P1",
+          "scenario": "Typed confirmation is case-sensitive",
+          "steps": "1. Click Delete on an employment type named 'Full-time'.\n2. Type 'full-time' (all lowercase) in the confirmation field.\n3. Observe whether the Delete button becomes enabled.",
+          "expected": "The 'Delete employment type' button remains disabled when the case does not match exactly."
+        },
+        {
+          "id": "TC-ET-806",
+          "severity": "P2",
+          "scenario": "Delete modal shows the employment type name to be typed",
+          "steps": "1. Click Delete on an employment type named 'Contractor'.\n2. Read the delete confirmation modal.",
+          "expected": "The modal shows the instruction to type 'Contractor' to confirm the deletion."
+        },
+        {
+          "id": "TC-ET-807",
+          "severity": "P2",
+          "scenario": "Deleted employment type no longer appears in the table",
+          "steps": "1. Delete an employment type currently visible in the table.\n2. Observe the table after deletion.",
+          "expected": "The deleted employment type row disappears from the table immediately after the success toast."
+        },
+        {
+          "id": "TC-ET-808",
+          "severity": "P3",
+          "scenario": "Delete modal warns that the action is permanent",
+          "steps": "1. Click Delete on any employment type.\n2. Read the body text of the confirmation modal.",
+          "expected": "The modal body text warns the user that this action is permanent and cannot be undone."
+        }
+      ]
+    },
+    {
+      "id": "TC-ET-900",
+      "name": "Importing Employment Types",
+      "test_cases": [
+        {
+          "id": "TC-ET-901",
+          "severity": "P1",
+          "scenario": "Clicking Import opens the import view",
+          "steps": "1. Navigate to the Employment Types page.\n2. Click the 'Import' button.",
+          "expected": "The import view or panel opens, allowing the user to upload a file."
+        },
+        {
+          "id": "TC-ET-902",
+          "severity": "P1",
+          "scenario": "A sample CSV file can be downloaded from the import view",
+          "steps": "1. Open the import view.\n2. Click the link or button to download the sample CSV.",
+          "expected": "A CSV file is downloaded with the correct column headers for employment types (e.g. name, is_active)."
+        },
+        {
+          "id": "TC-ET-903",
+          "severity": "P0",
+          "scenario": "A valid CSV file with new employment types can be imported successfully",
+          "steps": "1. Prepare a CSV file with valid employment type data.\n2. Open the import view and upload the file.\n3. Complete the import process.",
+          "expected": "The import completes and a success message is shown. The imported employment types appear in the table."
+        },
+        {
+          "id": "TC-ET-904",
+          "severity": "P1",
+          "scenario": "Upload field rejects non-CSV file types",
+          "steps": "1. Open the import view.\n2. Attempt to upload a file with a non-CSV extension (e.g. .xlsx or .pdf).",
+          "expected": "The import view rejects the file and shows an error indicating only CSV files are accepted."
+        },
+        {
+          "id": "TC-ET-905",
+          "severity": "P1",
+          "scenario": "Importing a CSV missing the 'name' column shows an error",
+          "steps": "1. Prepare a CSV file without the 'name' column.\n2. Upload it in the import view.",
+          "expected": "The import fails with a clear message identifying the missing required column."
+        },
+        {
+          "id": "TC-ET-906",
+          "severity": "P1",
+          "scenario": "Importing a name exceeding 100 characters shows a row-level error",
+          "steps": "1. Prepare a CSV with one row where the name is 101+ characters.\n2. Import the file.",
+          "expected": "The import reports an error for that row indicating the name is too long."
+        },
+        {
+          "id": "TC-ET-907",
+          "severity": "P1",
+          "scenario": "Importing a duplicate name shows a row-level conflict",
+          "steps": "1. Prepare a CSV with a name that already exists in the system.\n2. Import the file.",
+          "expected": "The import reports a conflict or skip message for that row. No duplicate employment type is created."
+        },
+        {
+          "id": "TC-ET-908",
+          "severity": "P2",
+          "scenario": "An empty CSV file shows an appropriate error",
+          "steps": "1. Create a CSV file with only the header row or completely empty.\n2. Upload it in the import view.",
+          "expected": "The import view shows a message indicating no data rows were found or the file is empty."
+        },
+        {
+          "id": "TC-ET-909",
+          "severity": "P2",
+          "scenario": "Import result shows a summary of imported and failed rows",
+          "steps": "1. Import a CSV with some valid and some invalid rows.\n2. Observe the result screen.",
+          "expected": "The result shows how many employment types were imported successfully and how many failed, with reasons."
+        },
+        {
+          "id": "TC-ET-910",
+          "severity": "P2",
+          "scenario": "After a successful import, the employment types table refreshes automatically",
+          "steps": "1. Import a valid CSV file.\n2. Close the import view and observe the table.",
+          "expected": "The data table refreshes and the newly imported employment types are visible without reloading the page."
+        },
+        {
+          "id": "TC-ET-911",
+          "severity": "P2",
+          "scenario": "Import view shows a spec or field guide for the expected CSV format",
+          "steps": "1. Open the import view.\n2. Look for a column specification or field guide.",
+          "expected": "The import view shows the expected column headers and requirements for the CSV."
+        }
+      ]
+    },
+    {
+      "id": "TC-ET-1000",
+      "name": "Exporting Employment Types",
+      "test_cases": [
+        {
+          "id": "TC-ET-1001",
+          "severity": "P1",
+          "scenario": "Clicking Export opens the export view",
+          "steps": "1. Navigate to the Employment Types page.\n2. Click the 'Export' button.",
+          "expected": "The export configuration panel opens, allowing the user to select fields and format."
+        },
+        {
+          "id": "TC-ET-1002",
+          "severity": "P0",
+          "scenario": "Employment types can be exported to CSV",
+          "steps": "1. Open the export view.\n2. Select CSV as the export format.\n3. Choose at least one field.\n4. Click Export.",
+          "expected": "A CSV file is downloaded containing the selected employment type data."
+        },
+        {
+          "id": "TC-ET-1003",
+          "severity": "P1",
+          "scenario": "Exported CSV contains the expected employment type data",
+          "steps": "1. Export employment types to CSV with all fields selected.\n2. Open the downloaded file.",
+          "expected": "The CSV contains a header row and data rows for each employment type, with Name, Code, and Status values matching the table."
+        },
+        {
+          "id": "TC-ET-1004",
+          "severity": "P1",
+          "scenario": "Export respects the active status filter",
+          "steps": "1. Set the Status filter to 'Active' on the Employment Types page.\n2. Open the export view and export.",
+          "expected": "The exported file contains only active employment types."
+        },
+        {
+          "id": "TC-ET-1005",
+          "severity": "P2",
+          "scenario": "Export respects the current search filter",
+          "steps": "1. Enter a search term on the Employment Types page.\n2. Open the export view and export.",
+          "expected": "The exported file contains only employment types matching the current search term."
+        },
+        {
+          "id": "TC-ET-1006",
+          "severity": "P2",
+          "scenario": "User can select which fields to include in the export",
+          "steps": "1. Open the export view.\n2. Deselect one or more fields.\n3. Export.",
+          "expected": "The downloaded file contains only the selected fields as columns."
+        },
+        {
+          "id": "TC-ET-1007",
+          "severity": "P3",
+          "scenario": "Closing the export view without exporting makes no change",
+          "steps": "1. Open the export view.\n2. Close it without clicking Export.",
+          "expected": "No file is downloaded. The Employment Types table is unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-ET-1100",
+      "name": "Non-Functional & Accessibility",
+      "test_cases": [
+        {
+          "id": "TC-ET-1101",
+          "severity": "P1",
+          "scenario": "All interactive elements on the Employment Types page are keyboard accessible",
+          "steps": "1. Navigate to the Employment Types page.\n2. Use only the Tab key to move through all interactive elements.\n3. Use Enter/Space to activate buttons.",
+          "expected": "All buttons, filters, table actions, and drawer controls can be reached and activated via keyboard."
+        },
+        {
+          "id": "TC-ET-1102",
+          "severity": "P1",
+          "scenario": "Create employment type drawer can be completed entirely via keyboard",
+          "steps": "1. Open the create drawer using the keyboard.\n2. Tab to the Name field and type a name.\n3. Tab to 'Create employment type' and press Enter.",
+          "expected": "The employment type is created successfully using keyboard navigation only."
+        },
+        {
+          "id": "TC-ET-1103",
+          "severity": "P2",
+          "scenario": "Focus is trapped inside the create or edit drawer while it is open",
+          "steps": "1. Open the create employment type drawer.\n2. Press Tab repeatedly.",
+          "expected": "Focus cycles only through elements within the drawer. Focus does not escape to the page behind."
+        },
+        {
+          "id": "TC-ET-1104",
+          "severity": "P2",
+          "scenario": "Closing a drawer returns focus to the element that opened it",
+          "steps": "1. Click 'Add Employment Type' to open the create drawer.\n2. Click 'Cancel' to close it.",
+          "expected": "Focus returns to the 'Add Employment Type' button after the drawer closes."
+        },
+        {
+          "id": "TC-ET-1105",
+          "severity": "P1",
+          "scenario": "Employment Types page loads within an acceptable time",
+          "steps": "1. Ensure the system has at least 20 employment types.\n2. Navigate to the Employment Types page and measure load time.",
+          "expected": "The page and table load within 3 seconds on a standard connection."
+        },
+        {
+          "id": "TC-ET-1106",
+          "severity": "P2",
+          "scenario": "Pagination controls work correctly on the Employment Types table",
+          "steps": "1. Ensure more than 25 employment types exist.\n2. Navigate to the Employment Types page.\n3. Use the pagination controls to go to the next page.",
+          "expected": "The table shows the next page of employment types. The current page indicator updates correctly."
+        },
+        {
+          "id": "TC-ET-1107",
+          "severity": "P2",
+          "scenario": "Employment Types page works correctly in both light and dark themes",
+          "steps": "1. Navigate to the Employment Types page in light theme.\n2. Toggle to dark theme.\n3. Observe the page.",
+          "expected": "All text, icons, drawers, and modals render correctly in dark theme with no contrast or layout issues."
+        },
+        {
+          "id": "TC-ET-1108",
+          "severity": "P2",
+          "scenario": "Active filter chip is displayed when a filter is applied",
+          "steps": "1. Navigate to the Employment Types page.\n2. Enter a search term in the search field.",
+          "expected": "An active filter chip appears showing the applied search term. Clicking the chip clears the filter."
+        },
+        {
+          "id": "TC-ET-1109",
+          "severity": "P3",
+          "scenario": "Long employment type names wrap or truncate gracefully in the table",
+          "steps": "1. Create an employment type with a name close to 100 characters.\n2. View it in the table.",
+          "expected": "The name wraps or truncates in the table cell without breaking the row layout."
+        }
+      ]
+    },
+    {
+      "id": "TC-ET-1200",
+      "name": "Desktop Layout",
+      "test_cases": [
+        {
+          "id": "TC-ET-1201",
+          "severity": "P1",
+          "scenario": "All table columns are visible on a desktop viewport",
+          "steps": "1. Open the Employment Types page on a desktop browser (viewport ≥ 1024px).\n2. Observe the table columns.",
+          "expected": "All columns are visible: Name, Code, Default, Status, Created."
+        },
+        {
+          "id": "TC-ET-1202",
+          "severity": "P1",
+          "scenario": "Create employment type drawer is full-width on desktop without overflow",
+          "steps": "1. Open the Employment Types page on a desktop browser.\n2. Click 'Add Employment Type' to open the create drawer.",
+          "expected": "The drawer occupies the expected width (up to 900px) and the Name field is fully visible without horizontal scrolling."
+        },
+        {
+          "id": "TC-ET-1203",
+          "severity": "P2",
+          "scenario": "Employment type detail page shows two-column layout on desktop",
+          "steps": "1. Open an employment type's detail page on a desktop browser.",
+          "expected": "The page shows a two-column layout: left panel (employment type info) and right panel (members) side by side."
+        },
+        {
+          "id": "TC-ET-1204",
+          "severity": "P2",
+          "scenario": "Page header buttons are correctly spaced on desktop",
+          "steps": "1. Open the Employment Types page on a desktop browser.\n2. Observe the Import, Export, and Add Employment Type buttons.",
+          "expected": "The buttons are aligned in a row in the top-right action area with consistent spacing."
+        },
+        {
+          "id": "TC-ET-1205",
+          "severity": "P2",
+          "scenario": "Members table on detail page shows all columns on desktop",
+          "steps": "1. Open an employment type's detail page on a desktop browser.\n2. Observe the members table columns.",
+          "expected": "All member columns are visible: Name, Email, Role, Location."
+        },
+        {
+          "id": "TC-ET-1206",
+          "severity": "P2",
+          "scenario": "Row overflow menu appears for actions that do not fit inline",
+          "steps": "1. Open the Employment Types page on a desktop viewport.\n2. Observe the action buttons on a row with Edit, Toggle, Set as Default, and Delete.",
+          "expected": "Actions are shown inline where space allows. Additional actions overflow into an ellipsis (…) menu."
+        },
+        {
+          "id": "TC-ET-1207",
+          "severity": "P3",
+          "scenario": "Sorting by Name updates the table immediately on desktop",
+          "steps": "1. Click the Name column header on the Employment Types page.\n2. Observe the table response.",
+          "expected": "The table re-sorts immediately and the sort direction indicator appears next to the Name column header."
+        }
+      ]
+    },
+    {
+      "id": "TC-ET-1300",
+      "name": "Mobile & Responsive",
+      "test_cases": [
+        {
+          "id": "TC-ET-1301",
+          "severity": "P1",
+          "scenario": "Secondary columns are hidden on mobile viewports",
+          "steps": "1. Open the Employment Types page on a mobile device or viewport ≤ 767px.\n2. Observe the table columns.",
+          "expected": "Code, Default, and Created columns are hidden. Only Name and Status remain visible."
+        },
+        {
+          "id": "TC-ET-1302",
+          "severity": "P1",
+          "scenario": "Create employment type drawer is usable on a mobile viewport",
+          "steps": "1. Open the Employment Types page on a mobile viewport.\n2. Open the create drawer and fill in the Name field.\n3. Submit the form.",
+          "expected": "The drawer opens correctly, the Name field is accessible, and the employment type can be created without layout issues."
+        },
+        {
+          "id": "TC-ET-1303",
+          "severity": "P2",
+          "scenario": "Employment type detail page stacks panels vertically on mobile",
+          "steps": "1. Open an employment type's detail page on a mobile viewport.",
+          "expected": "The info panel and members panel stack vertically. The info panel is on top and the members panel is below."
+        },
+        {
+          "id": "TC-ET-1304",
+          "severity": "P2",
+          "scenario": "Members table on detail page hides secondary columns on mobile",
+          "steps": "1. Open an employment type's detail page on a mobile viewport.\n2. Observe the members table.",
+          "expected": "The Email, Role, and Location columns are hidden. Only the avatar and Name are visible on mobile."
+        },
+        {
+          "id": "TC-ET-1305",
+          "severity": "P2",
+          "scenario": "Delete and Set as Default modals are fully visible on mobile",
+          "steps": "1. Open the delete or set-default confirmation modal on a mobile viewport.\n2. Observe the layout.",
+          "expected": "The modal is fully visible on screen with buttons accessible without scrolling."
+        },
+        {
+          "id": "TC-ET-1306",
+          "severity": "P2",
+          "scenario": "Search field is accessible and functional on mobile",
+          "steps": "1. Open the Employment Types page on a mobile device.\n2. Tap the search field and type a name.",
+          "expected": "The search field accepts input and the table filters correctly on mobile."
+        },
+        {
+          "id": "TC-ET-1307",
+          "severity": "P3",
+          "scenario": "Page header does not overflow on small mobile viewports",
+          "steps": "1. Open the Employment Types page on a 375px-wide viewport.\n2. Observe the page title and action buttons.",
+          "expected": "The page title and buttons do not overflow or overlap. The layout remains readable."
+        }
+      ]
+    },
+    {
+      "id": "TC-ET-1400",
+      "name": "Integration with Other Modules",
+      "test_cases": [
+        {
+          "id": "TC-ET-1401",
+          "severity": "P1",
+          "scenario": "Employment types appear as options in member assignment forms",
+          "steps": "1. Ensure active employment types exist.\n2. Navigate to the People or Members module.\n3. Open the form to add or edit a member and look for the employment type field.",
+          "expected": "Active employment types appear as selectable options in the employment type dropdown."
+        },
+        {
+          "id": "TC-ET-1402",
+          "severity": "P1",
+          "scenario": "Inactive employment types do not appear in member assignment dropdowns",
+          "steps": "1. Deactivate an employment type.\n2. Navigate to a member assignment form in another module.\n3. Open the employment type dropdown.",
+          "expected": "The deactivated employment type does not appear as an option for new assignments."
+        },
+        {
+          "id": "TC-ET-1403",
+          "severity": "P1",
+          "scenario": "The default employment type is pre-selected when adding a new member",
+          "steps": "1. Set an employment type as the default.\n2. Navigate to the People or Team Members module.\n3. Open the form to add a new member.",
+          "expected": "The employment type field defaults to the employment type marked as Default."
+        },
+        {
+          "id": "TC-ET-1404",
+          "severity": "P1",
+          "scenario": "Members with a given employment type appear on that employment type's detail page",
+          "steps": "1. Assign a user the employment type 'Contractor'.\n2. Navigate to the 'Contractor' employment type detail page.\n3. Observe the Members panel.",
+          "expected": "The user appears in the members table on the employment type detail page."
+        },
+        {
+          "id": "TC-ET-1405",
+          "severity": "P2",
+          "scenario": "Deactivating an employment type does not remove existing members from it",
+          "steps": "1. Ensure an employment type has assigned members.\n2. Deactivate that employment type.\n3. Navigate to the employment type detail page.",
+          "expected": "The members panel still shows the previously assigned members. Deactivation does not change their employment type."
+        },
+        {
+          "id": "TC-ET-1406",
+          "severity": "P2",
+          "scenario": "Employment type is shown in the Roles detail page members table",
+          "steps": "1. Assign a member the employment type 'Full-time' and a specific Role.\n2. Navigate to that role's detail page.\n3. Observe the Employment Type column in the members table.",
+          "expected": "The member's employment type 'Full-time' is shown in the Employment Type column of the Roles detail members table."
+        },
+        {
+          "id": "TC-ET-1407",
+          "severity": "P2",
+          "scenario": "Employment Types module is accessible from the Configurations navigation",
+          "steps": "1. Log in and click the Configurations section in the main navigation.\n2. Look for the Employment Types link.",
+          "expected": "An 'Employment Types' link is present in the Configurations section and navigates to /employment-types/."
+        },
+        {
+          "id": "TC-ET-1408",
+          "severity": "P3",
+          "scenario": "Changing a member's employment type updates which detail page they appear on",
+          "steps": "1. A member is currently assigned Employment Type A.\n2. Edit that member and change their employment type to Employment Type B.\n3. Navigate to both Employment Type A and Employment Type B detail pages.",
+          "expected": "The member no longer appears on Employment Type A's detail page and now appears on Employment Type B's detail page."
+        }
+      ]
+    }
+  ]
+}

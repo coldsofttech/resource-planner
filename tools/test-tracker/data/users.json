@@ -1,0 +1,575 @@
+{
+  "module": {
+    "slug": "users",
+    "name": "Users",
+    "sort_order": 10,
+    "parent": {
+      "slug": "administration",
+      "name": "Administration",
+      "sort_order": 8
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-US-100",
+      "name": "Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-US-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user is redirected from the Users page",
+          "steps": "1. Open the Users page URL without being logged in.",
+          "expected": "The browser redirects to the login page. The Users page content is not shown."
+        },
+        {
+          "id": "TC-US-102",
+          "severity": "P1",
+          "scenario": "User with view-only permission can see the user list but no management actions",
+          "steps": "1. Log in as a user with only view access.\n2. Navigate to Administration > Users.",
+          "expected": "The Users list loads and displays all users. No Add User, Toggle, Reset Password, Assign Permissions, or Delete actions are visible."
+        },
+        {
+          "id": "TC-US-103",
+          "severity": "P1",
+          "scenario": "Add User button only visible when classic authentication is in use",
+          "steps": "1. Log in with an account that has 'can_add_user' permission on a system configured with classic authentication.\n2. Navigate to Administration > Users.",
+          "expected": "The 'Add User' button is visible in the page header."
+        },
+        {
+          "id": "TC-US-104",
+          "severity": "P1",
+          "scenario": "Add User button is hidden when using OAuth or SAML authentication",
+          "steps": "1. Log in on a system configured with OAuth or SAML (non-classic auth).\n2. Navigate to Administration > Users.",
+          "expected": "The 'Add User' button is not shown, even for users with add-user permission. Users are managed via the identity provider."
+        },
+        {
+          "id": "TC-US-105",
+          "severity": "P1",
+          "scenario": "Toggle and Delete actions are hidden for superuser accounts",
+          "steps": "1. Log in as a user with 'can_change_user' and 'can_delete_user' permissions.\n2. Navigate to Administration > Users.\n3. Find a user that is a superuser and expand their row actions.",
+          "expected": "The Toggle and Delete actions are hidden for superuser accounts. These actions cannot be performed on superusers."
+        },
+        {
+          "id": "TC-US-106",
+          "severity": "P1",
+          "scenario": "User with 'can_change_user' sees Toggle and Reset Password actions",
+          "steps": "1. Log in as a user with 'can_change_user' permission.\n2. Navigate to Administration > Users.\n3. Expand a non-superuser's row actions.",
+          "expected": "The Toggle (activate/deactivate) and Reset Password actions are visible for non-superuser accounts."
+        },
+        {
+          "id": "TC-US-107",
+          "severity": "P1",
+          "scenario": "User with 'can_manage_user_permissions' sees Assign Permissions action",
+          "steps": "1. Log in as a user with 'can_manage_user_permissions' permission.\n2. Navigate to Administration > Users.\n3. Expand any user's row actions.",
+          "expected": "An 'Assign Permissions' action is visible in the row actions."
+        },
+        {
+          "id": "TC-US-108",
+          "severity": "P1",
+          "scenario": "User with 'can_delete_user' sees Delete action for non-superusers",
+          "steps": "1. Log in as a user with 'can_delete_user' permission.\n2. Navigate to Administration > Users.\n3. Expand a non-superuser's row actions.",
+          "expected": "A 'Delete' action (danger-styled) is visible for non-superuser accounts."
+        },
+        {
+          "id": "TC-US-109",
+          "severity": "P1",
+          "scenario": "Export button is only visible to users with 'can_view_users' permission",
+          "steps": "1. Log in as a user with the 'can_view_users' permission.\n2. Navigate to Administration > Users.",
+          "expected": "The Export button is visible in the page header. For users without this permission, the button is not present."
+        }
+      ]
+    },
+    {
+      "id": "TC-US-200",
+      "name": "Browsing & Filtering",
+      "test_cases": [
+        {
+          "id": "TC-US-201",
+          "severity": "P0",
+          "scenario": "Users page loads with the correct layout and table",
+          "steps": "1. Navigate to Administration > Users.",
+          "expected": "The page shows the 'Administration' eyebrow, 'Users' heading, and subtitle 'Manage user accounts and access.' The filter panel and users table are visible with columns: Name, Email, Auth Type, Last Login, Status, Created."
+        },
+        {
+          "id": "TC-US-202",
+          "severity": "P1",
+          "scenario": "Default filter shows only active users",
+          "steps": "1. Navigate to Administration > Users.\n2. Check the Is Active filter value.",
+          "expected": "The Is Active filter is set to 'Active' by default. Only active users appear in the table."
+        },
+        {
+          "id": "TC-US-203",
+          "severity": "P1",
+          "scenario": "Search by name filters the user list",
+          "steps": "1. Navigate to Administration > Users.\n2. Type a user's name in the search field.",
+          "expected": "The table updates to show only users whose names match the search input."
+        },
+        {
+          "id": "TC-US-204",
+          "severity": "P1",
+          "scenario": "Search by email address finds matching users",
+          "steps": "1. Navigate to Administration > Users.\n2. Type a partial or full email address in the search field.",
+          "expected": "Users with matching email addresses are shown in the results."
+        },
+        {
+          "id": "TC-US-205",
+          "severity": "P1",
+          "scenario": "Is Active filter set to 'All' shows both active and inactive users",
+          "steps": "1. Navigate to Administration > Users.\n2. Change Is Active to 'All'.",
+          "expected": "Both active and inactive users appear in the table."
+        },
+        {
+          "id": "TC-US-206",
+          "severity": "P1",
+          "scenario": "Auth Type filter narrows results to users of the selected authentication method",
+          "steps": "1. Navigate to Administration > Users.\n2. Select a specific auth type (e.g., Classic, OAuth, SAML) from the Auth Type filter.",
+          "expected": "Only users with the selected authentication type are shown."
+        },
+        {
+          "id": "TC-US-207",
+          "severity": "P2",
+          "scenario": "Table can be sorted by Name column",
+          "steps": "1. Navigate to Administration > Users.\n2. Click the Name column header.",
+          "expected": "Users are sorted alphabetically by name. Clicking again reverses the sort direction."
+        },
+        {
+          "id": "TC-US-208",
+          "severity": "P2",
+          "scenario": "Table can be sorted by Last Login and Created columns",
+          "steps": "1. Navigate to Administration > Users.\n2. Click the Last Login column header, then the Created column header.",
+          "expected": "Each click sorts the table by the corresponding date column. A sort direction indicator is shown."
+        },
+        {
+          "id": "TC-US-209",
+          "severity": "P2",
+          "scenario": "Pagination loads more users when the list exceeds 25",
+          "steps": "1. Navigate to Administration > Users with Is Active set to 'All'.\n2. If there are more than 25 users, navigate to the next page.",
+          "expected": "Pagination controls are shown. The next page loads additional users without a full page reload."
+        },
+        {
+          "id": "TC-US-210",
+          "severity": "P2",
+          "scenario": "No results message shown when search returns no users",
+          "steps": "1. Navigate to Administration > Users.\n2. Type a search term that matches no user.",
+          "expected": "An empty state message 'No users found.' is displayed."
+        },
+        {
+          "id": "TC-US-211",
+          "severity": "P3",
+          "scenario": "Pressing '/' keyboard shortcut focuses the search field",
+          "steps": "1. Navigate to Administration > Users.\n2. Press the '/' key on the keyboard.",
+          "expected": "The search field receives focus and is ready for input."
+        },
+        {
+          "id": "TC-US-212",
+          "severity": "P2",
+          "scenario": "Active filter chips displayed below the filter panel",
+          "steps": "1. Navigate to Administration > Users.\n2. Apply a Status filter and an Auth Type filter.",
+          "expected": "Active filter chips appear below the filter panel representing the applied filters. Each chip can be removed to clear that filter."
+        }
+      ]
+    },
+    {
+      "id": "TC-US-300",
+      "name": "Creating Users (Classic Auth)",
+      "test_cases": [
+        {
+          "id": "TC-US-301",
+          "severity": "P0",
+          "scenario": "Clicking Add User opens the create user drawer",
+          "steps": "1. Log in with 'can_add_user' permission on a classic auth system.\n2. Navigate to Administration > Users.\n3. Click the 'Add User' button.",
+          "expected": "A create user drawer slides open with First name, Last name, and Email address fields."
+        },
+        {
+          "id": "TC-US-302",
+          "severity": "P0",
+          "scenario": "Creating a user with valid details sends a setup email",
+          "steps": "1. Open the create user drawer.\n2. Enter a first name, last name, and valid email address.\n3. Click 'Create user'.",
+          "expected": "The drawer closes. A success toast appears. The new user appears in the table with Active status. A setup email is sent to the provided address so the user can set their password."
+        },
+        {
+          "id": "TC-US-303",
+          "severity": "P1",
+          "scenario": "Hint text informs admin that a setup email will be sent",
+          "steps": "1. Open the create user drawer.\n2. Read the hint text shown below the email field.",
+          "expected": "The hint text reads: 'A setup email will be sent to this address. The user will set their password on first login.'"
+        },
+        {
+          "id": "TC-US-304",
+          "severity": "P1",
+          "scenario": "First name is required — cannot create a user without it",
+          "steps": "1. Open the create user drawer.\n2. Leave First name blank.\n3. Click 'Create user'.",
+          "expected": "A validation error appears on the First name field. The user is not created and the drawer stays open."
+        },
+        {
+          "id": "TC-US-305",
+          "severity": "P1",
+          "scenario": "Last name is required — cannot create a user without it",
+          "steps": "1. Open the create user drawer.\n2. Leave Last name blank.\n3. Click 'Create user'.",
+          "expected": "A validation error appears on the Last name field. The user is not created."
+        },
+        {
+          "id": "TC-US-306",
+          "severity": "P1",
+          "scenario": "Email address is required and must be in valid format",
+          "steps": "1. Open the create user drawer.\n2. Enter 'notanemail' in the Email address field.\n3. Click 'Create user'.",
+          "expected": "A validation error appears on the Email address field indicating an invalid format."
+        },
+        {
+          "id": "TC-US-307",
+          "severity": "P1",
+          "scenario": "Duplicate email address is rejected",
+          "steps": "1. Open the create user drawer.\n2. Enter an email address that already belongs to an existing user.\n3. Click 'Create user'.",
+          "expected": "An error toast or inline error appears indicating the email is already in use. No duplicate user is created."
+        },
+        {
+          "id": "TC-US-308",
+          "severity": "P2",
+          "scenario": "First name and last name have a maximum length of 150 characters",
+          "steps": "1. Open the create user drawer.\n2. Enter more than 150 characters in the First name or Last name field.\n3. Click 'Create user'.",
+          "expected": "The field rejects or truncates input beyond 150 characters. A validation error is shown if needed."
+        },
+        {
+          "id": "TC-US-309",
+          "severity": "P1",
+          "scenario": "Cancel button closes the create user drawer without saving",
+          "steps": "1. Open the create user drawer.\n2. Enter some details.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. No user is created. The table remains unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-US-400",
+      "name": "Activating & Deactivating Users",
+      "test_cases": [
+        {
+          "id": "TC-US-401",
+          "severity": "P1",
+          "scenario": "Deactivating an active user prompts for confirmation",
+          "steps": "1. Log in with 'can_change_user' permission.\n2. Navigate to Administration > Users.\n3. Click the Toggle action on an active, non-superuser account.",
+          "expected": "A deactivation confirmation modal appears asking the user to confirm they want to deactivate the account."
+        },
+        {
+          "id": "TC-US-402",
+          "severity": "P1",
+          "scenario": "Confirming deactivation makes the user inactive",
+          "steps": "1. Click Toggle on an active user.\n2. Confirm the deactivation in the modal.",
+          "expected": "The modal closes. A success toast appears. The user's Status column shows 'Inactive'. The row action icon changes to reflect the inactive state."
+        },
+        {
+          "id": "TC-US-403",
+          "severity": "P1",
+          "scenario": "Activating an inactive user prompts for confirmation",
+          "steps": "1. Find an inactive user in the list (set Is Active filter to 'All' or 'Inactive').\n2. Click the Toggle action on that user.",
+          "expected": "An activation confirmation modal appears."
+        },
+        {
+          "id": "TC-US-404",
+          "severity": "P1",
+          "scenario": "Confirming activation makes the user active",
+          "steps": "1. Click Toggle on an inactive user.\n2. Confirm the activation.",
+          "expected": "The modal closes. A success toast appears. The user's Status column updates to 'Active'."
+        },
+        {
+          "id": "TC-US-405",
+          "severity": "P1",
+          "scenario": "Cancelling the toggle confirmation modal makes no change",
+          "steps": "1. Click Toggle on a user.\n2. Click Cancel in the confirmation modal.",
+          "expected": "The modal closes. The user's status is unchanged."
+        },
+        {
+          "id": "TC-US-406",
+          "severity": "P0",
+          "scenario": "Superuser accounts cannot be activated or deactivated via the toggle action",
+          "steps": "1. Log in with 'can_change_user' permission.\n2. Locate a superuser account in the Users list.",
+          "expected": "The Toggle action is not visible or accessible for superuser accounts."
+        }
+      ]
+    },
+    {
+      "id": "TC-US-500",
+      "name": "Resetting Passwords",
+      "test_cases": [
+        {
+          "id": "TC-US-501",
+          "severity": "P1",
+          "scenario": "Reset Password action triggers a confirmation before sending the reset email",
+          "steps": "1. Log in with 'can_change_user' permission.\n2. Navigate to Administration > Users.\n3. Click the 'Reset Password' action on a user.",
+          "expected": "A confirmation modal (status-modal) appears asking the admin to confirm sending a password reset email to the user."
+        },
+        {
+          "id": "TC-US-502",
+          "severity": "P1",
+          "scenario": "Confirming the reset sends a password reset email to the user",
+          "steps": "1. Click 'Reset Password' on a user.\n2. Confirm the action in the modal.",
+          "expected": "The modal closes. A success toast appears. A password reset email is sent to the user's registered email address."
+        },
+        {
+          "id": "TC-US-503",
+          "severity": "P2",
+          "scenario": "Reset Password action is hidden when the action is not applicable",
+          "steps": "1. Log in with 'can_change_user' permission.\n2. Locate a user for whom password reset is not applicable (e.g., SSO-only users).",
+          "expected": "The Reset Password action is hidden for users where it does not apply (hidden-key='hide_reset_password')."
+        },
+        {
+          "id": "TC-US-504",
+          "severity": "P1",
+          "scenario": "Cancelling the reset confirmation modal sends no email",
+          "steps": "1. Click 'Reset Password' on a user.\n2. Click Cancel in the confirmation modal.",
+          "expected": "The modal closes. No reset email is sent. The user can still log in with their existing password."
+        }
+      ]
+    },
+    {
+      "id": "TC-US-600",
+      "name": "Assigning Permissions",
+      "test_cases": [
+        {
+          "id": "TC-US-601",
+          "severity": "P1",
+          "scenario": "Assign Permissions action opens the permissions drawer",
+          "steps": "1. Log in with 'can_manage_user_permissions' permission.\n2. Navigate to Administration > Users.\n3. Click 'Assign Permissions' on any user.",
+          "expected": "The Assign Permissions drawer opens showing the permissions panel for the selected user."
+        },
+        {
+          "id": "TC-US-602",
+          "severity": "P1",
+          "scenario": "Saving permissions updates the user's access rights",
+          "steps": "1. Open the Assign Permissions drawer for a user.\n2. Toggle some permissions on or off.\n3. Click 'Save permissions'.",
+          "expected": "The drawer closes. A success toast appears. The user's permissions are updated and take effect immediately."
+        },
+        {
+          "id": "TC-US-603",
+          "severity": "P1",
+          "scenario": "Cancel button closes the permissions drawer without saving",
+          "steps": "1. Open the Assign Permissions drawer for a user.\n2. Make changes to permissions.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes without saving any changes. The user's permissions remain as they were."
+        }
+      ]
+    },
+    {
+      "id": "TC-US-700",
+      "name": "User Detail Page",
+      "test_cases": [
+        {
+          "id": "TC-US-701",
+          "severity": "P1",
+          "scenario": "Clicking a user row navigates to the user detail page",
+          "steps": "1. Navigate to Administration > Users.\n2. Click anywhere on a user's row (not on an action button).",
+          "expected": "The browser navigates to the user detail page showing the selected user's information."
+        },
+        {
+          "id": "TC-US-702",
+          "severity": "P1",
+          "scenario": "User detail page shows the user's key information",
+          "steps": "1. Navigate to a user's detail page from the Users list.",
+          "expected": "The left panel shows the user's avatar, email address, last login, and created date. When available: first name, last name, display name, groups, location, role, and employment type are also displayed."
+        },
+        {
+          "id": "TC-US-703",
+          "severity": "P1",
+          "scenario": "User detail page shows Effective Permissions for users with view_user_permissions",
+          "steps": "1. Log in with 'can_view_user_permissions' permission.\n2. Navigate to a user's detail page.",
+          "expected": "The right panel shows an 'Effective Permissions' section listing all permissions granted to that user."
+        },
+        {
+          "id": "TC-US-704",
+          "severity": "P1",
+          "scenario": "Assign Permissions button on detail page opens the permissions drawer",
+          "steps": "1. Log in with 'can_manage_user_permissions' permission.\n2. Navigate to a user's detail page.\n3. Click 'Assign Permissions' in the page header.",
+          "expected": "The Assign Permissions drawer opens for the viewed user."
+        },
+        {
+          "id": "TC-US-705",
+          "severity": "P1",
+          "scenario": "Reset Password button on detail page sends a reset email",
+          "steps": "1. Log in with 'can_change_user' permission.\n2. Navigate to a user's detail page.\n3. Click 'Reset Password'.",
+          "expected": "A confirmation modal appears. Confirming it sends a password reset email to the user and shows a success toast."
+        }
+      ]
+    },
+    {
+      "id": "TC-US-800",
+      "name": "Deleting Users",
+      "test_cases": [
+        {
+          "id": "TC-US-801",
+          "severity": "P1",
+          "scenario": "Delete action opens a confirmation modal with the user's name",
+          "steps": "1. Log in with 'can_delete_user' permission.\n2. Navigate to Administration > Users.\n3. Click the Delete action on a non-superuser account.",
+          "expected": "A delete confirmation modal appears. The modal shows the user's name and asks for confirmation before permanently deleting."
+        },
+        {
+          "id": "TC-US-802",
+          "severity": "P0",
+          "scenario": "Confirming deletion removes the user permanently",
+          "steps": "1. Click Delete on a user.\n2. Confirm deletion in the modal.",
+          "expected": "The modal closes. A success toast appears. The user is permanently removed from the table and the system."
+        },
+        {
+          "id": "TC-US-803",
+          "severity": "P1",
+          "scenario": "Cancelling the delete modal makes no changes",
+          "steps": "1. Click Delete on a user.\n2. Click Cancel in the modal.",
+          "expected": "The modal closes. The user is still in the table and their account is unaffected."
+        },
+        {
+          "id": "TC-US-804",
+          "severity": "P0",
+          "scenario": "Superuser accounts cannot be deleted",
+          "steps": "1. Log in with 'can_delete_user' permission.\n2. Locate a superuser in the Users list.",
+          "expected": "The Delete action is not visible for superuser accounts. Superusers are protected from deletion via this interface."
+        }
+      ]
+    },
+    {
+      "id": "TC-US-900",
+      "name": "Exporting",
+      "test_cases": [
+        {
+          "id": "TC-US-901",
+          "severity": "P1",
+          "scenario": "Clicking Export opens the export panel",
+          "steps": "1. Navigate to Administration > Users.\n2. Click the 'Export' button.",
+          "expected": "An export configuration panel or drawer opens."
+        },
+        {
+          "id": "TC-US-902",
+          "severity": "P1",
+          "scenario": "Export respects active filters",
+          "steps": "1. Apply an Auth Type filter to show only classic auth users.\n2. Click 'Export' and download the file.",
+          "expected": "The exported file contains only users matching the current filter."
+        },
+        {
+          "id": "TC-US-903",
+          "severity": "P1",
+          "scenario": "Export file downloads successfully",
+          "steps": "1. Navigate to Administration > Users.\n2. Click 'Export' and confirm the export.",
+          "expected": "A file is downloaded containing user data in the expected format."
+        }
+      ]
+    },
+    {
+      "id": "TC-US-1000",
+      "name": "Non-Functional",
+      "test_cases": [
+        {
+          "id": "TC-US-1001",
+          "severity": "P1",
+          "scenario": "Users page loads within an acceptable time",
+          "steps": "1. Navigate to Administration > Users in an environment with 100+ users.",
+          "expected": "The page loads and the table populates within 3 seconds. Pagination handles large datasets."
+        },
+        {
+          "id": "TC-US-1002",
+          "severity": "P1",
+          "scenario": "Session expiry during an action redirects to login",
+          "steps": "1. Open the create user drawer or a permissions drawer.\n2. Allow the session to expire.\n3. Attempt to save.",
+          "expected": "The browser redirects to login. No partial data is saved."
+        },
+        {
+          "id": "TC-US-1003",
+          "severity": "P2",
+          "scenario": "Network failure during user creation shows an error toast",
+          "steps": "1. Open the create user drawer.\n2. Fill in all required fields.\n3. Simulate a network error on submit.",
+          "expected": "An error toast appears with a helpful message. The drawer stays open with the entered data intact."
+        },
+        {
+          "id": "TC-US-1004",
+          "severity": "P2",
+          "scenario": "Table refreshes automatically after a successful action",
+          "steps": "1. Create a new user via the Add User drawer.\n2. Observe the table after the drawer closes.",
+          "expected": "The table refreshes to include the newly created user without requiring a full page reload."
+        }
+      ]
+    },
+    {
+      "id": "TC-US-1100",
+      "name": "Desktop",
+      "test_cases": [
+        {
+          "id": "TC-US-1101",
+          "severity": "P1",
+          "scenario": "All table columns are visible on desktop",
+          "steps": "1. Open Administration > Users on a desktop browser (1280px+ wide).",
+          "expected": "Name, Email, Auth Type, Last Login, Status, and Created columns are all visible."
+        },
+        {
+          "id": "TC-US-1102",
+          "severity": "P2",
+          "scenario": "All three filter fields are visible on desktop",
+          "steps": "1. Open Administration > Users on a desktop browser.",
+          "expected": "The filter panel shows Search, Is Active, and Auth Type — all visible without scrolling."
+        },
+        {
+          "id": "TC-US-1103",
+          "severity": "P2",
+          "scenario": "Create user drawer renders correctly at 900px width on desktop",
+          "steps": "1. Click Add User on a desktop browser.",
+          "expected": "The create user drawer renders at 900px. First name and Last name fields appear side by side (col-md-6). Email spans full width. The hint text is readable."
+        }
+      ]
+    },
+    {
+      "id": "TC-US-1200",
+      "name": "Mobile",
+      "test_cases": [
+        {
+          "id": "TC-US-1201",
+          "severity": "P1",
+          "scenario": "Only Name and Status columns are visible in the table on mobile",
+          "steps": "1. Open Administration > Users on a mobile device or narrow viewport (< 768px).",
+          "expected": "Only the Name and Status columns are visible. Email, Auth Type, Last Login, and Created columns are hidden."
+        },
+        {
+          "id": "TC-US-1202",
+          "severity": "P2",
+          "scenario": "Row actions accessible via overflow menu on mobile",
+          "steps": "1. Open Administration > Users on a mobile device.\n2. Tap a row's overflow ('...') menu.",
+          "expected": "A menu appears with the permitted actions (Toggle, Reset Password, Assign Permissions, Delete) accessible."
+        },
+        {
+          "id": "TC-US-1203",
+          "severity": "P2",
+          "scenario": "Create user drawer renders correctly on mobile",
+          "steps": "1. Tap 'Add User' on a mobile device.",
+          "expected": "The create user drawer opens full-screen or full-width on mobile. All fields stack vertically and are easy to interact with."
+        }
+      ]
+    },
+    {
+      "id": "TC-US-1300",
+      "name": "Integration",
+      "test_cases": [
+        {
+          "id": "TC-US-1301",
+          "severity": "P1",
+          "scenario": "Newly created user can log in with the credentials set via the setup email",
+          "steps": "1. Create a new user via the Add User drawer.\n2. Open the setup email received by the new user.\n3. Follow the link and set a password.\n4. Log in with the new credentials.",
+          "expected": "The new user can successfully log in to the application."
+        },
+        {
+          "id": "TC-US-1302",
+          "severity": "P1",
+          "scenario": "Deactivated user cannot log in",
+          "steps": "1. Deactivate an existing user from the Users list.\n2. Attempt to log in as that deactivated user.",
+          "expected": "The login attempt fails. The user sees an appropriate message that their account is inactive."
+        },
+        {
+          "id": "TC-US-1303",
+          "severity": "P1",
+          "scenario": "User with assigned permissions can access the permitted modules",
+          "steps": "1. Assign specific permissions to a user via the Assign Permissions drawer.\n2. Log in as that user.\n3. Navigate to the modules for which permissions were granted.",
+          "expected": "The user can access only the modules and actions they were explicitly granted permissions for."
+        },
+        {
+          "id": "TC-US-1304",
+          "severity": "P2",
+          "scenario": "Deactivated user is no longer available as a selectable member",
+          "steps": "1. Deactivate a user from the Users list.\n2. Navigate to the Members page and check if the deactivated user appears in member-related dropdowns.",
+          "expected": "The deactivated user does not appear in member selection dropdowns used in features like team assignment or leave management."
+        }
+      ]
+    }
+  ]
+}

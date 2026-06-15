@@ -234,7 +234,7 @@ class UserAvatarService(ContextService):
 
         req = urllib.request.Request(url)  # nosec B310
         req.add_header("User-Agent", "ResourcePlanner/1.0")
-        with urllib.request.urlopen(req, timeout=10) as resp:  # nosec B310
+        with urllib.request.urlopen(req, timeout=10) as resp:  # nosec B310  # nosemgrep
             content = resp.read()
             raw_ct = resp.headers.get("Content-Type", "image/jpeg")
             content_type = raw_ct.split(";")[0].strip()

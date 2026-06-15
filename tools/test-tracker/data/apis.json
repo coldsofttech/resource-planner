@@ -1,0 +1,945 @@
+{
+  "module": {
+    "slug": "apis",
+    "name": "APIs",
+    "sort_order": 99,
+    "parent": null
+  },
+  "suites": [
+    {
+      "id": "TC-API-100",
+      "name": "Authentication",
+      "test_cases": [
+        {
+          "id": "TC-API-101",
+          "severity": "P0",
+          "scenario": "Login with valid credentials returns a token",
+          "steps": "1. Send a POST request to /api/v1/auth/login/ with a valid username and password.",
+          "expected": "A token is returned in the response body. The response indicates success."
+        },
+        {
+          "id": "TC-API-102",
+          "severity": "P0",
+          "scenario": "Login with invalid credentials is rejected",
+          "steps": "1. Send a POST request to /api/v1/auth/login/ with an incorrect password.",
+          "expected": "The request is rejected. No token is returned. The response contains a structured error message."
+        },
+        {
+          "id": "TC-API-103",
+          "severity": "P0",
+          "scenario": "Authenticated request to a private API succeeds with a valid token",
+          "steps": "1. Obtain a valid token via login.\n2. Send a GET request to any private endpoint (e.g. /api/v1/users/) with Authorization: Bearer <token> in the header.",
+          "expected": "The request succeeds and data is returned."
+        },
+        {
+          "id": "TC-API-104",
+          "severity": "P0",
+          "scenario": "Request to a private API without a token is rejected",
+          "steps": "1. Send a GET request to a private endpoint (e.g. /api/v1/users/) with no Authorization header.",
+          "expected": "The request is rejected with an authentication error. No data is returned."
+        },
+        {
+          "id": "TC-API-105",
+          "severity": "P0",
+          "scenario": "Request with an invalid or malformed token is rejected",
+          "steps": "1. Send a GET request to a private endpoint with Authorization: Bearer invalid_token_value.",
+          "expected": "The request is rejected. A structured error response is returned."
+        },
+        {
+          "id": "TC-API-106",
+          "severity": "P1",
+          "scenario": "Logout invalidates the current session token",
+          "steps": "1. Log in and obtain a token.\n2. Send a POST request to /api/v1/auth/logout/ with the token.\n3. Attempt to use the same token on a private endpoint.",
+          "expected": "The logout request succeeds. The previously valid token is no longer accepted on subsequent requests."
+        },
+        {
+          "id": "TC-API-107",
+          "severity": "P1",
+          "scenario": "Public API endpoints are accessible without a token",
+          "steps": "1. Send a GET request to /api/v1/auth/me/ or a known public endpoint without any Authorization header.",
+          "expected": "Public endpoints respond as documented. Private endpoints reject unauthenticated requests."
+        },
+        {
+          "id": "TC-API-108",
+          "severity": "P1",
+          "scenario": "Forgot password request initiates the password reset flow",
+          "steps": "1. Send a POST request to /api/v1/auth/forgot-password/ with a registered email address.",
+          "expected": "The request is accepted. A password reset process is initiated. The response does not reveal whether the email exists."
+        },
+        {
+          "id": "TC-API-109",
+          "severity": "P1",
+          "scenario": "Set password endpoint accepts a valid token and new password",
+          "steps": "1. Obtain a valid password-reset token.\n2. Send a POST request to /api/v1/auth/set-password/ with the token and a new password meeting strength requirements.",
+          "expected": "The password is updated successfully. The response confirms success."
+        },
+        {
+          "id": "TC-API-110",
+          "severity": "P1",
+          "scenario": "Set password endpoint rejects a used or expired token",
+          "steps": "1. Use a password-reset token that has already been used or has expired.\n2. Send a POST request to /api/v1/auth/set-password/ with that token.",
+          "expected": "The request is rejected. The token is not accepted. An error is returned."
+        },
+        {
+          "id": "TC-API-111",
+          "severity": "P1",
+          "scenario": "Current user profile is returned via the /me endpoint",
+          "steps": "1. Log in and obtain a valid token.\n2. Send a GET request to /api/v1/auth/me/ with the token.",
+          "expected": "The response contains the authenticated user's profile information (name, email, role, etc.)."
+        }
+      ]
+    },
+    {
+      "id": "TC-API-200",
+      "name": "List Endpoints",
+      "test_cases": [
+        {
+          "id": "TC-API-201",
+          "severity": "P0",
+          "scenario": "List endpoint returns a paginated response",
+          "steps": "1. Log in and obtain a token.\n2. Send a GET request to any list endpoint (e.g. /api/v1/users/).",
+          "expected": "The response contains a 'results' array and a 'pagination' object with total_count, total_pages, current_page, page_size, has_next, and has_previous fields."
+        },
+        {
+          "id": "TC-API-202",
+          "severity": "P1",
+          "scenario": "Page size can be controlled via query parameter",
+          "steps": "1. Send a GET request to a list endpoint with ?page_size=5.",
+          "expected": "At most 5 records are returned in the 'results' array. The pagination object reflects the page size."
+        },
+        {
+          "id": "TC-API-203",
+          "severity": "P1",
+          "scenario": "Navigating to the second page returns the correct records",
+          "steps": "1. Send a GET request to a list endpoint with ?page=2.",
+          "expected": "The response contains the second page of records. The pagination object shows current_page=2 and has_previous=true."
+        },
+        {
+          "id": "TC-API-204",
+          "severity": "P1",
+          "scenario": "List endpoint supports search/filter via query parameters",
+          "steps": "1. Send a GET request to a list endpoint with a filter parameter (e.g. ?search=name).",
+          "expected": "Only records matching the filter criteria are returned in the results."
+        },
+        {
+          "id": "TC-API-205",
+          "severity": "P1",
+          "scenario": "List endpoint supports sorting via query parameters",
+          "steps": "1. Send a GET request to a list endpoint with ?sort=name&order_by=ASC.",
+          "expected": "Results are returned sorted by name in ascending order."
+        },
+        {
+          "id": "TC-API-206",
+          "severity": "P1",
+          "scenario": "Descending sort order is supported",
+          "steps": "1. Send a GET request to a list endpoint with ?sort=name&order_by=DESC.",
+          "expected": "Results are returned sorted by name in descending order."
+        },
+        {
+          "id": "TC-API-207",
+          "severity": "P2",
+          "scenario": "Empty list returns a results array with zero items",
+          "steps": "1. Request a list endpoint when no records exist or a filter matches nothing.",
+          "expected": "The response contains an empty 'results' array. The pagination object shows total_count=0."
+        },
+        {
+          "id": "TC-API-208",
+          "severity": "P2",
+          "scenario": "Options endpoint returns a simplified list for dropdowns",
+          "steps": "1. Send a GET request to a list options endpoint (e.g. /api/v1/users/options/).",
+          "expected": "The response contains a simplified list suitable for populating dropdowns (e.g. id/code + name pairs). No full record details are included."
+        },
+        {
+          "id": "TC-API-209",
+          "severity": "P2",
+          "scenario": "Stats endpoint returns summary counts",
+          "steps": "1. Send a GET request to a stats endpoint (e.g. /api/v1/users/stats/).",
+          "expected": "The response contains aggregate counts or statistics for the resource (e.g. total, active, inactive counts)."
+        }
+      ]
+    },
+    {
+      "id": "TC-API-300",
+      "name": "Retrieve Endpoints",
+      "test_cases": [
+        {
+          "id": "TC-API-301",
+          "severity": "P0",
+          "scenario": "Retrieve a single record by its code returns full detail",
+          "steps": "1. Log in and obtain a token.\n2. Send a GET request to a detail endpoint using a known record code (e.g. /api/v1/roles/ROLE-001/).",
+          "expected": "The full record is returned in the response body, including all fields."
+        },
+        {
+          "id": "TC-API-302",
+          "severity": "P0",
+          "scenario": "Retrieving a non-existent record returns a not-found response",
+          "steps": "1. Send a GET request to a detail endpoint using a code that does not exist (e.g. /api/v1/roles/NONEXISTENT/).",
+          "expected": "A structured error response is returned indicating the record was not found."
+        },
+        {
+          "id": "TC-API-303",
+          "severity": "P1",
+          "scenario": "Retrieve endpoint returns all expected fields",
+          "steps": "1. Retrieve a known record.\n2. Check the response body for all expected fields documented in the API contract.",
+          "expected": "All documented fields are present in the response. No unexpected fields are missing."
+        },
+        {
+          "id": "TC-API-304",
+          "severity": "P2",
+          "scenario": "Retrieving a record created by another user is permitted for authorized roles",
+          "steps": "1. Log in as a user with sufficient permissions.\n2. Retrieve a record created by a different user.",
+          "expected": "The record is returned successfully. No ownership restriction prevents access."
+        }
+      ]
+    },
+    {
+      "id": "TC-API-400",
+      "name": "Create Endpoints",
+      "test_cases": [
+        {
+          "id": "TC-API-401",
+          "severity": "P0",
+          "scenario": "Create endpoint with valid payload creates a new record",
+          "steps": "1. Log in and obtain a token.\n2. Send a POST request to a create endpoint (e.g. /api/v1/roles/) with a valid JSON payload.",
+          "expected": "The record is created. The response includes the newly created record with its assigned code and all fields."
+        },
+        {
+          "id": "TC-API-402",
+          "severity": "P0",
+          "scenario": "Create endpoint with missing required fields returns a validation error",
+          "steps": "1. Send a POST request to a create endpoint with a payload that omits a required field.",
+          "expected": "The request is rejected. The response identifies which field(s) are missing. No record is created."
+        },
+        {
+          "id": "TC-API-403",
+          "severity": "P1",
+          "scenario": "Creating a record with a duplicate name or unique field is rejected",
+          "steps": "1. Create a record successfully.\n2. Attempt to create another record with the same name or unique field value.",
+          "expected": "The second request is rejected with a conflict or validation error. Only the original record exists."
+        },
+        {
+          "id": "TC-API-404",
+          "severity": "P1",
+          "scenario": "Create endpoint with invalid field format returns a validation error",
+          "steps": "1. Send a POST request to a create endpoint with a field containing an invalid format (e.g. a number where a string is expected, or a malformed date).",
+          "expected": "The request is rejected with a structured validation error identifying the invalid field."
+        },
+        {
+          "id": "TC-API-405",
+          "severity": "P1",
+          "scenario": "Create endpoint returns the full created record in the response",
+          "steps": "1. Create a new record with a valid payload.\n2. Inspect the response body.",
+          "expected": "The response contains the complete created record including system-generated fields (code, created_at, etc.)."
+        },
+        {
+          "id": "TC-API-406",
+          "severity": "P1",
+          "scenario": "Unauthenticated user cannot create records via the API",
+          "steps": "1. Send a POST request to a create endpoint without an Authorization header.",
+          "expected": "The request is rejected with an authentication error. No record is created."
+        },
+        {
+          "id": "TC-API-407",
+          "severity": "P2",
+          "scenario": "Create endpoint ignores extra unexpected fields in the payload",
+          "steps": "1. Send a POST request with the required payload plus additional unknown fields.",
+          "expected": "The record is created successfully. Unknown fields are ignored and do not appear in the response."
+        },
+        {
+          "id": "TC-API-408",
+          "severity": "P2",
+          "scenario": "Creating a record with a field value exceeding the maximum length is rejected",
+          "steps": "1. Send a POST request with a name or text field that exceeds the documented maximum length.",
+          "expected": "The request is rejected with a validation error indicating the field is too long."
+        }
+      ]
+    },
+    {
+      "id": "TC-API-500",
+      "name": "Update Endpoints",
+      "test_cases": [
+        {
+          "id": "TC-API-501",
+          "severity": "P0",
+          "scenario": "Update endpoint with valid payload modifies the record",
+          "steps": "1. Log in and obtain a token.\n2. Send a PATCH request to a detail endpoint (e.g. /api/v1/roles/ROLE-001/) with an updated field value.",
+          "expected": "The record is updated. The response includes the updated record with the new values."
+        },
+        {
+          "id": "TC-API-502",
+          "severity": "P0",
+          "scenario": "Partial update only changes specified fields",
+          "steps": "1. Retrieve a record.\n2. PATCH the record with only one field changed.",
+          "expected": "Only the specified field is changed. All other fields retain their original values."
+        },
+        {
+          "id": "TC-API-503",
+          "severity": "P1",
+          "scenario": "Update with an invalid field value is rejected",
+          "steps": "1. Send a PATCH request with a field value that fails validation (e.g. an empty string for a required field).",
+          "expected": "The request is rejected with a structured validation error. The record is not changed."
+        },
+        {
+          "id": "TC-API-504",
+          "severity": "P1",
+          "scenario": "Updating a non-existent record returns a not-found response",
+          "steps": "1. Send a PATCH request to a detail endpoint using a code that does not exist.",
+          "expected": "A structured error response is returned. No record is created or modified."
+        },
+        {
+          "id": "TC-API-505",
+          "severity": "P1",
+          "scenario": "Immutable system-generated fields cannot be changed via update",
+          "steps": "1. Retrieve a record and note its code and created_at values.\n2. Attempt a PATCH with a different code or created_at value.",
+          "expected": "The system-generated fields remain unchanged. The update either ignores those fields or rejects the request."
+        },
+        {
+          "id": "TC-API-506",
+          "severity": "P1",
+          "scenario": "Unauthenticated user cannot update records",
+          "steps": "1. Send a PATCH request to a detail endpoint without an Authorization header.",
+          "expected": "The request is rejected with an authentication error. The record is not modified."
+        },
+        {
+          "id": "TC-API-507",
+          "severity": "P2",
+          "scenario": "Updating a protected or system record is rejected",
+          "steps": "1. Attempt to PATCH a record that is marked as protected or system-defined.",
+          "expected": "The request is rejected with an appropriate error. Protected records cannot be modified."
+        }
+      ]
+    },
+    {
+      "id": "TC-API-600",
+      "name": "Delete Endpoints",
+      "test_cases": [
+        {
+          "id": "TC-API-601",
+          "severity": "P0",
+          "scenario": "Delete endpoint removes the record successfully",
+          "steps": "1. Log in and obtain a token.\n2. Send a DELETE request to a detail endpoint for an existing record.",
+          "expected": "The record is removed. The response confirms deletion. Attempting to retrieve the deleted record returns a not-found response."
+        },
+        {
+          "id": "TC-API-602",
+          "severity": "P0",
+          "scenario": "Deleting a non-existent record returns a not-found response",
+          "steps": "1. Send a DELETE request to a detail endpoint using a code that does not exist.",
+          "expected": "A structured error response is returned. No side effects occur."
+        },
+        {
+          "id": "TC-API-603",
+          "severity": "P1",
+          "scenario": "Deleting a protected or system record is rejected",
+          "steps": "1. Attempt to DELETE a record that is marked as protected or system-defined.",
+          "expected": "The request is rejected. The record remains intact."
+        },
+        {
+          "id": "TC-API-604",
+          "severity": "P1",
+          "scenario": "Unauthenticated user cannot delete records",
+          "steps": "1. Send a DELETE request without an Authorization header.",
+          "expected": "The request is rejected with an authentication error. The record is not deleted."
+        },
+        {
+          "id": "TC-API-605",
+          "severity": "P2",
+          "scenario": "Deleting a record with dependent data handles cascades correctly",
+          "steps": "1. Create a record that has child or related records.\n2. Delete the parent record.",
+          "expected": "The delete either cascades as documented, or is rejected with an error explaining that dependent records exist. No orphaned data is left behind."
+        }
+      ]
+    },
+    {
+      "id": "TC-API-700",
+      "name": "Activate & Deactivate Actions",
+      "test_cases": [
+        {
+          "id": "TC-API-701",
+          "severity": "P0",
+          "scenario": "Activate action marks an inactive record as active",
+          "steps": "1. Ensure a record is in an inactive state.\n2. Send a POST request to the activate endpoint (e.g. /api/v1/roles/ROLE-001/activate/).",
+          "expected": "The record's status changes to active. The response confirms the update."
+        },
+        {
+          "id": "TC-API-702",
+          "severity": "P0",
+          "scenario": "Deactivate action marks an active record as inactive",
+          "steps": "1. Ensure a record is in an active state.\n2. Send a POST request to the deactivate endpoint (e.g. /api/v1/roles/ROLE-001/deactivate/).",
+          "expected": "The record's status changes to inactive. The response confirms the update."
+        },
+        {
+          "id": "TC-API-703",
+          "severity": "P1",
+          "scenario": "Activating an already-active record is handled gracefully",
+          "steps": "1. Activate an already active record.",
+          "expected": "The request either succeeds idempotently (record remains active) or returns an informative error. No data corruption occurs."
+        },
+        {
+          "id": "TC-API-704",
+          "severity": "P1",
+          "scenario": "Deactivating an already-inactive record is handled gracefully",
+          "steps": "1. Deactivate an already inactive record.",
+          "expected": "The request either succeeds idempotently (record remains inactive) or returns an informative error. No data corruption occurs."
+        },
+        {
+          "id": "TC-API-705",
+          "severity": "P1",
+          "scenario": "Activate/deactivate action on a non-existent record returns not-found",
+          "steps": "1. Send a POST request to the activate or deactivate endpoint using a code that does not exist.",
+          "expected": "A structured error response is returned indicating the record was not found."
+        },
+        {
+          "id": "TC-API-706",
+          "severity": "P1",
+          "scenario": "Unauthenticated user cannot activate or deactivate records",
+          "steps": "1. Send a POST request to an activate or deactivate endpoint without an Authorization header.",
+          "expected": "The request is rejected with an authentication error. The record's status is not changed."
+        }
+      ]
+    },
+    {
+      "id": "TC-API-800",
+      "name": "Set Active & Set Default Actions",
+      "test_cases": [
+        {
+          "id": "TC-API-801",
+          "severity": "P0",
+          "scenario": "Set-active action marks a record as the active/current entry",
+          "steps": "1. Log in and obtain a token.\n2. Send a POST request to the set-active endpoint for a record (e.g. /api/v1/financial-years/FY-2025/set-active/).",
+          "expected": "The record is marked as the active entry. Any previously active record is no longer active. The response confirms the change."
+        },
+        {
+          "id": "TC-API-802",
+          "severity": "P1",
+          "scenario": "Only one record is active at a time after set-active",
+          "steps": "1. Set one record as active.\n2. Set a different record as active.\n3. List all records and check the active flag.",
+          "expected": "Only the most recently activated record has the active flag set. All other records are inactive."
+        },
+        {
+          "id": "TC-API-803",
+          "severity": "P1",
+          "scenario": "Set-active on a non-existent record returns not-found",
+          "steps": "1. Send a POST request to the set-active endpoint using a code that does not exist.",
+          "expected": "A structured error response is returned. No other record's status is changed."
+        },
+        {
+          "id": "TC-API-804",
+          "severity": "P1",
+          "scenario": "Unauthenticated user cannot set the active record",
+          "steps": "1. Send a POST request to a set-active endpoint without an Authorization header.",
+          "expected": "The request is rejected. No record's status is changed."
+        },
+        {
+          "id": "TC-API-805",
+          "severity": "P2",
+          "scenario": "Active record is retrievable via a dedicated active endpoint",
+          "steps": "1. Set a record as active.\n2. Send a GET request to the active endpoint (e.g. /api/v1/financial-years/active/).",
+          "expected": "The currently active record is returned. If no active record exists, an appropriate empty or error response is returned."
+        }
+      ]
+    },
+    {
+      "id": "TC-API-900",
+      "name": "Export Endpoints",
+      "test_cases": [
+        {
+          "id": "TC-API-901",
+          "severity": "P0",
+          "scenario": "Export specs endpoint returns the export field configuration",
+          "steps": "1. Log in and obtain a token.\n2. Send a GET request to the export specs endpoint (e.g. /api/v1/roles/export/specs/).",
+          "expected": "The response contains a list of exportable fields with their labels and types."
+        },
+        {
+          "id": "TC-API-902",
+          "severity": "P0",
+          "scenario": "Export endpoint downloads the records as a file",
+          "steps": "1. Send a GET request to the export endpoint (e.g. /api/v1/roles/export/) with appropriate query parameters.",
+          "expected": "A file is returned (CSV, XLSX, or similar). The file contains the expected column headers and data rows."
+        },
+        {
+          "id": "TC-API-903",
+          "severity": "P1",
+          "scenario": "Export respects active filters",
+          "steps": "1. Apply a search or status filter via query parameters when calling the export endpoint.",
+          "expected": "The exported file contains only records matching the applied filters, not the full dataset."
+        },
+        {
+          "id": "TC-API-904",
+          "severity": "P1",
+          "scenario": "Export with no matching records returns an empty file or appropriate response",
+          "steps": "1. Apply a filter that matches no records and call the export endpoint.",
+          "expected": "The export either returns a file with headers only or an appropriate message. No error or crash occurs."
+        },
+        {
+          "id": "TC-API-905",
+          "severity": "P1",
+          "scenario": "Unauthenticated user cannot access export endpoints",
+          "steps": "1. Call an export endpoint without an Authorization header.",
+          "expected": "The request is rejected. No file is returned."
+        },
+        {
+          "id": "TC-API-906",
+          "severity": "P2",
+          "scenario": "Export file contains the expected columns as defined by the specs",
+          "steps": "1. Call the export specs endpoint to see declared columns.\n2. Download the export file.\n3. Compare the file columns against the declared specs.",
+          "expected": "The file columns match those declared in the specs response."
+        }
+      ]
+    },
+    {
+      "id": "TC-API-1000",
+      "name": "Import Endpoints",
+      "test_cases": [
+        {
+          "id": "TC-API-1001",
+          "severity": "P0",
+          "scenario": "Import specs endpoint returns the expected field definitions",
+          "steps": "1. Log in and obtain a token.\n2. Send a GET request to the import specs endpoint (e.g. /api/v1/roles/import/specs/).",
+          "expected": "The response contains field definitions including name, type, required status, and any accepted values."
+        },
+        {
+          "id": "TC-API-1002",
+          "severity": "P0",
+          "scenario": "Import sample endpoint returns a downloadable sample file",
+          "steps": "1. Send a GET request to the import sample endpoint (e.g. /api/v1/roles/import/sample/).",
+          "expected": "A sample file is returned (CSV or XLSX) with correct column headers and example data rows."
+        },
+        {
+          "id": "TC-API-1003",
+          "severity": "P0",
+          "scenario": "Bulk import endpoint creates records from a valid file",
+          "steps": "1. Download the sample import file.\n2. Populate the file with valid data rows.\n3. POST the file to the import endpoint (e.g. /api/v1/roles/import/).",
+          "expected": "The records are created. The response indicates how many records were imported successfully."
+        },
+        {
+          "id": "TC-API-1004",
+          "severity": "P1",
+          "scenario": "Import with invalid rows returns row-level errors",
+          "steps": "1. Create an import file with some rows containing invalid data (e.g. missing required fields, invalid formats).\n2. POST the file to the import endpoint.",
+          "expected": "Valid rows are imported. Invalid rows are reported with row numbers and error descriptions. No crash occurs."
+        },
+        {
+          "id": "TC-API-1005",
+          "severity": "P1",
+          "scenario": "Import with an entirely invalid file is rejected gracefully",
+          "steps": "1. POST a file with the wrong format or completely invalid content to the import endpoint.",
+          "expected": "The request is rejected with an error describing the file format issue. No partial records are created."
+        },
+        {
+          "id": "TC-API-1006",
+          "severity": "P1",
+          "scenario": "Import with duplicate records handles conflicts",
+          "steps": "1. Import a file containing a record that already exists (same unique identifier).\n2. Check the response.",
+          "expected": "Existing records are either updated or skipped as documented. The response clarifies how conflicts were handled."
+        },
+        {
+          "id": "TC-API-1007",
+          "severity": "P1",
+          "scenario": "Unauthenticated user cannot access import endpoints",
+          "steps": "1. POST to an import endpoint without an Authorization header.",
+          "expected": "The request is rejected. No records are created."
+        },
+        {
+          "id": "TC-API-1008",
+          "severity": "P2",
+          "scenario": "Import of an empty file (headers only) returns zero records imported",
+          "steps": "1. POST a file with only the header row and no data rows to the import endpoint.",
+          "expected": "Zero records are imported. The response indicates this without an error."
+        },
+        {
+          "id": "TC-API-1009",
+          "severity": "P2",
+          "scenario": "Import sample column headers match the import specs fields",
+          "steps": "1. Call the import specs endpoint and note the declared fields.\n2. Download the sample import file.\n3. Compare the sample file headers against the specs.",
+          "expected": "The sample file headers exactly match the field names declared in the import specs."
+        }
+      ]
+    },
+    {
+      "id": "TC-API-1100",
+      "name": "Engine-Specific Actions",
+      "test_cases": [
+        {
+          "id": "TC-API-1101",
+          "severity": "P0",
+          "scenario": "Sprint generate endpoint creates sprints from a defined schedule",
+          "steps": "1. Log in and obtain a token.\n2. Send a POST request to the sprint generate endpoint (e.g. /api/v1/sprints/generate/) with the required configuration (start date, number of sprints, duration).",
+          "expected": "Sprints are generated as configured. The response lists the created sprints or confirms the count created."
+        },
+        {
+          "id": "TC-API-1102",
+          "severity": "P1",
+          "scenario": "Sprint generate with invalid configuration is rejected",
+          "steps": "1. Send a POST request to the sprint generate endpoint with a missing or invalid parameter (e.g. no start date).",
+          "expected": "The request is rejected with a validation error. No sprints are created."
+        },
+        {
+          "id": "TC-API-1103",
+          "severity": "P1",
+          "scenario": "Sprint generate with overlapping date ranges is handled",
+          "steps": "1. Generate a set of sprints.\n2. Attempt to generate another set that overlaps with the existing sprint dates.",
+          "expected": "The request is rejected or handled as documented. No duplicate or overlapping sprints are created."
+        },
+        {
+          "id": "TC-API-1104",
+          "severity": "P0",
+          "scenario": "Sprint capacity rebuild endpoint recalculates capacity data",
+          "steps": "1. Send a POST request to the sprint capacity rebuild endpoint (e.g. /api/v1/sprints/SPRINT-001/capacity/rebuild/).",
+          "expected": "Capacity is recalculated for the sprint. The response confirms the rebuild was successful."
+        },
+        {
+          "id": "TC-API-1105",
+          "severity": "P1",
+          "scenario": "Capacity rebuild on a non-existent sprint returns not-found",
+          "steps": "1. Send a POST request to the capacity rebuild endpoint using a sprint code that does not exist.",
+          "expected": "A structured error response is returned. No calculation occurs."
+        },
+        {
+          "id": "TC-API-1106",
+          "severity": "P1",
+          "scenario": "Unauthenticated user cannot trigger engine actions",
+          "steps": "1. Send a POST request to any engine endpoint (generate, rebuild, etc.) without an Authorization header.",
+          "expected": "The request is rejected with an authentication error. No processing occurs."
+        },
+        {
+          "id": "TC-API-1107",
+          "severity": "P2",
+          "scenario": "Sprint generate with a large number of sprints completes without timeout",
+          "steps": "1. Send a POST request to the sprint generate endpoint requesting a large batch (e.g. 52 sprints for a full year).",
+          "expected": "All sprints are generated successfully. The response returns within an acceptable time."
+        }
+      ]
+    },
+    {
+      "id": "TC-API-1200",
+      "name": "Setup APIs",
+      "test_cases": [
+        {
+          "id": "TC-API-1201",
+          "severity": "P0",
+          "scenario": "Setup API endpoints are accessible before the system is configured",
+          "steps": "1. Access the setup API endpoints (e.g. /api/v1/setup/) without authentication on a fresh installation.",
+          "expected": "Setup endpoints respond and allow the initial configuration process to proceed."
+        },
+        {
+          "id": "TC-API-1202",
+          "severity": "P0",
+          "scenario": "Setup cannot be repeated after the system is fully configured",
+          "steps": "1. Complete the setup process.\n2. Attempt to call setup API endpoints again.",
+          "expected": "The setup endpoints are no longer accessible or return an error indicating setup is already complete."
+        },
+        {
+          "id": "TC-API-1203",
+          "severity": "P1",
+          "scenario": "Setup API validates database connection details",
+          "steps": "1. Call the setup database test endpoint with valid connection details.",
+          "expected": "The response confirms the database is reachable and the connection is valid."
+        },
+        {
+          "id": "TC-API-1204",
+          "severity": "P1",
+          "scenario": "Setup API rejects invalid database connection details",
+          "steps": "1. Call the setup database test endpoint with incorrect host, port, or credentials.",
+          "expected": "The response indicates the connection failed. An error message is returned."
+        },
+        {
+          "id": "TC-API-1205",
+          "severity": "P1",
+          "scenario": "Setup completion endpoint finalizes configuration and makes the system operational",
+          "steps": "1. Walk through all required setup steps via the API.\n2. Call the setup completion endpoint.",
+          "expected": "The system is marked as set up. The application becomes available for normal use."
+        }
+      ]
+    },
+    {
+      "id": "TC-API-1300",
+      "name": "API Schema Endpoint (/api/schema/)",
+      "test_cases": [
+        {
+          "id": "TC-API-1301",
+          "severity": "P0",
+          "scenario": "API schema endpoint returns a downloadable OpenAPI specification",
+          "steps": "1. Navigate to /api/schema/ in the browser or send a GET request.",
+          "expected": "An OpenAPI specification file is returned (YAML or JSON). The file is downloadable."
+        },
+        {
+          "id": "TC-API-1302",
+          "severity": "P1",
+          "scenario": "Schema file contains all registered API endpoints",
+          "steps": "1. Download the schema file from /api/schema/.\n2. Open the file and check for key endpoints (auth, users, projects, etc.).",
+          "expected": "All major API endpoints are present in the schema. The endpoint list is complete."
+        },
+        {
+          "id": "TC-API-1303",
+          "severity": "P1",
+          "scenario": "Schema file is valid OpenAPI format",
+          "steps": "1. Download the schema file.\n2. Validate it using an OpenAPI validator tool.",
+          "expected": "The schema passes validation without errors."
+        },
+        {
+          "id": "TC-API-1304",
+          "severity": "P2",
+          "scenario": "Schema endpoint returns the correct content type header",
+          "steps": "1. Request /api/schema/ and inspect the response headers.",
+          "expected": "The Content-Type header indicates YAML or JSON as appropriate."
+        },
+        {
+          "id": "TC-API-1305",
+          "severity": "P2",
+          "scenario": "Schema endpoint responds quickly even for a large API surface",
+          "steps": "1. Request /api/schema/ and measure the response time.",
+          "expected": "The schema is generated and returned within an acceptable time (e.g. under 3 seconds)."
+        }
+      ]
+    },
+    {
+      "id": "TC-API-1400",
+      "name": "Swagger UI (/api/docs/)",
+      "test_cases": [
+        {
+          "id": "TC-API-1401",
+          "severity": "P0",
+          "scenario": "Swagger UI page loads successfully",
+          "steps": "1. Navigate to /api/docs/ in the browser.",
+          "expected": "The Swagger UI page loads. The page title indicates it is the API documentation. The endpoint list is visible."
+        },
+        {
+          "id": "TC-API-1402",
+          "severity": "P1",
+          "scenario": "Swagger UI displays all API endpoints grouped by tag",
+          "steps": "1. Open /api/docs/ and expand the endpoint groups.",
+          "expected": "Endpoints are grouped by resource or tag (e.g. Auth, Users, Projects). All major endpoint groups are visible."
+        },
+        {
+          "id": "TC-API-1403",
+          "severity": "P1",
+          "scenario": "Expanding an endpoint shows its method, parameters, and request body schema",
+          "steps": "1. In Swagger UI, expand any endpoint (e.g. POST /api/v1/auth/login/).",
+          "expected": "The endpoint details show HTTP method, URL, required parameters, request body schema, and expected response formats."
+        },
+        {
+          "id": "TC-API-1404",
+          "severity": "P1",
+          "scenario": "Try It Out allows sending a test request from the browser",
+          "steps": "1. Expand an endpoint in Swagger UI.\n2. Click 'Try it out'.\n3. Fill in the required fields.\n4. Click 'Execute'.",
+          "expected": "The request is sent to the API. The response is displayed in the Swagger UI including status code and response body."
+        },
+        {
+          "id": "TC-API-1405",
+          "severity": "P1",
+          "scenario": "Swagger UI Authorize dialog allows entering a Bearer token",
+          "steps": "1. Click the 'Authorize' button in Swagger UI.\n2. Enter a valid Bearer token in the authorization dialog.\n3. Click 'Authorize'.",
+          "expected": "The token is stored. Subsequent 'Try it out' requests include the token in the Authorization header."
+        },
+        {
+          "id": "TC-API-1406",
+          "severity": "P2",
+          "scenario": "Swagger UI shows request and response examples where available",
+          "steps": "1. Expand an endpoint in Swagger UI.\n2. Look for example request bodies and response examples.",
+          "expected": "Where documented, example payloads and response structures are shown in the Swagger UI."
+        },
+        {
+          "id": "TC-API-1407",
+          "severity": "P2",
+          "scenario": "Swagger UI is accessible on mobile viewport",
+          "steps": "1. Open /api/docs/ on a mobile device or narrow viewport.",
+          "expected": "The page is usable on mobile. Endpoint groups are navigable. Content is readable without horizontal overflow."
+        },
+        {
+          "id": "TC-API-1408",
+          "severity": "P2",
+          "scenario": "Swagger UI loads the schema from /api/schema/ correctly",
+          "steps": "1. Open /api/docs/ and check the browser's network tab for the schema request.",
+          "expected": "Swagger UI successfully loads the schema from /api/schema/ and renders endpoints from it."
+        }
+      ]
+    },
+    {
+      "id": "TC-API-1500",
+      "name": "Redoc UI (/api/redoc/)",
+      "test_cases": [
+        {
+          "id": "TC-API-1501",
+          "severity": "P0",
+          "scenario": "Redoc page loads successfully",
+          "steps": "1. Navigate to /api/redoc/ in the browser.",
+          "expected": "The Redoc documentation page loads. A navigation sidebar and main content panel are visible."
+        },
+        {
+          "id": "TC-API-1502",
+          "severity": "P1",
+          "scenario": "Redoc sidebar shows all endpoint groups",
+          "steps": "1. Open /api/redoc/ and inspect the left navigation sidebar.",
+          "expected": "All major API endpoint groups are listed in the sidebar (e.g. Auth, Users, Projects, Sprints, etc.)."
+        },
+        {
+          "id": "TC-API-1503",
+          "severity": "P1",
+          "scenario": "Clicking a sidebar item scrolls to the correct endpoint section",
+          "steps": "1. Open /api/redoc/.\n2. Click an endpoint group or specific endpoint in the sidebar.",
+          "expected": "The main content area scrolls to or displays the selected endpoint documentation."
+        },
+        {
+          "id": "TC-API-1504",
+          "severity": "P1",
+          "scenario": "Endpoint details show request and response schemas",
+          "steps": "1. Open an endpoint section in Redoc.\n2. Inspect the request body and response sections.",
+          "expected": "Field names, types, required status, and descriptions are shown for request and response schemas."
+        },
+        {
+          "id": "TC-API-1505",
+          "severity": "P2",
+          "scenario": "Redoc is readable and well-formatted on desktop",
+          "steps": "1. Open /api/redoc/ on a desktop browser at 1280px+ viewport width.",
+          "expected": "Content is well-formatted with clear typography, proper spacing, and readable code blocks."
+        },
+        {
+          "id": "TC-API-1506",
+          "severity": "P2",
+          "scenario": "Redoc is accessible on mobile viewport",
+          "steps": "1. Open /api/redoc/ on a mobile device or narrow viewport.",
+          "expected": "The page is usable on mobile. Navigation collapses appropriately. Content is readable."
+        },
+        {
+          "id": "TC-API-1507",
+          "severity": "P2",
+          "scenario": "Redoc search finds endpoints by name or keyword",
+          "steps": "1. Open /api/redoc/.\n2. Use the search functionality (if available) to search for 'login' or another keyword.",
+          "expected": "Relevant endpoints are highlighted or filtered in the sidebar or main content."
+        }
+      ]
+    },
+    {
+      "id": "TC-API-1600",
+      "name": "Non-Functional",
+      "test_cases": [
+        {
+          "id": "TC-API-1601",
+          "severity": "P1",
+          "scenario": "All API error responses use a consistent structured format",
+          "steps": "1. Trigger various error conditions (missing field, invalid token, not found, forbidden).\n2. Inspect the response body for each.",
+          "expected": "All error responses follow the format: { \"error\": { \"code\": \"...\", \"message\": \"...\" } }. No raw exception messages or stack traces are returned."
+        },
+        {
+          "id": "TC-API-1602",
+          "severity": "P1",
+          "scenario": "API responses include appropriate Content-Type headers",
+          "steps": "1. Call any API endpoint and inspect the response headers.",
+          "expected": "The Content-Type header is set to application/json for all JSON API responses."
+        },
+        {
+          "id": "TC-API-1603",
+          "severity": "P1",
+          "scenario": "API list endpoints respond within an acceptable time for typical datasets",
+          "steps": "1. Populate the system with a realistic number of records (e.g. 100+ rows).\n2. Call a list endpoint and measure response time.",
+          "expected": "The list endpoint responds within 2 seconds for typical datasets."
+        },
+        {
+          "id": "TC-API-1604",
+          "severity": "P2",
+          "scenario": "API responses do not expose internal stack traces on server errors",
+          "steps": "1. Trigger an intentional server-side error (if possible in a test environment).\n2. Inspect the response body.",
+          "expected": "The response contains a user-friendly error message. No Python traceback, SQL query, or internal file paths are visible."
+        },
+        {
+          "id": "TC-API-1605",
+          "severity": "P2",
+          "scenario": "CORS headers are set appropriately for API responses",
+          "steps": "1. Send a cross-origin request (or inspect headers) to an API endpoint.",
+          "expected": "CORS headers are present and configured correctly. Unauthorised origins are not given access."
+        },
+        {
+          "id": "TC-API-1606",
+          "severity": "P2",
+          "scenario": "Pagination defaults are consistent across all list endpoints",
+          "steps": "1. Call several list endpoints without specifying page_size.",
+          "expected": "All list endpoints use the same default page size (e.g. 20 or 25 records per page)."
+        },
+        {
+          "id": "TC-API-1607",
+          "severity": "P2",
+          "scenario": "API does not return sensitive user data in list responses",
+          "steps": "1. Call a user list endpoint.\n2. Inspect the response for sensitive fields such as passwords, tokens, or secret keys.",
+          "expected": "No sensitive fields are present in the response. Passwords and tokens are never returned."
+        }
+      ]
+    },
+    {
+      "id": "TC-API-1700",
+      "name": "Security",
+      "test_cases": [
+        {
+          "id": "TC-API-1701",
+          "severity": "P0",
+          "scenario": "All private API endpoints require a valid Bearer token",
+          "steps": "1. Enumerate all private API endpoints.\n2. Send a request to each without an Authorization header.",
+          "expected": "Every private endpoint returns an authentication error. None return data without a valid token."
+        },
+        {
+          "id": "TC-API-1702",
+          "severity": "P0",
+          "scenario": "A token belonging to one user cannot be used to access another user's private data",
+          "steps": "1. Log in as User A and obtain a token.\n2. Attempt to access or modify a resource that belongs exclusively to User B using User A's token.",
+          "expected": "The request is rejected or returns only data the authenticated user is authorized to see."
+        },
+        {
+          "id": "TC-API-1703",
+          "severity": "P0",
+          "scenario": "Expired tokens are rejected",
+          "steps": "1. Obtain a token and wait for it to expire (or simulate expiry in a test environment).\n2. Use the expired token on a private endpoint.",
+          "expected": "The request is rejected. A clear authentication or token-expired error is returned."
+        },
+        {
+          "id": "TC-API-1704",
+          "severity": "P0",
+          "scenario": "Sensitive data is not returned in error messages",
+          "steps": "1. Trigger various error conditions across the API.\n2. Inspect all error response bodies.",
+          "expected": "Error messages contain only user-safe information. No passwords, tokens, database details, or internal paths are exposed."
+        },
+        {
+          "id": "TC-API-1705",
+          "severity": "P1",
+          "scenario": "Tampered or forged tokens are rejected",
+          "steps": "1. Take a valid token and modify one character in the middle.\n2. Use the modified token on a private endpoint.",
+          "expected": "The request is rejected. The tampered token is not accepted."
+        },
+        {
+          "id": "TC-API-1706",
+          "severity": "P1",
+          "scenario": "Permission-restricted actions cannot be performed by users without the required permission",
+          "steps": "1. Log in as a user without a specific permission (e.g. can_delete_user).\n2. Attempt to call the corresponding endpoint.",
+          "expected": "The request is rejected with an authorization error. The action is not performed."
+        },
+        {
+          "id": "TC-API-1707",
+          "severity": "P1",
+          "scenario": "SQL injection attempts in query parameters are handled safely",
+          "steps": "1. Send a request to a list or filter endpoint with SQL injection patterns in query parameters (e.g. ?search='; DROP TABLE users;--).",
+          "expected": "The API processes the request safely. No SQL is executed. The response is either an empty result or a validation error."
+        },
+        {
+          "id": "TC-API-1708",
+          "severity": "P1",
+          "scenario": "Oversized request payloads are rejected",
+          "steps": "1. Send a POST request with an extremely large body (e.g. several megabytes of data in a text field).",
+          "expected": "The API rejects the request with an appropriate error (e.g. payload too large). The server does not crash."
+        },
+        {
+          "id": "TC-API-1709",
+          "severity": "P2",
+          "scenario": "Rate limiting is applied to authentication endpoints",
+          "steps": "1. Send a large number of rapid POST requests to /api/v1/auth/login/ with incorrect credentials.",
+          "expected": "After a threshold of failed attempts, further requests are rate-limited or temporarily blocked."
+        },
+        {
+          "id": "TC-API-1710",
+          "severity": "P2",
+          "scenario": "The API does not expose internal resource IDs in responses",
+          "steps": "1. Call any list or detail endpoint and inspect the response.\n2. Look for internal database integer IDs.",
+          "expected": "Resources are identified by codes or slugs (e.g. ROLE-001), not raw database integer IDs."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,395 @@
+{
+  "module": {
+    "slug": "project-statuses",
+    "name": "Project Statuses",
+    "sort_order": 20,
+    "parent": {
+      "slug": "projects-configurations",
+      "name": "Projects / Configurations",
+      "sort_order": 10
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-PS-100",
+      "name": "Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-PS-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user is redirected from the Project Statuses page",
+          "steps": "1. Open the Project Statuses page URL without being logged in.",
+          "expected": "The browser redirects to the login page."
+        },
+        {
+          "id": "TC-PS-102",
+          "severity": "P1",
+          "scenario": "Authenticated user with view access can see the statuses and their sub-statuses",
+          "steps": "1. Log in as a user with view access.\n2. Navigate to Projects / Configurations > Project Statuses.",
+          "expected": "The page loads and displays all main project statuses grouped with their associated sub-statuses. No Add, Edit, Toggle, or Delete actions are visible."
+        },
+        {
+          "id": "TC-PS-103",
+          "severity": "P1",
+          "scenario": "Add Sub-Status button is visible in the page header",
+          "steps": "1. Navigate to Projects / Configurations > Project Statuses.",
+          "expected": "An 'Add Sub-Status' button is visible in the page header along with Import and Export buttons."
+        },
+        {
+          "id": "TC-PS-104",
+          "severity": "P1",
+          "scenario": "Main project statuses cannot be created, edited, or deleted by users",
+          "steps": "1. Navigate to Projects / Configurations > Project Statuses.\n2. Look for any way to add, edit, or delete a main status (e.g., 'In Progress', 'Completed').",
+          "expected": "No actions are available to create, modify, or remove main statuses. They are system-defined and fixed. Only sub-statuses can be managed."
+        }
+      ]
+    },
+    {
+      "id": "TC-PS-200",
+      "name": "Browsing the Status List",
+      "test_cases": [
+        {
+          "id": "TC-PS-201",
+          "severity": "P0",
+          "scenario": "Project Statuses page loads with a grouped layout showing main statuses and their sub-statuses",
+          "steps": "1. Navigate to Projects / Configurations > Project Statuses.",
+          "expected": "The page shows the 'Projects / Configurations' eyebrow, 'Project Statuses' heading, and subtitle 'Manage project statuses and their sub-statuses across your organisation.' After a loading spinner, the content area shows main statuses grouped with their sub-statuses listed beneath each."
+        },
+        {
+          "id": "TC-PS-202",
+          "severity": "P1",
+          "scenario": "Loading spinner is shown while the status list loads",
+          "steps": "1. Navigate to Projects / Configurations > Project Statuses and observe the page while it loads.",
+          "expected": "A loading spinner is briefly visible before the status groups appear."
+        },
+        {
+          "id": "TC-PS-203",
+          "severity": "P1",
+          "scenario": "Each main status section displays its associated sub-statuses",
+          "steps": "1. Navigate to Projects / Configurations > Project Statuses.\n2. View each main status group.",
+          "expected": "Each main status (e.g., 'Not Started', 'In Progress', 'Completed') shows its list of sub-statuses beneath it. If a main status has no sub-statuses, the section is still visible with an empty or 'no sub-statuses' indicator."
+        },
+        {
+          "id": "TC-PS-204",
+          "severity": "P2",
+          "scenario": "Sub-statuses show their active/inactive status",
+          "steps": "1. Navigate to Projects / Configurations > Project Statuses.\n2. Look at the sub-statuses within a main status group.",
+          "expected": "Each sub-status indicates whether it is active or inactive (e.g., via a badge or status indicator)."
+        }
+      ]
+    },
+    {
+      "id": "TC-PS-300",
+      "name": "Creating Sub-Statuses",
+      "test_cases": [
+        {
+          "id": "TC-PS-301",
+          "severity": "P0",
+          "scenario": "Clicking Add Sub-Status opens the create sub-status drawer",
+          "steps": "1. Navigate to Projects / Configurations > Project Statuses.\n2. Click 'Add Sub-Status' in the page header.",
+          "expected": "The create sub-status drawer slides open with a Main Status dropdown and a Sub-Status Name field."
+        },
+        {
+          "id": "TC-PS-302",
+          "severity": "P0",
+          "scenario": "Creating a sub-status with valid details adds it under the selected main status",
+          "steps": "1. Open the create sub-status drawer.\n2. Select a main status from the dropdown (e.g., 'In Progress').\n3. Enter a sub-status name (e.g., 'Draft').\n4. Click 'Add Sub-Status'.",
+          "expected": "The drawer closes. A success toast appears. The new sub-status 'Draft' appears under the 'In Progress' main status group on the page."
+        },
+        {
+          "id": "TC-PS-303",
+          "severity": "P1",
+          "scenario": "Main Status is required — cannot create a sub-status without selecting one",
+          "steps": "1. Open the create sub-status drawer.\n2. Leave the Main Status field unselected.\n3. Enter a sub-status name.\n4. Click 'Add Sub-Status'.",
+          "expected": "A validation error appears on the Main Status field. The sub-status is not created."
+        },
+        {
+          "id": "TC-PS-304",
+          "severity": "P1",
+          "scenario": "Sub-Status Name is required — cannot create without it",
+          "steps": "1. Open the create sub-status drawer.\n2. Select a main status but leave the Sub-Status Name blank.\n3. Click 'Add Sub-Status'.",
+          "expected": "A validation error appears on the Sub-Status Name field. The sub-status is not created."
+        },
+        {
+          "id": "TC-PS-305",
+          "severity": "P1",
+          "scenario": "Sub-Status Name has a maximum length of 100 characters",
+          "steps": "1. Open the create sub-status drawer.\n2. Enter more than 100 characters in the Sub-Status Name field.",
+          "expected": "The character counter updates as the user types. The field enforces the 100-character limit."
+        },
+        {
+          "id": "TC-PS-306",
+          "severity": "P2",
+          "scenario": "Character counter shows remaining characters for the Sub-Status Name",
+          "steps": "1. Open the create sub-status drawer.\n2. Type into the Sub-Status Name field.",
+          "expected": "A character counter updates in real time (e.g., '5 / 100')."
+        },
+        {
+          "id": "TC-PS-307",
+          "severity": "P1",
+          "scenario": "Cancel button closes the create sub-status drawer without saving",
+          "steps": "1. Open the create sub-status drawer.\n2. Enter some details.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. No sub-status is created."
+        },
+        {
+          "id": "TC-PS-308",
+          "severity": "P1",
+          "scenario": "Duplicate sub-status name under the same main status is rejected",
+          "steps": "1. Open the create sub-status drawer.\n2. Select a main status.\n3. Enter a sub-status name that already exists under that main status.\n4. Click 'Add Sub-Status'.",
+          "expected": "An error appears indicating the sub-status name already exists for that main status."
+        }
+      ]
+    },
+    {
+      "id": "TC-PS-400",
+      "name": "Editing Sub-Statuses",
+      "test_cases": [
+        {
+          "id": "TC-PS-401",
+          "severity": "P0",
+          "scenario": "Edit action opens the edit sub-status drawer pre-populated with the current name",
+          "steps": "1. Click the Edit action on a sub-status.\n(The Edit action may appear in a row action within each main status section.)",
+          "expected": "The edit sub-status drawer opens. The Main Status field shows the parent status as read-only (view-field). The Sub-Status Name field is pre-populated with the current name."
+        },
+        {
+          "id": "TC-PS-402",
+          "severity": "P1",
+          "scenario": "Main Status cannot be changed in the edit drawer",
+          "steps": "1. Open the edit drawer for a sub-status.\n2. Attempt to change the Main Status field.",
+          "expected": "The Main Status field is read-only (shown as a view-field, not an editable dropdown). The parent status cannot be changed after creation."
+        },
+        {
+          "id": "TC-PS-403",
+          "severity": "P1",
+          "scenario": "Saving changes updates the sub-status name",
+          "steps": "1. Open the edit drawer for a sub-status.\n2. Change the Sub-Status Name.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes. A success toast appears. The sub-status shows the updated name in the list."
+        },
+        {
+          "id": "TC-PS-404",
+          "severity": "P1",
+          "scenario": "Sub-Status Name cannot be cleared in edit",
+          "steps": "1. Open the edit drawer for a sub-status.\n2. Clear the Sub-Status Name field.\n3. Click 'Save changes'.",
+          "expected": "A validation error appears. The change is not saved."
+        },
+        {
+          "id": "TC-PS-405",
+          "severity": "P1",
+          "scenario": "Cancel button in the edit drawer discards changes",
+          "steps": "1. Open the edit drawer for a sub-status.\n2. Change the name.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. The sub-status name is unchanged."
+        },
+        {
+          "id": "TC-PS-406",
+          "severity": "P2",
+          "scenario": "Character counter updates in the edit drawer as the user types",
+          "steps": "1. Open the edit drawer.\n2. Edit the Sub-Status Name field.",
+          "expected": "The character counter updates in real time."
+        }
+      ]
+    },
+    {
+      "id": "TC-PS-500",
+      "name": "Activating & Deactivating Sub-Statuses",
+      "test_cases": [
+        {
+          "id": "TC-PS-501",
+          "severity": "P1",
+          "scenario": "Toggle action on an active sub-status opens a deactivation confirmation",
+          "steps": "1. Find an active sub-status.\n2. Click its Toggle action.",
+          "expected": "A deactivation confirmation modal appears."
+        },
+        {
+          "id": "TC-PS-502",
+          "severity": "P1",
+          "scenario": "Confirming deactivation sets the sub-status to Inactive",
+          "steps": "1. Click Toggle on an active sub-status.\n2. Confirm in the modal.",
+          "expected": "The modal closes. A success toast appears. The sub-status shows as Inactive in its section."
+        },
+        {
+          "id": "TC-PS-503",
+          "severity": "P1",
+          "scenario": "Toggle action on an inactive sub-status opens an activation confirmation",
+          "steps": "1. Find an inactive sub-status.\n2. Click its Toggle action.",
+          "expected": "An activation confirmation modal appears."
+        },
+        {
+          "id": "TC-PS-504",
+          "severity": "P1",
+          "scenario": "Confirming activation sets the sub-status to Active",
+          "steps": "1. Click Toggle on an inactive sub-status.\n2. Confirm in the modal.",
+          "expected": "The sub-status shows as Active in its section."
+        },
+        {
+          "id": "TC-PS-505",
+          "severity": "P1",
+          "scenario": "Cancelling the toggle confirmation makes no change",
+          "steps": "1. Click Toggle on a sub-status.\n2. Click Cancel in the modal.",
+          "expected": "The modal closes. The sub-status status is unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-PS-600",
+      "name": "Deleting Sub-Statuses",
+      "test_cases": [
+        {
+          "id": "TC-PS-601",
+          "severity": "P1",
+          "scenario": "Delete action opens a confirmation modal",
+          "steps": "1. Click Delete on a sub-status.",
+          "expected": "A delete confirmation modal appears with the sub-status name."
+        },
+        {
+          "id": "TC-PS-602",
+          "severity": "P0",
+          "scenario": "Confirming deletion removes the sub-status from its main status section",
+          "steps": "1. Click Delete on a sub-status.\n2. Confirm in the modal.",
+          "expected": "The modal closes. A success toast appears. The sub-status is removed from the page."
+        },
+        {
+          "id": "TC-PS-603",
+          "severity": "P1",
+          "scenario": "Cancelling deletion makes no changes",
+          "steps": "1. Click Delete on a sub-status.\n2. Click Cancel in the modal.",
+          "expected": "The modal closes. The sub-status remains in the list."
+        }
+      ]
+    },
+    {
+      "id": "TC-PS-700",
+      "name": "Importing & Exporting",
+      "test_cases": [
+        {
+          "id": "TC-PS-701",
+          "severity": "P1",
+          "scenario": "Clicking Import opens the import panel for sub-statuses",
+          "steps": "1. Click 'Import' in the page header.",
+          "expected": "The import view opens allowing a file to be uploaded for importing sub-statuses."
+        },
+        {
+          "id": "TC-PS-702",
+          "severity": "P1",
+          "scenario": "Clicking Export opens the export panel",
+          "steps": "1. Click 'Export' in the page header.",
+          "expected": "The export panel opens, allowing sub-statuses to be exported."
+        },
+        {
+          "id": "TC-PS-703",
+          "severity": "P1",
+          "scenario": "Export file contains sub-status data including the associated main status",
+          "steps": "1. Click Export and download the file.",
+          "expected": "The exported file includes sub-status names and their associated main status labels."
+        },
+        {
+          "id": "TC-PS-704",
+          "severity": "P2",
+          "scenario": "Page refreshes to show newly imported sub-statuses after import completes",
+          "steps": "1. Import a valid sub-statuses file.\n2. Complete the import.",
+          "expected": "The statuses container refreshes. Newly imported sub-statuses appear under their respective main status groups."
+        }
+      ]
+    },
+    {
+      "id": "TC-PS-800",
+      "name": "Non-Functional",
+      "test_cases": [
+        {
+          "id": "TC-PS-801",
+          "severity": "P2",
+          "scenario": "Project Statuses page loads within an acceptable time",
+          "steps": "1. Navigate to Projects / Configurations > Project Statuses.",
+          "expected": "The loading spinner is brief. The grouped status list renders within 3 seconds."
+        },
+        {
+          "id": "TC-PS-802",
+          "severity": "P1",
+          "scenario": "Session expiry during an action redirects to login",
+          "steps": "1. Open the create sub-status drawer.\n2. Let the session expire.\n3. Attempt to save.",
+          "expected": "The browser redirects to the login page. No data is saved."
+        },
+        {
+          "id": "TC-PS-803",
+          "severity": "P2",
+          "scenario": "Status groups update after creating or deleting a sub-status",
+          "steps": "1. Create a sub-status under a main status.\n2. Observe the page after the drawer closes.",
+          "expected": "The sub-status appears in the appropriate main status group without a full page reload."
+        }
+      ]
+    },
+    {
+      "id": "TC-PS-900",
+      "name": "Desktop",
+      "test_cases": [
+        {
+          "id": "TC-PS-901",
+          "severity": "P1",
+          "scenario": "Status groups and sub-statuses are clearly laid out on desktop",
+          "steps": "1. Open Projects / Configurations > Project Statuses on a desktop browser.",
+          "expected": "Each main status is shown as a distinct section with its sub-statuses listed beneath it. The layout is clear and readable without horizontal scrolling."
+        },
+        {
+          "id": "TC-PS-902",
+          "severity": "P2",
+          "scenario": "Add Sub-Status, Import, and Export buttons are all visible in the page header on desktop",
+          "steps": "1. Open the Project Statuses page on a desktop browser.",
+          "expected": "All three header buttons are visible in the top-right area."
+        }
+      ]
+    },
+    {
+      "id": "TC-PS-1000",
+      "name": "Mobile",
+      "test_cases": [
+        {
+          "id": "TC-PS-1001",
+          "severity": "P1",
+          "scenario": "Status groups and sub-statuses are readable on mobile",
+          "steps": "1. Open Projects / Configurations > Project Statuses on a mobile device.",
+          "expected": "The status groups and their sub-statuses stack vertically and are readable without horizontal scrolling. No content is clipped."
+        },
+        {
+          "id": "TC-PS-1002",
+          "severity": "P2",
+          "scenario": "Create sub-status drawer is usable on mobile",
+          "steps": "1. Tap 'Add Sub-Status' on a mobile device.",
+          "expected": "The create sub-status drawer opens in a mobile-friendly layout. The Main Status dropdown and Sub-Status Name field are easy to interact with."
+        },
+        {
+          "id": "TC-PS-1003",
+          "severity": "P2",
+          "scenario": "Sub-status actions are accessible on mobile",
+          "steps": "1. On a mobile device, view a sub-status row and look for its actions (Edit, Toggle, Delete).",
+          "expected": "Actions are accessible via a tap or overflow menu on mobile."
+        }
+      ]
+    },
+    {
+      "id": "TC-PS-1100",
+      "name": "Integration",
+      "test_cases": [
+        {
+          "id": "TC-PS-1101",
+          "severity": "P1",
+          "scenario": "Newly created sub-status appears in the project status dropdown when editing a project",
+          "steps": "1. Create a sub-status under the 'In Progress' main status.\n2. Navigate to a project and open the status field.\n3. Select 'In Progress' as the main status and look for available sub-statuses.",
+          "expected": "The newly created sub-status is available for selection under 'In Progress' on the project."
+        },
+        {
+          "id": "TC-PS-1102",
+          "severity": "P1",
+          "scenario": "Deactivating a sub-status removes it from available sub-status selections in projects",
+          "steps": "1. Deactivate a sub-status.\n2. Try to assign that sub-status to a project.",
+          "expected": "The deactivated sub-status no longer appears in the sub-status selection for projects."
+        },
+        {
+          "id": "TC-PS-1103",
+          "severity": "P2",
+          "scenario": "Projects with a deleted sub-status retain a reference to the former sub-status or show a graceful fallback",
+          "steps": "1. Delete a sub-status that is currently assigned to one or more projects.\n2. View one of those projects.",
+          "expected": "The project either retains the deleted sub-status name for historical display, or shows a clear indicator that the sub-status no longer exists. No error or blank field appears unexpectedly."
+        }
+      ]
+    }
+  ]
+}

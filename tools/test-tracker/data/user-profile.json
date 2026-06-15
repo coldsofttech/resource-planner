@@ -1,0 +1,377 @@
+{
+  "module": {
+    "slug": "user-profile",
+    "name": "Profile",
+    "sort_order": 40,
+    "parent": {
+      "slug": "account",
+      "name": "Account",
+      "sort_order": 9
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-PRF-100",
+      "name": "Page Load",
+      "test_cases": [
+        {
+          "id": "TC-PRF-101",
+          "severity": "P0",
+          "scenario": "Profile page loads with the correct layout and user's current details",
+          "steps": "1. Log in as any user.\n2. Navigate to Account > Profile (or click the profile link).",
+          "expected": "The page shows the 'Account' eyebrow and 'Profile' heading with subtitle 'Manage your personal information and account settings.' The left column shows the user's avatar, account info, groups, and more info panels. The right column shows Account details, Preferences, and (if classic auth) Security panels."
+        },
+        {
+          "id": "TC-PRF-102",
+          "severity": "P1",
+          "scenario": "Avatar and display name are visible in the left column",
+          "steps": "1. Navigate to Account > Profile.",
+          "expected": "The left column shows the user's avatar, display name (bold), and email address beneath the avatar."
+        },
+        {
+          "id": "TC-PRF-103",
+          "severity": "P1",
+          "scenario": "SSO badge appears when the user's account is authenticated via SSO",
+          "steps": "1. Log in via an SSO provider (OAuth or SAML).\n2. Navigate to Account > Profile.",
+          "expected": "A small badge appears next to the 'Profile' heading indicating the SSO provider or auth type."
+        },
+        {
+          "id": "TC-PRF-104",
+          "severity": "P1",
+          "scenario": "Groups panel shows the user's current group memberships",
+          "steps": "1. Navigate to Account > Profile.\n2. View the Groups panel in the left column.",
+          "expected": "The Groups panel shows all permission groups the user belongs to as badge chips. If they belong to no groups, the panel is empty."
+        },
+        {
+          "id": "TC-PRF-105",
+          "severity": "P2",
+          "scenario": "More info panel shows location, employment type, and role",
+          "steps": "1. Navigate to Account > Profile.\n2. View the 'More info' panel in the left column.",
+          "expected": "Location, Employment type, and Role are shown (if set). These are read-only here; they can only be changed by an administrator via the Members page."
+        },
+        {
+          "id": "TC-PRF-106",
+          "severity": "P2",
+          "scenario": "Account info panel shows last login and password last changed dates",
+          "steps": "1. Navigate to Account > Profile.\n2. View the 'Account info' panel in the left column.",
+          "expected": "Last login and Password last changed are shown as meta-formatted timestamps."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRF-200",
+      "name": "Account Details",
+      "test_cases": [
+        {
+          "id": "TC-PRF-201",
+          "severity": "P0",
+          "scenario": "Account details panel is pre-filled with the user's current first name, last name, and display name",
+          "steps": "1. Navigate to Account > Profile.\n2. View the Account details panel in the right column.",
+          "expected": "The First name, Last name, and Display name fields show the user's current values. The Email address field shows their email in read-only mode."
+        },
+        {
+          "id": "TC-PRF-202",
+          "severity": "P1",
+          "scenario": "Email address field is read-only and cannot be edited",
+          "steps": "1. Navigate to Account > Profile.\n2. Attempt to click or type in the Email address field.",
+          "expected": "The Email address field is read-only. A hint text reads 'Email address cannot be changed.' The field cannot be edited."
+        },
+        {
+          "id": "TC-PRF-203",
+          "severity": "P1",
+          "scenario": "First name is required — cannot save account details without it",
+          "steps": "1. Navigate to Account > Profile.\n2. Clear the First name field.\n3. Click 'Save changes'.",
+          "expected": "A validation error appears on the First name field. The changes are not saved."
+        },
+        {
+          "id": "TC-PRF-204",
+          "severity": "P1",
+          "scenario": "Last name is required — cannot save account details without it",
+          "steps": "1. Navigate to Account > Profile.\n2. Clear the Last name field.\n3. Click 'Save changes'.",
+          "expected": "A validation error appears on the Last name field. The changes are not saved."
+        },
+        {
+          "id": "TC-PRF-205",
+          "severity": "P1",
+          "scenario": "Display name is optional and can be left blank",
+          "steps": "1. Navigate to Account > Profile.\n2. Clear the Display name field.\n3. Click 'Save changes'.",
+          "expected": "The changes are saved successfully. A success message or toast appears. The display name is cleared."
+        },
+        {
+          "id": "TC-PRF-206",
+          "severity": "P2",
+          "scenario": "Display name has a maximum length of 150 characters",
+          "steps": "1. Navigate to Account > Profile.\n2. Enter more than 150 characters in the Display name field.",
+          "expected": "The field enforces the 150-character limit."
+        },
+        {
+          "id": "TC-PRF-207",
+          "severity": "P2",
+          "scenario": "Display name hint informs the user where it is used",
+          "steps": "1. Navigate to Account > Profile.\n2. Look at the hint text below the Display name field.",
+          "expected": "The hint reads 'Shown in reports and resource plans.'"
+        },
+        {
+          "id": "TC-PRF-208",
+          "severity": "P1",
+          "scenario": "Saving account details updates the avatar and header immediately",
+          "steps": "1. Change the Display name field to a new value.\n2. Click 'Save changes'.",
+          "expected": "The account details are saved. The display name shown in the left column's avatar area updates to reflect the new value without a full page reload."
+        },
+        {
+          "id": "TC-PRF-209",
+          "severity": "P2",
+          "scenario": "Save changes button shows a loading state during submission",
+          "steps": "1. Make changes to the Account details panel.\n2. Click 'Save changes' and observe the button.",
+          "expected": "The button enters a busy/disabled loading state while the save is in progress. It returns to normal after the operation completes."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRF-300",
+      "name": "Preferences",
+      "test_cases": [
+        {
+          "id": "TC-PRF-301",
+          "severity": "P1",
+          "scenario": "Preferences panel shows timezone and skills fields",
+          "steps": "1. Navigate to Account > Profile.\n2. View the Preferences panel in the right column.",
+          "expected": "The Preferences panel shows a Timezone dropdown and a Skills selection field."
+        },
+        {
+          "id": "TC-PRF-302",
+          "severity": "P1",
+          "scenario": "User can update their timezone",
+          "steps": "1. Navigate to Account > Profile.\n2. Change the Timezone dropdown to a different timezone.\n3. Click 'Save preferences'.",
+          "expected": "A success toast appears. The user's timezone is updated."
+        },
+        {
+          "id": "TC-PRF-303",
+          "severity": "P1",
+          "scenario": "User can add skills to their profile",
+          "steps": "1. Navigate to Account > Profile.\n2. Add one or more skills in the Skills field.\n3. Click 'Save preferences'.",
+          "expected": "A success toast appears. The added skills are saved and visible in the Skills field and in the view drawer on the Members page."
+        },
+        {
+          "id": "TC-PRF-304",
+          "severity": "P1",
+          "scenario": "User can remove skills from their profile",
+          "steps": "1. Navigate to Account > Profile.\n2. Remove one or more existing skills from the Skills field.\n3. Click 'Save preferences'.",
+          "expected": "A success toast appears. The removed skills are no longer shown for the user."
+        },
+        {
+          "id": "TC-PRF-305",
+          "severity": "P2",
+          "scenario": "Save preferences button shows a loading state during submission",
+          "steps": "1. Make a preferences change.\n2. Click 'Save preferences' and observe the button.",
+          "expected": "The button shows a loading/busy state during the save operation."
+        },
+        {
+          "id": "TC-PRF-306",
+          "severity": "P2",
+          "scenario": "Both Account details and Preferences sections can be saved independently",
+          "steps": "1. Change the Display name in Account details.\n2. Click 'Save changes' (only in that section).\n3. Do NOT click 'Save preferences'.\n4. Refresh the page.",
+          "expected": "The Display name change was saved. The preferences remain unchanged. Each section saves independently."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRF-400",
+      "name": "Security (Password Change)",
+      "test_cases": [
+        {
+          "id": "TC-PRF-401",
+          "severity": "P1",
+          "scenario": "Security panel is visible for classic auth users",
+          "steps": "1. Log in as a user with a classic (username/password) account.\n2. Navigate to Account > Profile.",
+          "expected": "A 'Security' panel is visible in the right column containing Current password, New password, and Confirm password fields."
+        },
+        {
+          "id": "TC-PRF-402",
+          "severity": "P1",
+          "scenario": "Security panel is hidden for SSO (OAuth/SAML) users",
+          "steps": "1. Log in via an SSO provider.\n2. Navigate to Account > Profile.",
+          "expected": "The Security panel is not shown. SSO users manage their password through their identity provider."
+        },
+        {
+          "id": "TC-PRF-403",
+          "severity": "P0",
+          "scenario": "Current password is required to change the password",
+          "steps": "1. Navigate to Account > Profile.\n2. Leave the Current password field blank.\n3. Enter a new password and confirm it.\n4. Click 'Update password'.",
+          "expected": "A validation error appears on the Current password field. The password is not changed."
+        },
+        {
+          "id": "TC-PRF-404",
+          "severity": "P0",
+          "scenario": "Entering an incorrect current password is rejected",
+          "steps": "1. Navigate to Account > Profile.\n2. Enter an incorrect value in the Current password field.\n3. Enter a valid new password and confirm it.\n4. Click 'Update password'.",
+          "expected": "An error appears indicating the current password is incorrect. The password is not changed."
+        },
+        {
+          "id": "TC-PRF-405",
+          "severity": "P0",
+          "scenario": "New password and Confirm password must match",
+          "steps": "1. Navigate to Account > Profile.\n2. Enter the correct current password.\n3. Enter different values in New password and Confirm password.\n4. Click 'Update password'.",
+          "expected": "A validation error appears on the Confirm password field indicating the passwords do not match."
+        },
+        {
+          "id": "TC-PRF-406",
+          "severity": "P1",
+          "scenario": "New password must meet strength requirements",
+          "steps": "1. Navigate to Account > Profile.\n2. Enter a weak new password (e.g., 'password123').\n3. Click 'Update password'.",
+          "expected": "A validation error or hint appears indicating the password must be at least 12 characters with mixed case, a number, and a symbol."
+        },
+        {
+          "id": "TC-PRF-407",
+          "severity": "P1",
+          "scenario": "Successfully changing the password shows a success message",
+          "steps": "1. Navigate to Account > Profile.\n2. Enter the correct current password.\n3. Enter a valid strong new password and confirm it.\n4. Click 'Update password'.",
+          "expected": "A success message or toast appears. The 'Password last changed' date in the Account info panel updates to the current date and time."
+        },
+        {
+          "id": "TC-PRF-408",
+          "severity": "P1",
+          "scenario": "All password fields have eye icon toggles to show/hide the value",
+          "steps": "1. Navigate to Account > Profile.\n2. Click the eye icons on each of the three password fields.",
+          "expected": "Each field individually toggles between showing and hiding the password text."
+        },
+        {
+          "id": "TC-PRF-409",
+          "severity": "P2",
+          "scenario": "Password hint text is visible below the New password field",
+          "steps": "1. Navigate to Account > Profile.\n2. Look at the hint below the New password field.",
+          "expected": "The hint reads: 'Minimum 12 characters, mixed case, number and symbol.'"
+        }
+      ]
+    },
+    {
+      "id": "TC-PRF-500",
+      "name": "Non-Functional",
+      "test_cases": [
+        {
+          "id": "TC-PRF-501",
+          "severity": "P1",
+          "scenario": "Profile page loads within an acceptable time",
+          "steps": "1. Navigate to Account > Profile.",
+          "expected": "All panels load within 2-3 seconds. The groups panel populates without noticeable delay."
+        },
+        {
+          "id": "TC-PRF-502",
+          "severity": "P1",
+          "scenario": "Session expiry during a save redirects to login",
+          "steps": "1. Navigate to Account > Profile.\n2. Let the session expire.\n3. Attempt to save account details.",
+          "expected": "The browser redirects to the login page. No partial data is saved."
+        },
+        {
+          "id": "TC-PRF-503",
+          "severity": "P2",
+          "scenario": "Network error during save shows a helpful error message",
+          "steps": "1. Navigate to Account > Profile.\n2. Make a change and click 'Save changes' while the network is interrupted.",
+          "expected": "An error message or toast appears indicating the save failed. The form remains editable so the user can retry."
+        },
+        {
+          "id": "TC-PRF-504",
+          "severity": "P2",
+          "scenario": "Profile groups panel loads asynchronously",
+          "steps": "1. Navigate to Account > Profile.\n2. Observe the Groups panel while the page loads.",
+          "expected": "The Groups panel shows a 'Loading…' placeholder while groups are being fetched. It then replaces with the actual group badges."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRF-600",
+      "name": "Desktop",
+      "test_cases": [
+        {
+          "id": "TC-PRF-601",
+          "severity": "P1",
+          "scenario": "Profile page shows two-column layout on desktop",
+          "steps": "1. Navigate to Account > Profile on a desktop browser (1280px+ wide).",
+          "expected": "The left column (col-lg-4) shows avatar, account info, groups, and more info panels. The right column (col-lg-8) shows account details, preferences, and security panels. Both columns are visible side by side."
+        },
+        {
+          "id": "TC-PRF-602",
+          "severity": "P2",
+          "scenario": "Account details panel fields layout correctly on desktop",
+          "steps": "1. Open the Profile page on a desktop browser.\n2. View the Account details panel.",
+          "expected": "First name and Last name appear side by side (col-md-6). Display name and Email span full width."
+        },
+        {
+          "id": "TC-PRF-603",
+          "severity": "P2",
+          "scenario": "Security panel fields layout correctly on desktop for classic auth users",
+          "steps": "1. Open the Profile page as a classic auth user on desktop.\n2. View the Security panel.",
+          "expected": "Current password spans full width. New password and Confirm password appear side by side (col-md-6)."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRF-700",
+      "name": "Mobile",
+      "test_cases": [
+        {
+          "id": "TC-PRF-701",
+          "severity": "P1",
+          "scenario": "Account details and preferences panels appear first on mobile",
+          "steps": "1. Open Account > Profile on a mobile device.",
+          "expected": "The right column content (Account details, Preferences, Security) appears first (order-0 on mobile). The left column (avatar, info panels) appears below it."
+        },
+        {
+          "id": "TC-PRF-702",
+          "severity": "P1",
+          "scenario": "All panels stack vertically on mobile",
+          "steps": "1. Open Account > Profile on a mobile device.",
+          "expected": "All panels stack as a single column. No horizontal overflow occurs. All fields and buttons are easily tappable."
+        },
+        {
+          "id": "TC-PRF-703",
+          "severity": "P2",
+          "scenario": "Save buttons are accessible on mobile without scrolling excessively",
+          "steps": "1. Open Account > Profile on a mobile device.\n2. Navigate to each panel's save button.",
+          "expected": "The 'Save changes', 'Save preferences', and 'Update password' buttons are accessible within a reasonable scroll distance from the fields they correspond to."
+        },
+        {
+          "id": "TC-PRF-704",
+          "severity": "P2",
+          "scenario": "Password fields with eye icons are easy to use on mobile",
+          "steps": "1. Open Account > Profile on a mobile device.\n2. Tap the eye icons on the password fields.",
+          "expected": "The eye icon toggles are large enough to tap accurately on a mobile screen. Password visibility toggles correctly."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRF-800",
+      "name": "Integration",
+      "test_cases": [
+        {
+          "id": "TC-PRF-801",
+          "severity": "P1",
+          "scenario": "Display name change here is reflected in reports and resource plans",
+          "steps": "1. Update the Display name on the Profile page.\n2. Navigate to a resource plan or report that shows member names.",
+          "expected": "The updated display name appears in reports and resource plan views for this user."
+        },
+        {
+          "id": "TC-PRF-802",
+          "severity": "P1",
+          "scenario": "Skills added on the Profile page appear in the Members view drawer",
+          "steps": "1. Add a skill to the profile via the Preferences panel and save.\n2. Navigate to People > Members.\n3. Open the view drawer for the same user.",
+          "expected": "The new skill appears as a badge tag in the Skills field of the member's view drawer."
+        },
+        {
+          "id": "TC-PRF-803",
+          "severity": "P1",
+          "scenario": "Password changed on the profile takes effect immediately on next login",
+          "steps": "1. Change the password on the Profile page.\n2. Log out.\n3. Log in with the old password.",
+          "expected": "Login with the old password fails. Login with the new password succeeds."
+        },
+        {
+          "id": "TC-PRF-804",
+          "severity": "P2",
+          "scenario": "Profile page reflects group changes made by an administrator",
+          "steps": "1. As an admin, add a user to a new group via Administration > Groups.\n2. Log in as that user and navigate to Account > Profile.",
+          "expected": "The Groups panel on the Profile page shows the newly assigned group as a badge."
+        }
+      ]
+    }
+  ]
+}

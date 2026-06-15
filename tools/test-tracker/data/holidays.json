@@ -1,0 +1,807 @@
+{
+  "module": {
+    "slug": "holidays",
+    "name": "Holidays",
+    "sort_order": 10,
+    "parent": {
+      "slug": "calendar",
+      "name": "Calendar",
+      "sort_order": 5
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-HD-100",
+      "name": "Page Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-HD-101",
+          "severity": "P0",
+          "scenario": "Authenticated user can navigate to the Holidays page",
+          "steps": "1. Log in with a valid account.\n2. Navigate to Calendar > Holidays from the main menu.",
+          "expected": "The Holidays page loads. The page title reads 'Holidays' with the eyebrow 'Holidays'. The subtitle 'Manage public and bank holidays across locations for your organisation.' is visible."
+        },
+        {
+          "id": "TC-HD-102",
+          "severity": "P1",
+          "scenario": "Page header, filters, and table are rendered on load",
+          "steps": "1. Navigate to the Holidays page.",
+          "expected": "The page shows a search field, Location filter, Year filter, and an 'Add Holiday' button. The holidays table is rendered with columns: Name, Date, Location, Code, Created."
+        },
+        {
+          "id": "TC-HD-103",
+          "severity": "P0",
+          "scenario": "Unauthenticated user is redirected away from the Holidays page",
+          "steps": "1. Log out or open the Holidays page URL in an incognito window without logging in.",
+          "expected": "The user is redirected to the login page and cannot view any holiday data."
+        },
+        {
+          "id": "TC-HD-104",
+          "severity": "P1",
+          "scenario": "User with manage permissions sees the Add Holiday button",
+          "steps": "1. Log in as a user with permission to manage holidays.\n2. Navigate to Calendar > Holidays.",
+          "expected": "The 'Add Holiday' button is visible in the page header actions area."
+        },
+        {
+          "id": "TC-HD-105",
+          "severity": "P2",
+          "scenario": "Read-only user does not see Add, Edit, or Delete controls",
+          "steps": "1. Log in as a user with read-only access.\n2. Navigate to Calendar > Holidays.",
+          "expected": "The 'Add Holiday' button is not visible. No Edit or Delete action buttons appear in the table rows."
+        },
+        {
+          "id": "TC-HD-106",
+          "severity": "P1",
+          "scenario": "Breadcrumb reflects Calendar > Holidays hierarchy",
+          "steps": "1. Navigate to Calendar > Holidays.",
+          "expected": "The breadcrumb trail shows the correct hierarchy leading to the Holidays page."
+        }
+      ]
+    },
+    {
+      "id": "TC-HD-200",
+      "name": "Browsing, Search & Filtering",
+      "test_cases": [
+        {
+          "id": "TC-HD-201",
+          "severity": "P0",
+          "scenario": "Holidays list loads and displays existing records",
+          "steps": "1. Navigate to Calendar > Holidays.",
+          "expected": "All existing holidays are displayed in the table. Each row shows: Name, Date, Location, Code, and Created date."
+        },
+        {
+          "id": "TC-HD-202",
+          "severity": "P1",
+          "scenario": "Table displays correct columns in correct order",
+          "steps": "1. Navigate to the Holidays page.\n2. Observe the table column headers.",
+          "expected": "Columns appear in order: Name, Date, Location, Code, Created. Name and Date are sortable. Location, Code, and Created are present (some hidden on mobile)."
+        },
+        {
+          "id": "TC-HD-203",
+          "severity": "P1",
+          "scenario": "Search by holiday name filters the list",
+          "steps": "1. Navigate to the Holidays page.\n2. Type part of a holiday name into the search field.",
+          "expected": "The table updates to show only holidays whose names match the search term. Non-matching holidays are hidden."
+        },
+        {
+          "id": "TC-HD-204",
+          "severity": "P2",
+          "scenario": "Search with no matching results shows empty state",
+          "steps": "1. Navigate to the Holidays page.\n2. Type a name that does not match any holiday into the search field.",
+          "expected": "The table shows an empty state message indicating no results were found."
+        },
+        {
+          "id": "TC-HD-205",
+          "severity": "P2",
+          "scenario": "Clearing the search field restores the full holiday list",
+          "steps": "1. Navigate to the Holidays page.\n2. Type a search term that filters results.\n3. Clear the search field.",
+          "expected": "The full list of holidays is restored without any name filter applied."
+        },
+        {
+          "id": "TC-HD-206",
+          "severity": "P1",
+          "scenario": "Filter by Location shows only holidays for that location",
+          "steps": "1. Navigate to the Holidays page.\n2. Click the Location filter and select a specific location.",
+          "expected": "The table updates to show only holidays associated with the selected location. Holidays for other locations are not shown."
+        },
+        {
+          "id": "TC-HD-207",
+          "severity": "P1",
+          "scenario": "Filter by Year shows only holidays in that year",
+          "steps": "1. Navigate to the Holidays page.\n2. Click the Year filter and select a specific year.",
+          "expected": "The table updates to show only holidays whose dates fall within the selected year."
+        },
+        {
+          "id": "TC-HD-208",
+          "severity": "P1",
+          "scenario": "Combining Search, Location, and Year filters narrows results correctly",
+          "steps": "1. Navigate to the Holidays page.\n2. Select a location from the Location filter.\n3. Select a year from the Year filter.\n4. Type a partial name into the search field.",
+          "expected": "The table shows only holidays matching all three criteria simultaneously — name, location, and year all applied together."
+        },
+        {
+          "id": "TC-HD-209",
+          "severity": "P2",
+          "scenario": "Sort by Name (ascending and descending)",
+          "steps": "1. Navigate to the Holidays page.\n2. Click the Name column header once.\n3. Click the Name column header again.",
+          "expected": "First click sorts the holiday list alphabetically by name (A–Z). Second click sorts in reverse order (Z–A)."
+        },
+        {
+          "id": "TC-HD-210",
+          "severity": "P1",
+          "scenario": "Sort by Date (ascending and descending)",
+          "steps": "1. Navigate to the Holidays page.\n2. Click the Date column header once.\n3. Click the Date column header again.",
+          "expected": "First click sorts holidays by date from earliest to latest. Second click sorts from latest to earliest."
+        },
+        {
+          "id": "TC-HD-211",
+          "severity": "P2",
+          "scenario": "Sort by Created date (ascending and descending)",
+          "steps": "1. Navigate to the Holidays page.\n2. Click the Created column header once.\n3. Click the Created column header again.",
+          "expected": "Holidays are sorted by creation date in ascending then descending order."
+        },
+        {
+          "id": "TC-HD-212",
+          "severity": "P1",
+          "scenario": "Pagination controls work correctly when more than one page of holidays exists",
+          "steps": "1. Navigate to the Holidays page when more holidays exist than the default page size.\n2. Click the next page button.\n3. Click the previous page button.",
+          "expected": "Navigation between pages works correctly. Each page shows the correct subset of holidays. Page indicator updates accordingly."
+        },
+        {
+          "id": "TC-HD-213",
+          "severity": "P1",
+          "scenario": "Clicking a table row opens the view drawer",
+          "steps": "1. Navigate to the Holidays page.\n2. Click anywhere on a holiday row (not on an action button).",
+          "expected": "The view drawer slides open on the right showing the full details of the selected holiday."
+        },
+        {
+          "id": "TC-HD-214",
+          "severity": "P1",
+          "scenario": "Edit action button is visible and accessible for each row",
+          "steps": "1. Navigate to the Holidays page.\n2. Hover over or expand the actions for a holiday row.",
+          "expected": "An Edit action button is visible for each holiday row."
+        },
+        {
+          "id": "TC-HD-215",
+          "severity": "P1",
+          "scenario": "Delete action button is visible and accessible for each row",
+          "steps": "1. Navigate to the Holidays page.\n2. Hover over or expand the actions for a holiday row.",
+          "expected": "A Delete action button is visible for each holiday row."
+        },
+        {
+          "id": "TC-HD-216",
+          "severity": "P2",
+          "scenario": "No Toggle (activate/deactivate) action appears for holidays",
+          "steps": "1. Navigate to the Holidays page.\n2. Inspect the available row actions for any holiday.",
+          "expected": "No Toggle, Activate, or Deactivate action is present. Holidays have no active/inactive status."
+        }
+      ]
+    },
+    {
+      "id": "TC-HD-300",
+      "name": "Creating a Holiday",
+      "test_cases": [
+        {
+          "id": "TC-HD-301",
+          "severity": "P0",
+          "scenario": "Clicking Add Holiday opens the create drawer",
+          "steps": "1. Navigate to the Holidays page.\n2. Click the 'Add Holiday' button.",
+          "expected": "The create drawer slides open from the right side of the screen. The form is empty and ready for input."
+        },
+        {
+          "id": "TC-HD-302",
+          "severity": "P1",
+          "scenario": "Create drawer contains all required form fields",
+          "steps": "1. Click the 'Add Holiday' button to open the create drawer.\n2. Observe the form fields.",
+          "expected": "The drawer contains: Name field (with character counter), Date picker, and Location dropdown. All three fields are required."
+        },
+        {
+          "id": "TC-HD-303",
+          "severity": "P0",
+          "scenario": "Create a holiday with all required fields filled",
+          "steps": "1. Click 'Add Holiday'.\n2. Enter a holiday name (e.g. 'Christmas Day').\n3. Select a date.\n4. Select a location.\n5. Click the primary submit button.",
+          "expected": "The drawer closes. A success toast notification appears. The new holiday appears in the table list."
+        },
+        {
+          "id": "TC-HD-304",
+          "severity": "P0",
+          "scenario": "Newly created holiday appears in the list immediately",
+          "steps": "1. Create a new holiday with a unique name.\n2. Observe the holidays table after creation.",
+          "expected": "The new holiday row is visible in the table without needing to refresh the page."
+        },
+        {
+          "id": "TC-HD-305",
+          "severity": "P1",
+          "scenario": "Name field is required — form shows validation error when empty",
+          "steps": "1. Open the create drawer.\n2. Leave the Name field empty.\n3. Fill in Date and Location.\n4. Click the submit button.",
+          "expected": "The form does not submit. A validation error is shown under the Name field indicating it is required."
+        },
+        {
+          "id": "TC-HD-306",
+          "severity": "P1",
+          "scenario": "Date field is required — form shows validation error when empty",
+          "steps": "1. Open the create drawer.\n2. Fill in Name and Location.\n3. Leave the Date field empty.\n4. Click the submit button.",
+          "expected": "The form does not submit. A validation error is shown under the Date field indicating it is required."
+        },
+        {
+          "id": "TC-HD-307",
+          "severity": "P1",
+          "scenario": "Location field is required — form shows validation error when empty",
+          "steps": "1. Open the create drawer.\n2. Fill in Name and Date.\n3. Leave the Location field empty.\n4. Click the submit button.",
+          "expected": "The form does not submit. A validation error is shown under the Location field indicating it is required."
+        },
+        {
+          "id": "TC-HD-308",
+          "severity": "P2",
+          "scenario": "Name field enforces 120-character maximum",
+          "steps": "1. Open the create drawer.\n2. Type more than 120 characters into the Name field.",
+          "expected": "Input is limited to 120 characters. The character counter reflects the remaining characters and does not allow exceeding the limit."
+        },
+        {
+          "id": "TC-HD-309",
+          "severity": "P2",
+          "scenario": "Name field character counter updates as user types",
+          "steps": "1. Open the create drawer.\n2. Type characters into the Name field one at a time.",
+          "expected": "A character counter is visible below or near the Name field. It updates in real time showing how many characters have been used or remain of the 120-character limit."
+        },
+        {
+          "id": "TC-HD-310",
+          "severity": "P2",
+          "scenario": "Creating a holiday with a name that already exists for the same date and location",
+          "steps": "1. Note an existing holiday's name, date, and location.\n2. Open the create drawer.\n3. Enter the exact same name, date, and location.\n4. Click submit.",
+          "expected": "The form shows an error or the system prevents creating a duplicate holiday for the same name, date, and location combination."
+        },
+        {
+          "id": "TC-HD-311",
+          "severity": "P2",
+          "scenario": "Closing the create drawer discards entered data",
+          "steps": "1. Open the create drawer.\n2. Fill in Name, Date, and Location.\n3. Close the drawer by clicking the X or close button without submitting.",
+          "expected": "The drawer closes. No holiday is created. If opened again, the form is empty."
+        },
+        {
+          "id": "TC-HD-312",
+          "severity": "P1",
+          "scenario": "Create drawer closes automatically after successful submission",
+          "steps": "1. Open the create drawer.\n2. Fill in all required fields with valid values.\n3. Click the submit button.",
+          "expected": "After a successful save, the drawer closes automatically without requiring the user to close it manually."
+        },
+        {
+          "id": "TC-HD-313",
+          "severity": "P1",
+          "scenario": "Success toast notification appears after creating a holiday",
+          "steps": "1. Create a holiday with valid data and submit.",
+          "expected": "A success toast notification appears briefly confirming the holiday was created."
+        },
+        {
+          "id": "TC-HD-314",
+          "severity": "P2",
+          "scenario": "Same holiday name can be created for different locations",
+          "steps": "1. Create a holiday named 'New Year' for Location A.\n2. Create another holiday named 'New Year' for Location B.",
+          "expected": "Both holidays are created successfully. The same holiday name can exist across different locations."
+        },
+        {
+          "id": "TC-HD-315",
+          "severity": "P2",
+          "scenario": "Submit button shows busy/loading state during creation",
+          "steps": "1. Open the create drawer.\n2. Fill in all required fields.\n3. Click the submit button and observe it immediately.",
+          "expected": "The submit button shows a loading/busy indicator while the request is in progress. It is not clickable again until the operation completes."
+        }
+      ]
+    },
+    {
+      "id": "TC-HD-400",
+      "name": "View Drawer",
+      "test_cases": [
+        {
+          "id": "TC-HD-401",
+          "severity": "P0",
+          "scenario": "Clicking a holiday row opens the view drawer",
+          "steps": "1. Navigate to the Holidays page.\n2. Click on any holiday row (not on an action button).",
+          "expected": "The view drawer opens on the right side displaying the selected holiday's details."
+        },
+        {
+          "id": "TC-HD-402",
+          "severity": "P1",
+          "scenario": "View drawer displays all expected detail fields",
+          "steps": "1. Click on a holiday row to open the view drawer.\n2. Observe all fields shown in the drawer.",
+          "expected": "The view drawer displays: Name, Date, Location, Code (displayed as code/monospace), Created (meta), Created by (meta)."
+        },
+        {
+          "id": "TC-HD-403",
+          "severity": "P2",
+          "scenario": "Code field is displayed in monospace/code style in the view drawer",
+          "steps": "1. Open the view drawer for any holiday.\n2. Locate the Code field.",
+          "expected": "The Code field is rendered in a monospace or code-styled format, visually distinct from regular text fields."
+        },
+        {
+          "id": "TC-HD-404",
+          "severity": "P2",
+          "scenario": "Created and Created by metadata fields are accurate",
+          "steps": "1. Create a new holiday.\n2. Click the row to open its view drawer.\n3. Inspect the Created and Created by fields.",
+          "expected": "Created shows the date and time when the holiday was created. Created by shows the name of the user who created it."
+        },
+        {
+          "id": "TC-HD-405",
+          "severity": "P1",
+          "scenario": "View drawer footer shows Edit holiday button for permissioned users",
+          "steps": "1. Log in with manage permissions.\n2. Open the view drawer for any holiday.",
+          "expected": "The footer of the view drawer contains an 'Edit holiday' button for users who have permission to edit."
+        },
+        {
+          "id": "TC-HD-406",
+          "severity": "P1",
+          "scenario": "Edit holiday button in view drawer opens the edit drawer",
+          "steps": "1. Open the view drawer for a holiday.\n2. Click the 'Edit holiday' button in the footer.",
+          "expected": "The view drawer closes and the edit drawer opens, pre-populated with the same holiday's current data."
+        },
+        {
+          "id": "TC-HD-407",
+          "severity": "P2",
+          "scenario": "Close button in view drawer footer closes the drawer",
+          "steps": "1. Open the view drawer for a holiday.\n2. Click the 'Close' button in the footer.",
+          "expected": "The view drawer closes and the user is returned to the holidays list without any changes."
+        },
+        {
+          "id": "TC-HD-408",
+          "severity": "P2",
+          "scenario": "View drawer does not show Edit button for read-only users",
+          "steps": "1. Log in as a read-only user.\n2. Click on any holiday row to open the view drawer.",
+          "expected": "The view drawer opens showing holiday details but the 'Edit holiday' button is not present in the footer."
+        }
+      ]
+    },
+    {
+      "id": "TC-HD-500",
+      "name": "Editing a Holiday",
+      "test_cases": [
+        {
+          "id": "TC-HD-501",
+          "severity": "P0",
+          "scenario": "Clicking the Edit action button opens the edit drawer",
+          "steps": "1. Navigate to the Holidays page.\n2. Click the Edit action button on a holiday row.",
+          "expected": "The edit drawer opens and is pre-populated with the selected holiday's current name, date, and location."
+        },
+        {
+          "id": "TC-HD-502",
+          "severity": "P1",
+          "scenario": "Edit drawer pre-populates all fields with current holiday data",
+          "steps": "1. Open the edit drawer for a holiday with known values.\n2. Observe the Name, Date, and Location fields.",
+          "expected": "The Name field shows the current holiday name. The Date field shows the current date. The Location field shows the currently assigned location."
+        },
+        {
+          "id": "TC-HD-503",
+          "severity": "P1",
+          "scenario": "Edit the holiday name and save successfully",
+          "steps": "1. Open the edit drawer for a holiday.\n2. Clear the Name field and enter a new valid name.\n3. Click the save button.",
+          "expected": "The drawer closes. The updated holiday name is reflected in the table list. A success toast notification appears."
+        },
+        {
+          "id": "TC-HD-504",
+          "severity": "P1",
+          "scenario": "Edit the holiday date and save successfully",
+          "steps": "1. Open the edit drawer for a holiday.\n2. Change the Date to a different valid date.\n3. Click the save button.",
+          "expected": "The drawer closes. The updated date is reflected in the table list. A success toast notification appears."
+        },
+        {
+          "id": "TC-HD-505",
+          "severity": "P1",
+          "scenario": "Edit the holiday location and save successfully",
+          "steps": "1. Open the edit drawer for a holiday.\n2. Change the Location to a different location.\n3. Click the save button.",
+          "expected": "The drawer closes. The updated location is reflected in the table list. A success toast notification appears."
+        },
+        {
+          "id": "TC-HD-506",
+          "severity": "P0",
+          "scenario": "Saved changes are reflected immediately in the holidays list",
+          "steps": "1. Edit a holiday's name to a new value.\n2. Save and observe the table.",
+          "expected": "The row in the table updates immediately to show the new name without requiring a page refresh."
+        },
+        {
+          "id": "TC-HD-507",
+          "severity": "P1",
+          "scenario": "Success toast appears after saving holiday edits",
+          "steps": "1. Open the edit drawer for a holiday.\n2. Make a change to any field.\n3. Click the save button.",
+          "expected": "A success toast notification appears confirming the holiday was updated."
+        },
+        {
+          "id": "TC-HD-508",
+          "severity": "P1",
+          "scenario": "Clearing the Name field and saving shows a validation error",
+          "steps": "1. Open the edit drawer for a holiday.\n2. Clear the Name field entirely.\n3. Click the save button.",
+          "expected": "The form does not submit. A validation error is shown under the Name field indicating it is required."
+        },
+        {
+          "id": "TC-HD-509",
+          "severity": "P1",
+          "scenario": "Clearing the Date field and saving shows a validation error",
+          "steps": "1. Open the edit drawer for a holiday.\n2. Clear the Date field.\n3. Click the save button.",
+          "expected": "The form does not submit. A validation error is shown under the Date field indicating it is required."
+        },
+        {
+          "id": "TC-HD-510",
+          "severity": "P1",
+          "scenario": "Clearing the Location field and saving shows a validation error",
+          "steps": "1. Open the edit drawer for a holiday.\n2. Clear or deselect the Location.\n3. Click the save button.",
+          "expected": "The form does not submit. A validation error is shown under the Location field indicating it is required."
+        },
+        {
+          "id": "TC-HD-511",
+          "severity": "P2",
+          "scenario": "Closing the edit drawer without saving discards changes",
+          "steps": "1. Open the edit drawer for a holiday.\n2. Change the name to something different.\n3. Close the drawer without clicking save.",
+          "expected": "The drawer closes. The holiday's original name is unchanged in the table list."
+        },
+        {
+          "id": "TC-HD-512",
+          "severity": "P2",
+          "scenario": "Save button shows busy/loading state during the update",
+          "steps": "1. Open the edit drawer and make a change.\n2. Click the save button and observe immediately.",
+          "expected": "The save button shows a loading/busy indicator while the request is processing and cannot be clicked again until the operation completes."
+        }
+      ]
+    },
+    {
+      "id": "TC-HD-600",
+      "name": "Deleting a Holiday",
+      "test_cases": [
+        {
+          "id": "TC-HD-601",
+          "severity": "P0",
+          "scenario": "Clicking the Delete action button shows a confirmation modal",
+          "steps": "1. Navigate to the Holidays page.\n2. Click the Delete action button on any holiday row.",
+          "expected": "A confirmation modal appears asking the user to confirm the deletion. It mentions the holiday name."
+        },
+        {
+          "id": "TC-HD-602",
+          "severity": "P1",
+          "scenario": "Delete confirmation modal displays the holiday name",
+          "steps": "1. Click the Delete action button on a holiday named 'Christmas Day'.\n2. Observe the confirmation modal.",
+          "expected": "The modal text includes the holiday name ('Christmas Day') so the user can confirm they are deleting the correct record."
+        },
+        {
+          "id": "TC-HD-603",
+          "severity": "P0",
+          "scenario": "Confirming deletion removes the holiday from the list",
+          "steps": "1. Click Delete on a holiday.\n2. Click the confirm/delete button in the modal.",
+          "expected": "The modal closes. The holiday is removed from the table. A success toast notification confirms the deletion."
+        },
+        {
+          "id": "TC-HD-604",
+          "severity": "P1",
+          "scenario": "Success toast appears after confirming deletion",
+          "steps": "1. Delete a holiday and confirm in the modal.",
+          "expected": "A success toast notification appears briefly confirming that the holiday has been deleted."
+        },
+        {
+          "id": "TC-HD-605",
+          "severity": "P1",
+          "scenario": "Cancelling the delete modal keeps the holiday intact",
+          "steps": "1. Click Delete on a holiday.\n2. Click the Cancel button in the confirmation modal.",
+          "expected": "The modal closes. The holiday remains in the table list and no changes are made."
+        },
+        {
+          "id": "TC-HD-606",
+          "severity": "P2",
+          "scenario": "Delete confirmation modal closes after cancellation",
+          "steps": "1. Click Delete on a holiday.\n2. Click Cancel in the confirmation modal.",
+          "expected": "The modal closes cleanly. The user is returned to the holidays list with the holiday still present."
+        },
+        {
+          "id": "TC-HD-607",
+          "severity": "P2",
+          "scenario": "No Activate or Deactivate option exists for holidays",
+          "steps": "1. Navigate to the Holidays page.\n2. Review all available actions for any holiday row.",
+          "expected": "Only Edit and Delete actions are available. There are no Activate or Deactivate options since holidays do not have an active/inactive status."
+        }
+      ]
+    },
+    {
+      "id": "TC-HD-700",
+      "name": "Importing Holidays",
+      "test_cases": [
+        {
+          "id": "TC-HD-701",
+          "severity": "P1",
+          "scenario": "Import button is visible on the Holidays page",
+          "steps": "1. Navigate to the Holidays page with manage permissions.",
+          "expected": "An Import button is visible in the page header actions area alongside the Add Holiday button."
+        },
+        {
+          "id": "TC-HD-702",
+          "severity": "P1",
+          "scenario": "Clicking the Import button opens the import view",
+          "steps": "1. Click the Import button on the Holidays page.",
+          "expected": "The import view opens, providing options to download a sample file, upload a file, and review import specs."
+        },
+        {
+          "id": "TC-HD-703",
+          "severity": "P2",
+          "scenario": "Sample import file can be downloaded",
+          "steps": "1. Open the import view.\n2. Click the download sample file link or button.",
+          "expected": "A sample CSV or compatible file is downloaded that demonstrates the expected import format for holidays."
+        },
+        {
+          "id": "TC-HD-704",
+          "severity": "P1",
+          "scenario": "Uploading a valid import file succeeds and adds holidays",
+          "steps": "1. Open the import view.\n2. Upload a correctly formatted file containing valid holiday data.\n3. Confirm the import.",
+          "expected": "The import completes successfully. The imported holidays appear in the holidays list. A success message shows the number of records imported."
+        },
+        {
+          "id": "TC-HD-705",
+          "severity": "P1",
+          "scenario": "Import success message shows the count of imported holidays",
+          "steps": "1. Import a file containing multiple holiday records.\n2. Observe the result message after import completes.",
+          "expected": "The import result shows how many holidays were successfully imported."
+        },
+        {
+          "id": "TC-HD-706",
+          "severity": "P2",
+          "scenario": "Uploading an invalid file format shows an error",
+          "steps": "1. Open the import view.\n2. Upload a file with an unsupported format (e.g., a PDF or image file).",
+          "expected": "An error message is shown indicating the file format is not supported. No holidays are imported."
+        },
+        {
+          "id": "TC-HD-707",
+          "severity": "P1",
+          "scenario": "Holidays list refreshes after a successful import",
+          "steps": "1. Import a valid file with new holidays.\n2. Observe the holidays table after import completes.",
+          "expected": "The holidays table automatically refreshes and shows the newly imported holidays without requiring a manual page reload."
+        },
+        {
+          "id": "TC-HD-708",
+          "severity": "P2",
+          "scenario": "Import view can be closed without importing",
+          "steps": "1. Open the import view.\n2. Close it without uploading a file.",
+          "expected": "The import view closes cleanly. No data is changed and the holidays list remains unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-HD-800",
+      "name": "Exporting Holidays",
+      "test_cases": [
+        {
+          "id": "TC-HD-801",
+          "severity": "P1",
+          "scenario": "Export button is visible on the Holidays page",
+          "steps": "1. Navigate to the Holidays page with manage permissions.",
+          "expected": "An Export button is visible in the page header actions area."
+        },
+        {
+          "id": "TC-HD-802",
+          "severity": "P1",
+          "scenario": "Clicking the Export button opens the export view",
+          "steps": "1. Click the Export button on the Holidays page.",
+          "expected": "The export view opens, allowing the user to configure and trigger the export."
+        },
+        {
+          "id": "TC-HD-803",
+          "severity": "P1",
+          "scenario": "Triggering the export downloads a file",
+          "steps": "1. Open the export view.\n2. Confirm or click the export/download button.",
+          "expected": "A file is downloaded to the user's device containing the holiday data."
+        },
+        {
+          "id": "TC-HD-804",
+          "severity": "P1",
+          "scenario": "Exported file contains the correct holiday data",
+          "steps": "1. Export the holidays.\n2. Open the downloaded file.",
+          "expected": "The exported file contains all holidays currently visible in the list, with columns for Name, Date, Location, and Code at minimum."
+        },
+        {
+          "id": "TC-HD-805",
+          "severity": "P2",
+          "scenario": "Export view can be closed without exporting",
+          "steps": "1. Open the export view.\n2. Close it without initiating an export.",
+          "expected": "The export view closes cleanly without downloading any file."
+        }
+      ]
+    },
+    {
+      "id": "TC-HD-900",
+      "name": "Non-Functional — Accessibility & Security",
+      "test_cases": [
+        {
+          "id": "TC-HD-901",
+          "severity": "P2",
+          "scenario": "Holidays page is navigable using keyboard only",
+          "steps": "1. Navigate to the Holidays page.\n2. Use only the Tab and Enter keys to navigate the page, open the create drawer, and fill in form fields.",
+          "expected": "All interactive elements — filters, table rows, buttons, and form fields — are reachable and operable via keyboard navigation."
+        },
+        {
+          "id": "TC-HD-902",
+          "severity": "P2",
+          "scenario": "Create and edit drawers are keyboard accessible",
+          "steps": "1. Open the create drawer using keyboard navigation.\n2. Tab through all form fields and submit using the keyboard.",
+          "expected": "Focus moves logically through the Name, Date, and Location fields. The submit button is reachable and activatable via keyboard."
+        },
+        {
+          "id": "TC-HD-903",
+          "severity": "P2",
+          "scenario": "Modals (delete confirmation) are keyboard accessible",
+          "steps": "1. Trigger the delete confirmation modal via keyboard.\n2. Use Tab to navigate between Cancel and Confirm buttons.\n3. Press Enter to confirm.",
+          "expected": "Focus is trapped within the modal while it is open. Both Cancel and Confirm buttons are reachable via Tab. Pressing Enter on the focused button activates it."
+        },
+        {
+          "id": "TC-HD-904",
+          "severity": "P2",
+          "scenario": "Validation error messages are descriptive and clear",
+          "steps": "1. Attempt to submit the create form with all fields empty.\n2. Read the validation error messages that appear.",
+          "expected": "Validation messages are clear, human-readable, and tell the user exactly what is missing or incorrect (e.g. 'Name is required')."
+        },
+        {
+          "id": "TC-HD-905",
+          "severity": "P1",
+          "scenario": "No sensitive internal information is exposed in the UI or error messages",
+          "steps": "1. Trigger various error states on the Holidays page (invalid input, server errors).\n2. Observe all error messages shown to the user.",
+          "expected": "Error messages are user-friendly and do not expose stack traces, internal IDs, database queries, or server configuration details."
+        },
+        {
+          "id": "TC-HD-906",
+          "severity": "P0",
+          "scenario": "Session is required to access and modify holidays",
+          "steps": "1. Log out.\n2. Attempt to access the Holidays page directly via URL.",
+          "expected": "The user is redirected to the login page. Holiday data is not accessible without an active session."
+        },
+        {
+          "id": "TC-HD-907",
+          "severity": "P3",
+          "scenario": "Holidays page loads within an acceptable time",
+          "steps": "1. Navigate to the Holidays page on a normal connection.",
+          "expected": "The page and its holiday data load within a reasonable time (typically under 3 seconds on a standard connection)."
+        },
+        {
+          "id": "TC-HD-908",
+          "severity": "P2",
+          "scenario": "Drawers close cleanly and release focus back to the page",
+          "steps": "1. Open the create drawer.\n2. Close the drawer without submitting.\n3. Observe focus behaviour.",
+          "expected": "When the drawer closes, focus is returned to a logical element on the main page (such as the Add Holiday button)."
+        }
+      ]
+    },
+    {
+      "id": "TC-HD-1000",
+      "name": "Desktop Layout",
+      "test_cases": [
+        {
+          "id": "TC-HD-1001",
+          "severity": "P2",
+          "scenario": "All table columns are visible on desktop screen widths",
+          "steps": "1. Open the Holidays page on a desktop browser (viewport ≥ 1280px).\n2. Observe the table columns.",
+          "expected": "All columns are visible: Name, Date, Location, Code, and Created."
+        },
+        {
+          "id": "TC-HD-1002",
+          "severity": "P2",
+          "scenario": "Filters are displayed inline above the table on desktop",
+          "steps": "1. View the Holidays page on a desktop viewport.",
+          "expected": "The Search field, Location filter, and Year filter are displayed in a horizontal filter bar above the holidays table."
+        },
+        {
+          "id": "TC-HD-1003",
+          "severity": "P2",
+          "scenario": "Drawers open in a side panel overlay on desktop",
+          "steps": "1. Click 'Add Holiday' on a desktop browser.\n2. Observe how the drawer appears.",
+          "expected": "The create drawer slides in from the right as a side panel. The main page content is still partially visible behind it."
+        },
+        {
+          "id": "TC-HD-1004",
+          "severity": "P2",
+          "scenario": "Row action buttons are visible in the table on desktop",
+          "steps": "1. View the holidays table on desktop.\n2. Observe the last column of each row.",
+          "expected": "Edit and Delete action buttons are displayed directly in the row actions column, accessible without additional clicks."
+        },
+        {
+          "id": "TC-HD-1005",
+          "severity": "P2",
+          "scenario": "Page layout does not overflow or break at 1280px width",
+          "steps": "1. Set browser width to 1280px.\n2. Navigate to the Holidays page and interact with create/edit drawers.",
+          "expected": "All page elements, the table, filters, and drawers display without horizontal overflow, clipping, or layout breakage."
+        }
+      ]
+    },
+    {
+      "id": "TC-HD-1100",
+      "name": "Mobile & Responsive",
+      "test_cases": [
+        {
+          "id": "TC-HD-1101",
+          "severity": "P1",
+          "scenario": "Holidays page loads and is usable on a mobile device",
+          "steps": "1. Open the Holidays page on a mobile device or emulator (viewport ≤ 768px).",
+          "expected": "The page loads correctly and is navigable. The table, filters, and header buttons are visible and usable."
+        },
+        {
+          "id": "TC-HD-1102",
+          "severity": "P2",
+          "scenario": "Location, Code, and Created columns are hidden on mobile viewports",
+          "steps": "1. View the Holidays page on a mobile viewport.\n2. Observe the table columns.",
+          "expected": "On mobile, the table shows only Name and Date columns. Location, Code, and Created columns are hidden to reduce clutter."
+        },
+        {
+          "id": "TC-HD-1103",
+          "severity": "P2",
+          "scenario": "Create drawer is usable on mobile",
+          "steps": "1. On a mobile device, tap the 'Add Holiday' button.\n2. Fill in the Name, Date, and Location fields.\n3. Submit the form.",
+          "expected": "The create drawer opens properly on mobile. All form fields are accessible, the virtual keyboard does not obscure inputs, and the form can be submitted successfully."
+        },
+        {
+          "id": "TC-HD-1104",
+          "severity": "P2",
+          "scenario": "Delete confirmation modal is usable on mobile",
+          "steps": "1. On a mobile device, tap the Delete action for a holiday.\n2. Observe and interact with the confirmation modal.",
+          "expected": "The delete confirmation modal displays correctly on mobile. The Cancel and Confirm buttons are tappable and function as expected."
+        },
+        {
+          "id": "TC-HD-1105",
+          "severity": "P2",
+          "scenario": "Filters are accessible on mobile",
+          "steps": "1. On a mobile device, navigate to the Holidays page.\n2. Attempt to use the Search, Location, and Year filters.",
+          "expected": "All three filters are accessible and functional on mobile. The filter UI does not overflow the screen."
+        },
+        {
+          "id": "TC-HD-1106",
+          "severity": "P2",
+          "scenario": "View drawer opens and displays correctly on mobile",
+          "steps": "1. On a mobile device, tap a holiday row.\n2. Observe the view drawer.",
+          "expected": "The view drawer opens and fills the appropriate area of the mobile screen. All detail fields are readable and the footer buttons are tappable."
+        }
+      ]
+    },
+    {
+      "id": "TC-HD-1200",
+      "name": "Integration",
+      "test_cases": [
+        {
+          "id": "TC-HD-1201",
+          "severity": "P1",
+          "scenario": "Created holiday is associated with the correct location",
+          "steps": "1. Create a holiday and select 'London' as the location.\n2. After creation, open the holiday via the view drawer.",
+          "expected": "The Location field in the view drawer shows 'London', confirming the holiday is linked to the correct location."
+        },
+        {
+          "id": "TC-HD-1202",
+          "severity": "P1",
+          "scenario": "Location filter dropdown shows only locations configured in the system",
+          "steps": "1. Navigate to the Holidays page.\n2. Open the Location filter dropdown.",
+          "expected": "The Location filter contains only the locations that are configured in the Locations module. It does not show deleted or inactive locations."
+        },
+        {
+          "id": "TC-HD-1203",
+          "severity": "P2",
+          "scenario": "Year filter reflects years that have holidays",
+          "steps": "1. Navigate to the Holidays page.\n2. Open the Year filter dropdown.",
+          "expected": "The Year filter shows years for which at least one holiday exists, making it easy to navigate by year."
+        },
+        {
+          "id": "TC-HD-1204",
+          "severity": "P2",
+          "scenario": "Holiday code is automatically generated on creation",
+          "steps": "1. Create a new holiday.\n2. Open the created holiday via the view drawer or table.\n3. Observe the Code field.",
+          "expected": "A unique code is automatically generated for the holiday without requiring manual input from the user."
+        },
+        {
+          "id": "TC-HD-1205",
+          "severity": "P1",
+          "scenario": "Filtering by a location shows only holidays for that location",
+          "steps": "1. Create two holidays — one for 'Dublin' and one for 'Berlin'.\n2. On the Holidays page, filter by 'Dublin'.",
+          "expected": "Only the holiday associated with 'Dublin' is shown. The 'Berlin' holiday is not displayed."
+        },
+        {
+          "id": "TC-HD-1206",
+          "severity": "P2",
+          "scenario": "Holidays remain after editing without losing location association",
+          "steps": "1. Edit an existing holiday's name.\n2. Save the change.\n3. Open the updated holiday in the view drawer.",
+          "expected": "The location association is preserved after editing. The Location field in the view drawer still shows the original location."
+        },
+        {
+          "id": "TC-HD-1207",
+          "severity": "P2",
+          "scenario": "Multiple holidays can exist for the same location",
+          "steps": "1. Create two different holidays both assigned to the same location.\n2. Filter the list by that location.",
+          "expected": "Both holidays appear in the filtered list. A location can have multiple holidays."
+        }
+      ]
+    }
+  ]
+}

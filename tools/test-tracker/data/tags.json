@@ -1,0 +1,239 @@
+{
+  "module": {
+    "slug": "tags",
+    "name": "Tags",
+    "sort_order": 30,
+    "parent": {
+      "slug": "administration",
+      "name": "Administration",
+      "sort_order": 8
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-TG-100",
+      "name": "Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-TG-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user is redirected from the Tags page",
+          "steps": "1. Open the Tags page URL without being logged in.",
+          "expected": "The browser redirects to the login page. The Tags list is not shown."
+        },
+        {
+          "id": "TC-TG-102",
+          "severity": "P1",
+          "scenario": "Authenticated user can view the Tags list",
+          "steps": "1. Log in as any user.\n2. Navigate to Administration > Tags.",
+          "expected": "The Tags page loads and the tag list is visible. The page is read-only — no add, edit, or delete actions are available."
+        },
+        {
+          "id": "TC-TG-103",
+          "severity": "P1",
+          "scenario": "Export button is only visible to users with 'can_export_tag' permission",
+          "steps": "1. Log in as a user with the 'can_export_tag' permission.\n2. Navigate to Administration > Tags.",
+          "expected": "The Export button is visible in the page header."
+        },
+        {
+          "id": "TC-TG-104",
+          "severity": "P1",
+          "scenario": "Export button is not visible without the 'can_export_tag' permission",
+          "steps": "1. Log in as a user without the 'can_export_tag' permission.\n2. Navigate to Administration > Tags.",
+          "expected": "The Export button is not present in the page header."
+        },
+        {
+          "id": "TC-TG-105",
+          "severity": "P1",
+          "scenario": "No row actions are available on the Tags page",
+          "steps": "1. Navigate to Administration > Tags.\n2. Hover over or tap a tag row.",
+          "expected": "No action buttons (edit, delete, toggle, etc.) appear on any row. Tags are read-only; they can only be browsed and exported."
+        }
+      ]
+    },
+    {
+      "id": "TC-TG-200",
+      "name": "Browsing & Filtering",
+      "test_cases": [
+        {
+          "id": "TC-TG-201",
+          "severity": "P0",
+          "scenario": "Tags page loads with the correct layout and table",
+          "steps": "1. Navigate to Administration > Tags.",
+          "expected": "The page shows the 'Administration' eyebrow, 'Tags' heading, and subtitle 'Browse and export tags used across the platform.' The filter panel and table are visible with columns: Tag, Code, Created, Created By."
+        },
+        {
+          "id": "TC-TG-202",
+          "severity": "P1",
+          "scenario": "Search filters the tag list by name",
+          "steps": "1. Navigate to Administration > Tags.\n2. Type a partial tag name in the search field.",
+          "expected": "Only tags whose names match the search input are shown in the table."
+        },
+        {
+          "id": "TC-TG-203",
+          "severity": "P2",
+          "scenario": "Pressing '/' keyboard shortcut focuses the search field",
+          "steps": "1. Navigate to Administration > Tags.\n2. Press '/' on the keyboard.",
+          "expected": "The search field receives keyboard focus."
+        },
+        {
+          "id": "TC-TG-204",
+          "severity": "P2",
+          "scenario": "Table can be sorted by the Tag (name) column",
+          "steps": "1. Navigate to Administration > Tags.\n2. Click the 'Tag' column header.",
+          "expected": "Tags are sorted alphabetically by name. Clicking again reverses the direction."
+        },
+        {
+          "id": "TC-TG-205",
+          "severity": "P2",
+          "scenario": "Table can be sorted by the Created column",
+          "steps": "1. Navigate to Administration > Tags.\n2. Click the 'Created' column header.",
+          "expected": "Tags are sorted by creation date. Clicking again reverses the direction."
+        },
+        {
+          "id": "TC-TG-206",
+          "severity": "P2",
+          "scenario": "Code column displays in monospace style",
+          "steps": "1. Navigate to Administration > Tags.\n2. Look at the Code column values.",
+          "expected": "The Code column displays tag codes in a monospace font, visually distinct from the Tag name column."
+        },
+        {
+          "id": "TC-TG-207",
+          "severity": "P2",
+          "scenario": "Pagination loads more tags when there are more than 25",
+          "steps": "1. Navigate to Administration > Tags when there are more than 25 tags.\n2. Scroll to the bottom of the table.",
+          "expected": "Pagination controls appear. Clicking the next page loads the next set of tags."
+        },
+        {
+          "id": "TC-TG-208",
+          "severity": "P2",
+          "scenario": "Empty state shown when search returns no tags",
+          "steps": "1. Navigate to Administration > Tags.\n2. Enter a search term that matches no tag.",
+          "expected": "'No tags found.' is displayed in the table area."
+        },
+        {
+          "id": "TC-TG-209",
+          "severity": "P2",
+          "scenario": "Created By column shows the user who created each tag",
+          "steps": "1. Navigate to Administration > Tags.\n2. View the Created By column.",
+          "expected": "The Created By column displays the name or identifier of the user who created each tag."
+        },
+        {
+          "id": "TC-TG-210",
+          "severity": "P2",
+          "scenario": "Tags list reflects all tags used across the platform",
+          "steps": "1. Navigate to Administration > Tags.\n2. Create a tag in another module (e.g., by tagging a project).\n3. Return to the Tags page.",
+          "expected": "The newly created tag is visible in the Tags list. The page aggregates tags from across the entire platform."
+        }
+      ]
+    },
+    {
+      "id": "TC-TG-300",
+      "name": "Exporting",
+      "test_cases": [
+        {
+          "id": "TC-TG-301",
+          "severity": "P1",
+          "scenario": "Clicking Export opens the export panel",
+          "steps": "1. Log in with 'can_export_tag' permission.\n2. Navigate to Administration > Tags.\n3. Click the 'Export' button.",
+          "expected": "An export configuration panel or drawer opens."
+        },
+        {
+          "id": "TC-TG-302",
+          "severity": "P1",
+          "scenario": "Export respects the active search filter",
+          "steps": "1. Navigate to Administration > Tags.\n2. Search for tags matching a specific term.\n3. Click 'Export' and download the file.",
+          "expected": "The exported file contains only tags matching the current search filter, not all tags in the system."
+        },
+        {
+          "id": "TC-TG-303",
+          "severity": "P1",
+          "scenario": "Export file downloads successfully with expected columns",
+          "steps": "1. Navigate to Administration > Tags.\n2. Click 'Export' and confirm the export.",
+          "expected": "A file is downloaded. It contains at minimum: tag name, code, created date, and created by."
+        },
+        {
+          "id": "TC-TG-304",
+          "severity": "P2",
+          "scenario": "Export with empty result (no tags matching filter) handles gracefully",
+          "steps": "1. Apply a search filter that returns no tags.\n2. Click 'Export'.",
+          "expected": "The export either produces a file with headers only, or shows a message that there are no tags to export. No error or crash occurs."
+        }
+      ]
+    },
+    {
+      "id": "TC-TG-400",
+      "name": "Non-Functional",
+      "test_cases": [
+        {
+          "id": "TC-TG-401",
+          "severity": "P2",
+          "scenario": "Tags page loads within an acceptable time",
+          "steps": "1. Navigate to Administration > Tags when many tags exist across the platform.",
+          "expected": "The page and table load within 3 seconds. Pagination handles large datasets."
+        },
+        {
+          "id": "TC-TG-402",
+          "severity": "P2",
+          "scenario": "Tags page is read-only — no create, edit, or delete functionality exists",
+          "steps": "1. Navigate to Administration > Tags as an admin user.\n2. Try to find a way to create, edit, or delete a tag from this page.",
+          "expected": "No such actions exist on the Tags page. Tags are managed implicitly through other platform features (e.g., tagging projects or work items). The Tags page is purely for visibility and export."
+        },
+        {
+          "id": "TC-TG-403",
+          "severity": "P2",
+          "scenario": "Session expiry redirects to login",
+          "steps": "1. Let the session expire while on the Tags page.\n2. Attempt to interact with the page.",
+          "expected": "The browser redirects to the login page."
+        }
+      ]
+    },
+    {
+      "id": "TC-TG-500",
+      "name": "Desktop",
+      "test_cases": [
+        {
+          "id": "TC-TG-501",
+          "severity": "P1",
+          "scenario": "All table columns are visible on desktop",
+          "steps": "1. Open Administration > Tags on a desktop browser (1280px+ wide).",
+          "expected": "Tag, Code, Created, and Created By columns are all visible."
+        },
+        {
+          "id": "TC-TG-502",
+          "severity": "P2",
+          "scenario": "Code column renders at fixed width (140px) on desktop",
+          "steps": "1. Open Administration > Tags on a desktop browser.\n2. Check the Code column width.",
+          "expected": "The Code column is fixed at approximately 140px wide. Long codes are not cut off at this width."
+        }
+      ]
+    },
+    {
+      "id": "TC-TG-600",
+      "name": "Mobile",
+      "test_cases": [
+        {
+          "id": "TC-TG-601",
+          "severity": "P1",
+          "scenario": "Only the Tag column is visible in the table on mobile",
+          "steps": "1. Open Administration > Tags on a mobile device or narrow viewport.",
+          "expected": "Only the Tag (name) column is visible. Code, Created, and Created By (all hide-mobile) are hidden."
+        },
+        {
+          "id": "TC-TG-602",
+          "severity": "P2",
+          "scenario": "Search field is accessible on mobile",
+          "steps": "1. Open Administration > Tags on a mobile device.\n2. Tap the search field.",
+          "expected": "The search field is easily tappable and the keyboard appears. Searching updates the tag list."
+        },
+        {
+          "id": "TC-TG-603",
+          "severity": "P2",
+          "scenario": "Export button is accessible on mobile",
+          "steps": "1. Open Administration > Tags on a mobile device.\n2. Locate and tap the Export button.",
+          "expected": "The Export button is visible and tappable in the page header. Tapping it opens the export panel."
+        }
+      ]
+    }
+  ]
+}

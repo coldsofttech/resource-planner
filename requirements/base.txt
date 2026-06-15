@@ -8,6 +8,7 @@ watchtower~=3.3
 drf_spectacular~=0.29.0
 openpyxl~=3.1
 reportlab~=4.2
+defusedxml~=0.7
 -e ./packages/pycore
 -e ./packages/awscore
 -e ./packages/emailcore

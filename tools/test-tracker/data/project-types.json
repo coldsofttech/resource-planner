@@ -1,0 +1,547 @@
+{
+  "module": {
+    "slug": "project-types",
+    "name": "Project Types",
+    "sort_order": 10,
+    "parent": {
+      "slug": "projects-configurations",
+      "name": "Projects / Configurations",
+      "sort_order": 10
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-PT-100",
+      "name": "Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-PT-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user is redirected from the Project Types page",
+          "steps": "1. Open the Project Types page URL without being logged in.",
+          "expected": "The browser redirects to the login page. The Project Types list is not shown."
+        },
+        {
+          "id": "TC-PT-102",
+          "severity": "P1",
+          "scenario": "User with view-only access can see the Project Types list but no management actions",
+          "steps": "1. Log in as a user without management permissions.\n2. Navigate to Projects / Configurations > Project Types.",
+          "expected": "The Project Types list is visible. No Edit, Toggle, or Delete actions appear on any row. Add Project Type, Import, and Export buttons are not shown."
+        },
+        {
+          "id": "TC-PT-103",
+          "severity": "P1",
+          "scenario": "User with 'can_change_project_type' sees Edit and Toggle actions",
+          "steps": "1. Log in as a user with 'can_change_project_type' permission.\n2. Navigate to Projects / Configurations > Project Types.\n3. Expand a row's action menu.",
+          "expected": "Edit and Toggle (activate/deactivate) actions are visible for non-protected project types."
+        },
+        {
+          "id": "TC-PT-104",
+          "severity": "P1",
+          "scenario": "User with 'can_delete_project_type' sees the Delete action",
+          "steps": "1. Log in as a user with 'can_delete_project_type' permission.\n2. Navigate to Projects / Configurations > Project Types.\n3. Expand a row's action menu.",
+          "expected": "A Delete action (danger-styled) is visible for non-protected project types."
+        },
+        {
+          "id": "TC-PT-105",
+          "severity": "P1",
+          "scenario": "Add Project Type, Import, and Export buttons are visible in the page header",
+          "steps": "1. Navigate to Projects / Configurations > Project Types.\n2. Check the page header.",
+          "expected": "The Add Project Type, Import, and Export buttons are visible after the page loads."
+        }
+      ]
+    },
+    {
+      "id": "TC-PT-200",
+      "name": "Browsing & Filtering",
+      "test_cases": [
+        {
+          "id": "TC-PT-201",
+          "severity": "P0",
+          "scenario": "Project Types page loads with the correct layout and table",
+          "steps": "1. Navigate to Projects / Configurations > Project Types.",
+          "expected": "The page shows 'Projects / Configurations' eyebrow, 'Project Types' heading, and subtitle 'Manage project types used to classify and categorise projects across your organisation.' The table shows: Project Type, Code, Description, Status, Created columns."
+        },
+        {
+          "id": "TC-PT-202",
+          "severity": "P1",
+          "scenario": "Default filter shows only active project types",
+          "steps": "1. Navigate to Projects / Configurations > Project Types.\n2. Check the Is Active filter.",
+          "expected": "Is Active defaults to 'Active'. Only active project types are listed."
+        },
+        {
+          "id": "TC-PT-203",
+          "severity": "P1",
+          "scenario": "Search by name filters the list",
+          "steps": "1. Navigate to Projects / Configurations > Project Types.\n2. Type a project type name in the search field.",
+          "expected": "Only project types whose names match the search term are shown."
+        },
+        {
+          "id": "TC-PT-204",
+          "severity": "P1",
+          "scenario": "Is Active filter set to 'All' shows both active and inactive project types",
+          "steps": "1. Navigate to Projects / Configurations > Project Types.\n2. Change Is Active to 'All'.",
+          "expected": "Both active and inactive project types appear in the table."
+        },
+        {
+          "id": "TC-PT-205",
+          "severity": "P2",
+          "scenario": "Table can be sorted by Project Type (name) column",
+          "steps": "1. Click the 'Project Type' column header.",
+          "expected": "Rows sort alphabetically by name. A second click reverses the order."
+        },
+        {
+          "id": "TC-PT-206",
+          "severity": "P2",
+          "scenario": "Table can be sorted by Created date column",
+          "steps": "1. Click the 'Created' column header.",
+          "expected": "Rows sort by creation date. A second click reverses the order."
+        },
+        {
+          "id": "TC-PT-207",
+          "severity": "P2",
+          "scenario": "Pressing '/' focuses the search field",
+          "steps": "1. Navigate to Project Types.\n2. Press '/' on the keyboard.",
+          "expected": "The search field receives focus."
+        },
+        {
+          "id": "TC-PT-208",
+          "severity": "P2",
+          "scenario": "Empty state shown when no project types match the search",
+          "steps": "1. Search for a term that matches no project type.",
+          "expected": "'No project types found.' is shown in the table area."
+        },
+        {
+          "id": "TC-PT-209",
+          "severity": "P2",
+          "scenario": "Pagination works when more than 25 project types exist",
+          "steps": "1. Set Is Active to 'All' and scroll to the bottom if more than 25 exist.",
+          "expected": "Pagination controls appear. The next page loads correctly."
+        },
+        {
+          "id": "TC-PT-210",
+          "severity": "P2",
+          "scenario": "Active filter chips appear below the filter panel",
+          "steps": "1. Apply a search term.",
+          "expected": "An active filter chip appears below the filter panel. Removing it clears the filter."
+        }
+      ]
+    },
+    {
+      "id": "TC-PT-300",
+      "name": "Creating Project Types",
+      "test_cases": [
+        {
+          "id": "TC-PT-301",
+          "severity": "P0",
+          "scenario": "Clicking Add Project Type opens the create drawer",
+          "steps": "1. Click 'Add Project Type' in the page header.",
+          "expected": "The create project type drawer slides open with Project Type Name and Description fields."
+        },
+        {
+          "id": "TC-PT-302",
+          "severity": "P0",
+          "scenario": "Creating a project type with a valid name adds it to the list",
+          "steps": "1. Open the create drawer.\n2. Enter a name (e.g., 'Internal').\n3. Click 'Create project type'.",
+          "expected": "The drawer closes. A success toast appears. The new project type is visible in the table as Active."
+        },
+        {
+          "id": "TC-PT-303",
+          "severity": "P1",
+          "scenario": "Project Type Name is required",
+          "steps": "1. Open the create drawer.\n2. Leave the name blank.\n3. Click 'Create project type'.",
+          "expected": "A validation error appears on the Project Type Name field. The drawer stays open and nothing is saved."
+        },
+        {
+          "id": "TC-PT-304",
+          "severity": "P1",
+          "scenario": "Project Type Name has a maximum length of 60 characters",
+          "steps": "1. Open the create drawer.\n2. Enter more than 60 characters in the name field.\n3. Observe the character counter and the field behaviour.",
+          "expected": "The character counter updates as the user types. The field enforces the 60-character limit. Input beyond 60 characters is rejected or flagged with a validation error."
+        },
+        {
+          "id": "TC-PT-305",
+          "severity": "P2",
+          "scenario": "Character counter shows remaining characters as the user types the name",
+          "steps": "1. Open the create drawer.\n2. Type into the Project Type Name field.",
+          "expected": "A character counter displays how many characters have been used (e.g., '12 / 60'). It updates on each keystroke."
+        },
+        {
+          "id": "TC-PT-306",
+          "severity": "P2",
+          "scenario": "Description is optional — project type can be created without it",
+          "steps": "1. Open the create drawer.\n2. Enter a name but leave Description blank.\n3. Click 'Create project type'.",
+          "expected": "The project type is created successfully without a description."
+        },
+        {
+          "id": "TC-PT-307",
+          "severity": "P2",
+          "scenario": "Description has a maximum length of 500 characters",
+          "steps": "1. Open the create drawer.\n2. Enter more than 500 characters in the Description field.",
+          "expected": "The description field enforces the 500-character limit."
+        },
+        {
+          "id": "TC-PT-308",
+          "severity": "P1",
+          "scenario": "Duplicate project type name is rejected",
+          "steps": "1. Open the create drawer.\n2. Enter a name that already exists.\n3. Click 'Create project type'.",
+          "expected": "An error toast or inline error indicates the name is already in use. No duplicate is created."
+        },
+        {
+          "id": "TC-PT-309",
+          "severity": "P1",
+          "scenario": "Cancel button closes the create drawer without saving",
+          "steps": "1. Open the create drawer.\n2. Enter some details.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. No project type is created."
+        }
+      ]
+    },
+    {
+      "id": "TC-PT-400",
+      "name": "View Drawer",
+      "test_cases": [
+        {
+          "id": "TC-PT-401",
+          "severity": "P1",
+          "scenario": "Clicking a project type row opens the view drawer",
+          "steps": "1. Click anywhere on a project type row (not on an action button).",
+          "expected": "The view drawer slides open showing the selected project type's details."
+        },
+        {
+          "id": "TC-PT-402",
+          "severity": "P1",
+          "scenario": "View drawer displays all expected fields",
+          "steps": "1. Click a project type row to open the view drawer.",
+          "expected": "The view drawer shows: Project Type Name, Code (monospace), Status, Protected flag, Description, Created (meta), and Created by (meta)."
+        },
+        {
+          "id": "TC-PT-403",
+          "severity": "P1",
+          "scenario": "View drawer shows 'Edit Project Type' button for users with edit permission",
+          "steps": "1. Log in with 'can_change_project_type' permission.\n2. Open the view drawer for a non-protected project type.",
+          "expected": "The view drawer footer shows an 'Edit Project Type' button alongside the Close button."
+        },
+        {
+          "id": "TC-PT-404",
+          "severity": "P1",
+          "scenario": "View drawer shows only Close button for users without edit permission",
+          "steps": "1. Log in without 'can_change_project_type' permission.\n2. Open the view drawer for any project type.",
+          "expected": "The view drawer footer shows only the Close button. No 'Edit Project Type' button is present."
+        },
+        {
+          "id": "TC-PT-405",
+          "severity": "P1",
+          "scenario": "Clicking 'Edit Project Type' in the view drawer opens the edit drawer",
+          "steps": "1. Open the view drawer for a non-protected project type.\n2. Click 'Edit Project Type' in the footer.",
+          "expected": "The view drawer closes and the edit drawer opens for the same project type, pre-populated with its current values."
+        },
+        {
+          "id": "TC-PT-406",
+          "severity": "P1",
+          "scenario": "Protected field is shown in the view drawer",
+          "steps": "1. Open the view drawer for a protected project type.",
+          "expected": "The Protected field is visible and indicates the type is protected."
+        },
+        {
+          "id": "TC-PT-407",
+          "severity": "P1",
+          "scenario": "Close button dismisses the view drawer",
+          "steps": "1. Open the view drawer.\n2. Click 'Close'.",
+          "expected": "The view drawer slides closed. The list remains unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-PT-500",
+      "name": "Editing Project Types",
+      "test_cases": [
+        {
+          "id": "TC-PT-501",
+          "severity": "P0",
+          "scenario": "Edit action opens the edit drawer pre-populated with current values",
+          "steps": "1. Click the Edit action on a non-protected project type.",
+          "expected": "The edit drawer opens. The Project Type Name and Description fields are pre-filled with the current values."
+        },
+        {
+          "id": "TC-PT-502",
+          "severity": "P1",
+          "scenario": "Saving changes updates the project type in the list",
+          "steps": "1. Open the edit drawer for a project type.\n2. Change the name and/or description.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes. A success toast appears. The updated name and description are reflected in the table row."
+        },
+        {
+          "id": "TC-PT-503",
+          "severity": "P1",
+          "scenario": "Project Type Name cannot be cleared in edit",
+          "steps": "1. Open the edit drawer for a project type.\n2. Clear the name field.\n3. Click 'Save changes'.",
+          "expected": "A validation error appears on the name field. The project type is not saved with an empty name."
+        },
+        {
+          "id": "TC-PT-504",
+          "severity": "P1",
+          "scenario": "Cancel button in the edit drawer discards changes",
+          "steps": "1. Open the edit drawer.\n2. Change the name.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. The project type name in the table is unchanged."
+        },
+        {
+          "id": "TC-PT-505",
+          "severity": "P2",
+          "scenario": "Character counter updates in the edit drawer as the user types",
+          "steps": "1. Open the edit drawer.\n2. Edit the Project Type Name field.",
+          "expected": "The character counter updates in real time, showing characters used out of the 60-character limit."
+        }
+      ]
+    },
+    {
+      "id": "TC-PT-600",
+      "name": "Activating & Deactivating",
+      "test_cases": [
+        {
+          "id": "TC-PT-601",
+          "severity": "P1",
+          "scenario": "Toggle action on an active project type opens a deactivation confirmation",
+          "steps": "1. Click Toggle on an active, non-protected project type.",
+          "expected": "A deactivation confirmation modal appears."
+        },
+        {
+          "id": "TC-PT-602",
+          "severity": "P1",
+          "scenario": "Confirming deactivation sets the project type to Inactive",
+          "steps": "1. Click Toggle on an active project type.\n2. Confirm in the modal.",
+          "expected": "The modal closes. A success toast appears. The project type's Status column shows 'Inactive'."
+        },
+        {
+          "id": "TC-PT-603",
+          "severity": "P1",
+          "scenario": "Toggle action on an inactive project type opens an activation confirmation",
+          "steps": "1. Find an inactive project type (set Is Active to 'All').\n2. Click Toggle on it.",
+          "expected": "An activation confirmation modal appears."
+        },
+        {
+          "id": "TC-PT-604",
+          "severity": "P1",
+          "scenario": "Confirming activation sets the project type to Active",
+          "steps": "1. Click Toggle on an inactive project type.\n2. Confirm in the modal.",
+          "expected": "The Status column updates to 'Active'."
+        },
+        {
+          "id": "TC-PT-605",
+          "severity": "P1",
+          "scenario": "Cancelling the toggle confirmation makes no change",
+          "steps": "1. Click Toggle on a project type.\n2. Click Cancel in the modal.",
+          "expected": "The modal closes. The project type's status is unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-PT-700",
+      "name": "Protected Project Types",
+      "test_cases": [
+        {
+          "id": "TC-PT-701",
+          "severity": "P1",
+          "scenario": "Edit action is disabled for protected project types",
+          "steps": "1. Navigate to Projects / Configurations > Project Types.\n2. Locate a protected project type.\n3. View the row actions.",
+          "expected": "The Edit action is visible but shown in a disabled state. It cannot be clicked. Hovering shows it is unavailable."
+        },
+        {
+          "id": "TC-PT-702",
+          "severity": "P1",
+          "scenario": "Toggle action is disabled for protected project types",
+          "steps": "1. Locate a protected project type.\n2. View the Toggle action in the row.",
+          "expected": "The Toggle action is visible but disabled. Clicking it has no effect."
+        },
+        {
+          "id": "TC-PT-703",
+          "severity": "P1",
+          "scenario": "Delete action is disabled for protected project types",
+          "steps": "1. Locate a protected project type.\n2. View the Delete action in the row.",
+          "expected": "The Delete action is visible but disabled. The protected type cannot be deleted."
+        },
+        {
+          "id": "TC-PT-704",
+          "severity": "P1",
+          "scenario": "View drawer shows Protected field as 'Yes' for protected types",
+          "steps": "1. Click a protected project type row to open the view drawer.",
+          "expected": "The Protected field in the view drawer clearly indicates this type is protected."
+        },
+        {
+          "id": "TC-PT-705",
+          "severity": "P2",
+          "scenario": "Non-protected project types have all actions enabled",
+          "steps": "1. Locate a non-protected project type.\n2. Expand its row actions.",
+          "expected": "Edit, Toggle, and Delete actions are all enabled and interactive (subject to user permissions)."
+        }
+      ]
+    },
+    {
+      "id": "TC-PT-800",
+      "name": "Deleting Project Types",
+      "test_cases": [
+        {
+          "id": "TC-PT-801",
+          "severity": "P1",
+          "scenario": "Delete action opens a confirmation modal",
+          "steps": "1. Click Delete on a non-protected project type.",
+          "expected": "A delete confirmation modal appears showing the project type name."
+        },
+        {
+          "id": "TC-PT-802",
+          "severity": "P0",
+          "scenario": "Confirming deletion removes the project type from the list",
+          "steps": "1. Click Delete on a non-protected project type.\n2. Confirm in the modal.",
+          "expected": "The modal closes. A success toast appears. The project type is removed from the table."
+        },
+        {
+          "id": "TC-PT-803",
+          "severity": "P1",
+          "scenario": "Cancelling deletion makes no changes",
+          "steps": "1. Click Delete on a project type.\n2. Click Cancel in the modal.",
+          "expected": "The modal closes. The project type remains in the table."
+        }
+      ]
+    },
+    {
+      "id": "TC-PT-900",
+      "name": "Importing & Exporting",
+      "test_cases": [
+        {
+          "id": "TC-PT-901",
+          "severity": "P1",
+          "scenario": "Clicking Import opens the import panel",
+          "steps": "1. Click the 'Import' button in the page header.",
+          "expected": "The import view opens, allowing the user to upload a file to import project types."
+        },
+        {
+          "id": "TC-PT-902",
+          "severity": "P1",
+          "scenario": "Clicking Export opens the export panel",
+          "steps": "1. Click the 'Export' button in the page header.",
+          "expected": "The export panel opens."
+        },
+        {
+          "id": "TC-PT-903",
+          "severity": "P1",
+          "scenario": "Export respects the active filter",
+          "steps": "1. Apply a search filter to narrow the list.\n2. Click Export.",
+          "expected": "The exported file contains only project types matching the current filter."
+        },
+        {
+          "id": "TC-PT-904",
+          "severity": "P2",
+          "scenario": "Table refreshes after a successful import",
+          "steps": "1. Import a valid project types file.\n2. Complete the import.",
+          "expected": "The table refreshes and newly imported project types appear in the list."
+        }
+      ]
+    },
+    {
+      "id": "TC-PT-1000",
+      "name": "Non-Functional",
+      "test_cases": [
+        {
+          "id": "TC-PT-1001",
+          "severity": "P2",
+          "scenario": "Page loads within an acceptable time",
+          "steps": "1. Navigate to Projects / Configurations > Project Types.",
+          "expected": "The page and table load within 3 seconds."
+        },
+        {
+          "id": "TC-PT-1002",
+          "severity": "P1",
+          "scenario": "Session expiry during an action redirects to login",
+          "steps": "1. Open the create or edit drawer.\n2. Let the session expire.\n3. Attempt to save.",
+          "expected": "The browser redirects to the login page. No partial data is saved."
+        },
+        {
+          "id": "TC-PT-1003",
+          "severity": "P2",
+          "scenario": "Table refreshes automatically after create, edit, or delete",
+          "steps": "1. Create, edit, or delete a project type.",
+          "expected": "The table updates to reflect the change without requiring a full page reload."
+        }
+      ]
+    },
+    {
+      "id": "TC-PT-1100",
+      "name": "Desktop",
+      "test_cases": [
+        {
+          "id": "TC-PT-1101",
+          "severity": "P1",
+          "scenario": "All table columns are visible on desktop",
+          "steps": "1. Open Projects / Configurations > Project Types on a desktop browser (1280px+ wide).",
+          "expected": "Project Type, Code, Description, Status, and Created columns are all visible."
+        },
+        {
+          "id": "TC-PT-1102",
+          "severity": "P2",
+          "scenario": "View drawer fields appear side by side on desktop",
+          "steps": "1. Open the view drawer for a project type on desktop.",
+          "expected": "Name and Code appear side by side (col-md-6). Status and Protected appear side by side. Description spans full width. Created and Created by appear side by side."
+        },
+        {
+          "id": "TC-PT-1103",
+          "severity": "P2",
+          "scenario": "Row action buttons accessible on desktop without overflow menu",
+          "steps": "1. Hover over a project type row on desktop.",
+          "expected": "Edit, Toggle, and Delete actions are accessible inline."
+        }
+      ]
+    },
+    {
+      "id": "TC-PT-1200",
+      "name": "Mobile",
+      "test_cases": [
+        {
+          "id": "TC-PT-1201",
+          "severity": "P1",
+          "scenario": "Only Project Type name and Status are visible in the table on mobile",
+          "steps": "1. Open Projects / Configurations > Project Types on a mobile device.",
+          "expected": "Only the Project Type name and Status columns are visible. Code, Description, and Created are hidden."
+        },
+        {
+          "id": "TC-PT-1202",
+          "severity": "P2",
+          "scenario": "Row actions accessible via overflow menu on mobile",
+          "steps": "1. On mobile, tap the overflow menu on a project type row.",
+          "expected": "A menu appears with the available actions."
+        },
+        {
+          "id": "TC-PT-1203",
+          "severity": "P2",
+          "scenario": "View and create drawers render correctly on mobile",
+          "steps": "1. Open the view drawer and create drawer on a mobile device.",
+          "expected": "Both drawers render full-screen on mobile. Fields are readable and the save/cancel buttons are accessible."
+        }
+      ]
+    },
+    {
+      "id": "TC-PT-1300",
+      "name": "Integration",
+      "test_cases": [
+        {
+          "id": "TC-PT-1301",
+          "severity": "P1",
+          "scenario": "Newly created project type appears in the Project Type dropdown when creating a project",
+          "steps": "1. Create a new project type (e.g., 'Innovation').\n2. Navigate to the Projects list and begin creating a new project.\n3. Open the Project Type dropdown.",
+          "expected": "The newly created 'Innovation' type is available for selection when creating a project."
+        },
+        {
+          "id": "TC-PT-1302",
+          "severity": "P1",
+          "scenario": "Deactivating a project type removes it from available selections in new project forms",
+          "steps": "1. Deactivate an existing project type.\n2. Begin creating a new project.\n3. Check the Project Type dropdown.",
+          "expected": "The deactivated project type no longer appears in the dropdown for new projects."
+        },
+        {
+          "id": "TC-PT-1303",
+          "severity": "P2",
+          "scenario": "Projects already using a deactivated type still reference it correctly",
+          "steps": "1. Deactivate a project type that is already assigned to existing projects.\n2. View one of those existing projects.",
+          "expected": "Existing projects retain their assigned project type. The deactivation only prevents future selection."
+        }
+      ]
+    }
+  ]
+}

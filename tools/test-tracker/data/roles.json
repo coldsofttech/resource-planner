@@ -1,0 +1,1001 @@
+{
+  "module": {
+    "slug": "roles",
+    "name": "Roles",
+    "sort_order": 30,
+    "parent": {
+      "slug": "organisation",
+      "name": "Organisation",
+      "sort_order": 1
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-RL-100",
+      "name": "Page Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-RL-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user is redirected away from the Roles page",
+          "steps": "1. Open a browser with no active session.\n2. Navigate directly to /roles/.",
+          "expected": "The user is redirected to the login page and the Roles page is not shown."
+        },
+        {
+          "id": "TC-RL-102",
+          "severity": "P0",
+          "scenario": "Authenticated user with view permission can access the Roles page",
+          "steps": "1. Log in as a user who has permission to view roles.\n2. Navigate to Configurations > Roles.",
+          "expected": "The Roles page loads successfully showing the page title 'Roles', eyebrow 'Configurations', and the data table."
+        },
+        {
+          "id": "TC-RL-103",
+          "severity": "P1",
+          "scenario": "Add Role button is hidden for users without create permission",
+          "steps": "1. Log in as a user who does NOT have permission to create roles.\n2. Navigate to the Roles page.",
+          "expected": "The 'Add Role' button is not visible on the page."
+        },
+        {
+          "id": "TC-RL-104",
+          "severity": "P1",
+          "scenario": "Add Role button is visible for users with create permission",
+          "steps": "1. Log in as a user who has permission to create roles.\n2. Navigate to the Roles page.",
+          "expected": "The 'Add Role' button is visible in the top-right action area."
+        },
+        {
+          "id": "TC-RL-105",
+          "severity": "P1",
+          "scenario": "Edit and Toggle actions are hidden for users without change permission",
+          "steps": "1. Log in as a user who does NOT have permission to change roles.\n2. Navigate to the Roles page.\n3. Observe the row action buttons.",
+          "expected": "The Edit (pencil) and Toggle (activate/deactivate) action buttons are not shown on any row."
+        },
+        {
+          "id": "TC-RL-106",
+          "severity": "P1",
+          "scenario": "Delete action is hidden for users without delete permission",
+          "steps": "1. Log in as a user who does NOT have permission to delete roles.\n2. Navigate to the Roles page.\n3. Observe the row action buttons.",
+          "expected": "The Delete (bin) action button is not visible on any row."
+        },
+        {
+          "id": "TC-RL-107",
+          "severity": "P1",
+          "scenario": "Import and Export buttons are hidden for users without the relevant permission",
+          "steps": "1. Log in as a user without import or export permissions.\n2. Navigate to the Roles page.",
+          "expected": "The Import and Export buttons are not visible in the page header."
+        },
+        {
+          "id": "TC-RL-108",
+          "severity": "P2",
+          "scenario": "Page subtitle is correct",
+          "steps": "1. Log in and navigate to the Roles page.",
+          "expected": "The subtitle reads 'Manage roles and responsibilities across your organisation.'"
+        }
+      ]
+    },
+    {
+      "id": "TC-RL-200",
+      "name": "Browsing & Discovering Roles",
+      "test_cases": [
+        {
+          "id": "TC-RL-201",
+          "severity": "P1",
+          "scenario": "Roles list loads with active roles shown by default",
+          "steps": "1. Navigate to the Roles page.\n2. Observe the table on first load.",
+          "expected": "The table displays active roles by default. The Status filter is pre-set to 'Active'."
+        },
+        {
+          "id": "TC-RL-202",
+          "severity": "P1",
+          "scenario": "Roles table shows the correct columns",
+          "steps": "1. Navigate to the Roles page.\n2. Observe the column headers in the table.",
+          "expected": "The table displays columns: Role Name, Code, Assignable, Leadership, Default, Status, Created."
+        },
+        {
+          "id": "TC-RL-203",
+          "severity": "P1",
+          "scenario": "Searching for a role by name filters the table",
+          "steps": "1. Navigate to the Roles page.\n2. Type a partial role name into the search field.\n3. Wait for the table to update.",
+          "expected": "The table updates to show only roles whose name matches the search term."
+        },
+        {
+          "id": "TC-RL-204",
+          "severity": "P2",
+          "scenario": "Search field can be focused with the / shortcut key",
+          "steps": "1. Navigate to the Roles page.\n2. Press the '/' key on the keyboard.",
+          "expected": "The search input field receives focus automatically."
+        },
+        {
+          "id": "TC-RL-205",
+          "severity": "P1",
+          "scenario": "Status filter shows all roles when set to 'All'",
+          "steps": "1. Navigate to the Roles page.\n2. Change the Status filter to 'All'.",
+          "expected": "The table displays both active and inactive roles."
+        },
+        {
+          "id": "TC-RL-206",
+          "severity": "P1",
+          "scenario": "Status filter shows only inactive roles when set to 'Inactive'",
+          "steps": "1. Navigate to the Roles page.\n2. Change the Status filter to 'Inactive'.",
+          "expected": "The table displays only inactive roles."
+        },
+        {
+          "id": "TC-RL-207",
+          "severity": "P2",
+          "scenario": "Searching for a name with no matches shows the empty state",
+          "steps": "1. Navigate to the Roles page.\n2. Type a search term that matches no roles (e.g. 'zzznomatch').",
+          "expected": "The table shows the empty message 'No roles found.' and no data rows are displayed."
+        },
+        {
+          "id": "TC-RL-208",
+          "severity": "P2",
+          "scenario": "Clicking a role row opens the view drawer",
+          "steps": "1. Navigate to the Roles page.\n2. Click on a role row (not on an action button).",
+          "expected": "A view drawer slides in from the right showing the role's details."
+        },
+        {
+          "id": "TC-RL-209",
+          "severity": "P2",
+          "scenario": "Table is sortable by Role Name",
+          "steps": "1. Navigate to the Roles page.\n2. Click the 'Role Name' column header.",
+          "expected": "The table re-sorts rows alphabetically by role name. Clicking again reverses the sort order."
+        }
+      ]
+    },
+    {
+      "id": "TC-RL-300",
+      "name": "Creating a Role",
+      "test_cases": [
+        {
+          "id": "TC-RL-301",
+          "severity": "P1",
+          "scenario": "Clicking Add Role opens the create drawer",
+          "steps": "1. Navigate to the Roles page.\n2. Click the 'Add Role' button.",
+          "expected": "The Create role drawer slides in from the right with the title 'Create role' and an eyebrow of 'New record'."
+        },
+        {
+          "id": "TC-RL-302",
+          "severity": "P0",
+          "scenario": "A role can be created with a name only",
+          "steps": "1. Open the Create role drawer.\n2. Enter a unique name in the 'Role Name' field.\n3. Leave Assignable and Leadership toggles in their default state.\n4. Click 'Create role'.",
+          "expected": "The drawer closes, a success toast appears, and the new role appears in the table."
+        },
+        {
+          "id": "TC-RL-303",
+          "severity": "P1",
+          "scenario": "Role Name is a required field",
+          "steps": "1. Open the Create role drawer.\n2. Leave the Role Name field empty.\n3. Click 'Create role'.",
+          "expected": "An inline validation error appears below the Role Name field. The drawer remains open and the role is not created."
+        },
+        {
+          "id": "TC-RL-304",
+          "severity": "P1",
+          "scenario": "Role Name field enforces a maximum length of 100 characters",
+          "steps": "1. Open the Create role drawer.\n2. Type or paste a string of 101 characters into the Role Name field.",
+          "expected": "The field does not accept more than 100 characters. The character counter shows '100/100' at the limit."
+        },
+        {
+          "id": "TC-RL-305",
+          "severity": "P2",
+          "scenario": "Character counter updates in real time as the user types the role name",
+          "steps": "1. Open the Create role drawer.\n2. Type a 6-character name into the Role Name field.",
+          "expected": "The character counter below the field updates to show '6/100' as each character is typed."
+        },
+        {
+          "id": "TC-RL-306",
+          "severity": "P1",
+          "scenario": "Creating a role with Assignable toggle ON marks it as assignable",
+          "steps": "1. Open the Create role drawer.\n2. Enter a role name.\n3. Toggle ON 'Assignable to resources'.\n4. Click 'Create role'.",
+          "expected": "The role is created and the 'Assignable' column in the table shows a positive/checked indicator for the new row."
+        },
+        {
+          "id": "TC-RL-307",
+          "severity": "P1",
+          "scenario": "Creating a role with Leadership toggle ON marks it as a leadership role",
+          "steps": "1. Open the Create role drawer.\n2. Enter a role name.\n3. Toggle ON 'Leadership role'.\n4. Click 'Create role'.",
+          "expected": "The role is created and the 'Leadership' column in the table shows a positive/checked indicator for the new row."
+        },
+        {
+          "id": "TC-RL-308",
+          "severity": "P1",
+          "scenario": "Duplicate role name is rejected",
+          "steps": "1. Open the Create role drawer.\n2. Enter a name that already exists in the system.\n3. Click 'Create role'.",
+          "expected": "An error message is shown indicating the name already exists. The role is not created."
+        },
+        {
+          "id": "TC-RL-309",
+          "severity": "P2",
+          "scenario": "Duplicate role name check is case-insensitive",
+          "steps": "1. Ensure a role named 'Developer' already exists.\n2. Open the Create role drawer.\n3. Enter 'DEVELOPER' as the role name.\n4. Click 'Create role'.",
+          "expected": "An error message is shown indicating a duplicate name. The role is not created."
+        },
+        {
+          "id": "TC-RL-310",
+          "severity": "P2",
+          "scenario": "Newly created role is assigned a unique Code automatically",
+          "steps": "1. Create a new role with a valid name.\n2. Observe the Code column in the table for the new row.",
+          "expected": "The new role has a system-generated code shown in the Code column (e.g. 'RL-001')."
+        },
+        {
+          "id": "TC-RL-311",
+          "severity": "P2",
+          "scenario": "Clicking Cancel on the create drawer discards the form",
+          "steps": "1. Open the Create role drawer.\n2. Enter a role name.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. No role is created. The table is unchanged."
+        },
+        {
+          "id": "TC-RL-312",
+          "severity": "P2",
+          "scenario": "Newly created role is active by default",
+          "steps": "1. Create a new role with a valid name.\n2. Observe the Status column in the table.",
+          "expected": "The new role shows an 'Active' status badge."
+        },
+        {
+          "id": "TC-RL-313",
+          "severity": "P2",
+          "scenario": "Short role names like 'QA' are accepted",
+          "steps": "1. Open the Create role drawer.\n2. Enter 'QA' as the role name.\n3. Click 'Create role'.",
+          "expected": "The role is created successfully. No minimum-length error is shown."
+        },
+        {
+          "id": "TC-RL-314",
+          "severity": "P2",
+          "scenario": "Create role button shows a loading state during submission",
+          "steps": "1. Open the Create role drawer.\n2. Enter a valid role name.\n3. Click 'Create role' and immediately observe the button.",
+          "expected": "The 'Create role' button shows a loading indicator and is disabled while the request is in progress."
+        }
+      ]
+    },
+    {
+      "id": "TC-RL-400",
+      "name": "Role Detail Page",
+      "test_cases": [
+        {
+          "id": "TC-RL-401",
+          "severity": "P1",
+          "scenario": "Clicking a role name or row navigates to the role detail page",
+          "steps": "1. Navigate to the Roles page.\n2. Click on a role name link or the row.",
+          "expected": "The browser navigates to /roles/<code>/ and the detail page for that role is displayed."
+        },
+        {
+          "id": "TC-RL-402",
+          "severity": "P1",
+          "scenario": "Role detail page displays the correct information panel",
+          "steps": "1. Navigate to a role's detail page.",
+          "expected": "The left panel shows: Role Name, Code (code style), Status, Assignable, Leadership, Created date, and Created by."
+        },
+        {
+          "id": "TC-RL-403",
+          "severity": "P1",
+          "scenario": "Role detail page shows the members assigned to this role",
+          "steps": "1. Navigate to a detail page for a role that has members assigned.\n2. Observe the right-hand Members panel.",
+          "expected": "A 'Members' panel is shown on the right with a table listing people assigned to this role."
+        },
+        {
+          "id": "TC-RL-404",
+          "severity": "P1",
+          "scenario": "Members table shows correct columns on the detail page",
+          "steps": "1. Navigate to a role detail page that has at least one member.\n2. Observe the members table column headers.",
+          "expected": "The members table shows columns: Name, Email, Location, and Employment Type."
+        },
+        {
+          "id": "TC-RL-405",
+          "severity": "P2",
+          "scenario": "Members panel is hidden when no members are assigned to the role",
+          "steps": "1. Navigate to the detail page of a role that has no assigned members.",
+          "expected": "The Members panel is not displayed. Only the left information panel is visible."
+        },
+        {
+          "id": "TC-RL-406",
+          "severity": "P2",
+          "scenario": "Empty state message shown when members panel is visible but has no results",
+          "steps": "1. Navigate to a role detail page where the members API returns no results.",
+          "expected": "The members table shows the message 'No members are assigned to this role.'"
+        },
+        {
+          "id": "TC-RL-407",
+          "severity": "P2",
+          "scenario": "Members table can be sorted by Name on the detail page",
+          "steps": "1. Navigate to a role detail page with multiple members.\n2. Click the 'Name' column header.",
+          "expected": "The members table re-sorts alphabetically by name. Clicking again reverses the order."
+        },
+        {
+          "id": "TC-RL-408",
+          "severity": "P2",
+          "scenario": "Page title on detail page reflects the role name",
+          "steps": "1. Navigate to the detail page of a role named 'Senior Developer'.",
+          "expected": "The page title updates to 'Senior Developer' after the role data loads."
+        },
+        {
+          "id": "TC-RL-409",
+          "severity": "P2",
+          "scenario": "Detail page shows Assignable and Leadership flags correctly",
+          "steps": "1. Create a role with Assignable ON and Leadership OFF.\n2. Navigate to that role's detail page.",
+          "expected": "The Assignable field shows a positive/yes indicator. The Leadership field shows a negative/no indicator."
+        }
+      ]
+    },
+    {
+      "id": "TC-RL-500",
+      "name": "Editing a Role",
+      "test_cases": [
+        {
+          "id": "TC-RL-501",
+          "severity": "P1",
+          "scenario": "Clicking the Edit action opens the edit drawer for that role",
+          "steps": "1. Navigate to the Roles page.\n2. Click the Edit (pencil) action on a role row.",
+          "expected": "The edit drawer slides in pre-populated with that role's current name, Assignable state, and Leadership state."
+        },
+        {
+          "id": "TC-RL-502",
+          "severity": "P0",
+          "scenario": "Role name can be updated successfully",
+          "steps": "1. Open the edit drawer for an existing role.\n2. Clear the Role Name field and enter a new name.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes, a success toast appears, and the updated name is shown in the table row."
+        },
+        {
+          "id": "TC-RL-503",
+          "severity": "P1",
+          "scenario": "Clearing the role name field and saving shows a validation error",
+          "steps": "1. Open the edit drawer for an existing role.\n2. Clear the Role Name field completely.\n3. Click 'Save changes'.",
+          "expected": "An inline error appears below the Role Name field. The change is not saved."
+        },
+        {
+          "id": "TC-RL-504",
+          "severity": "P1",
+          "scenario": "Assignable toggle can be changed in the edit drawer",
+          "steps": "1. Open the edit drawer for a role where Assignable is OFF.\n2. Toggle ON 'Assignable to resources'.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes with a success toast. The Assignable column for that role now shows a positive indicator."
+        },
+        {
+          "id": "TC-RL-505",
+          "severity": "P1",
+          "scenario": "Leadership toggle can be changed in the edit drawer",
+          "steps": "1. Open the edit drawer for a role where Leadership is OFF.\n2. Toggle ON 'Leadership role'.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes with a success toast. The Leadership column for that role now shows a positive indicator."
+        },
+        {
+          "id": "TC-RL-506",
+          "severity": "P1",
+          "scenario": "Renaming a role to an existing name shows a conflict error",
+          "steps": "1. Open the edit drawer for Role A.\n2. Change the name to match the existing name of Role B.\n3. Click 'Save changes'.",
+          "expected": "An error message is shown indicating the name is already in use. The change is not saved."
+        },
+        {
+          "id": "TC-RL-507",
+          "severity": "P2",
+          "scenario": "Saving a role with the same name does not cause a conflict error",
+          "steps": "1. Open the edit drawer for a role.\n2. Do not change the name.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes with a success toast. No conflict error is shown."
+        },
+        {
+          "id": "TC-RL-508",
+          "severity": "P1",
+          "scenario": "Role Name field enforces 100-character limit in the edit drawer",
+          "steps": "1. Open the edit drawer for an existing role.\n2. Clear the name and paste a string of 101 characters.",
+          "expected": "The field does not accept more than 100 characters. The counter shows '100/100'."
+        },
+        {
+          "id": "TC-RL-509",
+          "severity": "P2",
+          "scenario": "Clicking Cancel on the edit drawer discards changes",
+          "steps": "1. Open the edit drawer for a role.\n2. Modify the role name.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. The role name in the table is unchanged."
+        },
+        {
+          "id": "TC-RL-510",
+          "severity": "P2",
+          "scenario": "Save changes button shows a loading state during submission",
+          "steps": "1. Open the edit drawer for a role.\n2. Change the role name.\n3. Click 'Save changes' and immediately observe the button.",
+          "expected": "The 'Save changes' button shows a loading indicator and is disabled while the request is processing."
+        }
+      ]
+    },
+    {
+      "id": "TC-RL-600",
+      "name": "Activating & Deactivating a Role",
+      "test_cases": [
+        {
+          "id": "TC-RL-601",
+          "severity": "P1",
+          "scenario": "An active role can be deactivated via the Toggle action",
+          "steps": "1. Navigate to the Roles page.\n2. Find an active role.\n3. Click the Toggle action on that row.",
+          "expected": "A deactivate confirmation modal appears asking the user to confirm deactivation."
+        },
+        {
+          "id": "TC-RL-602",
+          "severity": "P0",
+          "scenario": "Confirming deactivation changes the role status to Inactive",
+          "steps": "1. Click the Toggle action on an active role.\n2. In the deactivate modal, click the confirm button.",
+          "expected": "The modal closes, a success toast appears, and the role's status badge changes to 'Inactive'."
+        },
+        {
+          "id": "TC-RL-603",
+          "severity": "P2",
+          "scenario": "Cancelling the deactivate modal leaves the role active",
+          "steps": "1. Click the Toggle action on an active role.\n2. Click 'Cancel' in the deactivate modal.",
+          "expected": "The modal closes. The role remains active and unchanged."
+        },
+        {
+          "id": "TC-RL-604",
+          "severity": "P1",
+          "scenario": "An inactive role can be activated via the Toggle action",
+          "steps": "1. Navigate to the Roles page (Status filter set to All or Inactive).\n2. Find an inactive role.\n3. Click the Toggle action on that row.",
+          "expected": "An activate confirmation modal appears asking the user to confirm activation."
+        },
+        {
+          "id": "TC-RL-605",
+          "severity": "P0",
+          "scenario": "Confirming activation changes the role status to Active",
+          "steps": "1. Click the Toggle action on an inactive role.\n2. In the activate modal, click the confirm button.",
+          "expected": "The modal closes, a success toast appears, and the role's status badge changes to 'Active'."
+        },
+        {
+          "id": "TC-RL-606",
+          "severity": "P2",
+          "scenario": "Cancelling the activate modal leaves the role inactive",
+          "steps": "1. Click the Toggle action on an inactive role.\n2. Click 'Cancel' in the activate modal.",
+          "expected": "The modal closes. The role remains inactive and unchanged."
+        },
+        {
+          "id": "TC-RL-607",
+          "severity": "P2",
+          "scenario": "Deactivating a role removes it from the default Active filter view",
+          "steps": "1. Ensure the Status filter is set to 'Active'.\n2. Deactivate a role currently shown in the table.\n3. Confirm deactivation.",
+          "expected": "After deactivation, the role disappears from the table (since it is no longer active)."
+        },
+        {
+          "id": "TC-RL-608",
+          "severity": "P2",
+          "scenario": "Toggle action icon reflects the current active state of a role",
+          "steps": "1. Navigate to the Roles page with Status filter set to 'All'.\n2. Observe the Toggle action icon for active vs inactive roles.",
+          "expected": "The toggle icon appears in a different colour or style depending on whether the role is active or inactive."
+        }
+      ]
+    },
+    {
+      "id": "TC-RL-700",
+      "name": "Set as Default Role",
+      "test_cases": [
+        {
+          "id": "TC-RL-701",
+          "severity": "P1",
+          "scenario": "'Set as Default' action is visible only for non-default roles",
+          "steps": "1. Navigate to the Roles page.\n2. Observe the action buttons for a role that is NOT the current default.\n3. Then observe the action buttons for the current default role.",
+          "expected": "The 'Set as Default' (star) action is shown for non-default roles and is hidden for the role that is already the default."
+        },
+        {
+          "id": "TC-RL-702",
+          "severity": "P0",
+          "scenario": "A role can be set as the default via the Set as Default action",
+          "steps": "1. Find a non-default role.\n2. Click the 'Set as Default' (star) action on that row.",
+          "expected": "A confirmation modal appears asking the user to confirm setting this role as the default."
+        },
+        {
+          "id": "TC-RL-703",
+          "severity": "P0",
+          "scenario": "Confirming the Set as Default action updates the Default column",
+          "steps": "1. Click 'Set as Default' on a non-default role.\n2. Confirm in the modal.",
+          "expected": "The modal closes, a success toast appears, and the 'Default' column for that role now shows a positive indicator. The previously default role's Default column reverts to a negative indicator."
+        },
+        {
+          "id": "TC-RL-704",
+          "severity": "P2",
+          "scenario": "Cancelling the Set as Default modal makes no change",
+          "steps": "1. Click 'Set as Default' on a non-default role.\n2. Click 'Cancel' in the confirmation modal.",
+          "expected": "The modal closes. The default role is unchanged. The 'Default' column reflects no change."
+        },
+        {
+          "id": "TC-RL-705",
+          "severity": "P1",
+          "scenario": "Only one role can be the default at a time",
+          "steps": "1. Set Role A as the default.\n2. Then set Role B as the default.\n3. Observe the Default column for both roles.",
+          "expected": "Role B is now marked as default and Role A's default marker is removed. Only one role shows the default indicator."
+        },
+        {
+          "id": "TC-RL-706",
+          "severity": "P2",
+          "scenario": "'Set as Default' action does not appear in the overflow menu for the current default role",
+          "steps": "1. Identify the current default role in the table.\n2. Open the overflow (ellipsis) menu for that row.",
+          "expected": "The 'Set as Default' option is not shown in the menu for the role that is already the default."
+        },
+        {
+          "id": "TC-RL-707",
+          "severity": "P2",
+          "scenario": "Set as Default confirmation modal displays the role name",
+          "steps": "1. Click 'Set as Default' on a role named 'Engineer'.\n2. Read the confirmation modal text.",
+          "expected": "The modal title or body includes the role name 'Engineer' so the user can confirm the correct role."
+        },
+        {
+          "id": "TC-RL-708",
+          "severity": "P2",
+          "scenario": "Default indicator is visible in the table Default column",
+          "steps": "1. Navigate to the Roles page.\n2. Observe the Default column for the current default role.",
+          "expected": "The default role displays a clear visual indicator (e.g. checkmark, badge) in the Default column."
+        },
+        {
+          "id": "TC-RL-709",
+          "severity": "P3",
+          "scenario": "The default role is also visible in the detail page information panel",
+          "steps": "1. Set a role as the default.\n2. Navigate to that role's detail page.\n3. Look at the information panel.",
+          "expected": "The detail page reflects the role's Default status in the information panel."
+        }
+      ]
+    },
+    {
+      "id": "TC-RL-800",
+      "name": "Deleting a Role",
+      "test_cases": [
+        {
+          "id": "TC-RL-801",
+          "severity": "P1",
+          "scenario": "Clicking the Delete action opens a confirmation modal",
+          "steps": "1. Navigate to the Roles page.\n2. Click the Delete (bin) action on a role row.",
+          "expected": "A delete confirmation modal appears with the role name and a typed-confirmation input field."
+        },
+        {
+          "id": "TC-RL-802",
+          "severity": "P0",
+          "scenario": "A role is permanently deleted after typed confirmation",
+          "steps": "1. Click Delete on a role.\n2. Type the role name exactly as shown in the confirmation field.\n3. Click 'Delete role'.",
+          "expected": "The modal closes, a success toast appears, and the role is removed from the table."
+        },
+        {
+          "id": "TC-RL-803",
+          "severity": "P1",
+          "scenario": "Delete button in modal is disabled until the correct name is typed",
+          "steps": "1. Click Delete on a role.\n2. Leave the confirmation field empty or type an incorrect name.\n3. Observe the 'Delete role' button.",
+          "expected": "The 'Delete role' button remains disabled until the exact role name is typed into the confirmation field."
+        },
+        {
+          "id": "TC-RL-804",
+          "severity": "P2",
+          "scenario": "Cancelling the delete modal leaves the role intact",
+          "steps": "1. Click Delete on a role.\n2. Click 'Cancel' in the confirmation modal.",
+          "expected": "The modal closes. The role remains in the table and is not deleted."
+        },
+        {
+          "id": "TC-RL-805",
+          "severity": "P1",
+          "scenario": "Typed confirmation is case-sensitive",
+          "steps": "1. Click Delete on a role named 'Developer'.\n2. Type 'developer' (all lowercase) in the confirmation field.\n3. Observe whether the Delete button becomes enabled.",
+          "expected": "The 'Delete role' button remains disabled when the case does not match exactly."
+        },
+        {
+          "id": "TC-RL-806",
+          "severity": "P2",
+          "scenario": "Delete modal displays the exact role name to be typed",
+          "steps": "1. Click Delete on a role named 'Senior Engineer'.\n2. Read the delete confirmation modal.",
+          "expected": "The modal shows the instruction to type 'Senior Engineer' to confirm the deletion."
+        },
+        {
+          "id": "TC-RL-807",
+          "severity": "P2",
+          "scenario": "Deleted role no longer appears in the table",
+          "steps": "1. Delete a role that is currently visible in the table.\n2. Observe the table after deletion.",
+          "expected": "The deleted role row disappears from the table immediately after the success toast."
+        },
+        {
+          "id": "TC-RL-808",
+          "severity": "P3",
+          "scenario": "Deleting a role shows a clear irreversible warning in the modal",
+          "steps": "1. Click Delete on any role.\n2. Read the body text of the confirmation modal.",
+          "expected": "The modal body text warns the user that this action is permanent and cannot be undone."
+        }
+      ]
+    },
+    {
+      "id": "TC-RL-900",
+      "name": "Importing Roles",
+      "test_cases": [
+        {
+          "id": "TC-RL-901",
+          "severity": "P1",
+          "scenario": "Clicking Import opens the import view",
+          "steps": "1. Navigate to the Roles page.\n2. Click the 'Import' button.",
+          "expected": "The import view or panel opens, allowing the user to upload a file."
+        },
+        {
+          "id": "TC-RL-902",
+          "severity": "P1",
+          "scenario": "A sample CSV file can be downloaded from the import view",
+          "steps": "1. Open the import view.\n2. Click the link or button to download the sample CSV.",
+          "expected": "A CSV file is downloaded with the correct column headers for roles (e.g. role, is_assignable, is_leadership, is_active)."
+        },
+        {
+          "id": "TC-RL-903",
+          "severity": "P0",
+          "scenario": "A valid CSV file with new roles can be imported successfully",
+          "steps": "1. Prepare a CSV file with valid role data.\n2. Open the import view and upload the file.\n3. Complete the import process.",
+          "expected": "The import completes and a success message is shown. The imported roles appear in the table."
+        },
+        {
+          "id": "TC-RL-904",
+          "severity": "P1",
+          "scenario": "Upload field rejects non-CSV file types",
+          "steps": "1. Open the import view.\n2. Attempt to upload a file with a non-CSV extension (e.g. .xlsx or .pdf).",
+          "expected": "The import view rejects the file and shows an error indicating only CSV files are accepted."
+        },
+        {
+          "id": "TC-RL-905",
+          "severity": "P1",
+          "scenario": "Importing a CSV with a missing required column shows an error",
+          "steps": "1. Prepare a CSV file missing the 'role' column.\n2. Upload it in the import view.\n3. Proceed with the import.",
+          "expected": "The import fails with a clear message identifying the missing required column."
+        },
+        {
+          "id": "TC-RL-906",
+          "severity": "P1",
+          "scenario": "Importing a CSV with a role name exceeding 100 characters shows a row-level error",
+          "steps": "1. Prepare a CSV with one row where the role name is 101+ characters.\n2. Import the file.",
+          "expected": "The import reports an error for that row indicating the name is too long. Other valid rows may still be imported."
+        },
+        {
+          "id": "TC-RL-907",
+          "severity": "P1",
+          "scenario": "Importing a CSV with a duplicate role name shows a row-level conflict",
+          "steps": "1. Prepare a CSV with a role name that already exists in the system.\n2. Import the file.",
+          "expected": "The import reports a conflict or skip message for that row. The existing role is not duplicated."
+        },
+        {
+          "id": "TC-RL-908",
+          "severity": "P2",
+          "scenario": "An empty CSV file upload shows an appropriate error",
+          "steps": "1. Create an empty CSV file (header row only or completely empty).\n2. Upload it in the import view.",
+          "expected": "The import view shows a message indicating no data rows were found or the file is empty."
+        },
+        {
+          "id": "TC-RL-909",
+          "severity": "P2",
+          "scenario": "Import view shows a row count summary after successful import",
+          "steps": "1. Import a valid CSV with multiple role rows.\n2. Observe the result screen after the import completes.",
+          "expected": "The result shows how many roles were imported successfully and how many failed (if any)."
+        },
+        {
+          "id": "TC-RL-910",
+          "severity": "P2",
+          "scenario": "After a successful import, the roles table refreshes automatically",
+          "steps": "1. Import a valid CSV file with new roles.\n2. Close the import view and observe the table.",
+          "expected": "The data table refreshes and the newly imported roles are visible without manually reloading the page."
+        },
+        {
+          "id": "TC-RL-911",
+          "severity": "P2",
+          "scenario": "Import view shows a spec or field guide for the expected CSV format",
+          "steps": "1. Open the import view.\n2. Look for a column specification or field guide.",
+          "expected": "The import view shows the expected columns and their requirements so the user knows how to prepare their file."
+        },
+        {
+          "id": "TC-RL-912",
+          "severity": "P3",
+          "scenario": "Importing a CSV with is_assignable and is_leadership values sets those flags correctly",
+          "steps": "1. Prepare a CSV with a row where is_assignable=true and is_leadership=false.\n2. Import the file.\n3. Find the imported role in the table.",
+          "expected": "The imported role shows a positive Assignable indicator and a negative Leadership indicator in the table."
+        }
+      ]
+    },
+    {
+      "id": "TC-RL-1000",
+      "name": "Exporting Roles",
+      "test_cases": [
+        {
+          "id": "TC-RL-1001",
+          "severity": "P1",
+          "scenario": "Clicking Export opens the export view",
+          "steps": "1. Navigate to the Roles page.\n2. Click the 'Export' button.",
+          "expected": "The export configuration panel opens, allowing the user to select fields and format."
+        },
+        {
+          "id": "TC-RL-1002",
+          "severity": "P0",
+          "scenario": "Roles can be exported to CSV",
+          "steps": "1. Open the export view.\n2. Select CSV as the export format.\n3. Choose at least one field.\n4. Click Export.",
+          "expected": "A CSV file is downloaded containing the selected role data."
+        },
+        {
+          "id": "TC-RL-1003",
+          "severity": "P1",
+          "scenario": "Exported CSV contains the expected role data",
+          "steps": "1. Export roles to CSV.\n2. Open the downloaded file in a spreadsheet application.",
+          "expected": "The CSV contains a header row and data rows for each role, with values matching what is shown in the table."
+        },
+        {
+          "id": "TC-RL-1004",
+          "severity": "P1",
+          "scenario": "Export respects the active status filter",
+          "steps": "1. Set the Status filter to 'Active' on the Roles page.\n2. Open the export view and export all roles.",
+          "expected": "The exported file contains only active roles, matching the current filter state."
+        },
+        {
+          "id": "TC-RL-1005",
+          "severity": "P2",
+          "scenario": "Export respects the current search filter",
+          "steps": "1. Enter a search term on the Roles page to filter roles.\n2. Open the export view and export.",
+          "expected": "The exported file contains only roles matching the current search term."
+        },
+        {
+          "id": "TC-RL-1006",
+          "severity": "P2",
+          "scenario": "User can select which fields to include in the export",
+          "steps": "1. Open the export view.\n2. Deselect one or more fields from the available field list.\n3. Export.",
+          "expected": "The downloaded file contains only the selected fields as columns."
+        },
+        {
+          "id": "TC-RL-1007",
+          "severity": "P2",
+          "scenario": "Exported file includes Assignable and Leadership columns",
+          "steps": "1. Open the export view and select all fields.\n2. Export to CSV.\n3. Open the file.",
+          "expected": "The CSV includes columns for Assignable and Leadership with correct true/false or Yes/No values."
+        },
+        {
+          "id": "TC-RL-1008",
+          "severity": "P3",
+          "scenario": "Closing the export view without exporting makes no change to the table",
+          "steps": "1. Open the export view.\n2. Close it without clicking Export.",
+          "expected": "No file is downloaded. The Roles table is unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-RL-1100",
+      "name": "Non-Functional & Accessibility",
+      "test_cases": [
+        {
+          "id": "TC-RL-1101",
+          "severity": "P1",
+          "scenario": "All interactive elements on the Roles page are keyboard accessible",
+          "steps": "1. Navigate to the Roles page.\n2. Use only the Tab key to move through all interactive elements.\n3. Use Enter/Space to activate buttons.",
+          "expected": "All buttons, filters, table actions, and drawer controls can be reached and activated via keyboard without using a mouse."
+        },
+        {
+          "id": "TC-RL-1102",
+          "severity": "P1",
+          "scenario": "Create role drawer can be completed entirely via keyboard",
+          "steps": "1. Open the create drawer using the keyboard.\n2. Tab to the Role Name field and type a name.\n3. Tab to the Assignable toggle and toggle it.\n4. Tab to 'Create role' and press Enter.",
+          "expected": "The role is created successfully using keyboard navigation only."
+        },
+        {
+          "id": "TC-RL-1103",
+          "severity": "P2",
+          "scenario": "Focus is trapped inside the create or edit drawer while it is open",
+          "steps": "1. Open the create role drawer.\n2. Press Tab repeatedly.",
+          "expected": "Focus cycles only through elements within the drawer. Focus does not escape to the page behind the drawer."
+        },
+        {
+          "id": "TC-RL-1104",
+          "severity": "P2",
+          "scenario": "Closing a drawer returns focus to the element that opened it",
+          "steps": "1. Click 'Add Role' to open the create drawer.\n2. Click 'Cancel' to close it.",
+          "expected": "Focus returns to the 'Add Role' button after the drawer closes."
+        },
+        {
+          "id": "TC-RL-1105",
+          "severity": "P2",
+          "scenario": "Success and error toast notifications are announced to screen readers",
+          "steps": "1. Create a role using a screen reader enabled.\n2. Listen for announcements after submission.",
+          "expected": "The success toast message is announced by the screen reader when it appears."
+        },
+        {
+          "id": "TC-RL-1106",
+          "severity": "P1",
+          "scenario": "Roles page loads within an acceptable time with a moderate dataset",
+          "steps": "1. Ensure the system has at least 50 roles.\n2. Navigate to the Roles page and measure load time.",
+          "expected": "The page and table load within 3 seconds on a standard connection."
+        },
+        {
+          "id": "TC-RL-1107",
+          "severity": "P2",
+          "scenario": "Pagination controls work correctly on the Roles table",
+          "steps": "1. Ensure more than 25 roles exist.\n2. Navigate to the Roles page.\n3. Use the pagination controls to go to the next page.",
+          "expected": "The table shows the next page of roles. The current page indicator updates correctly."
+        },
+        {
+          "id": "TC-RL-1108",
+          "severity": "P2",
+          "scenario": "Roles page works correctly in both light and dark themes",
+          "steps": "1. Navigate to the Roles page in light theme.\n2. Toggle to dark theme using the theme toggle.\n3. Observe the page.",
+          "expected": "All text, icons, drawers, and modals render correctly in dark theme with no contrast or layout issues."
+        },
+        {
+          "id": "TC-RL-1109",
+          "severity": "P3",
+          "scenario": "Long role names wrap or truncate gracefully in the table",
+          "steps": "1. Create a role with a name close to the 100-character limit.\n2. View the role in the table.",
+          "expected": "The role name wraps or truncates in the table cell without breaking the row layout."
+        },
+        {
+          "id": "TC-RL-1110",
+          "severity": "P2",
+          "scenario": "Active filter chip is displayed when a filter is applied",
+          "steps": "1. Navigate to the Roles page.\n2. Enter a search term in the search field.",
+          "expected": "An active filter chip appears below the filter bar showing the applied search term. Clicking the chip clears the filter."
+        }
+      ]
+    },
+    {
+      "id": "TC-RL-1200",
+      "name": "Desktop Layout",
+      "test_cases": [
+        {
+          "id": "TC-RL-1201",
+          "severity": "P1",
+          "scenario": "All table columns are visible on a desktop viewport",
+          "steps": "1. Open the Roles page on a desktop browser (viewport ≥ 1024px).\n2. Observe the table columns.",
+          "expected": "All columns are visible: Role Name, Code, Assignable, Leadership, Default, Status, Created."
+        },
+        {
+          "id": "TC-RL-1202",
+          "severity": "P1",
+          "scenario": "Create role drawer is full-width on desktop and does not overflow",
+          "steps": "1. Open the Roles page on a desktop browser.\n2. Click 'Add Role' to open the create drawer.",
+          "expected": "The drawer occupies the expected width (up to 900px) and all fields are visible without horizontal scrolling."
+        },
+        {
+          "id": "TC-RL-1203",
+          "severity": "P2",
+          "scenario": "Role detail page shows two-column layout on desktop",
+          "steps": "1. Open a role's detail page on a desktop browser.\n2. Observe the page layout.",
+          "expected": "The page shows a two-column layout: the left panel (role info) and right panel (members) displayed side by side."
+        },
+        {
+          "id": "TC-RL-1204",
+          "severity": "P2",
+          "scenario": "Page header buttons are correctly spaced on desktop",
+          "steps": "1. Open the Roles page on a desktop browser.\n2. Observe the Import, Export, and Add Role buttons.",
+          "expected": "The buttons are aligned in a row in the top-right action area with consistent spacing."
+        },
+        {
+          "id": "TC-RL-1205",
+          "severity": "P2",
+          "scenario": "Filter panel and data table are side-by-side on large desktop",
+          "steps": "1. Open the Roles page on a 1440px wide browser window.",
+          "expected": "The filter bar is displayed above or inline with the data table, and the table fills the available width."
+        },
+        {
+          "id": "TC-RL-1206",
+          "severity": "P2",
+          "scenario": "Row overflow menu appears on desktop for actions that do not fit inline",
+          "steps": "1. Open the Roles page on a desktop viewport.\n2. Observe the action buttons on a row that has Edit, Toggle, Set as Default, and Delete.",
+          "expected": "Actions are shown inline where space allows. Additional actions overflow into an ellipsis (…) menu."
+        },
+        {
+          "id": "TC-RL-1207",
+          "severity": "P2",
+          "scenario": "Toggles in create and edit drawer are displayed side by side on desktop",
+          "steps": "1. Open the create or edit role drawer on a desktop viewport.\n2. Observe the layout of the Assignable and Leadership toggles.",
+          "expected": "The two toggle fields are displayed in a two-column layout side by side on desktop (col-md-6 each)."
+        },
+        {
+          "id": "TC-RL-1208",
+          "severity": "P3",
+          "scenario": "Sorting columns updates the table immediately on desktop",
+          "steps": "1. Click a sortable column header on the Roles page.\n2. Observe the table response.",
+          "expected": "The table re-sorts immediately and the sort direction indicator appears next to the column header."
+        }
+      ]
+    },
+    {
+      "id": "TC-RL-1300",
+      "name": "Mobile & Responsive",
+      "test_cases": [
+        {
+          "id": "TC-RL-1301",
+          "severity": "P1",
+          "scenario": "Secondary columns are hidden on mobile viewports",
+          "steps": "1. Open the Roles page on a mobile device or viewport ≤ 767px.\n2. Observe the table columns.",
+          "expected": "Code, Assignable, Leadership, Default, and Created columns are hidden. Only Role Name and Status remain visible."
+        },
+        {
+          "id": "TC-RL-1302",
+          "severity": "P1",
+          "scenario": "Create role drawer is usable on a mobile viewport",
+          "steps": "1. Open the Roles page on a mobile viewport.\n2. Open the create drawer and fill in the Role Name.\n3. Submit the form.",
+          "expected": "The drawer opens correctly, the form fields are accessible, and the role can be created without layout issues."
+        },
+        {
+          "id": "TC-RL-1303",
+          "severity": "P2",
+          "scenario": "Assignable and Leadership toggles stack vertically on mobile",
+          "steps": "1. Open the create or edit role drawer on a mobile viewport.\n2. Observe the layout of the toggle fields.",
+          "expected": "The Assignable and Leadership toggles stack vertically (full width, col-12) on mobile instead of side by side."
+        },
+        {
+          "id": "TC-RL-1304",
+          "severity": "P2",
+          "scenario": "Role detail page stacks panels vertically on mobile",
+          "steps": "1. Open a role's detail page on a mobile viewport.",
+          "expected": "The info panel and members panel stack vertically. The info panel is on top and the members panel is below."
+        },
+        {
+          "id": "TC-RL-1305",
+          "severity": "P2",
+          "scenario": "Members table on detail page hides secondary columns on mobile",
+          "steps": "1. Open a role's detail page on a mobile viewport.\n2. Observe the members table.",
+          "expected": "The Email, Location, and Employment Type columns are hidden. Only the avatar and Name are visible."
+        },
+        {
+          "id": "TC-RL-1306",
+          "severity": "P2",
+          "scenario": "Delete and Set as Default modals are fully visible on mobile",
+          "steps": "1. Open the delete or set-default confirmation modal on a mobile viewport.\n2. Observe the layout.",
+          "expected": "The modal is fully visible on screen with buttons accessible without scrolling."
+        },
+        {
+          "id": "TC-RL-1307",
+          "severity": "P2",
+          "scenario": "Search field is accessible and functional on mobile",
+          "steps": "1. Open the Roles page on a mobile device.\n2. Tap the search field and type a role name.",
+          "expected": "The search field accepts input and the table filters correctly on mobile."
+        },
+        {
+          "id": "TC-RL-1308",
+          "severity": "P3",
+          "scenario": "Page header does not overflow on small mobile viewports",
+          "steps": "1. Open the Roles page on a 375px-wide viewport.\n2. Observe the page title and action buttons.",
+          "expected": "The page title and action buttons do not overflow or overlap. The layout remains readable."
+        }
+      ]
+    },
+    {
+      "id": "TC-RL-1400",
+      "name": "Integration with Other Modules",
+      "test_cases": [
+        {
+          "id": "TC-RL-1401",
+          "severity": "P1",
+          "scenario": "A role that is marked as Assignable appears in user assignment dropdowns",
+          "steps": "1. Ensure a role exists with Assignable set to ON.\n2. Navigate to a module where users are assigned roles (e.g. People / Members).\n3. Open a role assignment dropdown.",
+          "expected": "The assignable role appears in the dropdown options for user assignment."
+        },
+        {
+          "id": "TC-RL-1402",
+          "severity": "P1",
+          "scenario": "A role that is NOT marked as Assignable does not appear in assignment dropdowns",
+          "steps": "1. Ensure a role exists with Assignable set to OFF.\n2. Navigate to a user assignment dropdown in another module.",
+          "expected": "The non-assignable role does not appear as an option for assignment."
+        },
+        {
+          "id": "TC-RL-1403",
+          "severity": "P1",
+          "scenario": "The default role is pre-selected when adding a new member",
+          "steps": "1. Ensure a default role is configured.\n2. Navigate to the People or Team Members module.\n3. Open the form to add a new member.",
+          "expected": "The role field in the add member form defaults to the role that is marked as Default."
+        },
+        {
+          "id": "TC-RL-1404",
+          "severity": "P1",
+          "scenario": "Members assigned to a role appear on that role's detail page",
+          "steps": "1. Assign a user the role of 'Senior Developer'.\n2. Navigate to the 'Senior Developer' role's detail page.\n3. Observe the Members panel.",
+          "expected": "The user who was assigned this role appears in the members table on the detail page."
+        },
+        {
+          "id": "TC-RL-1405",
+          "severity": "P2",
+          "scenario": "Deactivating a role does not remove existing members from that role",
+          "steps": "1. Ensure a role has assigned members.\n2. Deactivate that role.\n3. Navigate to the role's detail page.",
+          "expected": "The members panel still shows the previously assigned members. Deactivation does not unassign existing people."
+        },
+        {
+          "id": "TC-RL-1406",
+          "severity": "P2",
+          "scenario": "Inactive roles are not available for new member assignments",
+          "steps": "1. Deactivate a role.\n2. Navigate to a member assignment form in another module.\n3. Open the role dropdown.",
+          "expected": "The deactivated role does not appear as an option for new assignments."
+        },
+        {
+          "id": "TC-RL-1407",
+          "severity": "P2",
+          "scenario": "Roles module link is accessible from the navigation menu under Configurations",
+          "steps": "1. Log in and click the Configurations section in the main navigation.\n2. Look for the Roles link.",
+          "expected": "A 'Roles' link is present in the Configurations section and navigates to /roles/."
+        },
+        {
+          "id": "TC-RL-1408",
+          "severity": "P3",
+          "scenario": "Leadership roles are visible and filterable in team management views",
+          "steps": "1. Ensure at least one role is marked as Leadership.\n2. Navigate to a team or reporting view that shows role types.",
+          "expected": "Leadership roles are identifiable in cross-module views where role type is displayed."
+        }
+      ]
+    }
+  ]
+}

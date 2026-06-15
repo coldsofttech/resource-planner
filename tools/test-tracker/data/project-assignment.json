@@ -1,0 +1,265 @@
+{
+  "module": {
+    "slug": "project-assignment",
+    "name": "Project Assignment",
+    "sort_order": 2,
+    "parent": {
+      "slug": "projects",
+      "name": "Projects",
+      "sort_order": 2
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-PRA-100",
+      "name": "Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-PRA-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user cannot access team assignment features",
+          "steps": "1. Open a project detail page URL without being logged in.",
+          "expected": "The browser redirects to the login page. Team assignment controls are not accessible."
+        },
+        {
+          "id": "TC-PRA-102",
+          "severity": "P1",
+          "scenario": "'Assign Team' action is only visible to users with 'can_change_project'",
+          "steps": "1. Log in as a user with 'can_change_project'.\n2. Navigate to Projects and hover over a project row.",
+          "expected": "The 'Assign Team' action is visible in the row."
+        },
+        {
+          "id": "TC-PRA-103",
+          "severity": "P1",
+          "scenario": "'Assign Team' action is not visible without 'can_change_project'",
+          "steps": "1. Log in as a user without 'can_change_project'.\n2. Navigate to Projects and hover over a project row.",
+          "expected": "The 'Assign Team' action is not present."
+        },
+        {
+          "id": "TC-PRA-104",
+          "severity": "P1",
+          "scenario": "Team Assignment accordion in the edit drawer is only accessible with 'can_change_project'",
+          "steps": "1. Log in as a user without 'can_change_project'.\n2. Open a project detail page.",
+          "expected": "The 'Edit Project' button is not available. The Team Assignment section cannot be reached."
+        },
+        {
+          "id": "TC-PRA-105",
+          "severity": "P2",
+          "scenario": "Teams panel on the Operational tab is visible to all authenticated users",
+          "steps": "1. Log in as any authenticated user.\n2. Open a project detail page and click the Operational tab.",
+          "expected": "The Teams panel is visible and shows the assigned team badges in read-only form."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRA-200",
+      "name": "Assigning Primary Team (from Projects List)",
+      "test_cases": [
+        {
+          "id": "TC-PRA-201",
+          "severity": "P0",
+          "scenario": "Clicking 'Assign Team' from the list opens the Assign Team drawer",
+          "steps": "1. Navigate to Projects.\n2. Click the 'Assign Team' action on a project row.",
+          "expected": "A drawer opens with the title 'Assign Team'. A Team dropdown field is shown with an 'Unassign' option available."
+        },
+        {
+          "id": "TC-PRA-202",
+          "severity": "P0",
+          "scenario": "Selecting a team and saving assigns it as the primary team",
+          "steps": "1. Open the Assign Team drawer for a project.\n2. Select a team from the dropdown.\n3. Click 'Save'.",
+          "expected": "The drawer closes. The project row updates to show the assigned team in the 'Assigned Team' column. A success message is shown."
+        },
+        {
+          "id": "TC-PRA-203",
+          "severity": "P1",
+          "scenario": "Currently assigned team is pre-selected when the Assign Team drawer opens",
+          "steps": "1. Open the Assign Team drawer for a project that already has a team assigned.",
+          "expected": "The Team field is pre-populated with the currently assigned team."
+        },
+        {
+          "id": "TC-PRA-204",
+          "severity": "P1",
+          "scenario": "Selecting 'Unassign' removes the primary team from the project",
+          "steps": "1. Open the Assign Team drawer for a project with a team assigned.\n2. Select the 'Unassign' option.\n3. Click 'Save'.",
+          "expected": "The project's primary team is removed. The Assigned Team column in the list shows blank or 'None'."
+        },
+        {
+          "id": "TC-PRA-205",
+          "severity": "P1",
+          "scenario": "Cancelling the Assign Team drawer makes no change",
+          "steps": "1. Open the Assign Team drawer.\n2. Select a different team.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. The project's team assignment is unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRA-300",
+      "name": "Assigning Primary Team (via Edit Drawer)",
+      "test_cases": [
+        {
+          "id": "TC-PRA-301",
+          "severity": "P0",
+          "scenario": "Team Assignment accordion in the edit drawer shows the Assigned Team field",
+          "steps": "1. Open a project detail page.\n2. Click 'Edit Project'.\n3. Expand the 'Team Assignment' accordion.",
+          "expected": "The Team Assignment accordion contains an 'Assigned Team' single-select field and a 'Collaborating Teams' multi-select field."
+        },
+        {
+          "id": "TC-PRA-302",
+          "severity": "P0",
+          "scenario": "Changing the Assigned Team in the edit drawer and saving updates the project",
+          "steps": "1. Open the edit drawer.\n2. Expand Team Assignment.\n3. Select a different team in 'Assigned Team'.\n4. Click 'Save changes'.",
+          "expected": "The project saves. The Operational tab shows the updated team in the Teams panel. The list shows the updated team in the Assigned Team column."
+        },
+        {
+          "id": "TC-PRA-303",
+          "severity": "P1",
+          "scenario": "Assigned Team field is pre-filled with the current team when the edit drawer opens",
+          "steps": "1. Open the edit drawer for a project with a team assigned.",
+          "expected": "The 'Assigned Team' field in the Team Assignment accordion shows the currently assigned team."
+        },
+        {
+          "id": "TC-PRA-304",
+          "severity": "P1",
+          "scenario": "Assigned Team is optional — project can be saved with no team assigned",
+          "steps": "1. Open the edit drawer.\n2. Expand Team Assignment.\n3. Clear the Assigned Team field.\n4. Save changes.",
+          "expected": "The project saves successfully with no primary team assigned."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRA-400",
+      "name": "Collaborating Teams",
+      "test_cases": [
+        {
+          "id": "TC-PRA-401",
+          "severity": "P0",
+          "scenario": "Collaborating Teams field supports multi-select",
+          "steps": "1. Open the edit drawer.\n2. Expand Team Assignment.\n3. Click the Collaborating Teams field and select multiple teams.",
+          "expected": "Multiple teams can be selected. All selected teams appear as chips or tags in the field."
+        },
+        {
+          "id": "TC-PRA-402",
+          "severity": "P0",
+          "scenario": "Saving with multiple collaborating teams persists all selections",
+          "steps": "1. Open the edit drawer.\n2. Add two or more collaborating teams.\n3. Save changes.",
+          "expected": "All selected collaborating teams are saved. The Operational tab's Teams panel shows all assigned teams."
+        },
+        {
+          "id": "TC-PRA-403",
+          "severity": "P1",
+          "scenario": "Existing collaborating teams are pre-filled when the edit drawer opens",
+          "steps": "1. Open the edit drawer for a project with collaborating teams already assigned.",
+          "expected": "The Collaborating Teams field shows all currently assigned collaborating teams."
+        },
+        {
+          "id": "TC-PRA-404",
+          "severity": "P1",
+          "scenario": "Removing a collaborating team and saving removes it from the project",
+          "steps": "1. Open the edit drawer for a project with collaborating teams.\n2. Remove one collaborating team from the field.\n3. Save changes.",
+          "expected": "The removed team is no longer listed in the Teams panel on the Operational tab."
+        },
+        {
+          "id": "TC-PRA-405",
+          "severity": "P1",
+          "scenario": "Collaborating Teams field is optional — project can be saved with no collaborators",
+          "steps": "1. Open the edit drawer.\n2. Clear all collaborating teams.\n3. Save changes.",
+          "expected": "The project saves successfully with no collaborating teams."
+        },
+        {
+          "id": "TC-PRA-406",
+          "severity": "P2",
+          "scenario": "The same team cannot be added as both the assigned team and a collaborating team",
+          "steps": "1. Open the edit drawer.\n2. Set Team A as the Assigned Team.\n3. Attempt to also select Team A as a Collaborating Team.",
+          "expected": "The system either prevents the selection or returns an error when saving. A team cannot hold both roles on the same project."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRA-500",
+      "name": "Viewing Team Assignments",
+      "test_cases": [
+        {
+          "id": "TC-PRA-501",
+          "severity": "P1",
+          "scenario": "Assigned Team column in the list shows the primary team name",
+          "steps": "1. Assign a team to a project.\n2. Return to the Projects list.",
+          "expected": "The Assigned Team column shows the team's name for that project row."
+        },
+        {
+          "id": "TC-PRA-502",
+          "severity": "P1",
+          "scenario": "Teams panel on the Operational tab shows all assigned teams as badges",
+          "steps": "1. Open a project with both a primary team and collaborating teams.\n2. Click the Operational tab.",
+          "expected": "The Teams panel shows all assigned teams as badges. The primary and collaborating teams are both visible."
+        },
+        {
+          "id": "TC-PRA-503",
+          "severity": "P2",
+          "scenario": "Teams panel shows an empty or placeholder state when no teams are assigned",
+          "steps": "1. Open a project with no teams assigned.\n2. Click the Operational tab.",
+          "expected": "The Teams panel is empty or shows a placeholder message indicating no teams are assigned."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRA-600",
+      "name": "Non-Functional",
+      "test_cases": [
+        {
+          "id": "TC-PRA-601",
+          "severity": "P2",
+          "scenario": "Assigning a team that does not exist is not possible via the dropdown",
+          "steps": "1. Open the Assign Team drawer.\n2. Type a team name that does not exist.",
+          "expected": "The dropdown does not allow selecting a non-existent team. Free-text entry is not accepted."
+        },
+        {
+          "id": "TC-PRA-602",
+          "severity": "P2",
+          "scenario": "Team assignment changes are reflected immediately after saving",
+          "steps": "1. Assign a team via the list or edit drawer.\n2. Reload the project detail page.",
+          "expected": "The newly assigned team is shown on the Operational tab and in the list without requiring a hard page refresh after the drawer closes."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRA-700",
+      "name": "Desktop",
+      "test_cases": [
+        {
+          "id": "TC-PRA-701",
+          "severity": "P1",
+          "scenario": "Assigned Team column is visible in the project table on desktop",
+          "steps": "1. Open Projects on a desktop browser (1280px+ wide).",
+          "expected": "The 'Assigned Team' column is visible in the table."
+        },
+        {
+          "id": "TC-PRA-702",
+          "severity": "P2",
+          "scenario": "Team Assignment accordion in the edit drawer is easy to interact with on desktop",
+          "steps": "1. Open the edit drawer on a desktop browser.\n2. Expand the Team Assignment accordion.\n3. Select teams using both fields.",
+          "expected": "Both the Assigned Team and Collaborating Teams fields are fully interactive and readable on desktop."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRA-800",
+      "name": "Mobile",
+      "test_cases": [
+        {
+          "id": "TC-PRA-801",
+          "severity": "P1",
+          "scenario": "Assigned Team column is hidden on mobile",
+          "steps": "1. Open Projects on a mobile device or narrow viewport.",
+          "expected": "The Assigned Team column is not visible. Other hidden-mobile columns are also hidden."
+        },
+        {
+          "id": "TC-PRA-802",
+          "severity": "P2",
+          "scenario": "Team Assignment fields in the edit drawer are usable on mobile",
+          "steps": "1. Open the edit drawer on a mobile device.\n2. Expand Team Assignment.\n3. Tap the Assigned Team and Collaborating Teams fields.",
+          "expected": "Both fields are tappable and the team selection works. Dropdowns open correctly on mobile."
+        }
+      ]
+    }
+  ]
+}

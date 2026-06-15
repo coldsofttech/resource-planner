@@ -1,0 +1,547 @@
+{
+  "module": {
+    "slug": "programmes",
+    "name": "Programmes",
+    "sort_order": 10,
+    "parent": {
+      "slug": "projects",
+      "name": "Projects",
+      "sort_order": 11
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-PG-100",
+      "name": "Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-PG-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user is redirected from the Programmes page",
+          "steps": "1. Open the Programmes page URL without being logged in.",
+          "expected": "The browser redirects to the login page. The Programmes list is not shown."
+        },
+        {
+          "id": "TC-PG-102",
+          "severity": "P1",
+          "scenario": "User with view-only access can see the Programmes list but no management actions",
+          "steps": "1. Log in as a user without management permissions.\n2. Navigate to Projects > Programmes.",
+          "expected": "The Programmes list is visible. No Edit, Toggle, or Delete actions appear on any row. Add Programme, Import, and Export buttons are not shown."
+        },
+        {
+          "id": "TC-PG-103",
+          "severity": "P1",
+          "scenario": "User with 'can_change_programme' sees Edit and Toggle actions",
+          "steps": "1. Log in as a user with 'can_change_programme' permission.\n2. Navigate to Projects > Programmes.\n3. Expand a non-protected row's action menu.",
+          "expected": "Edit and Toggle (activate/deactivate) actions are visible and enabled for non-protected programmes."
+        },
+        {
+          "id": "TC-PG-104",
+          "severity": "P1",
+          "scenario": "User with 'can_delete_programme' sees the Delete action for non-protected programmes",
+          "steps": "1. Log in as a user with 'can_delete_programme' permission.\n2. Navigate to Projects > Programmes.\n3. Expand a non-protected row's action menu.",
+          "expected": "A Delete action (danger-styled) is visible for non-protected programmes."
+        },
+        {
+          "id": "TC-PG-105",
+          "severity": "P1",
+          "scenario": "Add Programme, Import, and Export buttons are visible in the page header",
+          "steps": "1. Navigate to Projects > Programmes.\n2. Check the page header.",
+          "expected": "Add Programme, Import, and Export buttons are visible after the page loads."
+        }
+      ]
+    },
+    {
+      "id": "TC-PG-200",
+      "name": "Browsing & Filtering",
+      "test_cases": [
+        {
+          "id": "TC-PG-201",
+          "severity": "P0",
+          "scenario": "Programmes page loads with the correct layout and table",
+          "steps": "1. Navigate to Projects > Programmes.",
+          "expected": "The page shows the 'Projects' eyebrow, 'Programmes' heading, and subtitle 'Manage programmes that group and govern projects across your organisation.' The table shows: Programme Name, Code, Description, Status, Created columns."
+        },
+        {
+          "id": "TC-PG-202",
+          "severity": "P1",
+          "scenario": "Default filter shows only active programmes",
+          "steps": "1. Navigate to Projects > Programmes.\n2. Check the Is Active filter.",
+          "expected": "Is Active defaults to 'Active'. Only active programmes are listed."
+        },
+        {
+          "id": "TC-PG-203",
+          "severity": "P1",
+          "scenario": "Search by name filters the list",
+          "steps": "1. Type a programme name in the search field.",
+          "expected": "Only programmes whose names match the search term are shown."
+        },
+        {
+          "id": "TC-PG-204",
+          "severity": "P1",
+          "scenario": "Is Active filter set to 'All' shows both active and inactive programmes",
+          "steps": "1. Change Is Active to 'All'.",
+          "expected": "Both active and inactive programmes appear in the table."
+        },
+        {
+          "id": "TC-PG-205",
+          "severity": "P2",
+          "scenario": "Table can be sorted by Programme Name column",
+          "steps": "1. Click the 'Programme Name' column header.",
+          "expected": "Rows sort alphabetically by name. A second click reverses the order."
+        },
+        {
+          "id": "TC-PG-206",
+          "severity": "P2",
+          "scenario": "Table can be sorted by Created date column",
+          "steps": "1. Click the 'Created' column header.",
+          "expected": "Rows sort by creation date. A second click reverses the order."
+        },
+        {
+          "id": "TC-PG-207",
+          "severity": "P2",
+          "scenario": "Pressing '/' focuses the search field",
+          "steps": "1. Press '/' on the keyboard.",
+          "expected": "The search field receives focus."
+        },
+        {
+          "id": "TC-PG-208",
+          "severity": "P2",
+          "scenario": "Empty state shown when no programmes match the search",
+          "steps": "1. Search for a term that matches no programme.",
+          "expected": "'No programmes found.' is shown in the table area."
+        },
+        {
+          "id": "TC-PG-209",
+          "severity": "P2",
+          "scenario": "Pagination loads more programmes when the list exceeds 25",
+          "steps": "1. Set Is Active to 'All' and navigate to the next page if more than 25 exist.",
+          "expected": "Pagination controls appear. The next page loads correctly."
+        },
+        {
+          "id": "TC-PG-210",
+          "severity": "P2",
+          "scenario": "Active filter chips appear below the filter panel",
+          "steps": "1. Apply a search term.",
+          "expected": "An active filter chip appears below the filter panel. Removing it clears the filter."
+        }
+      ]
+    },
+    {
+      "id": "TC-PG-300",
+      "name": "Creating Programmes",
+      "test_cases": [
+        {
+          "id": "TC-PG-301",
+          "severity": "P0",
+          "scenario": "Clicking Add Programme opens the create drawer",
+          "steps": "1. Click 'Add Programme' in the page header.",
+          "expected": "The create programme drawer slides open with Programme Name and Description fields."
+        },
+        {
+          "id": "TC-PG-302",
+          "severity": "P0",
+          "scenario": "Creating a programme with a valid name adds it to the list",
+          "steps": "1. Open the create drawer.\n2. Enter a programme name (e.g., 'Digital Transformation').\n3. Click 'Create programme'.",
+          "expected": "The drawer closes. A success toast appears. The new programme is visible in the table as Active."
+        },
+        {
+          "id": "TC-PG-303",
+          "severity": "P1",
+          "scenario": "Programme Name is required",
+          "steps": "1. Open the create drawer.\n2. Leave the name blank.\n3. Click 'Create programme'.",
+          "expected": "A validation error appears on the Programme Name field. The drawer stays open and nothing is saved."
+        },
+        {
+          "id": "TC-PG-304",
+          "severity": "P1",
+          "scenario": "Programme Name has a maximum length of 255 characters",
+          "steps": "1. Open the create drawer.\n2. Enter more than 255 characters in the Programme Name field.",
+          "expected": "The character counter updates as the user types. The field enforces the 255-character limit."
+        },
+        {
+          "id": "TC-PG-305",
+          "severity": "P2",
+          "scenario": "Character counter shows remaining characters as the user types the name",
+          "steps": "1. Open the create drawer.\n2. Type into the Programme Name field.",
+          "expected": "A character counter displays the characters used (e.g., '21 / 255'). It updates on each keystroke."
+        },
+        {
+          "id": "TC-PG-306",
+          "severity": "P2",
+          "scenario": "Description is optional — programme can be created without it",
+          "steps": "1. Open the create drawer.\n2. Enter a name but leave Description blank.\n3. Click 'Create programme'.",
+          "expected": "The programme is created successfully without a description."
+        },
+        {
+          "id": "TC-PG-307",
+          "severity": "P2",
+          "scenario": "Description has a maximum length of 500 characters",
+          "steps": "1. Open the create drawer.\n2. Enter more than 500 characters in the Description field.",
+          "expected": "The description field enforces the 500-character limit."
+        },
+        {
+          "id": "TC-PG-308",
+          "severity": "P1",
+          "scenario": "Duplicate programme name is rejected",
+          "steps": "1. Open the create drawer.\n2. Enter a name that already exists.\n3. Click 'Create programme'.",
+          "expected": "An error toast or inline error indicates the name is already in use. No duplicate is created."
+        },
+        {
+          "id": "TC-PG-309",
+          "severity": "P1",
+          "scenario": "Cancel button closes the create drawer without saving",
+          "steps": "1. Open the create drawer.\n2. Enter some details.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. No programme is created."
+        }
+      ]
+    },
+    {
+      "id": "TC-PG-400",
+      "name": "View Drawer",
+      "test_cases": [
+        {
+          "id": "TC-PG-401",
+          "severity": "P1",
+          "scenario": "Clicking a programme row opens the view drawer",
+          "steps": "1. Click anywhere on a programme row (not on an action button).",
+          "expected": "The view drawer slides open showing the selected programme's details."
+        },
+        {
+          "id": "TC-PG-402",
+          "severity": "P1",
+          "scenario": "View drawer displays all expected fields",
+          "steps": "1. Click a programme row to open the view drawer.",
+          "expected": "The view drawer shows: Programme Name, Code (monospace), Description, Status, Created (meta), and Created by (meta)."
+        },
+        {
+          "id": "TC-PG-403",
+          "severity": "P1",
+          "scenario": "View drawer shows 'Edit Programme' button for users with edit permission",
+          "steps": "1. Log in with 'can_change_programme' permission.\n2. Open the view drawer for a non-protected programme.",
+          "expected": "The view drawer footer shows an 'Edit Programme' button alongside the Close button."
+        },
+        {
+          "id": "TC-PG-404",
+          "severity": "P1",
+          "scenario": "View drawer shows only Close button for users without edit permission",
+          "steps": "1. Log in without 'can_change_programme' permission.\n2. Open the view drawer for any programme.",
+          "expected": "Only the Close button appears in the footer. No 'Edit Programme' button is present."
+        },
+        {
+          "id": "TC-PG-405",
+          "severity": "P1",
+          "scenario": "Clicking 'Edit Programme' in the view drawer opens the edit drawer",
+          "steps": "1. Open the view drawer for a non-protected programme.\n2. Click 'Edit Programme' in the footer.",
+          "expected": "The view drawer closes and the edit drawer opens for the same programme, pre-populated with its current values."
+        },
+        {
+          "id": "TC-PG-406",
+          "severity": "P1",
+          "scenario": "Close button dismisses the view drawer",
+          "steps": "1. Open the view drawer.\n2. Click 'Close'.",
+          "expected": "The view drawer slides closed. The list remains unchanged."
+        },
+        {
+          "id": "TC-PG-407",
+          "severity": "P2",
+          "scenario": "Code is shown in monospace style in the view drawer",
+          "steps": "1. Open the view drawer for a programme.",
+          "expected": "The Code field is displayed in monospace, visually distinct from other text fields."
+        }
+      ]
+    },
+    {
+      "id": "TC-PG-500",
+      "name": "Editing Programmes",
+      "test_cases": [
+        {
+          "id": "TC-PG-501",
+          "severity": "P0",
+          "scenario": "Edit action opens the edit drawer pre-populated with the current name and description",
+          "steps": "1. Click the Edit action on a non-protected programme.",
+          "expected": "The edit drawer opens with the Programme Name and Description pre-filled with the current values."
+        },
+        {
+          "id": "TC-PG-502",
+          "severity": "P1",
+          "scenario": "Saving changes updates the programme in the list",
+          "steps": "1. Open the edit drawer for a programme.\n2. Change the name and/or description.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes. A success toast appears. The updated name and description are reflected in the table."
+        },
+        {
+          "id": "TC-PG-503",
+          "severity": "P1",
+          "scenario": "Programme Name cannot be cleared in edit",
+          "steps": "1. Open the edit drawer.\n2. Clear the name.\n3. Click 'Save changes'.",
+          "expected": "A validation error appears on the name field. The programme is not saved with an empty name."
+        },
+        {
+          "id": "TC-PG-504",
+          "severity": "P1",
+          "scenario": "Cancel button in the edit drawer discards changes",
+          "steps": "1. Open the edit drawer.\n2. Change the name.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. The programme name in the table is unchanged."
+        },
+        {
+          "id": "TC-PG-505",
+          "severity": "P2",
+          "scenario": "Character counter updates in the edit drawer as the user types",
+          "steps": "1. Open the edit drawer.\n2. Type in the Programme Name field.",
+          "expected": "The character counter updates in real time."
+        }
+      ]
+    },
+    {
+      "id": "TC-PG-600",
+      "name": "Activating & Deactivating",
+      "test_cases": [
+        {
+          "id": "TC-PG-601",
+          "severity": "P1",
+          "scenario": "Toggle action on an active programme opens a deactivation confirmation",
+          "steps": "1. Click Toggle on an active, non-protected programme.",
+          "expected": "A deactivation confirmation modal appears."
+        },
+        {
+          "id": "TC-PG-602",
+          "severity": "P1",
+          "scenario": "Confirming deactivation sets the programme to Inactive",
+          "steps": "1. Click Toggle on an active programme.\n2. Confirm in the modal.",
+          "expected": "The modal closes. A success toast appears. The Status column shows 'Inactive'."
+        },
+        {
+          "id": "TC-PG-603",
+          "severity": "P1",
+          "scenario": "Toggle action on an inactive programme opens an activation confirmation",
+          "steps": "1. Find an inactive programme (set Is Active to 'All').\n2. Click Toggle on it.",
+          "expected": "An activation confirmation modal appears."
+        },
+        {
+          "id": "TC-PG-604",
+          "severity": "P1",
+          "scenario": "Confirming activation sets the programme to Active",
+          "steps": "1. Click Toggle on an inactive programme.\n2. Confirm in the modal.",
+          "expected": "The Status column updates to 'Active'."
+        },
+        {
+          "id": "TC-PG-605",
+          "severity": "P1",
+          "scenario": "Cancelling the toggle confirmation makes no change",
+          "steps": "1. Click Toggle on a programme.\n2. Click Cancel in the modal.",
+          "expected": "The modal closes. The programme's status is unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-PG-700",
+      "name": "Protected Programmes",
+      "test_cases": [
+        {
+          "id": "TC-PG-701",
+          "severity": "P1",
+          "scenario": "Edit action is disabled for protected programmes",
+          "steps": "1. Locate a protected programme in the list.\n2. View its row actions.",
+          "expected": "The Edit action is visible but shown in a disabled state. It cannot be clicked."
+        },
+        {
+          "id": "TC-PG-702",
+          "severity": "P1",
+          "scenario": "Toggle action is disabled for protected programmes",
+          "steps": "1. Locate a protected programme.\n2. View the Toggle action in its row.",
+          "expected": "The Toggle action is visible but disabled. Clicking it has no effect."
+        },
+        {
+          "id": "TC-PG-703",
+          "severity": "P1",
+          "scenario": "Delete action is hidden for protected programmes",
+          "steps": "1. Locate a protected programme.\n2. Expand the row actions.",
+          "expected": "The Delete action is completely hidden for protected programmes — it does not appear at all, unlike the Edit and Toggle actions which are disabled."
+        },
+        {
+          "id": "TC-PG-704",
+          "severity": "P2",
+          "scenario": "Non-protected programmes have all actions enabled",
+          "steps": "1. Locate a non-protected programme.\n2. Expand its row actions.",
+          "expected": "Edit, Toggle, and Delete actions are all enabled and interactive (subject to user permissions)."
+        }
+      ]
+    },
+    {
+      "id": "TC-PG-800",
+      "name": "Deleting Programmes",
+      "test_cases": [
+        {
+          "id": "TC-PG-801",
+          "severity": "P1",
+          "scenario": "Delete action opens a confirmation modal",
+          "steps": "1. Click Delete on a non-protected programme.",
+          "expected": "A delete confirmation modal appears showing the programme name."
+        },
+        {
+          "id": "TC-PG-802",
+          "severity": "P0",
+          "scenario": "Confirming deletion removes the programme from the list",
+          "steps": "1. Click Delete on a non-protected programme.\n2. Confirm in the modal.",
+          "expected": "The modal closes. A success toast appears. The programme is removed from the table."
+        },
+        {
+          "id": "TC-PG-803",
+          "severity": "P1",
+          "scenario": "Cancelling deletion makes no changes",
+          "steps": "1. Click Delete on a programme.\n2. Click Cancel in the modal.",
+          "expected": "The modal closes. The programme remains in the table unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-PG-900",
+      "name": "Importing & Exporting",
+      "test_cases": [
+        {
+          "id": "TC-PG-901",
+          "severity": "P1",
+          "scenario": "Clicking Import opens the import panel",
+          "steps": "1. Click 'Import' in the page header.",
+          "expected": "The import view opens allowing a file to be uploaded for importing programmes."
+        },
+        {
+          "id": "TC-PG-902",
+          "severity": "P1",
+          "scenario": "Clicking Export opens the export panel",
+          "steps": "1. Click 'Export' in the page header.",
+          "expected": "The export panel opens."
+        },
+        {
+          "id": "TC-PG-903",
+          "severity": "P1",
+          "scenario": "Export respects the active filter",
+          "steps": "1. Apply a search filter to narrow the list.\n2. Click Export.",
+          "expected": "The exported file contains only programmes matching the current filter."
+        },
+        {
+          "id": "TC-PG-904",
+          "severity": "P2",
+          "scenario": "Table refreshes after a successful import",
+          "steps": "1. Import a valid programmes file.\n2. Complete the import.",
+          "expected": "The table refreshes and newly imported programmes appear in the list."
+        }
+      ]
+    },
+    {
+      "id": "TC-PG-1000",
+      "name": "Non-Functional",
+      "test_cases": [
+        {
+          "id": "TC-PG-1001",
+          "severity": "P2",
+          "scenario": "Page loads within an acceptable time",
+          "steps": "1. Navigate to Projects > Programmes.",
+          "expected": "The page and table load within 3 seconds."
+        },
+        {
+          "id": "TC-PG-1002",
+          "severity": "P1",
+          "scenario": "Session expiry during an action redirects to login",
+          "steps": "1. Open the create or edit drawer.\n2. Let the session expire.\n3. Attempt to save.",
+          "expected": "The browser redirects to the login page. No partial data is saved."
+        },
+        {
+          "id": "TC-PG-1003",
+          "severity": "P2",
+          "scenario": "Table refreshes automatically after create, edit, or delete",
+          "steps": "1. Create, edit, or delete a programme.",
+          "expected": "The table updates to reflect the change without requiring a full page reload."
+        }
+      ]
+    },
+    {
+      "id": "TC-PG-1100",
+      "name": "Desktop",
+      "test_cases": [
+        {
+          "id": "TC-PG-1101",
+          "severity": "P1",
+          "scenario": "All table columns are visible on desktop",
+          "steps": "1. Open Projects > Programmes on a desktop browser (1280px+ wide).",
+          "expected": "Programme Name, Code, Description, Status, and Created columns are all visible."
+        },
+        {
+          "id": "TC-PG-1102",
+          "severity": "P2",
+          "scenario": "View drawer fields appear in correct layout on desktop",
+          "steps": "1. Open the view drawer for a programme on desktop.",
+          "expected": "Programme Name and Code appear side by side (col-md-6). Description spans full width. Status, Created, and Created by appear side by side."
+        },
+        {
+          "id": "TC-PG-1103",
+          "severity": "P2",
+          "scenario": "Row action buttons accessible on desktop without overflow menu",
+          "steps": "1. Hover over a programme row on desktop.",
+          "expected": "Edit, Toggle, and Delete (where permitted) are accessible inline."
+        }
+      ]
+    },
+    {
+      "id": "TC-PG-1200",
+      "name": "Mobile",
+      "test_cases": [
+        {
+          "id": "TC-PG-1201",
+          "severity": "P1",
+          "scenario": "Only Programme Name and Status columns visible in the table on mobile",
+          "steps": "1. Open Projects > Programmes on a mobile device.",
+          "expected": "Only the Programme Name and Status columns are visible. Code, Description, and Created are hidden."
+        },
+        {
+          "id": "TC-PG-1202",
+          "severity": "P2",
+          "scenario": "Row actions accessible via overflow menu on mobile",
+          "steps": "1. On mobile, tap the overflow menu on a programme row.",
+          "expected": "A menu appears with the available permitted actions."
+        },
+        {
+          "id": "TC-PG-1203",
+          "severity": "P2",
+          "scenario": "View and create drawers render correctly on mobile",
+          "steps": "1. Open the view drawer and create drawer on a mobile device.",
+          "expected": "Both drawers render full-screen on mobile. Fields are readable and buttons are easy to tap."
+        }
+      ]
+    },
+    {
+      "id": "TC-PG-1300",
+      "name": "Integration",
+      "test_cases": [
+        {
+          "id": "TC-PG-1301",
+          "severity": "P1",
+          "scenario": "Newly created programme is available when assigning a programme to a project",
+          "steps": "1. Create a new programme (e.g., 'Customer Experience').\n2. Navigate to the Projects list and open or create a project.\n3. Look for the Programme field.",
+          "expected": "The newly created 'Customer Experience' programme is available for selection on the project."
+        },
+        {
+          "id": "TC-PG-1302",
+          "severity": "P1",
+          "scenario": "Deactivating a programme removes it from the available selections in project forms",
+          "steps": "1. Deactivate an existing programme.\n2. Open a project to assign a programme.\n3. Check the Programme dropdown.",
+          "expected": "The deactivated programme no longer appears in the Programme dropdown for projects."
+        },
+        {
+          "id": "TC-PG-1303",
+          "severity": "P2",
+          "scenario": "Projects already assigned to a deactivated programme retain the assignment",
+          "steps": "1. Deactivate a programme that is already assigned to existing projects.\n2. View one of those projects.",
+          "expected": "Existing projects retain their programme assignment. The deactivation only prevents future selection."
+        },
+        {
+          "id": "TC-PG-1304",
+          "severity": "P2",
+          "scenario": "Programme name change is reflected on assigned projects",
+          "steps": "1. Edit a programme and change its name.\n2. View a project assigned to that programme.",
+          "expected": "The project shows the updated programme name."
+        }
+      ]
+    }
+  ]
+}

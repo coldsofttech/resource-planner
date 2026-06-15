@@ -10,5 +10,25 @@ runs:
   using: composite
   steps:
     - name: Bandit
+      id: bandit
       shell: bash
-      run: bandit -r ${{ inputs.path }} --configfile pyproject.toml
+      run: bandit -r ${{ inputs.path }} --configfile pyproject.toml -f sarif -o bandit.sarif
+      continue-on-error: true
+
+    - name: Ensure SARIF exists
+      shell: bash
+      if: always()
+      run: |
+        [ -f bandit.sarif ] || printf '{"version":"2.1.0","runs":[{"tool":{"driver":{"name":"Bandit","rules":[]}},"results":[]}]}' > bandit.sarif
+
+    - name: Upload SARIF
+      uses: github/codeql-action/upload-sarif@v4
+      if: always()
+      with:
+        sarif_file: bandit.sarif
+        category: bandit
+
+    - name: Fail on findings
+      shell: bash
+      if: steps.bandit.outcome == 'failure'
+      run: exit 1

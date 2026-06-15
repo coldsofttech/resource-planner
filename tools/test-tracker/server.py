@@ -509,7 +509,10 @@ class Handler(BaseHTTPRequestHandler):
                 requested = (BASE_DIR / p.lstrip("/")).resolve()
                 if not requested.is_relative_to(BASE_DIR.resolve()):
                     return self._json({"error": "forbidden"}, 403)
-                return self._file(requested)
+                if not requested.exists():
+                    return self._json({"error": "not_found"}, 404)
+                ct = MIME.get(requested.suffix, "text/plain")
+                return self._send(requested.read_bytes(), ct)
 
             if p == "/api/modules":
                 return self._json(api_modules())

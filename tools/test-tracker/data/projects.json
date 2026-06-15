@@ -1,0 +1,645 @@
+{
+  "module": {
+    "slug": "projects",
+    "name": "Projects",
+    "sort_order": 1,
+    "parent": {
+      "slug": "projects",
+      "name": "Projects",
+      "sort_order": 2
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-PRJ-100",
+      "name": "Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-PRJ-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user is redirected from the Projects page",
+          "steps": "1. Open the Projects page URL without being logged in.",
+          "expected": "The browser redirects to the login page. The Projects list is not shown."
+        },
+        {
+          "id": "TC-PRJ-102",
+          "severity": "P1",
+          "scenario": "Authenticated user can view the Projects list",
+          "steps": "1. Log in as any user.\n2. Navigate to Projects.",
+          "expected": "The Projects page loads and the project list is visible."
+        },
+        {
+          "id": "TC-PRJ-103",
+          "severity": "P1",
+          "scenario": "Add Project button is only visible to users with 'can_add_project' permission",
+          "steps": "1. Log in as a user with the 'can_add_project' permission.\n2. Navigate to Projects.",
+          "expected": "The 'Add Project' button is visible in the page header."
+        },
+        {
+          "id": "TC-PRJ-104",
+          "severity": "P1",
+          "scenario": "Add Project button is not visible without 'can_add_project' permission",
+          "steps": "1. Log in as a user without the 'can_add_project' permission.\n2. Navigate to Projects.",
+          "expected": "The 'Add Project' button is not present in the page header."
+        },
+        {
+          "id": "TC-PRJ-105",
+          "severity": "P1",
+          "scenario": "Assign Team and Toggle actions are only visible with 'can_change_project' permission",
+          "steps": "1. Log in as a user with the 'can_change_project' permission.\n2. Navigate to Projects and hover over a row.",
+          "expected": "The 'Assign Team' and 'Toggle' row actions are visible."
+        },
+        {
+          "id": "TC-PRJ-106",
+          "severity": "P1",
+          "scenario": "Delete action is only visible with 'can_delete_project' permission",
+          "steps": "1. Log in as a user with the 'can_delete_project' permission.\n2. Navigate to Projects and hover over a row.",
+          "expected": "The 'Delete' row action is visible."
+        },
+        {
+          "id": "TC-PRJ-107",
+          "severity": "P1",
+          "scenario": "Edit Project button on the detail page is only shown with 'can_change_project'",
+          "steps": "1. Log in as a user without 'can_change_project'.\n2. Navigate to a project's detail page.",
+          "expected": "The 'Edit Project' button is not shown in the page header. The page is read-only."
+        },
+        {
+          "id": "TC-PRJ-108",
+          "severity": "P2",
+          "scenario": "Session expiry redirects to login",
+          "steps": "1. Let the session expire while on the Projects page.\n2. Attempt to interact with the page.",
+          "expected": "The browser redirects to the login page."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRJ-200",
+      "name": "Browsing & Filtering",
+      "test_cases": [
+        {
+          "id": "TC-PRJ-201",
+          "severity": "P0",
+          "scenario": "Projects page loads with the correct layout",
+          "steps": "1. Navigate to Projects.",
+          "expected": "The page shows the 'Project' eyebrow, 'Projects' heading, and subtitle 'Manage and govern all projects across your organisation.' The filter panel and table are visible."
+        },
+        {
+          "id": "TC-PRJ-202",
+          "severity": "P0",
+          "scenario": "Projects table shows correct columns",
+          "steps": "1. Navigate to Projects on a desktop browser.",
+          "expected": "Columns visible: an icon/avatar column, ID (monospace), Name, Programme, Project Type, Status, Assigned Team, Confidence, Priority."
+        },
+        {
+          "id": "TC-PRJ-203",
+          "severity": "P1",
+          "scenario": "Active filter is applied by default — only active projects are shown",
+          "steps": "1. Navigate to Projects.",
+          "expected": "The Status filter defaults to 'Active'. Only active projects are listed."
+        },
+        {
+          "id": "TC-PRJ-204",
+          "severity": "P1",
+          "scenario": "Search filters the project list by name",
+          "steps": "1. Navigate to Projects.\n2. Type a partial project name in the search field.",
+          "expected": "Only projects whose names match the search input are shown."
+        },
+        {
+          "id": "TC-PRJ-205",
+          "severity": "P1",
+          "scenario": "Status filter can be changed to show all or inactive projects",
+          "steps": "1. Navigate to Projects.\n2. Change the Status filter to 'All' or 'Inactive'.",
+          "expected": "The table updates to show projects matching the selected status."
+        },
+        {
+          "id": "TC-PRJ-206",
+          "severity": "P2",
+          "scenario": "Pressing '/' focuses the search field",
+          "steps": "1. Navigate to Projects.\n2. Press '/' on the keyboard.",
+          "expected": "The search field receives keyboard focus."
+        },
+        {
+          "id": "TC-PRJ-207",
+          "severity": "P2",
+          "scenario": "Table can be sorted by Name column",
+          "steps": "1. Navigate to Projects.\n2. Click the 'Name' column header.",
+          "expected": "Projects are sorted alphabetically by name. Clicking again reverses the sort direction."
+        },
+        {
+          "id": "TC-PRJ-208",
+          "severity": "P2",
+          "scenario": "Table can be sorted by Programme and Project Type columns",
+          "steps": "1. Navigate to Projects.\n2. Click the 'Programme' or 'Project Type' column header.",
+          "expected": "Projects are sorted by the selected column. Clicking again reverses direction."
+        },
+        {
+          "id": "TC-PRJ-209",
+          "severity": "P2",
+          "scenario": "Pagination loads more projects when there are more than 25",
+          "steps": "1. Navigate to Projects when more than 25 projects exist.",
+          "expected": "Pagination controls appear. Clicking the next page loads the next set of projects."
+        },
+        {
+          "id": "TC-PRJ-210",
+          "severity": "P2",
+          "scenario": "Empty state is shown when no projects match the search",
+          "steps": "1. Type a search term that matches no project.",
+          "expected": "'No projects found.' is displayed in the table area."
+        },
+        {
+          "id": "TC-PRJ-211",
+          "severity": "P2",
+          "scenario": "Clicking a project row opens the project detail page",
+          "steps": "1. Navigate to Projects.\n2. Click a project row (not on an action button).",
+          "expected": "The browser navigates to the detail page for the selected project."
+        },
+        {
+          "id": "TC-PRJ-212",
+          "severity": "P2",
+          "scenario": "Active filters are shown as removable tags above the table",
+          "steps": "1. Apply a search term and change the status filter.\n2. Look above the table.",
+          "expected": "The active filter values are shown as tags. Clicking a tag removes the filter and updates the table."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRJ-300",
+      "name": "Creating a Project",
+      "test_cases": [
+        {
+          "id": "TC-PRJ-301",
+          "severity": "P0",
+          "scenario": "Clicking 'Add Project' opens the create drawer",
+          "steps": "1. Navigate to Projects.\n2. Click the 'Add Project' button.",
+          "expected": "A drawer slides in from the right with the title 'Create project'."
+        },
+        {
+          "id": "TC-PRJ-302",
+          "severity": "P0",
+          "scenario": "Creating a project with all required fields succeeds",
+          "steps": "1. Open the create drawer.\n2. Enter a project name.\n3. Select a Project Type.\n4. Select a Project Status.\n5. Click 'Create project'.",
+          "expected": "The project is created. The drawer closes. The new project appears in the list. A success message is shown."
+        },
+        {
+          "id": "TC-PRJ-303",
+          "severity": "P1",
+          "scenario": "Project Name is required — cannot create without it",
+          "steps": "1. Open the create drawer.\n2. Leave Project Name empty.\n3. Select a Project Type and Status.\n4. Click 'Create project'.",
+          "expected": "An inline validation error appears on the Project Name field. The project is not created."
+        },
+        {
+          "id": "TC-PRJ-304",
+          "severity": "P1",
+          "scenario": "Project Type is required — cannot create without it",
+          "steps": "1. Open the create drawer.\n2. Enter a project name.\n3. Leave Project Type unselected.\n4. Click 'Create project'.",
+          "expected": "An inline validation error appears on the Project Type field. The project is not created."
+        },
+        {
+          "id": "TC-PRJ-305",
+          "severity": "P1",
+          "scenario": "Project Status is required — cannot create without it",
+          "steps": "1. Open the create drawer.\n2. Enter a name and select a type.\n3. Clear the Status field.\n4. Click 'Create project'.",
+          "expected": "An inline validation error appears on the Status field. The project is not created."
+        },
+        {
+          "id": "TC-PRJ-306",
+          "severity": "P1",
+          "scenario": "Project Status defaults to 'New' when the drawer opens",
+          "steps": "1. Open the create drawer.\n2. Observe the Project Status field.",
+          "expected": "The Project Status field is pre-filled with 'New'."
+        },
+        {
+          "id": "TC-PRJ-307",
+          "severity": "P1",
+          "scenario": "Sub-Status options change when the Status is changed",
+          "steps": "1. Open the create drawer.\n2. Select a Project Status.\n3. Observe the Sub-Status dropdown options.",
+          "expected": "The Sub-Status options update to reflect the sub-statuses belonging to the selected status."
+        },
+        {
+          "id": "TC-PRJ-308",
+          "severity": "P1",
+          "scenario": "Project Name field enforces a maximum of 255 characters",
+          "steps": "1. Open the create drawer.\n2. Enter a project name longer than 255 characters.",
+          "expected": "The character counter turns red and/or input is capped at 255 characters. A validation error is shown if submitted."
+        },
+        {
+          "id": "TC-PRJ-309",
+          "severity": "P1",
+          "scenario": "Description field enforces a maximum of 500 characters",
+          "steps": "1. Open the create drawer.\n2. Enter more than 500 characters in the Description field.",
+          "expected": "The input is capped or a validation error is shown when 500 characters are exceeded."
+        },
+        {
+          "id": "TC-PRJ-310",
+          "severity": "P1",
+          "scenario": "Programme field is optional",
+          "steps": "1. Create a project without selecting a Programme.",
+          "expected": "The project is created successfully. No validation error for Programme."
+        },
+        {
+          "id": "TC-PRJ-311",
+          "severity": "P1",
+          "scenario": "Programme field is searchable",
+          "steps": "1. Open the create drawer.\n2. Click the Programme field and type a partial name.",
+          "expected": "Matching programmes are shown in the dropdown. Selecting one populates the field."
+        },
+        {
+          "id": "TC-PRJ-312",
+          "severity": "P2",
+          "scenario": "Confidence and Priority fields are optional and default to 'not set'",
+          "steps": "1. Open the create drawer.\n2. Leave Confidence and Priority unset.\n3. Create the project.",
+          "expected": "The project is created. Confidence and Priority display as unset or blank on the detail page."
+        },
+        {
+          "id": "TC-PRJ-313",
+          "severity": "P2",
+          "scenario": "Tentative Start and End dates are optional",
+          "steps": "1. Create a project without filling in start or end dates.",
+          "expected": "The project is created without errors."
+        },
+        {
+          "id": "TC-PRJ-314",
+          "severity": "P2",
+          "scenario": "Cancelling the create drawer discards changes",
+          "steps": "1. Open the create drawer.\n2. Fill in some fields.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. No project is created. The list is unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRJ-400",
+      "name": "Viewing a Project (Detail Page)",
+      "test_cases": [
+        {
+          "id": "TC-PRJ-401",
+          "severity": "P0",
+          "scenario": "Project detail page loads with the correct header",
+          "steps": "1. Click a project row from the Projects list.",
+          "expected": "The project detail page loads. The page shows the project's identicon and name in the header. The 'Project' eyebrow is shown."
+        },
+        {
+          "id": "TC-PRJ-402",
+          "severity": "P0",
+          "scenario": "General tab shows all project information fields",
+          "steps": "1. Open a project detail page.\n2. Select the 'General' tab (active by default).",
+          "expected": "The General Information panel shows: ID, Name, Project Type, Programme, Description, Status, Sub-Status, Confidence, Priority, Tentative Start Date, Tentative End Date."
+        },
+        {
+          "id": "TC-PRJ-403",
+          "severity": "P1",
+          "scenario": "Metadata panel shows created and updated information",
+          "steps": "1. Open a project detail page.\n2. Look at the Metadata panel below the General Information panel.",
+          "expected": "The Metadata panel shows: Created (date/time), Created By (user name), Updated (date/time), Updated By (user name)."
+        },
+        {
+          "id": "TC-PRJ-404",
+          "severity": "P1",
+          "scenario": "Tags panel is visible on the General tab",
+          "steps": "1. Open a project detail page.\n2. Look at the right column on the General tab.",
+          "expected": "A Tags panel is shown. Existing tags are displayed. If the user has 'can_change_project', a 'Save Tags' button is present."
+        },
+        {
+          "id": "TC-PRJ-405",
+          "severity": "P1",
+          "scenario": "Operational tab shows operational fields and project code",
+          "steps": "1. Open a project detail page.\n2. Click the 'Operational' tab.",
+          "expected": "The Operational panel shows Efforts Issued, Commitment Date, and Run Cost Applies. The Project Code panel shows the assigned code."
+        },
+        {
+          "id": "TC-PRJ-406",
+          "severity": "P1",
+          "scenario": "Operational tab shows Teams and Labels panels on the right",
+          "steps": "1. Open a project detail page.\n2. Click the 'Operational' tab.",
+          "expected": "The right column shows a Teams panel with assigned team badges and a Labels panel with label badges."
+        },
+        {
+          "id": "TC-PRJ-407",
+          "severity": "P1",
+          "scenario": "Follow button is visible but initially disabled until the page loads",
+          "steps": "1. Open a project detail page.",
+          "expected": "The 'Follow' button is visible in the page header. It becomes enabled after the project data loads."
+        },
+        {
+          "id": "TC-PRJ-408",
+          "severity": "P2",
+          "scenario": "ID field on the detail page displays in code/monospace style",
+          "steps": "1. Open a project detail page.\n2. Look at the ID field in the General Information panel.",
+          "expected": "The project ID is displayed in a monospace/code style, visually distinct from other fields."
+        },
+        {
+          "id": "TC-PRJ-409",
+          "severity": "P2",
+          "scenario": "Three tabs are shown: General, Operational, Estimates",
+          "steps": "1. Open any project detail page.",
+          "expected": "Three tabs are visible: General (with info-circle icon), Operational (with gear icon), Estimates (with calculator icon)."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRJ-500",
+      "name": "Editing a Project",
+      "test_cases": [
+        {
+          "id": "TC-PRJ-501",
+          "severity": "P0",
+          "scenario": "Clicking 'Edit Project' opens the edit drawer",
+          "steps": "1. Open a project detail page.\n2. Click the 'Edit Project' button.",
+          "expected": "The edit drawer slides in with the project's identicon in the header and all current values pre-filled across the accordion sections."
+        },
+        {
+          "id": "TC-PRJ-502",
+          "severity": "P0",
+          "scenario": "Saving the edit drawer updates the project",
+          "steps": "1. Open the edit drawer.\n2. Change the project name.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes. The project name is updated on the detail page and in the list. A success message is shown."
+        },
+        {
+          "id": "TC-PRJ-503",
+          "severity": "P1",
+          "scenario": "Edit drawer has five accordion sections",
+          "steps": "1. Open the edit drawer for a project.",
+          "expected": "Five accordion sections are present: General, Operational, Team Assignment, Labels, Project Code."
+        },
+        {
+          "id": "TC-PRJ-504",
+          "severity": "P1",
+          "scenario": "General accordion is expanded by default when the edit drawer opens",
+          "steps": "1. Open the edit drawer.",
+          "expected": "The 'General' accordion section is open and its fields are visible. Other sections are collapsed."
+        },
+        {
+          "id": "TC-PRJ-505",
+          "severity": "P1",
+          "scenario": "Project Name is required in the edit drawer",
+          "steps": "1. Open the edit drawer.\n2. Clear the Project Name field.\n3. Click 'Save changes'.",
+          "expected": "A validation error appears on the Project Name field. Changes are not saved."
+        },
+        {
+          "id": "TC-PRJ-506",
+          "severity": "P1",
+          "scenario": "Sub-Status options update when Status is changed in the edit drawer",
+          "steps": "1. Open the edit drawer.\n2. Change the Project Status to a different value.\n3. Observe the Sub-Status field.",
+          "expected": "The Sub-Status dropdown clears and loads options for the newly selected status."
+        },
+        {
+          "id": "TC-PRJ-507",
+          "severity": "P1",
+          "scenario": "Operational accordion fields can be toggled and saved",
+          "steps": "1. Open the edit drawer.\n2. Expand the Operational accordion.\n3. Toggle 'Efforts Issued' or 'Run Cost Applies'.\n4. Save changes.",
+          "expected": "The toggled values are saved. The Operational tab on the detail page reflects the change."
+        },
+        {
+          "id": "TC-PRJ-508",
+          "severity": "P2",
+          "scenario": "Cancelling the edit drawer discards all changes",
+          "steps": "1. Open the edit drawer.\n2. Change several fields.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. All original values are preserved. No changes are saved."
+        },
+        {
+          "id": "TC-PRJ-509",
+          "severity": "P2",
+          "scenario": "Accordion sections can each be independently expanded and collapsed",
+          "steps": "1. Open the edit drawer.\n2. Click each accordion header in turn.",
+          "expected": "Each accordion section toggles open and closed independently without affecting others."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRJ-600",
+      "name": "Tags on a Project",
+      "test_cases": [
+        {
+          "id": "TC-PRJ-601",
+          "severity": "P1",
+          "scenario": "Tags panel on the General tab shows existing tags",
+          "steps": "1. Open a project with existing tags.\n2. View the General tab.",
+          "expected": "The Tags panel on the right shows all tags currently applied to the project."
+        },
+        {
+          "id": "TC-PRJ-602",
+          "severity": "P1",
+          "scenario": "User with 'can_change_project' can add and save tags",
+          "steps": "1. Open a project detail page.\n2. Click in the Tags field and type a new tag.\n3. Click 'Save Tags'.",
+          "expected": "The tag is added to the project. A success confirmation is shown."
+        },
+        {
+          "id": "TC-PRJ-603",
+          "severity": "P1",
+          "scenario": "Tags field supports free-form tag entry",
+          "steps": "1. Open a project detail page with edit permissions.\n2. Type a new tag name in the Tags field.",
+          "expected": "New tags can be typed freely without being constrained to a predefined list."
+        },
+        {
+          "id": "TC-PRJ-604",
+          "severity": "P2",
+          "scenario": "Save Tags button is not shown to users without 'can_change_project'",
+          "steps": "1. Log in as a user without 'can_change_project'.\n2. Open a project detail page.",
+          "expected": "The Tags field and/or Save Tags button are not editable. Tags are shown in read-only mode."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRJ-700",
+      "name": "Activating & Deactivating Projects",
+      "test_cases": [
+        {
+          "id": "TC-PRJ-701",
+          "severity": "P0",
+          "scenario": "Toggling an active project opens a deactivate confirmation modal",
+          "steps": "1. Navigate to Projects.\n2. Click the 'Toggle' action on an active project.",
+          "expected": "A deactivate confirmation modal appears with the project name and a prompt to confirm deactivation."
+        },
+        {
+          "id": "TC-PRJ-702",
+          "severity": "P0",
+          "scenario": "Confirming deactivation marks the project as inactive",
+          "steps": "1. Click 'Toggle' on an active project.\n2. Confirm in the modal.",
+          "expected": "The project's status indicator changes to inactive. The row updates in the table. A success message is shown."
+        },
+        {
+          "id": "TC-PRJ-703",
+          "severity": "P0",
+          "scenario": "Toggling an inactive project opens an activate confirmation modal",
+          "steps": "1. Filter the list to show inactive projects.\n2. Click the 'Toggle' action on an inactive project.",
+          "expected": "An activate confirmation modal appears."
+        },
+        {
+          "id": "TC-PRJ-704",
+          "severity": "P0",
+          "scenario": "Confirming activation marks the project as active",
+          "steps": "1. Click 'Toggle' on an inactive project.\n2. Confirm in the modal.",
+          "expected": "The project is marked as active. The table updates. A success message is shown."
+        },
+        {
+          "id": "TC-PRJ-705",
+          "severity": "P1",
+          "scenario": "Cancelling the toggle modal makes no change",
+          "steps": "1. Click 'Toggle' on a project.\n2. Click 'Cancel' in the modal.",
+          "expected": "The modal closes. The project's active state is unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRJ-800",
+      "name": "Deleting a Project",
+      "test_cases": [
+        {
+          "id": "TC-PRJ-801",
+          "severity": "P0",
+          "scenario": "Clicking Delete opens a typed-confirmation delete modal",
+          "steps": "1. Navigate to Projects.\n2. Click the 'Delete' action on a project row.",
+          "expected": "A delete confirmation modal opens showing the project name and requiring confirmation."
+        },
+        {
+          "id": "TC-PRJ-802",
+          "severity": "P0",
+          "scenario": "Confirming deletion removes the project from the list",
+          "steps": "1. Click 'Delete' on a project.\n2. Confirm the deletion in the modal.",
+          "expected": "The project is removed. The table refreshes and the deleted project no longer appears. A success message is shown."
+        },
+        {
+          "id": "TC-PRJ-803",
+          "severity": "P1",
+          "scenario": "Cancelling the delete modal leaves the project intact",
+          "steps": "1. Click 'Delete' on a project.\n2. Click 'Cancel' in the modal.",
+          "expected": "The modal closes. The project remains in the list."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRJ-900",
+      "name": "Exporting Projects",
+      "test_cases": [
+        {
+          "id": "TC-PRJ-901",
+          "severity": "P1",
+          "scenario": "Export downloads a file containing project records",
+          "steps": "1. Navigate to Projects.\n2. Trigger the export (if an export button is available).\n3. Download the file.",
+          "expected": "A file is downloaded containing the project list with the expected columns (ID, Name, Programme, Type, Status, etc.)."
+        },
+        {
+          "id": "TC-PRJ-902",
+          "severity": "P2",
+          "scenario": "Export respects the active search and status filters",
+          "steps": "1. Apply a search filter on the Projects page.\n2. Trigger the export.",
+          "expected": "The exported file contains only projects matching the active filters."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRJ-1000",
+      "name": "Importing Projects",
+      "test_cases": [
+        {
+          "id": "TC-PRJ-1001",
+          "severity": "P1",
+          "scenario": "Import sample file can be downloaded for reference",
+          "steps": "1. Navigate to Projects.\n2. Open the import flow and download the sample file.",
+          "expected": "A sample file is downloaded with the correct column headers and example rows."
+        },
+        {
+          "id": "TC-PRJ-1002",
+          "severity": "P1",
+          "scenario": "Uploading a valid import file creates the projects",
+          "steps": "1. Prepare a valid import file based on the sample.\n2. Upload the file via the import flow.",
+          "expected": "Projects are created. A success summary shows how many were imported."
+        },
+        {
+          "id": "TC-PRJ-1003",
+          "severity": "P1",
+          "scenario": "Uploading a file with invalid rows reports row-level errors",
+          "steps": "1. Prepare an import file with some rows containing missing required fields.\n2. Upload the file.",
+          "expected": "Valid rows are imported. Invalid rows are reported with the row number and error details."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRJ-1100",
+      "name": "Non-Functional",
+      "test_cases": [
+        {
+          "id": "TC-PRJ-1101",
+          "severity": "P1",
+          "scenario": "Projects list loads within an acceptable time",
+          "steps": "1. Navigate to Projects when many projects exist.",
+          "expected": "The page and project list load within 3 seconds."
+        },
+        {
+          "id": "TC-PRJ-1102",
+          "severity": "P2",
+          "scenario": "Creating a project with the same name as an existing project is handled",
+          "steps": "1. Create a project.\n2. Attempt to create another project with the exact same name.",
+          "expected": "The system either allows it (if names are not unique-constrained) or displays a clear error. No silent failure."
+        },
+        {
+          "id": "TC-PRJ-1103",
+          "severity": "P2",
+          "scenario": "The project list does not show internal database IDs",
+          "steps": "1. Navigate to Projects.\n2. Inspect the ID column.",
+          "expected": "The ID column shows a human-readable project code (e.g. PRJ-001), not a raw integer database ID."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRJ-1200",
+      "name": "Desktop",
+      "test_cases": [
+        {
+          "id": "TC-PRJ-1201",
+          "severity": "P1",
+          "scenario": "All table columns are visible on desktop",
+          "steps": "1. Open Projects on a desktop browser (1280px+ wide).",
+          "expected": "All columns are visible: icon, ID, Name, Programme, Project Type, Status, Assigned Team, Confidence, Priority."
+        },
+        {
+          "id": "TC-PRJ-1202",
+          "severity": "P1",
+          "scenario": "Create drawer displays fields in a two-column grid on desktop",
+          "steps": "1. Open the create project drawer on a desktop browser.",
+          "expected": "Fields such as Project Type and Programme, Status and Sub-Status, etc. appear side-by-side in two columns."
+        },
+        {
+          "id": "TC-PRJ-1203",
+          "severity": "P2",
+          "scenario": "Project detail page shows a two-column layout on desktop",
+          "steps": "1. Open a project detail page on a desktop browser.",
+          "expected": "The General tab shows a two-column layout: General Information on the left, Tags on the right."
+        }
+      ]
+    },
+    {
+      "id": "TC-PRJ-1300",
+      "name": "Mobile",
+      "test_cases": [
+        {
+          "id": "TC-PRJ-1301",
+          "severity": "P1",
+          "scenario": "On mobile, only Name and Status columns are shown in the table",
+          "steps": "1. Open Projects on a mobile device or narrow viewport.",
+          "expected": "Only the icon/avatar, Name, and Status columns are visible. ID, Programme, Project Type, Assigned Team, Confidence, and Priority columns are hidden."
+        },
+        {
+          "id": "TC-PRJ-1302",
+          "severity": "P1",
+          "scenario": "Create drawer fields stack to full width on mobile",
+          "steps": "1. Open the create project drawer on a mobile device.",
+          "expected": "All form fields stack to full width. No fields overflow or are clipped."
+        },
+        {
+          "id": "TC-PRJ-1303",
+          "severity": "P2",
+          "scenario": "Search and filter controls are accessible on mobile",
+          "steps": "1. Open Projects on a mobile device.\n2. Tap the search field and apply a filter.",
+          "expected": "The search field and filter controls are easily tappable. Results update correctly."
+        },
+        {
+          "id": "TC-PRJ-1304",
+          "severity": "P2",
+          "scenario": "Project detail page stacks panels vertically on mobile",
+          "steps": "1. Open a project detail page on a mobile device.",
+          "expected": "The two-column layout collapses to a single column. All panels are readable without horizontal scrolling."
+        }
+      ]
+    }
+  ]
+}

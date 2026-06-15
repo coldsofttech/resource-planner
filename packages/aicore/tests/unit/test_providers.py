@@ -4,16 +4,18 @@ import json
 import unittest
 from unittest.mock import MagicMock, patch
 
+from aicore.providers.anthropic import AnthropicProvider
+from aicore.providers.bedrock import BedrockProvider
+from anthropic.types import TextBlock
+
 
 class TestAnthropicProvider(unittest.TestCase):
     @patch("aicore.providers.anthropic.anthropic.Anthropic")
     def test_complete_returns_stripped_text(self, mock_anthropic_cls):
-        from aicore.providers.anthropic import AnthropicProvider
-
         mock_client = MagicMock()
         mock_anthropic_cls.return_value = mock_client
         mock_client.messages.create.return_value = MagicMock(
-            content=[MagicMock(text="  MY_LABEL  ")]
+            content=[MagicMock(spec=TextBlock, text="  MY_LABEL  ")]
         )
 
         provider = AnthropicProvider(api_key="sk-ant-key", model="claude-sonnet-4")
@@ -28,8 +30,6 @@ class TestAnthropicProvider(unittest.TestCase):
 
     @patch("aicore.providers.anthropic.anthropic.Anthropic")
     def test_client_initialised_with_api_key(self, mock_anthropic_cls):
-        from aicore.providers.anthropic import AnthropicProvider
-
         AnthropicProvider(api_key="sk-ant-test", model="model")
         mock_anthropic_cls.assert_called_once_with(api_key="sk-ant-test")
 
@@ -37,8 +37,6 @@ class TestAnthropicProvider(unittest.TestCase):
 class TestBedrockProvider(unittest.TestCase):
     @patch("aicore.providers.bedrock.boto3.client")
     def test_complete_returns_stripped_text(self, mock_boto_client):
-        from aicore.providers.bedrock import BedrockProvider
-
         mock_client = MagicMock()
         mock_boto_client.return_value = mock_client
         body_bytes = json.dumps({"content": [{"text": "  BEDROCK_LABEL  "}]}).encode()
@@ -60,8 +58,6 @@ class TestBedrockProvider(unittest.TestCase):
 
     @patch("aicore.providers.bedrock.boto3.client")
     def test_role_auth_does_not_pass_credentials(self, mock_boto_client):
-        from aicore.providers.bedrock import BedrockProvider
-
         BedrockProvider(model="model", region="us-east-1", auth_mode="role")
         _, kwargs = mock_boto_client.call_args
         self.assertNotIn("aws_access_key_id", kwargs)
@@ -69,8 +65,6 @@ class TestBedrockProvider(unittest.TestCase):
 
     @patch("aicore.providers.bedrock.boto3.client")
     def test_user_auth_passes_credentials(self, mock_boto_client):
-        from aicore.providers.bedrock import BedrockProvider
-
         BedrockProvider(
             model="model",
             region="us-east-1",

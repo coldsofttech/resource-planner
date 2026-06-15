@@ -1,0 +1,1001 @@
+{
+  "module": {
+    "slug": "locations",
+    "name": "Locations",
+    "sort_order": 40,
+    "parent": {
+      "slug": "organisation",
+      "name": "Organisation",
+      "sort_order": 1
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-LC-100",
+      "name": "Page Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-LC-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user is redirected away from the Locations page",
+          "steps": "1. Open a browser with no active session.\n2. Navigate directly to /locations/.",
+          "expected": "The user is redirected to the login page and the Locations page is not shown."
+        },
+        {
+          "id": "TC-LC-102",
+          "severity": "P0",
+          "scenario": "Authenticated user with view permission can access the Locations page",
+          "steps": "1. Log in as a user who has permission to view locations.\n2. Navigate to Configurations > Locations.",
+          "expected": "The Locations page loads successfully showing the title 'Locations', eyebrow 'Configurations', and the data table."
+        },
+        {
+          "id": "TC-LC-103",
+          "severity": "P1",
+          "scenario": "Add Location button is hidden for users without create permission",
+          "steps": "1. Log in as a user who does NOT have permission to create locations.\n2. Navigate to the Locations page.",
+          "expected": "The 'Add Location' button is not visible on the page."
+        },
+        {
+          "id": "TC-LC-104",
+          "severity": "P1",
+          "scenario": "Add Location button is visible for users with create permission",
+          "steps": "1. Log in as a user who has permission to create locations.\n2. Navigate to the Locations page.",
+          "expected": "The 'Add Location' button is visible in the top-right action area."
+        },
+        {
+          "id": "TC-LC-105",
+          "severity": "P1",
+          "scenario": "Edit and Toggle actions are hidden for users without change permission",
+          "steps": "1. Log in as a user who does NOT have permission to change locations.\n2. Navigate to the Locations page.\n3. Observe the row action buttons.",
+          "expected": "The Edit (pencil) and Toggle (activate/deactivate) action buttons are not shown on any row."
+        },
+        {
+          "id": "TC-LC-106",
+          "severity": "P1",
+          "scenario": "Delete action is hidden for users without delete permission",
+          "steps": "1. Log in as a user who does NOT have permission to delete locations.\n2. Navigate to the Locations page.\n3. Observe the row action buttons.",
+          "expected": "The Delete (bin) action button is not visible on any row."
+        },
+        {
+          "id": "TC-LC-107",
+          "severity": "P1",
+          "scenario": "Import and Export buttons are hidden for users without the relevant permission",
+          "steps": "1. Log in as a user without import or export permissions.\n2. Navigate to the Locations page.",
+          "expected": "The Import and Export buttons are not visible in the page header."
+        },
+        {
+          "id": "TC-LC-108",
+          "severity": "P2",
+          "scenario": "Page subtitle is correct",
+          "steps": "1. Log in and navigate to the Locations page.",
+          "expected": "The subtitle reads 'Manage office and delivery locations for your organisation.'"
+        }
+      ]
+    },
+    {
+      "id": "TC-LC-200",
+      "name": "Browsing & Discovering Locations",
+      "test_cases": [
+        {
+          "id": "TC-LC-201",
+          "severity": "P1",
+          "scenario": "Locations list loads with active locations shown by default",
+          "steps": "1. Navigate to the Locations page.\n2. Observe the table on first load.",
+          "expected": "The table displays active locations by default. The Status filter is pre-set to 'Active'."
+        },
+        {
+          "id": "TC-LC-202",
+          "severity": "P1",
+          "scenario": "Locations table shows the correct columns",
+          "steps": "1. Navigate to the Locations page.\n2. Observe the column headers in the table.",
+          "expected": "The table displays columns: City, Country, Code, Default, Status, Created."
+        },
+        {
+          "id": "TC-LC-203",
+          "severity": "P1",
+          "scenario": "Searching for a location by city name filters the table",
+          "steps": "1. Navigate to the Locations page.\n2. Type a partial city name into the search field.\n3. Wait for the table to update.",
+          "expected": "The table updates to show only locations whose city name matches the search term."
+        },
+        {
+          "id": "TC-LC-204",
+          "severity": "P2",
+          "scenario": "Searching by country name filters the table",
+          "steps": "1. Navigate to the Locations page.\n2. Type a partial country name (e.g. 'United') into the search field.",
+          "expected": "The table updates to show locations in countries matching the search term."
+        },
+        {
+          "id": "TC-LC-205",
+          "severity": "P2",
+          "scenario": "Search field can be focused with the / shortcut key",
+          "steps": "1. Navigate to the Locations page.\n2. Press the '/' key on the keyboard.",
+          "expected": "The search input field receives focus automatically."
+        },
+        {
+          "id": "TC-LC-206",
+          "severity": "P1",
+          "scenario": "Status filter shows all locations when set to 'All'",
+          "steps": "1. Navigate to the Locations page.\n2. Change the Status filter to 'All'.",
+          "expected": "The table displays both active and inactive locations."
+        },
+        {
+          "id": "TC-LC-207",
+          "severity": "P1",
+          "scenario": "Status filter shows only inactive locations when set to 'Inactive'",
+          "steps": "1. Navigate to the Locations page.\n2. Change the Status filter to 'Inactive'.",
+          "expected": "The table displays only inactive locations."
+        },
+        {
+          "id": "TC-LC-208",
+          "severity": "P2",
+          "scenario": "Searching for a value with no matches shows the empty state",
+          "steps": "1. Navigate to the Locations page.\n2. Type a search term that matches no locations (e.g. 'zzznomatch').",
+          "expected": "The table shows the empty message 'No locations found.' and no data rows are displayed."
+        },
+        {
+          "id": "TC-LC-209",
+          "severity": "P2",
+          "scenario": "Clicking a location row opens the view drawer",
+          "steps": "1. Navigate to the Locations page.\n2. Click on a location row (not on an action button).",
+          "expected": "A view drawer slides in from the right showing the location's details."
+        },
+        {
+          "id": "TC-LC-210",
+          "severity": "P2",
+          "scenario": "Table is sortable by City and Country columns",
+          "steps": "1. Navigate to the Locations page.\n2. Click the 'City' column header.\n3. Then click the 'Country' column header.",
+          "expected": "The table re-sorts rows by the selected column. Clicking the same column again reverses the sort order."
+        }
+      ]
+    },
+    {
+      "id": "TC-LC-300",
+      "name": "Creating a Location",
+      "test_cases": [
+        {
+          "id": "TC-LC-301",
+          "severity": "P1",
+          "scenario": "Clicking Add Location opens the create drawer",
+          "steps": "1. Navigate to the Locations page.\n2. Click the 'Add Location' button.",
+          "expected": "The Create location drawer slides in from the right with the title 'Create location' and eyebrow 'New record'."
+        },
+        {
+          "id": "TC-LC-302",
+          "severity": "P0",
+          "scenario": "A location can be created with City and Country",
+          "steps": "1. Open the Create location drawer.\n2. Enter a unique city name in the City field.\n3. Enter a country name in the Country field.\n4. Click 'Create location'.",
+          "expected": "The drawer closes, a success toast appears, and the new location appears in the table with both City and Country shown."
+        },
+        {
+          "id": "TC-LC-303",
+          "severity": "P1",
+          "scenario": "City is a required field",
+          "steps": "1. Open the Create location drawer.\n2. Leave the City field empty.\n3. Enter a country.\n4. Click 'Create location'.",
+          "expected": "An inline validation error appears below the City field. The drawer remains open and the location is not created."
+        },
+        {
+          "id": "TC-LC-304",
+          "severity": "P1",
+          "scenario": "Country is a required field",
+          "steps": "1. Open the Create location drawer.\n2. Enter a city name.\n3. Leave the Country field empty.\n4. Click 'Create location'.",
+          "expected": "An inline validation error appears below the Country field. The drawer remains open and the location is not created."
+        },
+        {
+          "id": "TC-LC-305",
+          "severity": "P1",
+          "scenario": "Both City and Country show errors when both fields are empty",
+          "steps": "1. Open the Create location drawer.\n2. Leave both City and Country fields empty.\n3. Click 'Create location'.",
+          "expected": "Inline validation errors appear below both the City and Country fields."
+        },
+        {
+          "id": "TC-LC-306",
+          "severity": "P1",
+          "scenario": "City field enforces a maximum length of 100 characters",
+          "steps": "1. Open the Create location drawer.\n2. Type or paste a string of 101 characters into the City field.",
+          "expected": "The field does not accept more than 100 characters. The character counter shows '100/100' at the limit."
+        },
+        {
+          "id": "TC-LC-307",
+          "severity": "P1",
+          "scenario": "Country field enforces a maximum length of 100 characters",
+          "steps": "1. Open the Create location drawer.\n2. Type or paste a string of 101 characters into the Country field.",
+          "expected": "The field does not accept more than 100 characters. The character counter shows '100/100' at the limit."
+        },
+        {
+          "id": "TC-LC-308",
+          "severity": "P2",
+          "scenario": "Character counters update in real time for both City and Country fields",
+          "steps": "1. Open the Create location drawer.\n2. Type a 6-character city name.\n3. Type a 14-character country name.",
+          "expected": "The City counter shows '6/100' and the Country counter shows '14/100' as characters are typed."
+        },
+        {
+          "id": "TC-LC-309",
+          "severity": "P1",
+          "scenario": "Duplicate city and country combination is rejected",
+          "steps": "1. Open the Create location drawer.\n2. Enter a city and country combination that already exists.\n3. Click 'Create location'.",
+          "expected": "An error message is shown indicating a location with that city and country already exists. The location is not created."
+        },
+        {
+          "id": "TC-LC-310",
+          "severity": "P2",
+          "scenario": "Same city name is allowed in different countries",
+          "steps": "1. Ensure a location 'London, United Kingdom' already exists.\n2. Create a new location with City 'London' and Country 'Canada'.",
+          "expected": "The location 'London, Canada' is created successfully. No conflict error is shown."
+        },
+        {
+          "id": "TC-LC-311",
+          "severity": "P2",
+          "scenario": "Newly created location is assigned a unique Code automatically",
+          "steps": "1. Create a new location with valid City and Country.\n2. Observe the Code column in the table for the new row.",
+          "expected": "The new location has a system-generated code shown in the Code column (e.g. 'LOC-001')."
+        },
+        {
+          "id": "TC-LC-312",
+          "severity": "P2",
+          "scenario": "Clicking Cancel on the create drawer discards the form",
+          "steps": "1. Open the Create location drawer.\n2. Enter a city and country.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. No location is created. The table is unchanged."
+        },
+        {
+          "id": "TC-LC-313",
+          "severity": "P2",
+          "scenario": "Newly created location is active by default",
+          "steps": "1. Create a new location.\n2. Observe the Status column in the table.",
+          "expected": "The new location shows an 'Active' status badge."
+        },
+        {
+          "id": "TC-LC-314",
+          "severity": "P2",
+          "scenario": "Create location button shows a loading state during submission",
+          "steps": "1. Open the Create location drawer.\n2. Enter valid City and Country.\n3. Click 'Create location' and immediately observe the button.",
+          "expected": "The 'Create location' button shows a loading indicator and is disabled while the request is in progress."
+        }
+      ]
+    },
+    {
+      "id": "TC-LC-400",
+      "name": "Location Detail Page",
+      "test_cases": [
+        {
+          "id": "TC-LC-401",
+          "severity": "P1",
+          "scenario": "Clicking a location row navigates to the location detail page",
+          "steps": "1. Navigate to the Locations page.\n2. Click on a location name link or the row.",
+          "expected": "The browser navigates to /locations/<code>/ and the detail page for that location is displayed."
+        },
+        {
+          "id": "TC-LC-402",
+          "severity": "P1",
+          "scenario": "Location detail page displays the correct information panel",
+          "steps": "1. Navigate to a location's detail page.",
+          "expected": "The left panel shows: City, Country, Code (code style), Status, Created date, and Created by."
+        },
+        {
+          "id": "TC-LC-403",
+          "severity": "P1",
+          "scenario": "Location detail page shows members based at this location",
+          "steps": "1. Navigate to the detail page of a location that has members assigned.\n2. Observe the right-hand Members panel.",
+          "expected": "A 'Members' panel is shown on the right with a table listing people based at this location."
+        },
+        {
+          "id": "TC-LC-404",
+          "severity": "P1",
+          "scenario": "Members table shows correct columns on the detail page",
+          "steps": "1. Navigate to a location detail page that has at least one member.\n2. Observe the members table column headers.",
+          "expected": "The members table shows columns: Name, Email, Role, and Employment Type."
+        },
+        {
+          "id": "TC-LC-405",
+          "severity": "P2",
+          "scenario": "Members panel is hidden when no members are based at this location",
+          "steps": "1. Navigate to the detail page of a location that has no assigned members.",
+          "expected": "The Members panel is not displayed. Only the left information panel is visible."
+        },
+        {
+          "id": "TC-LC-406",
+          "severity": "P2",
+          "scenario": "Empty state message shown when members panel has no results",
+          "steps": "1. Navigate to a location detail page where the members API returns no results.",
+          "expected": "The members table shows the message 'No members are based at this location.'"
+        },
+        {
+          "id": "TC-LC-407",
+          "severity": "P2",
+          "scenario": "Members table can be sorted by Name on the detail page",
+          "steps": "1. Navigate to a location detail page with multiple members.\n2. Click the 'Name' column header.",
+          "expected": "The members table re-sorts alphabetically by name. Clicking again reverses the order."
+        },
+        {
+          "id": "TC-LC-408",
+          "severity": "P2",
+          "scenario": "Page title on detail page reflects the location name",
+          "steps": "1. Navigate to the detail page of a location with City 'London' and Country 'United Kingdom'.",
+          "expected": "The page title updates to include 'London' (and optionally country) after the location data loads."
+        },
+        {
+          "id": "TC-LC-409",
+          "severity": "P2",
+          "scenario": "Members can be paginated on the detail page members table",
+          "steps": "1. Navigate to a location detail page that has more than 25 assigned members.\n2. Observe the pagination controls below the members table.",
+          "expected": "Pagination controls appear and allow the user to navigate through pages of members."
+        }
+      ]
+    },
+    {
+      "id": "TC-LC-500",
+      "name": "Editing a Location",
+      "test_cases": [
+        {
+          "id": "TC-LC-501",
+          "severity": "P1",
+          "scenario": "Clicking the Edit action opens the edit drawer pre-populated",
+          "steps": "1. Navigate to the Locations page.\n2. Click the Edit (pencil) action on a location row.",
+          "expected": "The edit drawer slides in pre-populated with that location's current City and Country values."
+        },
+        {
+          "id": "TC-LC-502",
+          "severity": "P0",
+          "scenario": "City can be updated successfully",
+          "steps": "1. Open the edit drawer for an existing location.\n2. Clear the City field and enter a new city name.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes, a success toast appears, and the updated city name is shown in the table row."
+        },
+        {
+          "id": "TC-LC-503",
+          "severity": "P0",
+          "scenario": "Country can be updated successfully",
+          "steps": "1. Open the edit drawer for an existing location.\n2. Clear the Country field and enter a new country name.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes, a success toast appears, and the updated country is reflected in the table."
+        },
+        {
+          "id": "TC-LC-504",
+          "severity": "P1",
+          "scenario": "Clearing the City field and saving shows a validation error",
+          "steps": "1. Open the edit drawer for an existing location.\n2. Clear the City field.\n3. Click 'Save changes'.",
+          "expected": "An inline error appears below the City field. The change is not saved."
+        },
+        {
+          "id": "TC-LC-505",
+          "severity": "P1",
+          "scenario": "Clearing the Country field and saving shows a validation error",
+          "steps": "1. Open the edit drawer for an existing location.\n2. Clear the Country field.\n3. Click 'Save changes'.",
+          "expected": "An inline error appears below the Country field. The change is not saved."
+        },
+        {
+          "id": "TC-LC-506",
+          "severity": "P1",
+          "scenario": "Editing to a duplicate city and country combination shows a conflict error",
+          "steps": "1. Open the edit drawer for Location A.\n2. Change the City and Country to match the existing values of Location B.\n3. Click 'Save changes'.",
+          "expected": "An error message is shown indicating a location with that city and country already exists. The change is not saved."
+        },
+        {
+          "id": "TC-LC-507",
+          "severity": "P2",
+          "scenario": "Saving with the same city and country does not cause a conflict error",
+          "steps": "1. Open the edit drawer for a location.\n2. Do not change the City or Country.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes with a success toast. No conflict error is shown."
+        },
+        {
+          "id": "TC-LC-508",
+          "severity": "P1",
+          "scenario": "City and Country fields enforce 100-character limits in the edit drawer",
+          "steps": "1. Open the edit drawer for an existing location.\n2. Paste a 101-character string into City and then Country.",
+          "expected": "Neither field accepts more than 100 characters. Both counters show '100/100'."
+        },
+        {
+          "id": "TC-LC-509",
+          "severity": "P2",
+          "scenario": "Clicking Cancel on the edit drawer discards changes",
+          "steps": "1. Open the edit drawer for a location.\n2. Modify the City field.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. The location's city in the table is unchanged."
+        },
+        {
+          "id": "TC-LC-510",
+          "severity": "P2",
+          "scenario": "Save changes button shows a loading state during submission",
+          "steps": "1. Open the edit drawer for a location.\n2. Change the city name.\n3. Click 'Save changes' and observe the button.",
+          "expected": "The 'Save changes' button shows a loading indicator and is disabled while the request is processing."
+        }
+      ]
+    },
+    {
+      "id": "TC-LC-600",
+      "name": "Activating & Deactivating a Location",
+      "test_cases": [
+        {
+          "id": "TC-LC-601",
+          "severity": "P1",
+          "scenario": "An active location can be deactivated via the Toggle action",
+          "steps": "1. Navigate to the Locations page.\n2. Find an active location.\n3. Click the Toggle action on that row.",
+          "expected": "A deactivate confirmation modal appears asking the user to confirm deactivation."
+        },
+        {
+          "id": "TC-LC-602",
+          "severity": "P0",
+          "scenario": "Confirming deactivation changes the location status to Inactive",
+          "steps": "1. Click the Toggle action on an active location.\n2. In the deactivate modal, click the confirm button.",
+          "expected": "The modal closes, a success toast appears, and the location's status badge changes to 'Inactive'."
+        },
+        {
+          "id": "TC-LC-603",
+          "severity": "P2",
+          "scenario": "Cancelling the deactivate modal leaves the location active",
+          "steps": "1. Click the Toggle action on an active location.\n2. Click 'Cancel' in the deactivate modal.",
+          "expected": "The modal closes. The location remains active and unchanged."
+        },
+        {
+          "id": "TC-LC-604",
+          "severity": "P1",
+          "scenario": "An inactive location can be activated via the Toggle action",
+          "steps": "1. Navigate to the Locations page (Status filter set to All or Inactive).\n2. Find an inactive location.\n3. Click the Toggle action on that row.",
+          "expected": "An activate confirmation modal appears asking the user to confirm activation."
+        },
+        {
+          "id": "TC-LC-605",
+          "severity": "P0",
+          "scenario": "Confirming activation changes the location status to Active",
+          "steps": "1. Click the Toggle action on an inactive location.\n2. In the activate modal, click the confirm button.",
+          "expected": "The modal closes, a success toast appears, and the location's status badge changes to 'Active'."
+        },
+        {
+          "id": "TC-LC-606",
+          "severity": "P2",
+          "scenario": "Cancelling the activate modal leaves the location inactive",
+          "steps": "1. Click the Toggle action on an inactive location.\n2. Click 'Cancel' in the activate modal.",
+          "expected": "The modal closes. The location remains inactive and unchanged."
+        },
+        {
+          "id": "TC-LC-607",
+          "severity": "P2",
+          "scenario": "Deactivating a location removes it from the default Active filter view",
+          "steps": "1. Ensure the Status filter is set to 'Active'.\n2. Deactivate a location currently shown in the table.\n3. Confirm deactivation.",
+          "expected": "After deactivation, the location disappears from the table since it is no longer active."
+        },
+        {
+          "id": "TC-LC-608",
+          "severity": "P2",
+          "scenario": "Toggle action icon reflects the current active state of a location",
+          "steps": "1. Navigate to the Locations page with Status filter set to 'All'.\n2. Observe the Toggle action icon for active vs inactive locations.",
+          "expected": "The toggle icon appears in a different colour or style depending on whether the location is active or inactive."
+        }
+      ]
+    },
+    {
+      "id": "TC-LC-700",
+      "name": "Set as Default Location",
+      "test_cases": [
+        {
+          "id": "TC-LC-701",
+          "severity": "P1",
+          "scenario": "'Set as Default' action is visible only for non-default locations",
+          "steps": "1. Navigate to the Locations page.\n2. Observe the action buttons for a location that is NOT the current default.\n3. Then observe the action buttons for the current default location.",
+          "expected": "The 'Set as Default' (star) action is shown for non-default locations and is hidden for the location already set as default."
+        },
+        {
+          "id": "TC-LC-702",
+          "severity": "P0",
+          "scenario": "Clicking Set as Default opens a confirmation modal",
+          "steps": "1. Find a non-default location.\n2. Click the 'Set as Default' (star) action on that row.",
+          "expected": "A confirmation modal appears asking the user to confirm setting this location as the default."
+        },
+        {
+          "id": "TC-LC-703",
+          "severity": "P0",
+          "scenario": "Confirming Set as Default updates the Default column",
+          "steps": "1. Click 'Set as Default' on a non-default location.\n2. Confirm in the modal.",
+          "expected": "The modal closes, a success toast appears, and the 'Default' column for that location now shows a positive indicator. The previously default location's Default column reverts."
+        },
+        {
+          "id": "TC-LC-704",
+          "severity": "P2",
+          "scenario": "Cancelling the Set as Default modal makes no change",
+          "steps": "1. Click 'Set as Default' on a non-default location.\n2. Click 'Cancel' in the confirmation modal.",
+          "expected": "The modal closes. The default location is unchanged. The Default column reflects no change."
+        },
+        {
+          "id": "TC-LC-705",
+          "severity": "P1",
+          "scenario": "Only one location can be the default at a time",
+          "steps": "1. Set Location A as the default.\n2. Then set Location B as the default.\n3. Observe the Default column for both locations.",
+          "expected": "Location B is now marked as default and Location A's default marker is removed. Only one location has the default indicator."
+        },
+        {
+          "id": "TC-LC-706",
+          "severity": "P2",
+          "scenario": "Set as Default confirmation modal displays the location name",
+          "steps": "1. Click 'Set as Default' on a location named 'London, United Kingdom'.\n2. Read the confirmation modal text.",
+          "expected": "The modal title or body includes the location name so the user can confirm the correct location."
+        },
+        {
+          "id": "TC-LC-707",
+          "severity": "P2",
+          "scenario": "Default indicator is visible in the table Default column",
+          "steps": "1. Navigate to the Locations page.\n2. Observe the Default column for the current default location.",
+          "expected": "The default location displays a clear visual indicator (e.g. checkmark, badge) in the Default column."
+        },
+        {
+          "id": "TC-LC-708",
+          "severity": "P3",
+          "scenario": "The default location pre-fills when adding a new member",
+          "steps": "1. Set a location as the default.\n2. Navigate to the People or Team Members module.\n3. Open the form to add a new member.",
+          "expected": "The location field in the add member form defaults to the location marked as Default."
+        }
+      ]
+    },
+    {
+      "id": "TC-LC-800",
+      "name": "Deleting a Location",
+      "test_cases": [
+        {
+          "id": "TC-LC-801",
+          "severity": "P1",
+          "scenario": "Clicking the Delete action opens a confirmation modal",
+          "steps": "1. Navigate to the Locations page.\n2. Click the Delete (bin) action on a location row.",
+          "expected": "A delete confirmation modal appears with the location name and a typed-confirmation input field."
+        },
+        {
+          "id": "TC-LC-802",
+          "severity": "P0",
+          "scenario": "A location is permanently deleted after typed confirmation",
+          "steps": "1. Click Delete on a location.\n2. Type the location name exactly as shown in the confirmation field.\n3. Click 'Delete location'.",
+          "expected": "The modal closes, a success toast appears, and the location is removed from the table."
+        },
+        {
+          "id": "TC-LC-803",
+          "severity": "P1",
+          "scenario": "Delete button in modal is disabled until the correct name is typed",
+          "steps": "1. Click Delete on a location.\n2. Leave the confirmation field empty or type an incorrect value.\n3. Observe the 'Delete location' button.",
+          "expected": "The 'Delete location' button remains disabled until the exact location name is typed into the confirmation field."
+        },
+        {
+          "id": "TC-LC-804",
+          "severity": "P2",
+          "scenario": "Cancelling the delete modal leaves the location intact",
+          "steps": "1. Click Delete on a location.\n2. Click 'Cancel' in the confirmation modal.",
+          "expected": "The modal closes. The location remains in the table and is not deleted."
+        },
+        {
+          "id": "TC-LC-805",
+          "severity": "P1",
+          "scenario": "Typed confirmation is case-sensitive",
+          "steps": "1. Click Delete on a location whose name contains mixed case (e.g. 'London').\n2. Type 'london' (all lowercase) in the confirmation field.\n3. Observe whether the Delete button becomes enabled.",
+          "expected": "The 'Delete location' button remains disabled when the case does not match exactly."
+        },
+        {
+          "id": "TC-LC-806",
+          "severity": "P2",
+          "scenario": "Delete modal shows the location name to be typed",
+          "steps": "1. Click Delete on a location with City 'New York' and Country 'United States'.\n2. Read the delete confirmation modal.",
+          "expected": "The modal shows the expected text to type (e.g. the city name or a City, Country format) to confirm the deletion."
+        },
+        {
+          "id": "TC-LC-807",
+          "severity": "P2",
+          "scenario": "Deleted location no longer appears in the table",
+          "steps": "1. Delete a location that is currently visible in the table.\n2. Observe the table after deletion.",
+          "expected": "The deleted location row disappears from the table immediately after the success toast."
+        },
+        {
+          "id": "TC-LC-808",
+          "severity": "P3",
+          "scenario": "Delete modal warns that the action is permanent",
+          "steps": "1. Click Delete on any location.\n2. Read the body text of the confirmation modal.",
+          "expected": "The modal body text warns the user that this action is permanent and cannot be undone."
+        }
+      ]
+    },
+    {
+      "id": "TC-LC-900",
+      "name": "Importing Locations",
+      "test_cases": [
+        {
+          "id": "TC-LC-901",
+          "severity": "P1",
+          "scenario": "Clicking Import opens the import view",
+          "steps": "1. Navigate to the Locations page.\n2. Click the 'Import' button.",
+          "expected": "The import view or panel opens, allowing the user to upload a file."
+        },
+        {
+          "id": "TC-LC-902",
+          "severity": "P1",
+          "scenario": "A sample CSV file can be downloaded from the import view",
+          "steps": "1. Open the import view.\n2. Click the link or button to download the sample CSV.",
+          "expected": "A CSV file is downloaded with the correct column headers for locations (e.g. city, country, is_active)."
+        },
+        {
+          "id": "TC-LC-903",
+          "severity": "P0",
+          "scenario": "A valid CSV file with new locations can be imported successfully",
+          "steps": "1. Prepare a CSV file with valid location data (city and country in each row).\n2. Open the import view and upload the file.\n3. Complete the import process.",
+          "expected": "The import completes and a success message is shown. The imported locations appear in the table."
+        },
+        {
+          "id": "TC-LC-904",
+          "severity": "P1",
+          "scenario": "Upload field rejects non-CSV file types",
+          "steps": "1. Open the import view.\n2. Attempt to upload a file with a non-CSV extension (e.g. .xlsx or .pdf).",
+          "expected": "The import view rejects the file and shows an error indicating only CSV files are accepted."
+        },
+        {
+          "id": "TC-LC-905",
+          "severity": "P1",
+          "scenario": "Importing a CSV missing the 'city' column shows an error",
+          "steps": "1. Prepare a CSV file without the 'city' column.\n2. Upload it in the import view.",
+          "expected": "The import fails with a clear message identifying the missing required column."
+        },
+        {
+          "id": "TC-LC-906",
+          "severity": "P1",
+          "scenario": "Importing a CSV missing the 'country' column shows an error",
+          "steps": "1. Prepare a CSV file without the 'country' column.\n2. Upload it in the import view.",
+          "expected": "The import fails with a clear message identifying the missing required column."
+        },
+        {
+          "id": "TC-LC-907",
+          "severity": "P1",
+          "scenario": "Importing a CSV with a city name exceeding 100 characters shows a row-level error",
+          "steps": "1. Prepare a CSV with one row where the city name is 101+ characters.\n2. Import the file.",
+          "expected": "The import reports an error for that row indicating the city name is too long."
+        },
+        {
+          "id": "TC-LC-908",
+          "severity": "P1",
+          "scenario": "Importing a duplicate city and country combination shows a row-level conflict",
+          "steps": "1. Prepare a CSV with a city/country pair that already exists.\n2. Import the file.",
+          "expected": "The import reports a conflict or skip message for that row. No duplicate location is created."
+        },
+        {
+          "id": "TC-LC-909",
+          "severity": "P2",
+          "scenario": "An empty CSV file shows an appropriate error",
+          "steps": "1. Create a CSV file with only the header row or completely empty.\n2. Upload it in the import view.",
+          "expected": "The import view shows a message indicating no data rows were found or the file is empty."
+        },
+        {
+          "id": "TC-LC-910",
+          "severity": "P2",
+          "scenario": "Import result shows a summary of imported and failed rows",
+          "steps": "1. Import a CSV with some valid and some invalid rows.\n2. Observe the result screen.",
+          "expected": "The result shows how many locations were imported successfully and how many failed, with reasons for failures."
+        },
+        {
+          "id": "TC-LC-911",
+          "severity": "P2",
+          "scenario": "After a successful import, the locations table refreshes automatically",
+          "steps": "1. Import a valid CSV file with new locations.\n2. Close the import view and observe the table.",
+          "expected": "The data table refreshes and the newly imported locations are visible without manually reloading the page."
+        },
+        {
+          "id": "TC-LC-912",
+          "severity": "P3",
+          "scenario": "Importing locations with special characters in city names works correctly",
+          "steps": "1. Prepare a CSV with a city name containing special characters (e.g. 'São Paulo' or 'München').\n2. Import the file.",
+          "expected": "The location is imported successfully and the city name displays correctly with its special characters."
+        }
+      ]
+    },
+    {
+      "id": "TC-LC-1000",
+      "name": "Exporting Locations",
+      "test_cases": [
+        {
+          "id": "TC-LC-1001",
+          "severity": "P1",
+          "scenario": "Clicking Export opens the export view",
+          "steps": "1. Navigate to the Locations page.\n2. Click the 'Export' button.",
+          "expected": "The export configuration panel opens, allowing the user to select fields and format."
+        },
+        {
+          "id": "TC-LC-1002",
+          "severity": "P0",
+          "scenario": "Locations can be exported to CSV",
+          "steps": "1. Open the export view.\n2. Select CSV as the export format.\n3. Choose at least one field.\n4. Click Export.",
+          "expected": "A CSV file is downloaded containing the selected location data."
+        },
+        {
+          "id": "TC-LC-1003",
+          "severity": "P1",
+          "scenario": "Exported CSV contains the expected location data",
+          "steps": "1. Export locations to CSV with all fields selected.\n2. Open the downloaded file.",
+          "expected": "The CSV contains a header row and data rows for each location, with City, Country, Code, and Status values matching the table."
+        },
+        {
+          "id": "TC-LC-1004",
+          "severity": "P1",
+          "scenario": "Export respects the active status filter",
+          "steps": "1. Set the Status filter to 'Active' on the Locations page.\n2. Open the export view and export.",
+          "expected": "The exported file contains only active locations."
+        },
+        {
+          "id": "TC-LC-1005",
+          "severity": "P2",
+          "scenario": "Export respects the current search filter",
+          "steps": "1. Enter a search term on the Locations page to filter locations.\n2. Open the export view and export.",
+          "expected": "The exported file contains only locations matching the current search term."
+        },
+        {
+          "id": "TC-LC-1006",
+          "severity": "P2",
+          "scenario": "User can select which fields to include in the export",
+          "steps": "1. Open the export view.\n2. Deselect one or more fields.\n3. Export.",
+          "expected": "The downloaded file contains only the selected fields as columns."
+        },
+        {
+          "id": "TC-LC-1007",
+          "severity": "P2",
+          "scenario": "Exported file includes both City and Country columns",
+          "steps": "1. Open the export view and select all fields.\n2. Export to CSV.\n3. Open the file.",
+          "expected": "The CSV includes separate columns for City and Country with correct values."
+        },
+        {
+          "id": "TC-LC-1008",
+          "severity": "P3",
+          "scenario": "Closing the export view without exporting makes no change",
+          "steps": "1. Open the export view.\n2. Close it without clicking Export.",
+          "expected": "No file is downloaded. The Locations table is unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-LC-1100",
+      "name": "Non-Functional & Accessibility",
+      "test_cases": [
+        {
+          "id": "TC-LC-1101",
+          "severity": "P1",
+          "scenario": "All interactive elements on the Locations page are keyboard accessible",
+          "steps": "1. Navigate to the Locations page.\n2. Use only the Tab key to move through all interactive elements.\n3. Use Enter/Space to activate buttons.",
+          "expected": "All buttons, filters, table actions, and drawer controls can be reached and activated via keyboard."
+        },
+        {
+          "id": "TC-LC-1102",
+          "severity": "P1",
+          "scenario": "Create location drawer can be completed entirely via keyboard",
+          "steps": "1. Open the create drawer using the keyboard.\n2. Tab to the City field and type a city.\n3. Tab to the Country field and type a country.\n4. Tab to 'Create location' and press Enter.",
+          "expected": "The location is created successfully using keyboard navigation only."
+        },
+        {
+          "id": "TC-LC-1103",
+          "severity": "P2",
+          "scenario": "Focus is trapped inside the create or edit drawer while it is open",
+          "steps": "1. Open the create location drawer.\n2. Press Tab repeatedly.",
+          "expected": "Focus cycles only through elements within the drawer. Focus does not escape to the page behind."
+        },
+        {
+          "id": "TC-LC-1104",
+          "severity": "P2",
+          "scenario": "Closing a drawer returns focus to the element that opened it",
+          "steps": "1. Click 'Add Location' to open the create drawer.\n2. Click 'Cancel' to close it.",
+          "expected": "Focus returns to the 'Add Location' button after the drawer closes."
+        },
+        {
+          "id": "TC-LC-1105",
+          "severity": "P2",
+          "scenario": "Success and error toast notifications are announced to screen readers",
+          "steps": "1. Create a location with a screen reader active.\n2. Listen for announcements after submission.",
+          "expected": "The success toast message is announced by the screen reader when it appears."
+        },
+        {
+          "id": "TC-LC-1106",
+          "severity": "P1",
+          "scenario": "Locations page loads within an acceptable time with a moderate dataset",
+          "steps": "1. Ensure the system has at least 50 locations.\n2. Navigate to the Locations page and measure load time.",
+          "expected": "The page and table load within 3 seconds on a standard connection."
+        },
+        {
+          "id": "TC-LC-1107",
+          "severity": "P2",
+          "scenario": "Pagination controls work correctly on the Locations table",
+          "steps": "1. Ensure more than 25 locations exist.\n2. Navigate to the Locations page.\n3. Use the pagination controls to go to the next page.",
+          "expected": "The table shows the next page of locations. The current page indicator updates correctly."
+        },
+        {
+          "id": "TC-LC-1108",
+          "severity": "P2",
+          "scenario": "Locations page works correctly in both light and dark themes",
+          "steps": "1. Navigate to the Locations page in light theme.\n2. Toggle to dark theme.\n3. Observe the page.",
+          "expected": "All text, icons, drawers, and modals render correctly in dark theme with no contrast or layout issues."
+        },
+        {
+          "id": "TC-LC-1109",
+          "severity": "P3",
+          "scenario": "Long city or country names wrap or truncate gracefully in the table",
+          "steps": "1. Create a location with a city name close to 100 characters.\n2. View the location in the table.",
+          "expected": "The city name wraps or truncates in the table cell without breaking the row layout."
+        },
+        {
+          "id": "TC-LC-1110",
+          "severity": "P2",
+          "scenario": "Active filter chip is displayed when a filter is applied",
+          "steps": "1. Navigate to the Locations page.\n2. Enter a search term in the search field.",
+          "expected": "An active filter chip appears showing the applied search term. Clicking the chip clears the filter."
+        }
+      ]
+    },
+    {
+      "id": "TC-LC-1200",
+      "name": "Desktop Layout",
+      "test_cases": [
+        {
+          "id": "TC-LC-1201",
+          "severity": "P1",
+          "scenario": "All table columns are visible on a desktop viewport",
+          "steps": "1. Open the Locations page on a desktop browser (viewport ≥ 1024px).\n2. Observe the table columns.",
+          "expected": "All columns are visible: City, Country, Code, Default, Status, Created."
+        },
+        {
+          "id": "TC-LC-1202",
+          "severity": "P1",
+          "scenario": "Create location drawer is full-width on desktop without overflow",
+          "steps": "1. Open the Locations page on a desktop browser.\n2. Click 'Add Location' to open the create drawer.",
+          "expected": "The drawer occupies the expected width (up to 900px) and all fields are visible without horizontal scrolling."
+        },
+        {
+          "id": "TC-LC-1203",
+          "severity": "P2",
+          "scenario": "Location detail page shows two-column layout on desktop",
+          "steps": "1. Open a location's detail page on a desktop browser.\n2. Observe the page layout.",
+          "expected": "The page shows a two-column layout: left panel (location info) and right panel (members) side by side."
+        },
+        {
+          "id": "TC-LC-1204",
+          "severity": "P2",
+          "scenario": "Page header buttons are correctly spaced on desktop",
+          "steps": "1. Open the Locations page on a desktop browser.\n2. Observe the Import, Export, and Add Location buttons.",
+          "expected": "The buttons are aligned in a row in the top-right action area with consistent spacing."
+        },
+        {
+          "id": "TC-LC-1205",
+          "severity": "P2",
+          "scenario": "Create drawer City and Country fields display side by side on desktop",
+          "steps": "1. Open the create or edit location drawer on a large desktop viewport.\n2. Observe the field layout.",
+          "expected": "The City and Country fields are shown stacked vertically as full-width fields (col-12 each)."
+        },
+        {
+          "id": "TC-LC-1206",
+          "severity": "P2",
+          "scenario": "Row overflow menu appears for actions that do not fit inline",
+          "steps": "1. Open the Locations page on a desktop viewport.\n2. Observe the action buttons on a row with Edit, Toggle, Set as Default, and Delete.",
+          "expected": "Actions are shown inline where space allows. Additional actions overflow into an ellipsis (…) menu."
+        },
+        {
+          "id": "TC-LC-1207",
+          "severity": "P2",
+          "scenario": "Sorting by City and Country is available and functional on desktop",
+          "steps": "1. Open the Locations page on a desktop viewport.\n2. Click the City column header, then the Country column header.",
+          "expected": "The table sorts correctly by each column. Sort indicators appear on the active column header."
+        },
+        {
+          "id": "TC-LC-1208",
+          "severity": "P3",
+          "scenario": "Members table on detail page shows all columns on desktop",
+          "steps": "1. Open a location's detail page on a desktop browser.\n2. Observe the members table columns.",
+          "expected": "All member columns are visible: Name, Email, Role, Employment Type."
+        }
+      ]
+    },
+    {
+      "id": "TC-LC-1300",
+      "name": "Mobile & Responsive",
+      "test_cases": [
+        {
+          "id": "TC-LC-1301",
+          "severity": "P1",
+          "scenario": "Secondary columns are hidden on mobile viewports",
+          "steps": "1. Open the Locations page on a mobile device or viewport ≤ 767px.\n2. Observe the table columns.",
+          "expected": "Country, Code, Default, and Created columns are hidden. Only City and Status remain visible."
+        },
+        {
+          "id": "TC-LC-1302",
+          "severity": "P1",
+          "scenario": "Create location drawer is usable on a mobile viewport",
+          "steps": "1. Open the Locations page on a mobile viewport.\n2. Open the create drawer and fill in the City and Country fields.\n3. Submit the form.",
+          "expected": "The drawer opens correctly, the fields are accessible and usable, and the location can be created without layout issues."
+        },
+        {
+          "id": "TC-LC-1303",
+          "severity": "P2",
+          "scenario": "Location detail page stacks panels vertically on mobile",
+          "steps": "1. Open a location's detail page on a mobile viewport.",
+          "expected": "The info panel and members panel stack vertically. The info panel is on top and the members panel is below."
+        },
+        {
+          "id": "TC-LC-1304",
+          "severity": "P2",
+          "scenario": "Members table on detail page hides secondary columns on mobile",
+          "steps": "1. Open a location's detail page on a mobile viewport.\n2. Observe the members table.",
+          "expected": "The Email, Role, and Employment Type columns are hidden. Only the avatar and Name are visible on mobile."
+        },
+        {
+          "id": "TC-LC-1305",
+          "severity": "P2",
+          "scenario": "Delete and Set as Default modals are fully visible on mobile",
+          "steps": "1. Open the delete or set-default confirmation modal on a mobile viewport.\n2. Observe the layout.",
+          "expected": "The modal is fully visible on screen with buttons accessible without scrolling."
+        },
+        {
+          "id": "TC-LC-1306",
+          "severity": "P2",
+          "scenario": "Search field is accessible and functional on mobile",
+          "steps": "1. Open the Locations page on a mobile device.\n2. Tap the search field and type a city name.",
+          "expected": "The search field accepts input and the table filters correctly on mobile."
+        },
+        {
+          "id": "TC-LC-1307",
+          "severity": "P2",
+          "scenario": "Character counters are readable on mobile",
+          "steps": "1. Open the create location drawer on a mobile viewport.\n2. Type into the City field.",
+          "expected": "The character counter is visible and readable on a small screen, updating as characters are typed."
+        },
+        {
+          "id": "TC-LC-1308",
+          "severity": "P3",
+          "scenario": "Page header does not overflow on small mobile viewports",
+          "steps": "1. Open the Locations page on a 375px-wide viewport.\n2. Observe the page title and action buttons.",
+          "expected": "The page title and buttons do not overflow or overlap. The layout remains readable."
+        }
+      ]
+    },
+    {
+      "id": "TC-LC-1400",
+      "name": "Integration with Other Modules",
+      "test_cases": [
+        {
+          "id": "TC-LC-1401",
+          "severity": "P1",
+          "scenario": "Locations appear as options in the member location field in other modules",
+          "steps": "1. Ensure active locations exist.\n2. Navigate to the People or Members module.\n3. Open the form to add or edit a member and look for the location field.",
+          "expected": "Active locations appear as selectable options in the location dropdown."
+        },
+        {
+          "id": "TC-LC-1402",
+          "severity": "P1",
+          "scenario": "Inactive locations do not appear in member assignment dropdowns",
+          "steps": "1. Deactivate a location.\n2. Navigate to a member assignment form in another module.\n3. Open the location dropdown.",
+          "expected": "The deactivated location does not appear as an option for new assignments."
+        },
+        {
+          "id": "TC-LC-1403",
+          "severity": "P1",
+          "scenario": "The default location is pre-selected when adding a new member",
+          "steps": "1. Ensure a default location is configured.\n2. Navigate to the People or Team Members module.\n3. Open the form to add a new member.",
+          "expected": "The location field defaults to the location marked as Default."
+        },
+        {
+          "id": "TC-LC-1404",
+          "severity": "P1",
+          "scenario": "Members assigned to a location appear on that location's detail page",
+          "steps": "1. Assign a user to the location 'London, United Kingdom'.\n2. Navigate to that location's detail page.\n3. Observe the Members panel.",
+          "expected": "The user appears in the members table on the location detail page."
+        },
+        {
+          "id": "TC-LC-1405",
+          "severity": "P2",
+          "scenario": "Deactivating a location does not remove existing members from that location",
+          "steps": "1. Ensure a location has assigned members.\n2. Deactivate that location.\n3. Navigate to the location's detail page.",
+          "expected": "The members panel still shows the previously assigned members. Deactivation does not unassign people."
+        },
+        {
+          "id": "TC-LC-1406",
+          "severity": "P2",
+          "scenario": "Location name is shown in the Skills detail page members table (Location column)",
+          "steps": "1. Assign a member based at 'Berlin, Germany'.\n2. Navigate to a Skill's detail page that that member has.\n3. Observe the Location column in the members table.",
+          "expected": "The member's location 'Berlin, Germany' is shown in the Location column of the Skills detail members table."
+        },
+        {
+          "id": "TC-LC-1407",
+          "severity": "P2",
+          "scenario": "Locations module link is accessible from the navigation menu under Configurations",
+          "steps": "1. Log in and click the Configurations section in the main navigation.\n2. Look for the Locations link.",
+          "expected": "A 'Locations' link is present in the Configurations section and navigates to /locations/."
+        },
+        {
+          "id": "TC-LC-1408",
+          "severity": "P3",
+          "scenario": "Changing a member's location updates which location detail page they appear on",
+          "steps": "1. A member is currently assigned to Location A.\n2. Edit that member and change their location to Location B.\n3. Navigate to both Location A and Location B detail pages.",
+          "expected": "The member no longer appears on Location A's detail page and now appears on Location B's detail page."
+        }
+      ]
+    }
+  ]
+}

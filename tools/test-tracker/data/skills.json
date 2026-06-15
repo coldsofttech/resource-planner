@@ -8,1023 +8,926 @@
   "suites": [
     {
       "id": "TC-SK-100",
-      "name": "Page Load & Access Control",
+      "name": "Page Access & Permissions",
       "test_cases": [
         {
           "id": "TC-SK-101",
           "severity": "P0",
-          "scenario": "Skills page loads for authenticated user with view permission",
-          "steps": "Log in as a user with skills.view_skill permission. Navigate to /skills/.",
-          "expected": "Page loads successfully. Skill list table is visible. No errors in browser console."
+          "scenario": "Logged-out user is redirected to login when visiting the Skills page",
+          "steps": "1. Ensure you are not logged in.\n2. Navigate directly to /skills/.\n3. Observe what happens.",
+          "expected": "User is redirected to the login page. The Skills page is not shown."
         },
         {
           "id": "TC-SK-102",
           "severity": "P0",
-          "scenario": "Unauthenticated user is redirected to login",
-          "steps": "Log out. Navigate directly to /skills/.",
-          "expected": "User is redirected to /login/. Skills page is not accessible."
+          "scenario": "Authenticated user with view permission can access the Skills page",
+          "steps": "1. Log in as a user who has the skills.view_skill permission.\n2. Navigate to /skills/ via the sidebar or direct URL.\n3. Observe the page.",
+          "expected": "The Skills page loads successfully. The page title 'Skills' is visible. The skills list table is shown. No access-denied or error page is displayed."
         },
         {
           "id": "TC-SK-103",
-          "severity": "P1",
-          "scenario": "Add button is visible only for user with add_skill permission",
-          "steps": "Log in as user with skills.add_skill permission. Navigate to /skills/.",
-          "expected": "Add Skill button is visible in the page header."
+          "severity": "P0",
+          "scenario": "User without any skills permission cannot access the Skills page",
+          "steps": "1. Log in as a user who has no skills permissions.\n2. Navigate directly to /skills/.\n3. Observe what happens.",
+          "expected": "User is shown an access-denied message or redirected away. The skills list is not visible."
         },
         {
           "id": "TC-SK-104",
           "severity": "P1",
-          "scenario": "Add button is hidden for user without add_skill permission",
-          "steps": "Log in as user without skills.add_skill permission. Navigate to /skills/.",
-          "expected": "Add Skill button is not visible on the page."
+          "scenario": "Add Skill button is visible only for users with the add permission",
+          "steps": "1. Log in as a user with skills.add_skill permission.\n2. Navigate to /skills/.\n3. Look at the page header action area.",
+          "expected": "The 'Add Skill' button is visible in the top-right of the page header."
         },
         {
           "id": "TC-SK-105",
           "severity": "P1",
-          "scenario": "Import button is visible only for user with import_skill permission",
-          "steps": "Log in as user with skills.import_skill permission. Navigate to /skills/.",
-          "expected": "Import button is visible on the page."
+          "scenario": "Add Skill button is hidden for view-only users",
+          "steps": "1. Log in as a user with only skills.view_skill (no add permission).\n2. Navigate to /skills/.\n3. Look at the page header.",
+          "expected": "The 'Add Skill' button is not present anywhere on the page."
         },
         {
           "id": "TC-SK-106",
           "severity": "P1",
-          "scenario": "Export button is visible only for user with export_skill permission",
-          "steps": "Log in as user with skills.export_skill permission. Navigate to /skills/.",
-          "expected": "Export button is visible on the page."
+          "scenario": "Import button is visible only for users with the import permission",
+          "steps": "1. Log in as a user with skills.import_skill permission.\n2. Navigate to /skills/.\n3. Look at the page header action area.",
+          "expected": "The 'Import' button is visible in the page header."
         },
         {
           "id": "TC-SK-107",
           "severity": "P1",
-          "scenario": "Edit and delete actions are hidden for user without change/delete permission",
-          "steps": "Log in as user with only skills.view_skill permission. Navigate to /skills/. Inspect table row actions.",
-          "expected": "No edit or delete action buttons are visible on skill rows."
+          "scenario": "Export button is visible only for users with the export permission",
+          "steps": "1. Log in as a user with skills.export_skill permission.\n2. Navigate to /skills/.\n3. Look at the page header action area.",
+          "expected": "The 'Export' button is visible in the page header."
+        },
+        {
+          "id": "TC-SK-108",
+          "severity": "P1",
+          "scenario": "Edit and Delete row actions are hidden for view-only users",
+          "steps": "1. Log in as a user with only skills.view_skill permission.\n2. Navigate to /skills/.\n3. Hover over any skill row and inspect the available row actions.",
+          "expected": "No Edit (pencil), Toggle, or Delete (trash) action buttons are visible on any row."
+        },
+        {
+          "id": "TC-SK-109",
+          "severity": "P2",
+          "scenario": "Page header shows correct title, eyebrow, and subtitle",
+          "steps": "1. Log in and navigate to /skills/.\n2. Observe the page header area.",
+          "expected": "Eyebrow text reads 'Configurations'. Page title reads 'Skills'. Subtitle reads 'Manage engineer skill sets for your organisation.'"
+        },
+        {
+          "id": "TC-SK-110",
+          "severity": "P2",
+          "scenario": "Breadcrumb reflects the correct page location",
+          "steps": "1. Log in and navigate to /skills/.\n2. Observe the breadcrumb at the top of the page.",
+          "expected": "Breadcrumb shows the correct navigation path to the Skills page."
         }
       ]
     },
     {
       "id": "TC-SK-200",
-      "name": "List Skills — GET /api/v1/skills/",
+      "name": "Browsing & Discovering Skills",
       "test_cases": [
         {
           "id": "TC-SK-201",
           "severity": "P0",
-          "scenario": "Unauthenticated request returns 401",
-          "steps": "Send GET /api/v1/skills/ with no Authorization header.",
-          "expected": "HTTP 401 is returned. Response body contains a structured error."
+          "scenario": "Skills list shows all active skills on page load",
+          "steps": "1. Ensure several active skills exist (e.g. Python, Java, Go).\n2. Log in and navigate to /skills/.\n3. Observe the table.",
+          "expected": "All active skills are shown in the table. Inactive skills are not shown. Each row shows the skill's name, Code, Description, Status, and Created date."
         },
         {
           "id": "TC-SK-202",
           "severity": "P0",
-          "scenario": "Authenticated user without view_skill returns 403",
-          "steps": "Send GET /api/v1/skills/ with a valid Bearer token for a user who does not have skills.view_skill permission.",
-          "expected": "HTTP 403 is returned."
+          "scenario": "Inactive skills are not shown in the default list view",
+          "steps": "1. Ensure at least one inactive skill exists.\n2. Navigate to /skills/.\n3. Look through the list.",
+          "expected": "Inactive skills do not appear in the list. The Status filter is pre-set to 'Active'."
         },
         {
           "id": "TC-SK-203",
-          "severity": "P0",
-          "scenario": "Default list returns only active skills",
-          "steps": "Ensure both active and inactive skills exist. Send GET /api/v1/skills/ with a valid Bearer token and view_skill permission.",
-          "expected": "Response contains only active skills (is_active=true). Inactive skills are not included."
+          "severity": "P1",
+          "scenario": "Empty state message is shown when no active skills exist",
+          "steps": "1. Ensure no active skills exist.\n2. Navigate to /skills/.\n3. Observe the table area.",
+          "expected": "An empty state message 'No skills found.' is displayed in place of the table rows."
         },
         {
           "id": "TC-SK-204",
-          "severity": "P0",
-          "scenario": "Response includes standard pagination envelope",
-          "steps": "Send GET /api/v1/skills/ with a valid token.",
-          "expected": "Response body contains: success, message, data.results (array), data.pagination with total_count, total_pages, current_page, page_size, has_next, has_previous."
+          "severity": "P1",
+          "scenario": "Searching by skill name filters the list in real time",
+          "steps": "1. Navigate to /skills/.\n2. Click the search field (or press '/' shortcut).\n3. Type 'Py' to search for Python-related skills.",
+          "expected": "The table updates to show only skills whose name contains 'Py' (case-insensitive). Non-matching skills disappear from the list."
         },
         {
           "id": "TC-SK-205",
           "severity": "P1",
-          "scenario": "Search by skill name returns matching skills only",
-          "steps": "Send GET /api/v1/skills/?search=Python with a valid token. At least one skill with 'Python' in its name exists.",
-          "expected": "Only skills whose skill field contains 'Python' (case-insensitive) are returned."
+          "scenario": "Clearing the search field restores the full active list",
+          "steps": "1. Search for a skill by typing a name.\n2. Clear the search field completely.",
+          "expected": "The full list of active skills is restored. No filter indicator remains active."
         },
         {
           "id": "TC-SK-206",
           "severity": "P1",
-          "scenario": "Search with no matches returns empty results",
-          "steps": "Send GET /api/v1/skills/?search=ZZZNOMATCH with a valid token.",
-          "expected": "results is an empty array. pagination.total_count is 0."
+          "scenario": "Searching with no matching results shows an empty state",
+          "steps": "1. Navigate to /skills/.\n2. Type 'ZZZNOMATCH' in the search field.",
+          "expected": "The table shows the empty state message 'No skills found.' No skills are displayed. An active filter tag for the search term is visible."
         },
         {
           "id": "TC-SK-207",
           "severity": "P1",
-          "scenario": "is_active=false filter returns inactive skills",
-          "steps": "Ensure at least one inactive skill exists. Send GET /api/v1/skills/?is_active=false with a valid token.",
-          "expected": "Response contains only inactive skills (is_active=false)."
+          "scenario": "Status filter set to Inactive shows only inactive skills",
+          "steps": "1. Navigate to /skills/.\n2. Change the Status filter from 'Active' to 'Inactive'.",
+          "expected": "The table updates to show only skills with an inactive status. Active skills disappear from the list."
         },
         {
           "id": "TC-SK-208",
           "severity": "P1",
-          "scenario": "Sort by skill name ascending",
-          "steps": "Send GET /api/v1/skills/?sort=skill&order_by=ASC with a valid token.",
-          "expected": "Skills are returned in alphabetical order A→Z by skill name."
+          "scenario": "Status filter set to All shows both active and inactive skills",
+          "steps": "1. Navigate to /skills/.\n2. Change the Status filter to 'All'.",
+          "expected": "Both active and inactive skills appear in the table. Status badges indicate each skill's state clearly."
         },
         {
           "id": "TC-SK-209",
           "severity": "P1",
-          "scenario": "Sort by skill name descending",
-          "steps": "Send GET /api/v1/skills/?sort=skill&order_by=DESC with a valid token.",
-          "expected": "Skills are returned in reverse alphabetical order Z→A by skill name."
+          "scenario": "Clicking the Skill column header sorts skills A to Z",
+          "steps": "1. Navigate to /skills/.\n2. Click the 'Skill' column header to sort ascending.",
+          "expected": "Skills are re-ordered alphabetically A → Z by skill name. A sort indicator (arrow) appears on the Skill column."
         },
         {
           "id": "TC-SK-210",
           "severity": "P1",
-          "scenario": "Sort by created_at",
-          "steps": "Send GET /api/v1/skills/?sort=created_at&order_by=ASC with a valid token.",
-          "expected": "Skills are returned ordered oldest-first by creation date."
+          "scenario": "Clicking the Skill column header twice sorts skills Z to A",
+          "steps": "1. Navigate to /skills/.\n2. Click the 'Skill' column header twice.",
+          "expected": "Skills are re-ordered Z → A by skill name. The sort indicator reverses direction."
         },
         {
           "id": "TC-SK-211",
           "severity": "P1",
-          "scenario": "Pagination: page and page_size params work",
-          "steps": "Ensure more than 5 skills exist. Send GET /api/v1/skills/?page=1&page_size=2 with a valid token.",
-          "expected": "Exactly 2 skills are returned. pagination.page_size is 2. pagination.has_next is true if more skills exist."
+          "scenario": "Pagination controls navigate between pages of skills",
+          "steps": "1. Ensure more than 25 active skills exist.\n2. Navigate to /skills/.\n3. Scroll to the bottom and click the 'Next' pagination button.",
+          "expected": "The second page of skills loads. The pagination indicator shows the current page and total pages. The 'Previous' button becomes active."
         },
         {
           "id": "TC-SK-212",
           "severity": "P2",
-          "scenario": "page_size is capped at 100",
-          "steps": "Send GET /api/v1/skills/?page_size=999 with a valid token.",
-          "expected": "At most 100 results are returned. No error is raised."
+          "scenario": "Page size setting limits the number of visible rows",
+          "steps": "1. Navigate to /skills/.\n2. Change the page size setting to 10.",
+          "expected": "At most 10 skill rows are shown per page. Pagination updates to reflect the new page size."
         },
         {
           "id": "TC-SK-213",
           "severity": "P2",
-          "scenario": "Empty list returns valid paginated response",
-          "steps": "Ensure no active skills exist. Send GET /api/v1/skills/ with a valid token.",
-          "expected": "results is an empty array. pagination.total_count is 0. HTTP 200."
+          "scenario": "Active skills show a green Active status badge",
+          "steps": "1. Navigate to /skills/ with the default Active filter.\n2. Observe the Status column for any row.",
+          "expected": "Each row displays a green 'Active' status badge."
         },
         {
           "id": "TC-SK-214",
           "severity": "P2",
-          "scenario": "Response fields match list serializer schema",
-          "steps": "Send GET /api/v1/skills/ with a valid token.",
-          "expected": "Each skill object in results contains: code, skill, description, is_active, created_at, created_by, updated_at, updated_by."
+          "scenario": "Inactive skills show a muted Inactive status badge when visible",
+          "steps": "1. Set the Status filter to 'All'.\n2. Find an inactive skill in the list.",
+          "expected": "Inactive skills display a muted or grey 'Inactive' status badge, visually distinct from the Active badge."
         },
         {
           "id": "TC-SK-215",
           "severity": "P2",
-          "scenario": "Default ordering is alphabetical by skill name",
-          "steps": "Send GET /api/v1/skills/ with no sort param.",
-          "expected": "Skills are returned in ascending alphabetical order by skill name."
+          "scenario": "Active filter tags appear above the table for each applied filter",
+          "steps": "1. Navigate to /skills/.\n2. Search for a name and change the status filter to 'All'.",
+          "expected": "Active filter tags appear above the table showing the search term and status value. Clicking a tag removes that filter."
+        },
+        {
+          "id": "TC-SK-216",
+          "severity": "P2",
+          "scenario": "Code column shows the skill's system code in monospace font",
+          "steps": "1. Navigate to /skills/.\n2. Observe the Code column.",
+          "expected": "The Code column shows values like 'SKILL-0001' in a monospace/code style. It is hidden on mobile viewports."
         }
       ]
     },
     {
       "id": "TC-SK-300",
-      "name": "Get Skill — GET /api/v1/skills/<code>/",
+      "name": "Creating a Skill",
       "test_cases": [
         {
           "id": "TC-SK-301",
           "severity": "P0",
-          "scenario": "Unauthenticated request returns 401",
-          "steps": "Send GET /api/v1/skills/SKILL-0001/ with no Authorization header.",
-          "expected": "HTTP 401 is returned."
+          "scenario": "Clicking Add Skill button opens the create drawer",
+          "steps": "1. Log in as a user with skills.add_skill permission.\n2. Navigate to /skills/.\n3. Click the 'Add Skill' button in the page header.",
+          "expected": "A drawer panel slides in from the right with the title 'Create skill'. The Skill name and Description fields are visible and empty."
         },
         {
           "id": "TC-SK-302",
           "severity": "P0",
-          "scenario": "Authenticated user without view_skill returns 403",
-          "steps": "Send GET /api/v1/skills/SKILL-0001/ with a valid token for a user without skills.view_skill.",
-          "expected": "HTTP 403 is returned."
+          "scenario": "Filling in a valid skill name and clicking Create skill saves the skill",
+          "steps": "1. Open the create drawer.\n2. Type 'Python' in the Skill name field.\n3. Click 'Create skill'.",
+          "expected": "The drawer closes. A success toast notification appears. The new skill 'Python' appears in the list table."
         },
         {
           "id": "TC-SK-303",
           "severity": "P0",
-          "scenario": "Valid code returns skill detail with all fields",
-          "steps": "Ensure a skill exists with a known code. Send GET /api/v1/skills/<code>/ with a valid token.",
-          "expected": "HTTP 200. Response data contains: code, skill, description, is_active, created_at, created_by, updated_at, updated_by."
+          "scenario": "Submitting with the skill name field blank shows a validation error",
+          "steps": "1. Open the create drawer.\n2. Leave the Skill name field empty.\n3. Click 'Create skill'.",
+          "expected": "The form does not submit. A validation error message appears below the Skill name field indicating it is required."
         },
         {
           "id": "TC-SK-304",
           "severity": "P0",
-          "scenario": "Unknown code returns 404",
-          "steps": "Send GET /api/v1/skills/UNKNOWN-9999/ with a valid token.",
-          "expected": "HTTP 404. Structured error response is returned. No stack trace is exposed."
+          "scenario": "Submitting a skill name that already exists shows a conflict error",
+          "steps": "1. Ensure a skill named 'Python' already exists.\n2. Open the create drawer.\n3. Type 'Python' and click 'Create skill'.",
+          "expected": "An error message appears indicating a skill with that name already exists. No duplicate is created."
         },
         {
           "id": "TC-SK-305",
+          "severity": "P0",
+          "scenario": "Skill name field enforces a maximum length of 20 characters",
+          "steps": "1. Open the create drawer.\n2. Observe the Skill name field.\n3. Try typing more than 20 characters.",
+          "expected": "A character counter is visible on the field (e.g. '15/20'). Input is capped at 20 characters. The user cannot type beyond the limit."
+        },
+        {
+          "id": "TC-SK-306",
           "severity": "P1",
-          "scenario": "Inactive skill is retrievable by code",
-          "steps": "Ensure an inactive skill exists with a known code. Send GET /api/v1/skills/<code>/ with a valid token.",
-          "expected": "HTTP 200. Skill is returned with is_active=false."
+          "scenario": "Character counter updates in real time as the user types the skill name",
+          "steps": "1. Open the create drawer.\n2. Type 'Python' (6 characters) into the Skill name field.\n3. Observe the counter.",
+          "expected": "The character counter updates to show '6/20' (or similar). The counter increments with each keystroke."
+        },
+        {
+          "id": "TC-SK-307",
+          "severity": "P1",
+          "scenario": "Description field is optional — form submits successfully without it",
+          "steps": "1. Open the create drawer.\n2. Enter only a Skill name.\n3. Leave Description blank.\n4. Click 'Create skill'.",
+          "expected": "Skill is created successfully. The description is empty on the created skill."
+        },
+        {
+          "id": "TC-SK-308",
+          "severity": "P1",
+          "scenario": "New skill is active by default after creation",
+          "steps": "1. Create a skill using the create drawer without specifying an active/inactive state.\n2. Find the skill in the list.",
+          "expected": "The newly created skill appears with an 'Active' status badge in the default list view."
+        },
+        {
+          "id": "TC-SK-309",
+          "severity": "P1",
+          "scenario": "Create button shows a loading state while the request is in progress",
+          "steps": "1. Open the create drawer.\n2. Fill in a valid skill name.\n3. Click 'Create skill' and immediately observe the button.",
+          "expected": "The 'Create skill' button becomes disabled and shows a loading indicator (spinner or 'Creating…' label) while the request is processing."
+        },
+        {
+          "id": "TC-SK-310",
+          "severity": "P1",
+          "scenario": "Clicking Cancel or closing the drawer discards unsaved changes",
+          "steps": "1. Open the create drawer.\n2. Type a skill name in the field.\n3. Click 'Cancel' or the X close button.",
+          "expected": "The drawer closes. No skill is created. The typed name is discarded."
+        },
+        {
+          "id": "TC-SK-311",
+          "severity": "P2",
+          "scenario": "The create drawer form resets after a successful creation",
+          "steps": "1. Create a skill successfully.\n2. Open the create drawer again immediately after.",
+          "expected": "The Skill name and Description fields are empty and ready for a new entry. No previously entered values remain."
+        },
+        {
+          "id": "TC-SK-312",
+          "severity": "P2",
+          "scenario": "Short skill names like 'C++' and 'Go' are accepted without error",
+          "steps": "1. Open the create drawer.\n2. Type 'C++' in the Skill name field.\n3. Click 'Create skill'.",
+          "expected": "The skill is created successfully. Special characters in the name are preserved exactly."
         }
       ]
     },
     {
       "id": "TC-SK-400",
-      "name": "Create Skill — POST /api/v1/skills/",
+      "name": "Skill Detail Page",
       "test_cases": [
         {
           "id": "TC-SK-401",
           "severity": "P0",
-          "scenario": "Unauthenticated request returns 401",
-          "steps": "Send POST /api/v1/skills/ with no Authorization header and a valid JSON body.",
-          "expected": "HTTP 401 is returned."
+          "scenario": "Clicking on a skill row navigates to the skill detail page",
+          "steps": "1. Navigate to /skills/.\n2. Click on a skill row (not on an action button).",
+          "expected": "User is navigated to the skill detail page at /skills/<code>/. The page title shows the skill name."
         },
         {
           "id": "TC-SK-402",
           "severity": "P0",
-          "scenario": "Authenticated user without add_skill returns 403",
-          "steps": "Send POST /api/v1/skills/ with a valid token for a user without skills.add_skill.",
-          "expected": "HTTP 403 is returned."
+          "scenario": "Skill detail page shows all skill information",
+          "steps": "1. Click on a skill from the list to open its detail page.\n2. Observe the left info panel.",
+          "expected": "The detail panel shows: Skill name, Code (in monospace), Status, Description, Created date, and Created by."
         },
         {
           "id": "TC-SK-403",
           "severity": "P0",
-          "scenario": "Valid payload creates skill and returns 201",
-          "steps": "Send POST /api/v1/skills/ with body: {\"skill\": \"Python\", \"description\": \"Core programming language\", \"is_active\": true}. Include valid Bearer token with add_skill permission.",
-          "expected": "HTTP 201. Response contains the created skill with code, skill, description, is_active=true, created_at, created_by."
+          "scenario": "Skill detail page shows the members table listing people who have that skill",
+          "steps": "1. Ensure at least one user is assigned this skill.\n2. Navigate to that skill's detail page.",
+          "expected": "The Members section is visible on the right side. The table lists people with this skill, showing Name, Email, Role, and Location columns."
         },
         {
           "id": "TC-SK-404",
-          "severity": "P0",
-          "scenario": "Duplicate skill name returns 409",
-          "steps": "Create a skill named 'Python'. Send POST /api/v1/skills/ with skill='Python' again.",
-          "expected": "HTTP 409. Response body contains error indicating a skill with that name already exists."
+          "severity": "P1",
+          "scenario": "Members table shows an empty state when no one has been assigned this skill",
+          "steps": "1. Navigate to the detail page of a skill with no assigned members.",
+          "expected": "The Members panel either shows an empty state message 'No members have this skill.' or is hidden."
         },
         {
           "id": "TC-SK-405",
-          "severity": "P0",
-          "scenario": "Missing required skill field returns 400",
-          "steps": "Send POST /api/v1/skills/ with body: {\"description\": \"No skill name given\"}.",
-          "expected": "HTTP 400. Error response references the skill field as required."
+          "severity": "P1",
+          "scenario": "Breadcrumb on detail page links back to the Skills list",
+          "steps": "1. Navigate to a skill detail page.\n2. Observe the breadcrumb.\n3. Click the 'Skills' link in the breadcrumb.",
+          "expected": "Breadcrumb shows the path back to Skills. Clicking it returns the user to /skills/."
         },
         {
           "id": "TC-SK-406",
-          "severity": "P0",
-          "scenario": "Skill name exceeding 20 characters returns 400",
-          "steps": "Send POST /api/v1/skills/ with skill set to a 21-character string.",
-          "expected": "HTTP 400. Error response indicates skill name is too long (max 20 chars)."
+          "severity": "P1",
+          "scenario": "Detail page shows the skill code in a monospace style",
+          "steps": "1. Navigate to a skill detail page.\n2. Observe the Code field.",
+          "expected": "The Code value (e.g. 'SKILL-0001') is displayed in a monospace or code style, distinct from regular text."
         },
         {
           "id": "TC-SK-407",
           "severity": "P1",
-          "scenario": "Description is optional and defaults to empty string",
-          "steps": "Send POST /api/v1/skills/ with body: {\"skill\": \"Java\"}.",
-          "expected": "HTTP 201. Created skill has description as an empty string."
+          "scenario": "Inactive skill detail page shows the inactive status clearly",
+          "steps": "1. Navigate to the detail page of an inactive skill.",
+          "expected": "The Status field shows 'Inactive' with appropriate styling (muted/grey badge)."
         },
         {
           "id": "TC-SK-408",
-          "severity": "P1",
-          "scenario": "is_active is optional and defaults to true",
-          "steps": "Send POST /api/v1/skills/ with body: {\"skill\": \"Go\"}.",
-          "expected": "HTTP 201. Created skill has is_active=true."
+          "severity": "P2",
+          "scenario": "Members table on detail page supports pagination for skills with many members",
+          "steps": "1. Navigate to the detail page of a skill with more than 25 members assigned.\n2. Observe the members table.",
+          "expected": "Pagination controls appear below the members table. The user can navigate between pages of members."
         },
         {
           "id": "TC-SK-409",
-          "severity": "P1",
-          "scenario": "Creating skill with is_active=false creates inactive skill",
-          "steps": "Send POST /api/v1/skills/ with body: {\"skill\": \"COBOL\", \"is_active\": false}.",
-          "expected": "HTTP 201. Response shows is_active=false."
-        },
-        {
-          "id": "TC-SK-410",
-          "severity": "P1",
-          "scenario": "Created skill appears in list API immediately",
-          "steps": "Create a skill via POST. Then send GET /api/v1/skills/ with is_active=true.",
-          "expected": "The newly created skill appears in the list results."
-        },
-        {
-          "id": "TC-SK-411",
-          "severity": "P1",
-          "scenario": "created_by is set to the authenticated user",
-          "steps": "Log in as a specific user. Create a skill via POST /api/v1/skills/. Retrieve the skill with GET /api/v1/skills/<code>/.",
-          "expected": "created_by in the response reflects the user who made the create request."
-        },
-        {
-          "id": "TC-SK-412",
-          "severity": "P1",
-          "scenario": "Skill name with exactly 20 characters is accepted",
-          "steps": "Send POST /api/v1/skills/ with skill set to exactly 20 characters.",
-          "expected": "HTTP 201. Skill is created successfully."
-        },
-        {
-          "id": "TC-SK-413",
-          "severity": "P1",
-          "scenario": "Skill name with 21 characters is rejected",
-          "steps": "Send POST /api/v1/skills/ with skill set to exactly 21 characters.",
-          "expected": "HTTP 400. Error references the 20-character maximum for the skill field."
+          "severity": "P2",
+          "scenario": "Members table shows Location column for each member",
+          "steps": "1. Navigate to a skill detail page with at least one member.\n2. Observe the table columns.",
+          "expected": "The members table includes a Location column showing each member's assigned location."
         }
       ]
     },
     {
       "id": "TC-SK-500",
-      "name": "Update Skill — PATCH /api/v1/skills/<code>/",
+      "name": "Editing a Skill",
       "test_cases": [
         {
           "id": "TC-SK-501",
           "severity": "P0",
-          "scenario": "Unauthenticated request returns 401",
-          "steps": "Send PATCH /api/v1/skills/<code>/ with no Authorization header.",
-          "expected": "HTTP 401 is returned."
+          "scenario": "Clicking the Edit row action opens the edit drawer with current values pre-filled",
+          "steps": "1. Log in with skills.change_skill permission.\n2. Navigate to /skills/.\n3. Click the pencil (Edit) icon on any skill row.",
+          "expected": "The edit drawer slides in from the right. The Skill name field is pre-filled with the current name. The Description field shows the current description."
         },
         {
           "id": "TC-SK-502",
           "severity": "P0",
-          "scenario": "Authenticated user without change_skill returns 403",
-          "steps": "Send PATCH /api/v1/skills/<code>/ with a valid token for a user without skills.change_skill.",
-          "expected": "HTTP 403 is returned."
+          "scenario": "Editing the skill name and saving updates it in the list",
+          "steps": "1. Open the edit drawer for a skill named 'Python'.\n2. Clear the name field and type 'Python3'.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes. A success toast appears. The skill row in the list now shows 'Python3'."
         },
         {
           "id": "TC-SK-503",
           "severity": "P0",
-          "scenario": "Valid partial update of skill name returns updated skill",
-          "steps": "Send PATCH /api/v1/skills/<code>/ with body: {\"skill\": \"Rust\"}.",
-          "expected": "HTTP 200. Response shows the updated skill name. Other fields are unchanged."
+          "scenario": "Clearing the skill name field in edit mode shows a validation error",
+          "steps": "1. Open the edit drawer for any skill.\n2. Clear the Skill name field completely.\n3. Click 'Save changes'.",
+          "expected": "The form does not submit. A validation error appears below the name field."
         },
         {
           "id": "TC-SK-504",
-          "severity": "P1",
-          "scenario": "Updating description returns updated value",
-          "steps": "Send PATCH /api/v1/skills/<code>/ with body: {\"description\": \"Updated description\"}.",
-          "expected": "HTTP 200. Response shows the updated description."
+          "severity": "P0",
+          "scenario": "Renaming a skill to an existing skill's name shows a conflict error",
+          "steps": "1. Ensure two skills exist: 'Python' and 'Java'.\n2. Open the edit drawer for 'Python'.\n3. Change the name to 'Java'.\n4. Click 'Save changes'.",
+          "expected": "An error message appears indicating the skill name is already in use. The skill name is not changed."
         },
         {
           "id": "TC-SK-505",
-          "severity": "P1",
-          "scenario": "Updating is_active via PATCH works",
-          "steps": "Create an active skill. Send PATCH /api/v1/skills/<code>/ with body: {\"is_active\": false}.",
-          "expected": "HTTP 200. Response shows is_active=false."
+          "severity": "P0",
+          "scenario": "Skill name field enforces 20-character limit in edit mode with a visible counter",
+          "steps": "1. Open the edit drawer for any skill.\n2. Observe the Skill name field.\n3. Try typing a name longer than 20 characters.",
+          "expected": "Input is capped at 20 characters. The character counter updates in real time and prevents further input at the limit."
         },
         {
           "id": "TC-SK-506",
-          "severity": "P0",
-          "scenario": "Renaming to a name that belongs to another skill returns 409",
-          "steps": "Ensure two skills exist: 'Python' and 'Java'. Send PATCH /api/v1/skills/<Python code>/ with body: {\"skill\": \"Java\"}.",
-          "expected": "HTTP 409. Error indicates a skill with that name already exists."
+          "severity": "P1",
+          "scenario": "Saving a skill with its own current name succeeds without a conflict error",
+          "steps": "1. Open the edit drawer for any skill.\n2. Without changing the name, click 'Save changes'.",
+          "expected": "The update succeeds. No conflict error is shown. The skill remains unchanged."
         },
         {
           "id": "TC-SK-507",
           "severity": "P1",
-          "scenario": "Updating a skill with its own current name does not conflict",
-          "steps": "Send PATCH /api/v1/skills/<code>/ with body: {\"skill\": \"<same name as skill>\"}.",
-          "expected": "HTTP 200. Update succeeds. No conflict error is raised."
+          "scenario": "Editing only the description updates it without affecting the skill name",
+          "steps": "1. Open the edit drawer for a skill.\n2. Leave the name unchanged.\n3. Update the Description field.\n4. Click 'Save changes'.",
+          "expected": "The drawer closes with a success toast. The skill's description is updated."
         },
         {
           "id": "TC-SK-508",
-          "severity": "P0",
-          "scenario": "Updating unknown code returns 404",
-          "steps": "Send PATCH /api/v1/skills/UNKNOWN-9999/ with a valid body and token.",
-          "expected": "HTTP 404."
+          "severity": "P1",
+          "scenario": "Save button shows a loading state while the update is in progress",
+          "steps": "1. Open the edit drawer.\n2. Make a change.\n3. Click 'Save changes' and observe the button immediately.",
+          "expected": "The 'Save changes' button is disabled and shows a loading indicator while the request completes."
         },
         {
           "id": "TC-SK-509",
-          "severity": "P0",
-          "scenario": "Skill name longer than 20 characters returns 400",
-          "steps": "Send PATCH /api/v1/skills/<code>/ with skill set to 21 characters.",
-          "expected": "HTTP 400. Error references the 20-character maximum."
+          "severity": "P1",
+          "scenario": "Clicking Cancel or closing the edit drawer discards unsaved changes",
+          "steps": "1. Open the edit drawer for a skill.\n2. Change the name to something else.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. The skill's name in the list remains unchanged."
         },
         {
           "id": "TC-SK-510",
-          "severity": "P1",
-          "scenario": "Empty PATCH body succeeds without modifying the skill",
-          "steps": "Send PATCH /api/v1/skills/<code>/ with an empty JSON body {}.",
-          "expected": "HTTP 200. Skill data is unchanged. No error is returned."
-        },
-        {
-          "id": "TC-SK-511",
-          "severity": "P1",
-          "scenario": "updated_by reflects the user who made the update",
-          "steps": "Log in as a specific user. Send PATCH /api/v1/skills/<code>/ with any valid change. Retrieve the skill.",
-          "expected": "updated_by in the response reflects the user who performed the update."
+          "severity": "P2",
+          "scenario": "Edit drawer footer shows the last updated by and timestamp",
+          "steps": "1. Open the edit drawer for a skill that has been previously edited.\n2. Observe the footer area.",
+          "expected": "The footer shows metadata such as 'Last updated by [username] on [date]'."
         }
       ]
     },
     {
       "id": "TC-SK-600",
-      "name": "Delete Skill — DELETE /api/v1/skills/<code>/",
+      "name": "Activating & Deactivating a Skill",
       "test_cases": [
         {
           "id": "TC-SK-601",
           "severity": "P0",
-          "scenario": "Unauthenticated request returns 401",
-          "steps": "Send DELETE /api/v1/skills/<code>/ with no Authorization header.",
-          "expected": "HTTP 401 is returned."
+          "scenario": "Clicking the Toggle action on an active skill opens the Deactivate confirmation modal",
+          "steps": "1. Log in with skills.change_skill permission.\n2. Navigate to /skills/ with the 'All' status filter.\n3. Find an active skill.\n4. Click the Toggle icon on that row.",
+          "expected": "A Deactivate confirmation modal appears, naming the skill and asking the user to confirm deactivation."
         },
         {
           "id": "TC-SK-602",
           "severity": "P0",
-          "scenario": "Authenticated user without delete_skill returns 403",
-          "steps": "Send DELETE /api/v1/skills/<code>/ with a valid token for a user without skills.delete_skill.",
-          "expected": "HTTP 403 is returned."
+          "scenario": "Confirming deactivation removes the skill from the Active list",
+          "steps": "1. Open the deactivate confirmation modal for an active skill.\n2. Click the Confirm/Deactivate button.",
+          "expected": "The modal closes. A success toast appears. The skill no longer appears when the Status filter is set to 'Active'."
         },
         {
           "id": "TC-SK-603",
           "severity": "P0",
-          "scenario": "Valid delete returns 204",
-          "steps": "Ensure a skill with a known code exists. Send DELETE /api/v1/skills/<code>/ with a valid token and delete_skill permission.",
-          "expected": "HTTP 204. No response body."
+          "scenario": "Deactivated skill appears in the Inactive filter view",
+          "steps": "1. Deactivate a skill.\n2. Change the Status filter to 'Inactive'.",
+          "expected": "The deactivated skill appears in the list with an 'Inactive' status badge."
         },
         {
           "id": "TC-SK-604",
           "severity": "P0",
-          "scenario": "Unknown code returns 404",
-          "steps": "Send DELETE /api/v1/skills/UNKNOWN-9999/ with a valid token.",
-          "expected": "HTTP 404. Structured error response is returned."
+          "scenario": "Clicking Toggle on an inactive skill opens the Activate confirmation modal",
+          "steps": "1. Set the Status filter to 'All' or 'Inactive'.\n2. Find an inactive skill.\n3. Click the Toggle icon on that row.",
+          "expected": "An Activate confirmation modal appears, naming the skill and asking the user to confirm activation."
         },
         {
           "id": "TC-SK-605",
-          "severity": "P1",
-          "scenario": "Deleted skill no longer appears in list",
-          "steps": "Create a skill. Delete it via DELETE. Then send GET /api/v1/skills/?is_active=false or active.",
-          "expected": "The deleted skill does not appear in any list response."
+          "severity": "P0",
+          "scenario": "Confirming activation makes the skill appear in the Active list",
+          "steps": "1. Open the activate confirmation modal for an inactive skill.\n2. Click Confirm/Activate.",
+          "expected": "The modal closes. A success toast appears. The skill now appears with an 'Active' badge in the default list."
         },
         {
           "id": "TC-SK-606",
           "severity": "P1",
-          "scenario": "Retrieve of deleted skill returns 404",
-          "steps": "Delete a skill. Then send GET /api/v1/skills/<code>/ for the deleted skill.",
-          "expected": "HTTP 404."
+          "scenario": "Cancelling the deactivation modal leaves the skill unchanged",
+          "steps": "1. Open the deactivate modal for an active skill.\n2. Click Cancel or close the modal.",
+          "expected": "The modal closes. The skill remains active. No change is made."
         },
         {
           "id": "TC-SK-607",
           "severity": "P1",
-          "scenario": "Deleted skill does not appear in options endpoint",
-          "steps": "Create and delete a skill. Send GET /api/v1/skills/options/.",
-          "expected": "The deleted skill is absent from the options list."
+          "scenario": "Cancelling the activation modal leaves the skill unchanged",
+          "steps": "1. Open the activate modal for an inactive skill.\n2. Click Cancel or close the modal.",
+          "expected": "The modal closes. The skill remains inactive. No change is made."
+        },
+        {
+          "id": "TC-SK-608",
+          "severity": "P2",
+          "scenario": "Deactivate/Activate modal clearly names the skill being acted on",
+          "steps": "1. Open the deactivate or activate modal for a skill named 'Python'.\n2. Read the modal text.",
+          "expected": "The modal title or body includes the skill name 'Python', making it clear which skill the action applies to."
         }
       ]
     },
     {
       "id": "TC-SK-700",
-      "name": "Activate Skill — POST /api/v1/skills/<code>/activate/",
+      "name": "Deleting a Skill",
       "test_cases": [
         {
           "id": "TC-SK-701",
           "severity": "P0",
-          "scenario": "Unauthenticated request returns 401",
-          "steps": "Send POST /api/v1/skills/<code>/activate/ with no Authorization header.",
-          "expected": "HTTP 401 is returned."
+          "scenario": "Clicking the Delete row action opens a delete confirmation modal",
+          "steps": "1. Log in with skills.delete_skill permission.\n2. Navigate to /skills/.\n3. Click the trash (Delete) icon on any skill row.",
+          "expected": "A delete confirmation modal appears. It displays the skill name and a warning that the action is permanent."
         },
         {
           "id": "TC-SK-702",
           "severity": "P0",
-          "scenario": "Authenticated user without change_skill returns 403",
-          "steps": "Send POST /api/v1/skills/<code>/activate/ with a valid token for a user without skills.change_skill.",
-          "expected": "HTTP 403 is returned."
+          "scenario": "Delete confirmation requires typing the skill name before enabling the Delete button",
+          "steps": "1. Open the delete confirmation modal for a skill named 'Python'.\n2. Observe the confirmation input.\n3. Leave the input empty and try clicking Delete.",
+          "expected": "The 'Delete skill' button is disabled until the user types 'Python' exactly in the confirmation input."
         },
         {
           "id": "TC-SK-703",
           "severity": "P0",
-          "scenario": "Activating an inactive skill sets is_active to true",
-          "steps": "Ensure a skill with is_active=false exists. Send POST /api/v1/skills/<code>/activate/ with a valid token.",
-          "expected": "HTTP 200. Response shows is_active=true. Skill now appears in default list and options."
+          "scenario": "Typing the skill name correctly enables the Delete button",
+          "steps": "1. Open the delete modal for a skill named 'Python'.\n2. Type 'Python' in the confirmation input.",
+          "expected": "The 'Delete skill' button becomes enabled once the exact name is typed."
         },
         {
           "id": "TC-SK-704",
-          "severity": "P1",
-          "scenario": "Activating an already-active skill is a no-op",
-          "steps": "Ensure a skill with is_active=true exists. Send POST /api/v1/skills/<code>/activate/.",
-          "expected": "HTTP 200. Response shows is_active=true. No error is raised."
+          "severity": "P0",
+          "scenario": "Confirming deletion removes the skill from the list permanently",
+          "steps": "1. Type the skill name in the delete confirmation input.\n2. Click the 'Delete skill' button.",
+          "expected": "The modal closes. A success toast appears. The deleted skill no longer appears in any list view, including the 'All' status filter."
         },
         {
           "id": "TC-SK-705",
-          "severity": "P0",
-          "scenario": "Activating unknown code returns 404",
-          "steps": "Send POST /api/v1/skills/UNKNOWN-9999/activate/ with a valid token.",
-          "expected": "HTTP 404."
+          "severity": "P1",
+          "scenario": "Typing an incorrect name in the confirmation input keeps the Delete button disabled",
+          "steps": "1. Open the delete modal for a skill named 'Python'.\n2. Type 'python' (wrong case) or 'Pytho' (incomplete).",
+          "expected": "The 'Delete skill' button remains disabled. Deletion cannot be confirmed without typing the exact name."
         },
         {
           "id": "TC-SK-706",
           "severity": "P1",
-          "scenario": "Activated skill appears in default (active-only) list and options",
-          "steps": "Deactivate a skill. Activate it. Send GET /api/v1/skills/ and GET /api/v1/skills/options/.",
-          "expected": "The skill appears in both the active list and the options list."
+          "scenario": "Clicking Cancel on the delete modal leaves the skill unchanged",
+          "steps": "1. Open the delete modal.\n2. Click 'Cancel' or the X close button.",
+          "expected": "The modal closes. The skill remains in the list. No deletion occurs."
+        },
+        {
+          "id": "TC-SK-707",
+          "severity": "P2",
+          "scenario": "Success toast is shown after successful deletion",
+          "steps": "1. Delete a skill by confirming the deletion.\n2. Observe the notification area.",
+          "expected": "A success toast appears confirming the skill has been deleted, showing the skill name."
         }
       ]
     },
     {
       "id": "TC-SK-800",
-      "name": "Deactivate Skill — POST /api/v1/skills/<code>/deactivate/",
+      "name": "Importing Skills",
       "test_cases": [
         {
           "id": "TC-SK-801",
           "severity": "P0",
-          "scenario": "Unauthenticated request returns 401",
-          "steps": "Send POST /api/v1/skills/<code>/deactivate/ with no Authorization header.",
-          "expected": "HTTP 401 is returned."
+          "scenario": "Clicking the Import button opens the import view",
+          "steps": "1. Log in with skills.import_skill permission.\n2. Navigate to /skills/.\n3. Click the 'Import' button.",
+          "expected": "An import panel or overlay appears with options to upload a file and download a sample template."
         },
         {
           "id": "TC-SK-802",
           "severity": "P0",
-          "scenario": "Authenticated user without change_skill returns 403",
-          "steps": "Send POST /api/v1/skills/<code>/deactivate/ with a valid token for a user without skills.change_skill.",
-          "expected": "HTTP 403 is returned."
+          "scenario": "User can download the sample CSV template from the import view",
+          "steps": "1. Open the import view.\n2. Click the 'Download sample' or 'Download template' button.",
+          "expected": "A CSV file named 'skills_import_template.csv' is downloaded. It contains a header row (skill, description, is_active) and at least one sample data row."
         },
         {
           "id": "TC-SK-803",
           "severity": "P0",
-          "scenario": "Deactivating an active skill sets is_active to false",
-          "steps": "Ensure a skill with is_active=true exists. Send POST /api/v1/skills/<code>/deactivate/ with a valid token.",
-          "expected": "HTTP 200. Response shows is_active=false."
+          "scenario": "Uploading a valid CSV and confirming imports the skills",
+          "steps": "1. Prepare a CSV with header 'skill,description,is_active' and two valid rows (skill names ≤20 chars each).\n2. Open the import view.\n3. Upload the CSV file.\n4. Click Import/Submit.",
+          "expected": "The import completes. A results summary shows the number of skills created. The imported skills appear in the Skills list."
         },
         {
           "id": "TC-SK-804",
-          "severity": "P1",
-          "scenario": "Deactivating an already-inactive skill is a no-op",
-          "steps": "Ensure a skill with is_active=false exists. Send POST /api/v1/skills/<code>/deactivate/.",
-          "expected": "HTTP 200. Response shows is_active=false. No error is raised."
+          "severity": "P0",
+          "scenario": "Uploading a non-CSV file shows a clear format error",
+          "steps": "1. Open the import view.\n2. Attempt to upload a .xlsx or .txt file.",
+          "expected": "An error message appears indicating that only CSV files are supported."
         },
         {
           "id": "TC-SK-805",
           "severity": "P0",
-          "scenario": "Deactivating unknown code returns 404",
-          "steps": "Send POST /api/v1/skills/UNKNOWN-9999/deactivate/ with a valid token.",
-          "expected": "HTTP 404."
+          "scenario": "Attempting to import without uploading a file shows an error",
+          "steps": "1. Open the import view.\n2. Click Import without selecting a file.",
+          "expected": "An error message appears prompting the user to select a file."
         },
         {
           "id": "TC-SK-806",
-          "severity": "P1",
-          "scenario": "Deactivated skill excluded from default list",
-          "steps": "Deactivate a skill. Send GET /api/v1/skills/ (default active-only).",
-          "expected": "The deactivated skill is not included in the results."
+          "severity": "P0",
+          "scenario": "CSV missing the required 'skill' column shows a column error",
+          "steps": "1. Upload a CSV with only a 'description' column and no 'skill' column.\n2. Submit the import.",
+          "expected": "An error message appears explaining that the 'skill' column is missing and is required."
         },
         {
           "id": "TC-SK-807",
-          "severity": "P1",
-          "scenario": "Deactivated skill excluded from options list",
-          "steps": "Deactivate a skill. Send GET /api/v1/skills/options/.",
-          "expected": "The deactivated skill does not appear in the options response."
+          "severity": "P0",
+          "scenario": "Row with a skill name exceeding 20 characters is reported as an error in import results",
+          "steps": "1. Prepare a CSV with one valid row and one row where the skill name is 21 characters.\n2. Upload and submit.",
+          "expected": "The results summary shows 1 created and 1 error. The error entry identifies the row number and states the 20-character limit was exceeded. No skill is created for that row."
         },
         {
           "id": "TC-SK-808",
           "severity": "P1",
-          "scenario": "Deactivated skill appears when filtering is_active=false",
-          "steps": "Deactivate a skill. Send GET /api/v1/skills/?is_active=false.",
-          "expected": "The deactivated skill appears in the results."
+          "scenario": "Rows with blank skill names are reported as errors in import results",
+          "steps": "1. Upload a CSV with one valid row and one row where the skill cell is blank.\n2. Submit the import.",
+          "expected": "The valid row is created. The blank-name row appears in the errors section with a message about the skill name being required."
+        },
+        {
+          "id": "TC-SK-809",
+          "severity": "P1",
+          "scenario": "Rows with duplicate skill names are reported as errors in import results",
+          "steps": "1. Ensure a skill named 'Python' already exists.\n2. Upload a CSV containing a row with skill='Python'.\n3. Submit the import.",
+          "expected": "The row with 'Python' appears in the errors section. No duplicate skill is created."
+        },
+        {
+          "id": "TC-SK-810",
+          "severity": "P1",
+          "scenario": "Uploading a file exceeding the size limit shows a clear error",
+          "steps": "1. Open the import view.\n2. Attempt to upload a CSV file larger than 5 MB.",
+          "expected": "An error message appears stating the file exceeds the maximum allowed size."
+        },
+        {
+          "id": "TC-SK-811",
+          "severity": "P1",
+          "scenario": "Dry run mode shows a preview of results without creating any skills",
+          "steps": "1. Open the import view.\n2. Enable the dry run / validate option.\n3. Upload a valid CSV and submit.",
+          "expected": "The results are previewed (showing skills that would be created). No actual skills are created in the system. The Skills list is unchanged."
+        },
+        {
+          "id": "TC-SK-812",
+          "severity": "P1",
+          "scenario": "Skills list refreshes automatically after a successful import",
+          "steps": "1. Import a valid CSV with new skills.\n2. After import completes, observe the Skills list.",
+          "expected": "The newly imported skills appear in the list without the user needing to manually refresh the page."
+        },
+        {
+          "id": "TC-SK-813",
+          "severity": "P2",
+          "scenario": "Import view shows field definitions and accepted formats",
+          "steps": "1. Open the import view.\n2. Look for information about the accepted file format and field rules.",
+          "expected": "The import view shows the accepted format (CSV), field descriptions (skill required max 20 chars, description optional, is_active optional), and limits (max rows, max file size)."
         }
       ]
     },
     {
       "id": "TC-SK-900",
-      "name": "Statistics — GET /api/v1/skills/stats/",
+      "name": "Exporting Skills",
       "test_cases": [
         {
           "id": "TC-SK-901",
           "severity": "P0",
-          "scenario": "Unauthenticated request returns 401",
-          "steps": "Send GET /api/v1/skills/stats/ with no Authorization header.",
-          "expected": "HTTP 401 is returned."
+          "scenario": "Clicking the Export button opens the export view",
+          "steps": "1. Log in with skills.export_skill permission.\n2. Navigate to /skills/.\n3. Click the 'Export' button.",
+          "expected": "An export panel or overlay appears with options to choose format and columns."
         },
         {
           "id": "TC-SK-902",
           "severity": "P0",
-          "scenario": "Authenticated user without view_skill returns 403",
-          "steps": "Send GET /api/v1/skills/stats/ with a valid token for a user without skills.view_skill.",
-          "expected": "HTTP 403 is returned."
+          "scenario": "Exporting as CSV downloads a valid CSV file with skill data",
+          "steps": "1. Open the export view.\n2. Select CSV format.\n3. Click Export/Download.",
+          "expected": "A CSV file is downloaded. It contains a header row and one data row per active skill. The file can be opened in a spreadsheet application."
         },
         {
           "id": "TC-SK-903",
           "severity": "P1",
-          "scenario": "Statistics returns total, active, and inactive counts",
-          "steps": "Ensure a known set of active and inactive skills exists. Send GET /api/v1/skills/stats/ with a valid token.",
-          "expected": "HTTP 200. Response contains total, active, and inactive counts that match the current state."
+          "scenario": "Exporting as XLSX downloads a valid Excel file",
+          "steps": "1. Open the export view.\n2. Select XLSX format.\n3. Click Export.",
+          "expected": "An .xlsx file is downloaded. It can be opened in Excel or Google Sheets and contains skill data with a header row."
         },
         {
           "id": "TC-SK-904",
           "severity": "P1",
-          "scenario": "Statistics are accurate after create and deactivate operations",
-          "steps": "Note current stats. Create one active skill and deactivate one existing skill. Send GET /api/v1/skills/stats/ again.",
-          "expected": "total increases by 1, active and inactive counts update to reflect the operations."
+          "scenario": "Exporting as PDF downloads a readable PDF file",
+          "steps": "1. Open the export view.\n2. Select PDF format.\n3. Click Export.",
+          "expected": "A PDF file is downloaded. It contains skill data formatted in a table that is human-readable."
         },
         {
           "id": "TC-SK-905",
+          "severity": "P1",
+          "scenario": "Exporting as JSON downloads a valid JSON file",
+          "steps": "1. Open the export view.\n2. Select JSON format.\n3. Click Export.",
+          "expected": "A JSON file is downloaded containing an array of skill objects."
+        },
+        {
+          "id": "TC-SK-906",
+          "severity": "P1",
+          "scenario": "Export respects the active search and filter state from the list page",
+          "steps": "1. On the Skills list page, search for 'Python'.\n2. Click Export.\n3. Download the CSV.",
+          "expected": "The exported file contains only skills matching the active search term, not all skills."
+        },
+        {
+          "id": "TC-SK-907",
+          "severity": "P1",
+          "scenario": "User can select which columns to include in the export",
+          "steps": "1. Open the export view.\n2. Deselect the 'Description' and 'Created at' columns.\n3. Export as CSV.",
+          "expected": "The downloaded CSV contains only the selected columns. Deselected columns are absent from the file."
+        },
+        {
+          "id": "TC-SK-908",
           "severity": "P2",
-          "scenario": "fields param returns only requested stat keys",
-          "steps": "Send GET /api/v1/skills/stats/?fields=active,inactive with a valid token.",
-          "expected": "HTTP 200. Response contains only the active and inactive keys, not total."
+          "scenario": "Exporting with no matching skills produces a file with headers only",
+          "steps": "1. Apply a search that matches no skills (e.g. 'ZZZNOMATCH').\n2. Click Export and choose CSV.",
+          "expected": "The downloaded CSV contains only the header row and no data rows."
+        },
+        {
+          "id": "TC-SK-909",
+          "severity": "P2",
+          "scenario": "Export view shows the list of available columns and their labels",
+          "steps": "1. Open the export view.\n2. Observe the column selection area.",
+          "expected": "A list of selectable columns is shown (e.g. Skill, Code, Description, Status, Created at, Created by). Each has a clear label."
         }
       ]
     },
     {
       "id": "TC-SK-1000",
-      "name": "Options — GET /api/v1/skills/options/",
+      "name": "Non-Functional & Accessibility",
       "test_cases": [
         {
           "id": "TC-SK-1001",
-          "severity": "P0",
-          "scenario": "Unauthenticated request returns 401",
-          "steps": "Send GET /api/v1/skills/options/ with no Authorization header.",
-          "expected": "HTTP 401 is returned."
+          "severity": "P1",
+          "scenario": "Skills list loads within 3 seconds on a standard broadband connection",
+          "steps": "1. Open the browser's network tab.\n2. Navigate to /skills/.\n3. Measure time from navigation start until the table rows are visible.",
+          "expected": "The skills list renders with data within 3 seconds."
         },
         {
           "id": "TC-SK-1002",
-          "severity": "P0",
-          "scenario": "Authenticated user without view_skill returns 403",
-          "steps": "Send GET /api/v1/skills/options/ with a valid token for a user without skills.view_skill.",
-          "expected": "HTTP 403 is returned."
+          "severity": "P1",
+          "scenario": "A loading spinner is shown while the skills list is being fetched",
+          "steps": "1. Throttle the network to 'Slow 3G' in browser devtools.\n2. Navigate to /skills/.\n3. Observe the table area before data loads.",
+          "expected": "A loading indicator (spinner or skeleton rows) is shown in the table while the data is being fetched."
         },
         {
           "id": "TC-SK-1003",
-          "severity": "P0",
-          "scenario": "Options returns only active skills",
-          "steps": "Ensure active and inactive skills exist. Send GET /api/v1/skills/options/ with a valid token.",
-          "expected": "HTTP 200. Response list contains only active skills. Inactive skills are absent."
+          "severity": "P1",
+          "scenario": "All interactive elements on the Skills page are reachable via Tab key",
+          "steps": "1. Navigate to /skills/.\n2. Without using a mouse, press Tab repeatedly.\n3. Observe which elements receive focus.",
+          "expected": "Focus moves through all interactive elements in a logical order: search, filter, table rows, action buttons, pagination, and page header actions. No element is skipped."
         },
         {
           "id": "TC-SK-1004",
-          "severity": "P0",
-          "scenario": "Each option entry contains code and skill fields only",
-          "steps": "Send GET /api/v1/skills/options/ with a valid token.",
-          "expected": "Each item in the response has code and skill fields. No extra fields (description, created_at, etc.) are included."
+          "severity": "P1",
+          "scenario": "All form fields in create and edit drawers have visible labels",
+          "steps": "1. Open the create drawer.\n2. Observe each field.\n3. Repeat for the edit drawer.",
+          "expected": "Every input field has a clearly visible label. Labels are present for Skill name and Description."
         },
         {
           "id": "TC-SK-1005",
           "severity": "P1",
-          "scenario": "Newly created skill appears in options immediately",
-          "steps": "Create a new active skill. Send GET /api/v1/skills/options/.",
-          "expected": "The new skill appears in the options list."
+          "scenario": "Validation error messages are descriptive and tell the user what to do",
+          "steps": "1. Submit the create form with an empty skill name.\n2. Read the error message.",
+          "expected": "The error message is specific (e.g. 'Skill name is required.'). It does not show a technical error code or a generic 'Error' message."
         },
         {
           "id": "TC-SK-1006",
           "severity": "P1",
-          "scenario": "Deactivated skill is removed from options",
-          "steps": "Deactivate a skill. Send GET /api/v1/skills/options/.",
-          "expected": "The deactivated skill is no longer present in the options response."
+          "scenario": "The page remains usable if the API returns an error",
+          "steps": "1. Simulate a network error (disable the network after the page loads).\n2. Try refreshing the table or performing an action.",
+          "expected": "An error message is shown to the user. The page does not crash or display a blank white screen."
         },
         {
           "id": "TC-SK-1007",
           "severity": "P2",
-          "scenario": "Options returns empty list when no active skills exist",
-          "steps": "Ensure all skills are inactive or none exist. Send GET /api/v1/skills/options/.",
-          "expected": "HTTP 200. Response is an empty array."
+          "scenario": "Browser tab title shows 'Skills' when on the Skills page",
+          "steps": "1. Navigate to /skills/.\n2. Look at the browser tab title.",
+          "expected": "The browser tab shows 'Skills' or 'Skills — Resource Planner' (or similar app-specific title)."
+        },
+        {
+          "id": "TC-SK-1008",
+          "severity": "P2",
+          "scenario": "Modals and drawers can be closed with the Escape key",
+          "steps": "1. Open the create drawer.\n2. Press the Escape key.\n3. Repeat for the delete modal.",
+          "expected": "Pressing Escape closes the drawer or modal. Focus returns to the element that triggered it."
+        },
+        {
+          "id": "TC-SK-1009",
+          "severity": "P2",
+          "scenario": "Focus is trapped inside a modal while it is open",
+          "steps": "1. Open the delete confirmation modal.\n2. Press Tab repeatedly to cycle through focus.",
+          "expected": "Focus cycles only through elements inside the modal. It does not reach elements behind the modal overlay."
+        },
+        {
+          "id": "TC-SK-1010",
+          "severity": "P2",
+          "scenario": "Toast notifications disappear automatically after a few seconds",
+          "steps": "1. Create a skill successfully.\n2. Observe the success toast.\n3. Wait without interacting.",
+          "expected": "The success toast disappears automatically after approximately 5 seconds without the user having to dismiss it."
         }
       ]
     },
     {
       "id": "TC-SK-1100",
-      "name": "Import Skills — POST /api/v1/skills/import/",
+      "name": "Desktop Layout",
       "test_cases": [
         {
           "id": "TC-SK-1101",
-          "severity": "P0",
-          "scenario": "Unauthenticated request returns 401",
-          "steps": "Send POST /api/v1/skills/import/ with no Authorization header.",
-          "expected": "HTTP 401 is returned."
+          "severity": "P1",
+          "scenario": "All table columns are visible at a 1280px wide viewport",
+          "steps": "1. Set browser viewport to 1280px wide.\n2. Navigate to /skills/.\n3. Observe the table columns.",
+          "expected": "All columns — Skill, Code, Description, Status, Created — are visible without horizontal scrolling."
         },
         {
           "id": "TC-SK-1102",
-          "severity": "P0",
-          "scenario": "Authenticated user without import_skill returns 403",
-          "steps": "Send POST /api/v1/skills/import/ with a valid token for a user without skills.import_skill.",
-          "expected": "HTTP 403 is returned."
+          "severity": "P1",
+          "scenario": "Row action buttons are accessible without horizontal scrolling at 1280px",
+          "steps": "1. Set viewport to 1280px.\n2. Hover over a table row.\n3. Observe action buttons.",
+          "expected": "Edit, Toggle, and Delete action buttons (where applicable) are fully visible and clickable."
         },
         {
           "id": "TC-SK-1103",
-          "severity": "P0",
-          "scenario": "Valid CSV with header and data rows imports successfully",
-          "steps": "Upload a CSV file with header row 'skill,description,is_active' and two valid data rows. Send POST /api/v1/skills/import/ with a valid token.",
-          "expected": "HTTP 207. Response shows created_rows list with both skills. errors is empty. Skills are visible in GET /api/v1/skills/."
+          "severity": "P1",
+          "scenario": "Create and edit drawers render at correct width without overlapping content",
+          "steps": "1. On a 1440px wide desktop screen, open the create drawer.\n2. Observe the drawer width and positioning.",
+          "expected": "The drawer opens at the expected width (approximately 900px or proportional). The underlying page content is dimmed but not obscured by the drawer."
         },
         {
           "id": "TC-SK-1104",
-          "severity": "P0",
-          "scenario": "No file uploaded returns 400",
-          "steps": "Send POST /api/v1/skills/import/ with a valid token but no file in the request body.",
-          "expected": "HTTP 400. Error indicates no import file was uploaded."
+          "severity": "P2",
+          "scenario": "Skill detail page shows two-column layout on desktop — info panel and members table side by side",
+          "steps": "1. Set viewport to 1280px or wider.\n2. Navigate to a skill detail page.\n3. Observe the layout.",
+          "expected": "The info panel is on the left (approximately 4 of 12 columns) and the members table is on the right (approximately 8 of 12 columns), displayed side by side."
         },
         {
           "id": "TC-SK-1105",
-          "severity": "P0",
-          "scenario": "Non-CSV file returns 400",
-          "steps": "Upload a .xlsx or .txt file to POST /api/v1/skills/import/.",
-          "expected": "HTTP 400. Error indicates unsupported file format and lists allowed formats (csv only)."
-        },
-        {
-          "id": "TC-SK-1106",
-          "severity": "P0",
-          "scenario": "Missing required 'skill' column in CSV returns 400",
-          "steps": "Upload a CSV file with only a 'description' column header (no 'skill' column). Send POST /api/v1/skills/import/.",
-          "expected": "HTTP 400. Error indicates the 'skill' column is missing."
-        },
-        {
-          "id": "TC-SK-1107",
-          "severity": "P1",
-          "scenario": "Row with blank skill name is skipped and reported in errors",
-          "steps": "Upload a CSV with one valid row and one row where the skill cell is blank. Send POST /api/v1/skills/import/.",
-          "expected": "HTTP 207. The valid row is created. The blank skill row appears in errors with field=skill and message about skill being required."
-        },
-        {
-          "id": "TC-SK-1108",
-          "severity": "P0",
-          "scenario": "Row with skill name exceeding 20 characters is skipped and reported in errors",
-          "steps": "Upload a CSV with a row where the skill value is 21 characters. Send POST /api/v1/skills/import/.",
-          "expected": "HTTP 207. The oversized skill name row appears in errors indicating 20-character maximum. No skill is created for that row."
-        },
-        {
-          "id": "TC-SK-1109",
-          "severity": "P1",
-          "scenario": "Row with duplicate skill name is skipped and reported in errors",
-          "steps": "Ensure a skill named 'Python' already exists. Upload a CSV containing a row with skill='Python'. Send POST /api/v1/skills/import/.",
-          "expected": "HTTP 207. The duplicate row appears in errors. No new skill is created for that row."
-        },
-        {
-          "id": "TC-SK-1110",
-          "severity": "P1",
-          "scenario": "File exceeding 5 MB size limit returns 400",
-          "steps": "Upload a CSV file larger than 5 MB. Send POST /api/v1/skills/import/.",
-          "expected": "HTTP 400. Error indicates the file is too large and shows the maximum allowed size."
-        },
-        {
-          "id": "TC-SK-1111",
-          "severity": "P1",
-          "scenario": "File with more than 1000 data rows returns 400",
-          "steps": "Upload a CSV file with 1001 data rows. Send POST /api/v1/skills/import/.",
-          "expected": "HTTP 400. Error indicates too many rows and shows the maximum allowed (1000)."
-        },
-        {
-          "id": "TC-SK-1112",
-          "severity": "P1",
-          "scenario": "Dry run (validate=true) previews result without creating skills",
-          "steps": "Upload a valid CSV. Send POST /api/v1/skills/import/?validate=true.",
-          "expected": "HTTP 207. Response shows dry_run=true, created_rows previewed, but no skills are actually created. GET /api/v1/skills/ does not show any new skills."
-        },
-        {
-          "id": "TC-SK-1113",
-          "severity": "P1",
-          "scenario": "CSV row with is_active=false creates an inactive skill",
-          "steps": "Upload a CSV with a row: skill='COBOL',description='',is_active=false.",
-          "expected": "HTTP 207. The skill is created. GET /api/v1/skills/?is_active=false confirms it as inactive."
-        },
-        {
-          "id": "TC-SK-1114",
           "severity": "P2",
-          "scenario": "CSV row with only skill column creates skill with default values",
-          "steps": "Upload a CSV with header 'skill' only and a row with just a skill name (≤20 chars).",
-          "expected": "HTTP 207. Skill is created. description defaults to empty string, is_active defaults to true."
-        },
-        {
-          "id": "TC-SK-1115",
-          "severity": "P1",
-          "scenario": "GET /api/v1/skills/import/specs/ returns field definitions and limits",
-          "steps": "Send GET /api/v1/skills/import/specs/ with a valid token and import_skill permission.",
-          "expected": "HTTP 200. Response contains supported_formats (['csv']), max_rows (1000), max_file_size_mb (5), fields array describing skill/description/is_active columns, and notes array."
-        },
-        {
-          "id": "TC-SK-1116",
-          "severity": "P1",
-          "scenario": "GET /api/v1/skills/import/sample/ downloads a CSV template",
-          "steps": "Send GET /api/v1/skills/import/sample/ with a valid token and import_skill permission.",
-          "expected": "Response is a CSV file download (skills_import_template.csv) with header row: skill,description,is_active and a sample data row."
-        },
-        {
-          "id": "TC-SK-1117",
-          "severity": "P2",
-          "scenario": "Import response includes accurate total row count",
-          "steps": "Upload a CSV with 5 rows (3 valid, 1 duplicate, 1 blank skill). Send POST /api/v1/skills/import/.",
-          "expected": "Response total is 5. created_rows has 3 entries. errors has 2 entries."
+          "scenario": "Filter panel and table display correctly side by side at wide viewports",
+          "steps": "1. Set viewport to 1440px or wider.\n2. Navigate to /skills/.\n3. Observe the layout of the filter panel and the data table.",
+          "expected": "The filter panel and table are in a clean layout. Neither overlaps the other. Active filter tags appear correctly."
         }
       ]
     },
     {
       "id": "TC-SK-1200",
-      "name": "Export Skills — GET /api/v1/skills/export/",
+      "name": "Mobile & Responsive",
       "test_cases": [
         {
           "id": "TC-SK-1201",
-          "severity": "P0",
-          "scenario": "Unauthenticated request returns 401",
-          "steps": "Send GET /api/v1/skills/export/ with no Authorization header.",
-          "expected": "HTTP 401 is returned."
+          "severity": "P1",
+          "scenario": "Skills list page is usable on a 375px (mobile) viewport",
+          "steps": "1. Set browser viewport to 375px wide.\n2. Navigate to /skills/.\n3. Interact with the search and list.",
+          "expected": "The page is fully usable. No content is cut off. The table is scrollable or adapts to show key columns (Skill and Status at minimum). The Add/Import/Export buttons remain accessible."
         },
         {
           "id": "TC-SK-1202",
-          "severity": "P0",
-          "scenario": "Authenticated user without export_skill returns 403",
-          "steps": "Send GET /api/v1/skills/export/ with a valid token for a user without skills.export_skill.",
-          "expected": "HTTP 403 is returned."
+          "severity": "P1",
+          "scenario": "Code and Description columns are hidden on mobile to reduce clutter",
+          "steps": "1. Set viewport to 375px.\n2. Navigate to /skills/.\n3. Observe the table columns.",
+          "expected": "The Code and Description columns are hidden on mobile. The Skill name and Status columns remain visible."
         },
         {
           "id": "TC-SK-1203",
-          "severity": "P0",
-          "scenario": "Export as CSV returns a downloadable CSV file",
-          "steps": "Send GET /api/v1/skills/export/?type=csv with a valid token.",
-          "expected": "Response content-type is text/csv. File is downloadable. Contains a header row and data rows for all active skills."
+          "severity": "P1",
+          "scenario": "Create skill drawer is fully usable on mobile without hidden or inaccessible fields",
+          "steps": "1. On a 375px viewport, navigate to /skills/.\n2. Tap 'Add Skill'.\n3. Try filling in the form fields.",
+          "expected": "The drawer opens and occupies most of the screen. Both Skill name and Description fields are visible and tappable. The Cancel and Create skill buttons are reachable."
         },
         {
           "id": "TC-SK-1204",
           "severity": "P1",
-          "scenario": "Export as XLSX returns a downloadable Excel file",
-          "steps": "Send GET /api/v1/skills/export/?type=xlsx with a valid token.",
-          "expected": "Response is an XLSX file. It can be opened in Excel/Google Sheets and contains skill data."
+          "scenario": "Delete confirmation modal is usable on mobile",
+          "steps": "1. On a 375px viewport, open the delete modal for a skill.\n2. Try typing the skill name in the confirmation input.\n3. Try clicking Confirm.",
+          "expected": "The modal fits within the screen. The confirmation input is tappable. The Delete button is reachable after typing the skill name."
         },
         {
           "id": "TC-SK-1205",
-          "severity": "P1",
-          "scenario": "Export as PDF returns a downloadable PDF file",
-          "steps": "Send GET /api/v1/skills/export/?type=pdf with a valid token.",
-          "expected": "Response is a PDF file containing skills data in a readable format."
+          "severity": "P2",
+          "scenario": "All buttons are large enough to tap on touch screens",
+          "steps": "1. On a mobile device or 375px viewport, inspect the interactive buttons (Add Skill, Import, Export, row actions, modal buttons).\n2. Assess their tap target size.",
+          "expected": "All interactive buttons have a minimum tap target of 44×44 CSS pixels."
         },
         {
           "id": "TC-SK-1206",
-          "severity": "P1",
-          "scenario": "Export as JSON returns a downloadable JSON file",
-          "steps": "Send GET /api/v1/skills/export/?type=json with a valid token.",
-          "expected": "Response is a JSON file containing skill records."
-        },
-        {
-          "id": "TC-SK-1207",
-          "severity": "P1",
-          "scenario": "Unsupported export format returns 400",
-          "steps": "Send GET /api/v1/skills/export/?type=xml with a valid token.",
-          "expected": "HTTP 400. Error indicates unsupported format and lists allowed values: csv, xlsx, pdf, json."
-        },
-        {
-          "id": "TC-SK-1208",
-          "severity": "P1",
-          "scenario": "fields param filters exported columns",
-          "steps": "Send GET /api/v1/skills/export/?type=csv&fields=skill,code with a valid token.",
-          "expected": "Exported CSV contains only 'skill' and 'code' columns. Other columns are absent."
-        },
-        {
-          "id": "TC-SK-1209",
-          "severity": "P1",
-          "scenario": "Default export includes only active skills",
-          "steps": "Ensure both active and inactive skills exist. Send GET /api/v1/skills/export/?type=csv with no is_active filter.",
-          "expected": "Exported file contains only active skills."
-        },
-        {
-          "id": "TC-SK-1210",
-          "severity": "P1",
-          "scenario": "is_active=all exports both active and inactive skills",
-          "steps": "Send GET /api/v1/skills/export/?type=csv&is_active=all with a valid token.",
-          "expected": "Exported CSV contains both active and inactive skills."
-        },
-        {
-          "id": "TC-SK-1211",
-          "severity": "P1",
-          "scenario": "search filter in export matches list filter behavior",
-          "steps": "Send GET /api/v1/skills/export/?type=csv&search=Python with a valid token.",
-          "expected": "Exported file contains only skills whose skill name matches 'Python'."
-        },
-        {
-          "id": "TC-SK-1212",
-          "severity": "P1",
-          "scenario": "GET /api/v1/skills/export/specs/ returns available column definitions",
-          "steps": "Send GET /api/v1/skills/export/specs/ with a valid token and export_skill permission.",
-          "expected": "HTTP 200. Response contains a columns array with entries for skill, code, description, is_active, created_at, created_by, updated_at, updated_by — each with key, label, and default."
-        },
-        {
-          "id": "TC-SK-1213",
           "severity": "P2",
-          "scenario": "Export with no matching skills returns file with headers only",
-          "steps": "Apply a search filter that matches no skills. Send GET /api/v1/skills/export/?type=csv&search=ZZZNOMATCH.",
-          "expected": "Exported CSV contains the header row only, no data rows."
-        },
-        {
-          "id": "TC-SK-1214",
-          "severity": "P2",
-          "scenario": "Default exported columns match export specs default=true columns",
-          "steps": "Send GET /api/v1/skills/export/?type=csv with no fields param.",
-          "expected": "Exported CSV headers match the columns where default=true in export specs: skill, code, description, is_active, created_at."
+          "scenario": "Skill detail page stacks info panel and members table vertically on mobile",
+          "steps": "1. Set viewport to 375px.\n2. Navigate to a skill detail page.",
+          "expected": "The info panel appears first, followed by the members table below it in a single-column stacked layout."
         }
       ]
     },
     {
       "id": "TC-SK-1300",
-      "name": "Security",
+      "name": "Integration with Other Modules",
       "test_cases": [
         {
           "id": "TC-SK-1301",
-          "severity": "P0",
-          "scenario": "All skill endpoints require a valid Bearer token",
-          "steps": "Send requests to all endpoints (list, retrieve, options, create, update, delete, activate, deactivate, stats, import, export) with no Authorization header.",
-          "expected": "All return HTTP 401. No endpoint is accessible without authentication."
+          "severity": "P1",
+          "scenario": "A skill created in Skills appears in skill selection dropdowns in other modules",
+          "steps": "1. Create a new skill named 'GraphQL' on the Skills page.\n2. Navigate to another module that has a skill assignment field (e.g. Users or Resource Plans).\n3. Open the skill dropdown or selector.",
+          "expected": "'GraphQL' appears as an option in the skill dropdown of other modules."
         },
         {
           "id": "TC-SK-1302",
-          "severity": "P0",
-          "scenario": "Invalid Bearer token returns 401",
-          "steps": "Send GET /api/v1/skills/ with Authorization: Bearer invalidtoken123.",
-          "expected": "HTTP 401 is returned."
+          "severity": "P1",
+          "scenario": "A deactivated skill is excluded from skill selection dropdowns in other modules",
+          "steps": "1. Deactivate a skill named 'COBOL'.\n2. Navigate to another module with a skill selector.\n3. Open the skill dropdown.",
+          "expected": "'COBOL' does not appear in the skill selection dropdown. Only active skills are selectable."
         },
         {
           "id": "TC-SK-1303",
-          "severity": "P0",
-          "scenario": "Correct permission is enforced per endpoint",
-          "steps": "Use a user with only view_skill. Attempt POST /api/v1/skills/ (create), PATCH (update), DELETE, activate, deactivate, import, export.",
-          "expected": "All write/import/export endpoints return HTTP 403. list, retrieve, stats, and options succeed."
+          "severity": "P1",
+          "scenario": "Users assigned a skill appear on that skill's detail page members table",
+          "steps": "1. Assign a skill 'Python' to two users via the relevant flow.\n2. Navigate to the Python skill detail page.\n3. Observe the Members table.",
+          "expected": "The two users appear in the Members table with their Name, Email, Role, and Location displayed."
         },
         {
           "id": "TC-SK-1304",
-          "severity": "P0",
-          "scenario": "Error responses do not expose internal stack traces",
-          "steps": "Trigger a 404 and a 400 error on any skill endpoint.",
-          "expected": "Error response contains only code and message. No stack trace, SQL query, or internal file path is visible."
+          "severity": "P2",
+          "scenario": "Skill code remains stable as a reference identifier across modules",
+          "steps": "1. Note the code for a skill (e.g. 'SKILL-0003').\n2. Edit the skill's name.\n3. Check references to that skill in other modules.",
+          "expected": "The skill code remains 'SKILL-0003' after a name change. References in other modules still resolve to the correct skill."
         },
         {
           "id": "TC-SK-1305",
-          "severity": "P1",
-          "scenario": "Response fields do not include unexpected sensitive data",
-          "steps": "Retrieve any skill via GET /api/v1/skills/<code>/.",
-          "expected": "Response contains only documented fields: code, skill, description, is_active, created_at, created_by, updated_at, updated_by. No internal DB fields or system fields are exposed."
+          "severity": "P2",
+          "scenario": "Deleting a skill frees the skill name for reuse",
+          "steps": "1. Delete a skill named 'Scala'.\n2. Create a new skill also named 'Scala'.",
+          "expected": "The new skill named 'Scala' is created successfully. No conflict error appears referencing the deleted skill."
         },
         {
           "id": "TC-SK-1306",
-          "severity": "P1",
-          "scenario": "Audit log is created on create, update, delete, activate, deactivate",
-          "steps": "Perform create, update, delete, activate, and deactivate operations on a skill. Check the audit log.",
-          "expected": "Each operation generates an audit record with the correct module (skills), resource type (skill), resource code, before/after state, and actor."
-        }
-      ]
-    },
-    {
-      "id": "TC-SK-1400",
-      "name": "Edge Cases",
-      "test_cases": [
-        {
-          "id": "TC-SK-1401",
-          "severity": "P1",
-          "scenario": "Skill name with exactly 20 characters (boundary) is accepted",
-          "steps": "Send POST /api/v1/skills/ with a skill name of exactly 20 characters.",
-          "expected": "HTTP 201. Skill is created successfully. Name is stored as provided."
-        },
-        {
-          "id": "TC-SK-1402",
-          "severity": "P1",
-          "scenario": "Skill name with 21 characters (boundary +1) is rejected on create",
-          "steps": "Send POST /api/v1/skills/ with a skill name of exactly 21 characters.",
-          "expected": "HTTP 400. Error references the 20-character limit."
-        },
-        {
-          "id": "TC-SK-1403",
-          "severity": "P1",
-          "scenario": "Skill name with 21 characters (boundary +1) is rejected on update",
-          "steps": "Send PATCH /api/v1/skills/<code>/ with a skill name of exactly 21 characters.",
-          "expected": "HTTP 400. Error references the 20-character limit."
-        },
-        {
-          "id": "TC-SK-1404",
           "severity": "P2",
-          "scenario": "Skill name with special characters is accepted",
-          "steps": "Send POST /api/v1/skills/ with skill: 'C++' (3 chars).",
-          "expected": "HTTP 201. Skill is created and the name is stored exactly as provided."
-        },
-        {
-          "id": "TC-SK-1405",
-          "severity": "P2",
-          "scenario": "Skill name with unicode characters is accepted within 20-char limit",
-          "steps": "Send POST /api/v1/skills/ with a unicode skill name of ≤20 characters.",
-          "expected": "HTTP 201. Skill is created with the unicode name intact."
-        },
-        {
-          "id": "TC-SK-1406",
-          "severity": "P2",
-          "scenario": "Description can be an empty string on create",
-          "steps": "Send POST /api/v1/skills/ with body: {\"skill\": \"Rust\", \"description\": \"\"}.",
-          "expected": "HTTP 201. Skill created with empty description."
-        },
-        {
-          "id": "TC-SK-1407",
-          "severity": "P2",
-          "scenario": "Description can be set to empty string on update",
-          "steps": "Create a skill with a non-empty description. Then PATCH it with description: ''.",
-          "expected": "HTTP 200. Updated skill has empty description."
-        },
-        {
-          "id": "TC-SK-1408",
-          "severity": "P2",
-          "scenario": "Sorting by an unsupported field does not crash the API",
-          "steps": "Send GET /api/v1/skills/?sort=nonexistent_field with a valid token.",
-          "expected": "HTTP 200. Returns skills with default ordering. No 500 error."
-        },
-        {
-          "id": "TC-SK-1409",
-          "severity": "P2",
-          "scenario": "page=0 is treated as page 1",
-          "steps": "Send GET /api/v1/skills/?page=0 with a valid token.",
-          "expected": "HTTP 200. Returns the first page of results. No error."
-        },
-        {
-          "id": "TC-SK-1410",
-          "severity": "P2",
-          "scenario": "Non-numeric page or page_size is handled gracefully",
-          "steps": "Send GET /api/v1/skills/?page=abc&page_size=xyz with a valid token.",
-          "expected": "HTTP 200. Falls back to default page=1, page_size=25. No error."
-        },
-        {
-          "id": "TC-SK-1411",
-          "severity": "P2",
-          "scenario": "Importing a CSV with BOM encoding is handled correctly",
-          "steps": "Save a CSV file with UTF-8 BOM encoding containing valid skill rows. Upload it via POST /api/v1/skills/import/.",
-          "expected": "HTTP 207. BOM is stripped. Skills are created correctly. No missing column error."
-        },
-        {
-          "id": "TC-SK-1412",
-          "severity": "P2",
-          "scenario": "Concurrent create requests with the same skill name results in only one skill created",
-          "steps": "Simultaneously send two POST /api/v1/skills/ requests with the same skill name.",
-          "expected": "One request succeeds with HTTP 201. The other returns HTTP 409. Only one skill with that name exists in the system."
-        },
-        {
-          "id": "TC-SK-1413",
-          "severity": "P2",
-          "scenario": "Skill name with only whitespace is treated as blank and rejected",
-          "steps": "Send POST /api/v1/skills/ with skill: '   ' (whitespace only).",
-          "expected": "HTTP 400 or HTTP 207 (if via import). The skill is not created. An error is returned referencing the skill field."
+          "scenario": "Audit log records skill create, edit, activate, deactivate, and delete actions",
+          "steps": "1. Perform create, edit, deactivate, activate, and delete operations on a skill.\n2. Open the audit log module (if available) and filter for the Skills module.",
+          "expected": "Each operation appears as a separate audit log entry with the actor, action type, skill name, and timestamp recorded correctly."
         }
       ]
     }
