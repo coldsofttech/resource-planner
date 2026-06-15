@@ -30,7 +30,6 @@ exclude_dirs = ["tests"]
 skips = ["B101", "B105", "B106", "B107"]
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "config.settings"
 pythonpath = ["apps/web"]
 testpaths = ["apps/web"]
 python_files = ["test_*.py"]
