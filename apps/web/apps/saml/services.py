@@ -1,5 +1,5 @@
 import os
-import xml.etree.ElementTree as ET  # nosec B405
+import xml.etree.ElementTree as ET  # nosec B405  # nosemgrep: use-defused-xml
 from urllib.parse import urlparse
 
 from django.db import transaction

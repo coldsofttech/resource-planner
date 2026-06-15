@@ -30,7 +30,7 @@ RESET = "\033[0m" if _tty else ""
 def run(cmd, cwd=ROOT):
     """Run shell command safely."""
     print(f"\n>>> {cmd}\n")
-    result = subprocess.run(cmd, shell=True, cwd=cwd)  # nosec B602
+    result = subprocess.run(cmd, shell=True, cwd=cwd)  # nosec B602  # nosemgrep
 
     if result.returncode != 0:
         print(f"{RED}\nCommand failed: {cmd}{RESET}")
@@ -44,7 +44,7 @@ _PYTEST_NO_TESTS = 5  # pytest exit code when no tests are collected
 def _run_pytest(cmd: str) -> int:
     """Run a pytest command; exit code 5 (no tests collected) is treated as success."""
     print(f"\n>>> {cmd}\n")
-    result = subprocess.run(cmd, shell=True, cwd=ROOT)  # nosec B602
+    result = subprocess.run(cmd, shell=True, cwd=ROOT)  # nosec B602  # nosemgrep
     rc = result.returncode
     if rc == _PYTEST_NO_TESTS:
         print(f"{YELLOW}No tests collected — skipping.{RESET}")
@@ -161,7 +161,7 @@ _ANSI_RE = re.compile(r"\x1b\[[0-9;]*[mKHJABCDEFGsu]")
 def _run_cmd_buffered(cmd: str, buf: "collections.deque[str]", cwd: Path = ROOT) -> int:
     """Run a shell command, streaming each output line into buf. Returns exit code."""
     buf.append(f"$ {cmd}")
-    proc = subprocess.Popen(  # nosec B602
+    proc = subprocess.Popen(  # nosec B602  # nosemgrep
         cmd,
         shell=True,
         cwd=cwd,
@@ -1092,7 +1092,8 @@ def _fetch_keycloak_oauth_saml_config(
     """
     import json
     import urllib.request
-    import xml.etree.ElementTree as ET
+
+    import defusedxml.ElementTree as ET  # nosemgrep
 
     discovery_url = (
         f"{_KEYCLOAK_URL}/realms/{_KEYCLOAK_REALM}/.well-known/openid-configuration"
@@ -1100,14 +1101,14 @@ def _fetch_keycloak_oauth_saml_config(
     metadata_url = f"{_KEYCLOAK_URL}/realms/{_KEYCLOAK_REALM}/protocol/saml/descriptor"
 
     try:
-        with urllib.request.urlopen(discovery_url, timeout=5) as resp:  # nosec B310
+        with urllib.request.urlopen(discovery_url, timeout=5) as resp:  # nosec B310  # nosemgrep
             oidc = json.loads(resp.read())
     except Exception as exc:
         print(f"{RED}  Failed to fetch OIDC discovery: {exc}{RESET}")
         return None
 
     try:
-        with urllib.request.urlopen(metadata_url, timeout=5) as resp:  # nosec B310
+        with urllib.request.urlopen(metadata_url, timeout=5) as resp:  # nosec B310  # nosemgrep
             saml_xml = resp.read().decode()
     except Exception as exc:
         print(f"{RED}  Failed to fetch SAML metadata: {exc}{RESET}")

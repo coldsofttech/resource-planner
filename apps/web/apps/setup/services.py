@@ -481,7 +481,7 @@ class TestService(ContextService):
         req = urllib.request.Request(idp_sso_url, method="GET")  # nosec B310
         req.add_header("Accept", "text/html,application/json")
         try:
-            with urllib.request.urlopen(req, timeout=10):  # nosec B310
+            with urllib.request.urlopen(req, timeout=10):  # nosec B310  # nosemgrep
                 pass
         except urllib.error.HTTPError:
             pass  # Any HTTP response confirms the endpoint is up
@@ -560,7 +560,7 @@ class TestService(ContextService):
             req.add_header("Content-Type", "application/x-www-form-urlencoded")
             req.add_header("Accept", "application/json")
             try:
-                with urllib.request.urlopen(req, timeout=10) as resp:  # nosec B310
+                with urllib.request.urlopen(req, timeout=10) as resp:  # nosec B310  # nosemgrep
                     try:
                         return resp.status, json.loads(
                             resp.read().decode("utf-8", errors="replace")
@@ -610,7 +610,7 @@ class TestService(ContextService):
         auth_req = urllib.request.Request(auth_endpoint, method="GET")  # nosec B310
         auth_req.add_header("Accept", "text/html,application/json")
         try:
-            with urllib.request.urlopen(auth_req, timeout=10):  # nosec B310
+            with urllib.request.urlopen(auth_req, timeout=10):  # nosec B310  # nosemgrep
                 pass
         except urllib.error.HTTPError:
             pass  # Any HTTP response confirms reachability

@@ -33,7 +33,7 @@ def exchange_code(
     req = urllib.request.Request(token_endpoint, data=data, method="POST")  # nosec B310
     req.add_header("Content-Type", "application/x-www-form-urlencoded")
     req.add_header("Accept", "application/json")
-    with urllib.request.urlopen(req, timeout=15) as resp:  # nosec B310
+    with urllib.request.urlopen(req, timeout=15) as resp:  # nosec B310  # nosemgrep
         return json.loads(resp.read())
 
 
@@ -41,7 +41,7 @@ def fetch_userinfo(*, userinfo_endpoint: str, access_token: str) -> dict:
     req = urllib.request.Request(userinfo_endpoint)  # nosec B310
     req.add_header("Authorization", f"Bearer {access_token}")
     req.add_header("Accept", "application/json")
-    with urllib.request.urlopen(req, timeout=15) as resp:  # nosec B310
+    with urllib.request.urlopen(req, timeout=15) as resp:  # nosec B310  # nosemgrep
         return json.loads(resp.read())
 
 

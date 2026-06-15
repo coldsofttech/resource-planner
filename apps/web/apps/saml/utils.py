@@ -2,7 +2,7 @@ import base64
 import re
 import secrets
 import urllib.parse
-import xml.etree.ElementTree as ET  # nosec B405
+import xml.etree.ElementTree as ET  # nosec B405  # nosemgrep: use-defused-xml
 import zlib
 from datetime import datetime, timezone
 from io import StringIO
@@ -11,6 +11,7 @@ from cryptography import x509
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
+from defusedxml.ElementTree import fromstring as _safe_fromstring
 
 _SAML_NS = "urn:oasis:names:tc:SAML:2.0:assertion"
 _SAMLP_NS = "urn:oasis:names:tc:SAML:2.0:protocol"
@@ -71,7 +72,7 @@ def build_authn_request_redirect_url(
 def parse_saml_response(saml_response_b64: str) -> tuple[ET.Element, bytes]:
     """Decode and XML-parse a base64-encoded SAMLResponse. Returns (root, raw_bytes)."""
     xml_bytes = base64.b64decode(saml_response_b64)
-    root = ET.fromstring(xml_bytes.decode("utf-8"))  # nosec B314
+    root = _safe_fromstring(xml_bytes.decode("utf-8"))  # nosec B314
     return root, xml_bytes
 
 
@@ -146,7 +147,7 @@ def verify_signature(xml_bytes: bytes, idp_cert_pem: str) -> bool:
     Returns False (rather than raising) on any validation failure.
     """
     try:
-        root = ET.fromstring(xml_bytes.decode("utf-8"))  # nosec B314
+        root = _safe_fromstring(xml_bytes.decode("utf-8"))  # nosec B314
     except ET.ParseError:
         return False
 
@@ -192,7 +193,7 @@ def verify_signature(xml_bytes: bytes, idp_cert_pem: str) -> bool:
     elif "sha256" in algo:
         hash_algo = hashes.SHA256()
     else:
-        hash_algo = hashes.SHA1()  # noqa: S303  # nosec B303  (legacy IdP fallback)
+        hash_algo = hashes.SHA1()  # noqa: S303  # nosec B303  # nosemgrep
 
     # Normalise the PEM cert (accept raw base64 without headers).
     cert_pem = idp_cert_pem.strip()

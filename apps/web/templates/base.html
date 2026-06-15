@@ -27,12 +27,8 @@
     {% endblock head_extra %}
   </head>
   <body>
-    {% if messages %}
-      <script type="application/json" id="django-messages">
-      [{% for msg in messages %}{"type":"{{ msg.tags }}","message":"{{ msg.message|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}]
-      </script>
-    {% endif %}
-    <script type="application/json" id="rp-permissions">{{ rp_permissions_json|safe }}</script>
+    {{ messages_for_js|json_script:"django-messages" }}
+    {{ rp_permissions_list|json_script:"rp-permissions" }}
     <div class="rp-app"
          data-screen-label="{% block screen_label %}Home{% endblock screen_label %}">
       <main class="rp-app-main">
