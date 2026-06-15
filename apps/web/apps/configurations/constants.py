@@ -16,3 +16,5 @@ class Module(models.TextChoices):
     EMAIL = "email", "Email"
     HOLIDAYS = "holidays", "Holidays"
     FINANCIAL_YEAR = "financial_year", "Financial Year"
+    SPRINTS = "sprints", "Sprints"
+    USERS = "users", "Users"

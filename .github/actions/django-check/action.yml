@@ -1,0 +1,11 @@
+name: Django Check
+description: Run Django deploy-mode system checks
+
+runs:
+  using: composite
+  steps:
+    - name: Django Security Checks
+      shell: bash
+      run: |
+        cd apps/web
+        python manage.py check --deploy

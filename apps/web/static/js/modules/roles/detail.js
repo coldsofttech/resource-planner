@@ -1,6 +1,6 @@
 "use strict";
 
-import { esc } from "../../components/utils.js";
+import { esc, setBreadcrumbs } from "../../components/utils.js";
 import { apiFetch, formatDate } from "../utils/utils.js";
 import { toast } from "../utils/toast.js";
 import { API_URLS, UI_URLS } from "../main/urls.js";
@@ -32,10 +32,12 @@ async function loadRoleDetails() {
     const titleEl = document.getElementById("rp-role-detail-title");
     if (titleEl) titleEl.textContent = role.role;
 
-    const breadcrumbs = document.getElementById("app-breadcrumbs");
-    if (breadcrumbs?.setCrumbs) {
-      breadcrumbs.setCrumbs([{ label: "Roles", href: UI_URLS.roles.list() }, { label: role.role }]);
-    }
+    setBreadcrumbs([
+      { label: "Organisation" },
+      { label: "Configurations" },
+      { label: "Roles", href: UI_URLS.roles.list() },
+      { label: role.role },
+    ]);
 
     const setView = (id, val) => {
       const el = document.getElementById(id);
@@ -69,6 +71,7 @@ async function loadRoleDetails() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  if (!roleCode) return;
   loadRoleDetails();
   if (hasPermission("auth.view_user")) {
     document.getElementById("rp-role-members-col")?.removeAttribute("hidden");

@@ -21,11 +21,11 @@ from apps.users.tests.factories import (
 class GetAllCategoriesTest(TestCase):
     def test_returns_all_categories(self):
         make_permission_category(module="projects", codename="view")
-        make_permission_category(module="sprints", codename="view")
+        make_permission_category(module="resources", codename="view")
         qs = selectors.get_all_categories()
         codes = list(
             qs.values_list("codename", flat=True).filter(
-                module__in=["projects", "sprints"]
+                module__in=["projects", "resources"]
             )
         )
         self.assertIn("view", codes)
@@ -33,7 +33,7 @@ class GetAllCategoriesTest(TestCase):
 
     def test_filters_by_module(self):
         make_permission_category(module="projects", codename="view")
-        make_permission_category(module="sprints", codename="view")
+        make_permission_category(module="resources", codename="view")
         qs = selectors.get_all_categories(module="projects")
         self.assertTrue(all(c.module == "projects" for c in qs))
 
@@ -117,13 +117,13 @@ class GetGroupCategoriesTest(TestCase):
 
     def test_ordered_by_module_then_category_order(self):
         group = make_group()
-        cat_b = make_permission_category(module="sprints", codename="view", order=1)
+        cat_b = make_permission_category(module="resources", codename="view", order=1)
         cat_a = make_permission_category(module="projects", codename="view", order=1)
         GroupPermissionCategory.objects.create(group=group, category=cat_b)
         GroupPermissionCategory.objects.create(group=group, category=cat_a)
         qs = selectors.get_group_categories(group)
         self.assertEqual(qs[0].category.module, "projects")
-        self.assertEqual(qs[1].category.module, "sprints")
+        self.assertEqual(qs[1].category.module, "resources")
 
 
 # ── get_user_by_profile_code ──────────────────────────────────────────────────
@@ -177,13 +177,13 @@ class GetUserCategoriesTest(TestCase):
 
     def test_ordered_by_module_then_category_order(self):
         user = make_user()
-        cat_b = make_permission_category(module="sprints", codename="view", order=1)
+        cat_b = make_permission_category(module="resources", codename="view", order=1)
         cat_a = make_permission_category(module="projects", codename="view", order=1)
         UserPermissionCategory.objects.create(user=user, category=cat_b)
         UserPermissionCategory.objects.create(user=user, category=cat_a)
         qs = selectors.get_user_categories(user)
         self.assertEqual(qs[0].category.module, "projects")
-        self.assertEqual(qs[1].category.module, "sprints")
+        self.assertEqual(qs[1].category.module, "resources")
 
 
 # ── get_user_permissions ──────────────────────────────────────────────────────
@@ -325,7 +325,7 @@ class GetEffectiveUserAssignmentsTest(TestCase):
         self.assertEqual(result[0]["scope"], PermissionScope.ALL)
 
     def test_results_sorted_by_module_then_order(self):
-        cat_b = make_permission_category(module="sprints", codename="view", order=1)
+        cat_b = make_permission_category(module="resources", codename="view", order=1)
         cat_c = make_permission_category(module="projects", codename="edit", order=2)
         UserPermissionCategory.objects.create(user=self.user, category=cat_b)
         UserPermissionCategory.objects.create(user=self.user, category=cat_c)
@@ -334,7 +334,7 @@ class GetEffectiveUserAssignmentsTest(TestCase):
         modules = [r["category"].module for r in result]
         self.assertEqual(modules[0], "projects")
         self.assertEqual(modules[1], "projects")
-        self.assertEqual(modules[2], "sprints")
+        self.assertEqual(modules[2], "resources")
 
     def test_multiple_groups_highest_scope_used(self):
         group_a = make_group("A")

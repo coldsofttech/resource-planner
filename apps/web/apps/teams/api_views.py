@@ -16,6 +16,7 @@ from apps.users.serializers import MemberMiniListSerializer
 from apps.users.services import MembersService
 
 
+@extend_schema(tags=["Teams"])
 class TeamViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
     service_class = TeamService
     import_service_class = TeamImportService

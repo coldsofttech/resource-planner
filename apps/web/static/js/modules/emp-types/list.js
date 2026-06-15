@@ -1,6 +1,6 @@
 "use strict";
 
-import { esc } from "../../components/utils.js";
+import { esc, setBreadcrumbs } from "../../components/utils.js";
 import {
   apiFetch,
   formatDate,
@@ -376,6 +376,12 @@ function initExportView() {
 document.addEventListener("DOMContentLoaded", () => {
   const table = document.getElementById("rp-emp-types-table");
   if (!table) return;
+
+  setBreadcrumbs([
+    { label: "Organisation" },
+    { label: "Configurations" },
+    { label: "Employment Types", href: UI_URLS.empTypes.list() },
+  ]);
 
   initActions(table);
   initRowNavigation(table);

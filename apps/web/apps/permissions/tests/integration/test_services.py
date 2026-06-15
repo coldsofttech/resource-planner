@@ -30,7 +30,7 @@ class PermissionCategoryServiceListTest(TestCase):
         self.svc = PermissionCategoryService()
         make_permission_category(module="projects", codename="view", order=1)
         make_permission_category(module="projects", codename="edit", order=2)
-        make_permission_category(module="sprints", codename="view", order=1)
+        make_permission_category(module="resources", codename="view", order=1)
 
     def test_returns_paginated_result(self):
         result = self.svc.list(params=DEFAULT_LIST_PARAMS)
@@ -357,7 +357,7 @@ class UserPermissionCategoryServiceEffectiveTest(TestCase):
     def test_returns_combined_group_and_direct_assignments(self):
         group = make_group()
         group.user_set.add(self.user)
-        cat_b = make_permission_category(module="sprints", codename="view")
+        cat_b = make_permission_category(module="resources", codename="view")
         GroupPermissionCategory.objects.create(
             group=group, category=self.cat, scope=PermissionScope.TEAM
         )

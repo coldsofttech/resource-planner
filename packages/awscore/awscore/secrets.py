@@ -41,7 +41,8 @@ class SecretsManager:
             response = self._client.get_secret_value(SecretId=name)
             return response.get("SecretString", "")
         except ClientError as exc:
-            logger.error("Failed to retrieve secret '%s': %s", name, exc)
+            code = exc.response.get("Error", {}).get("Code", "UnknownError")
+            logger.error("Failed to retrieve secret: %s", code)
             raise
 
     def put(self, name: str, value: str, description: str = "") -> None:
@@ -51,18 +52,20 @@ class SecretsManager:
             kwargs["Description"] = description
         try:
             self._client.create_secret(**kwargs)
-            logger.info("Secret '%s' created.", name)
+            logger.info("Secret created.")
         except ClientError as exc:
-            logger.error("Failed to create secret '%s': %s", name, exc)
+            code = exc.response.get("Error", {}).get("Code", "UnknownError")
+            logger.error("Failed to create secret: %s", code)
             raise
 
     def update(self, name: str, value: str) -> None:
         """Update the value of an existing secret."""
         try:
             self._client.put_secret_value(SecretId=name, SecretString=value)
-            logger.info("Secret '%s' updated.", name)
+            logger.info("Secret updated.")
         except ClientError as exc:
-            logger.error("Failed to update secret '%s': %s", name, exc)
+            code = exc.response.get("Error", {}).get("Code", "UnknownError")
+            logger.error("Failed to update secret: %s", code)
             raise
 
     def put_or_update(self, name: str, value: str, description: str = "") -> None:

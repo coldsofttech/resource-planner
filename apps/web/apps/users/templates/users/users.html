@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Users
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/users.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Administration
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Users
+{% endblock page_title %}
+{% block page_sub %}
+  Manage user accounts and access.
+{% endblock page_sub %}
+{% block page_actions %}
+  {% if can_view_users %}
+    <secondary-button id="rp-users-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+  {% endif %}
+  {% if can_add_user and is_classic_auth %}
+    <primary-button id="rp-users-add-btn" label="Add User" prefix-icon="bi-plus-lg" hidden></primary-button>
+  {% endif %}
+{% endblock page_actions %}
+{% block screen_label %}
+  users-admin
+{% endblock screen_label %}
+{% block content %}
+  <list-view show-active-filters>
+  <filter-panel id="rp-users-filter-panel">
+  <search-field id="rp-users-search" name="search" placeholder="Search users..." shortcut="/" show-label></search-field>
+  <is-active-field id="rp-users-status" name="is_active" value="true" show-label></is-active-field>
+  <auth-type-field id="rp-users-filter-auth-type" name="auth_type" show-label></auth-type-field>
+  </filter-panel>
+  <data-table id="rp-users-table" url="/api/v1/users/" paginated page-size="25" row-template="renderUsersRow" empty-message="No users found.">
+    <table-columns>
+      <table-column label="Name" key="display_name" sortable>
+      </table-column>
+      <table-column label="Email" key="email" hide-mobile>
+      </table-column>
+      <table-column label="Auth Type" key="auth_type" width="130px" hide-mobile>
+      </table-column>
+      <table-column label="Last Login" key="last_login" width="160px" hide-mobile sortable>
+      </table-column>
+      <table-column label="Status" key="is_active" width="110px">
+      </table-column>
+      <table-column label="Created" key="created_at" width="140px" hide-mobile sortable>
+      </table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_user %}
+        <table-action icon="bi-toggle-on" label="Toggle" event="rp:user:toggle" color-key="is_active" hidden-key="is_superuser">
+        </table-action>
+        <table-action icon="bi-key" label="Reset Password" event="rp:user:reset-password" hidden-key="hide_reset_password">
+        </table-action>
+      {% endif %}
+      {% if can_manage_user_permissions %}
+        <table-action icon="bi-shield-plus" label="Assign Permissions" event="rp:user:assign-permissions"></table-action>
+      {% endif %}
+      {% if can_delete_user %}
+        <table-action icon="bi-trash" label="Delete" event="rp:user:delete" danger hidden-key="is_superuser">
+        </table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </list-view>
+  <!-- Create drawer -->
+  {% if can_add_user and is_classic_auth %}
+  <drawer-modal id="rp-user-create-drawer" width="900">
+  <drawer-header eyebrow="New record" title="Create user" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-new-user-first-name" col="col-md-6" label="First name" placeholder="e.g. Jane" required maxlength="150"></text-field>
+    <text-field id="rp-new-user-last-name" col="col-md-6" label="Last name" placeholder="e.g. Smith" required maxlength="150"></text-field>
+    <email-field id="rp-new-user-email" col="col-12" label="Email address" placeholder="e.g. jane.smith@example.com" required></email-field>
+    <hint-field col="col-12">A setup email will be sent to this address. The user will set their password on first login.</hint-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Create user" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  {% endif %}
+  <!-- Assign Permissions drawer -->
+  {% if can_manage_user_permissions %}
+  <drawer-modal id="rp-user-assign-permissions-drawer" width="900">
+    <drawer-header eyebrow="User" title="Assign permissions" no-sizes></drawer-header>
+    <drawer-panel>
+      <permissions-panel id="rp-user-permissions-panel" subject-type="user"></permissions-panel>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Save permissions" primary-icon="bi-shield-check"></drawer-footer>
+  </drawer-modal>
+  {% endif %}
+  <!-- Modals -->
+  <delete-modal id="rp-user-delete-modal" action-label="Delete user"></delete-modal>
+  <activate-modal id="rp-user-activate-modal"></activate-modal>
+  <deactivate-modal id="rp-user-deactivate-modal"></deactivate-modal>
+  <!-- Reset password confirmation modal -->
+  <status-modal id="rp-user-reset-password-modal"></status-modal>
+  <!-- Export -->
+  <export-view id="rp-users-export-view" title="Export Users" eyebrow="Users" active-filter-id="rp-users-filter-panel"></export-view>
+{% endblock content %}

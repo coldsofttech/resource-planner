@@ -722,3 +722,9 @@ textarea.rp-input {
   color: var(--rp-text-muted);
   text-align: center;
 }
+
+/* ── Searchable combobox (dropdown-field[searchable]) ────────────────────── */
+
+.rp-combobox {
+  position: relative;
+}

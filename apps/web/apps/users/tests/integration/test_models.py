@@ -169,6 +169,10 @@ class GroupProfileFieldDefaultsTest(TestCase):
         gp = make_group_profile("Admin Default Group")
         self.assertFalse(gp.is_admin_group)
 
+    def test_is_active_defaults_to_true(self):
+        gp = make_group_profile("Active Default Group")
+        self.assertTrue(gp.is_active)
+
     def test_is_system_defaults_to_false(self):
         gp = make_group_profile("System Default Group")
         self.assertFalse(gp.is_system)

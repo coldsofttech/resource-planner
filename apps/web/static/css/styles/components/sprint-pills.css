@@ -24,3 +24,13 @@
   font-family: var(--rp-font-mono);
   font-size: var(--rp-fs-12);
 }
+
+/* Mobile: show timer instead of name */
+@media (max-width: 640px) {
+  .rp-sprint-pill .rp-sprint-name {
+    display: none;
+  }
+  .rp-sprint-pill .rp-sprint-time {
+    color: var(--rp-text);
+  }
+}

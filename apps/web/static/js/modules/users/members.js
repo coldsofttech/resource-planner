@@ -1,6 +1,6 @@
 "use strict";
 
-import { esc } from "../../components/utils.js";
+import { esc, setBreadcrumbs } from "../../components/utils.js";
 import {
   apiFetch,
   formatDate,
@@ -10,7 +10,7 @@ import {
   restoreButton,
 } from "../utils/utils.js";
 import { toast } from "../utils/toast.js";
-import { API_URLS } from "../main/urls.js";
+import { API_URLS, UI_URLS } from "../main/urls.js";
 import { hasPermission } from "../utils/index.js";
 
 let pendingRow = null;
@@ -32,7 +32,7 @@ window.renderMembersRow = function renderMembersRow(row) {
       : teams.map((t) => `<span class="rp-badge rp-badge-soft">${esc(t.name)}</span>`).join(" ");
 
   return `
-    <td><user-avatar avatar-url="${esc(row.avatar_url || "")}" name="${esc(name)}" size="sm"></user-avatar></td>
+    <td><user-avatar avatar-url="${esc(row.avatar_url || "")}" name="${esc(name)}" seed="${esc(row.email || "")}" size="sm"></user-avatar></td>
     <td class="fw-medium">${esc(name)}</td>
     <td style="color:var(--rp-text-muted)">${esc(row.email)}</td>
     <td style="color:var(--rp-text-muted)">${esc(location)}</td>
@@ -58,6 +58,7 @@ function openEditDrawer(row) {
     .querySelector("#rp-edit-member-avatar-cell")
     ?.setAttribute("avatar-url", row.avatar_url || "");
   drawer.querySelector("#rp-edit-member-avatar-cell")?.setAttribute("name", name);
+  drawer.querySelector("#rp-edit-member-avatar-cell")?.setAttribute("seed", row.email || "");
   drawer.setTitle(name);
 
   // Populate fields — use setAttribute so async-loaded dropdowns pick up the value
@@ -158,6 +159,7 @@ function openViewDrawer(row) {
     .querySelector("#rp-view-member-avatar-cell")
     ?.setAttribute("avatar-url", row.avatar_url || "");
   drawer.querySelector("#rp-view-member-avatar-cell")?.setAttribute("name", name);
+  drawer.querySelector("#rp-view-member-avatar-cell")?.setAttribute("seed", row.email || "");
   drawer.setTitle(name);
 
   // Field values
@@ -247,6 +249,7 @@ function openAssignTeamDrawer(row) {
     .querySelector("#rp-assign-team-member-avatar")
     ?.setAttribute("avatar-url", row.avatar_url || "");
   drawer.querySelector("#rp-assign-team-member-avatar")?.setAttribute("name", name);
+  drawer.querySelector("#rp-assign-team-member-avatar")?.setAttribute("seed", row.email || "");
   drawer.setTitle(name);
 
   const isLeadership = row.role?.is_leadership ?? false;
@@ -361,6 +364,12 @@ async function initHolidaysFieldMeta() {
 document.addEventListener("DOMContentLoaded", () => {
   const table = document.getElementById("rp-members-table");
   if (!table) return;
+
+  setBreadcrumbs([
+    { label: "Organisation" },
+    { label: "People" },
+    { label: "Members", href: UI_URLS.members.list() },
+  ]);
 
   initActions(table);
   initViewDrawer(table);

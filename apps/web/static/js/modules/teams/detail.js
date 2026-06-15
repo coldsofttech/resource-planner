@@ -1,6 +1,6 @@
 "use strict";
 
-import { esc } from "../../components/utils.js";
+import { esc, setBreadcrumbs } from "../../components/utils.js";
 import { apiFetch, formatDate } from "../utils/utils.js";
 import { toast } from "../utils/toast.js";
 import { API_URLS, UI_URLS } from "../main/urls.js";
@@ -35,10 +35,12 @@ async function loadTeamDetails() {
     const titleEl = document.getElementById("rp-team-detail-title");
     if (titleEl) titleEl.textContent = team.name;
 
-    const breadcrumbs = document.getElementById("app-breadcrumbs");
-    if (breadcrumbs?.setCrumbs) {
-      breadcrumbs.setCrumbs([{ label: "Teams", href: UI_URLS.teams.list() }, { label: team.name }]);
-    }
+    setBreadcrumbs([
+      { label: "Organisation" },
+      { label: "People" },
+      { label: "Teams", href: UI_URLS.teams.list() },
+      { label: team.name },
+    ]);
 
     const setView = (id, val) => {
       const el = document.getElementById(id);
@@ -70,6 +72,7 @@ async function loadTeamDetails() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  if (!teamCode) return;
   loadTeamDetails();
   if (hasPermission("auth.view_user")) {
     document.getElementById("rp-team-members-col")?.removeAttribute("hidden");

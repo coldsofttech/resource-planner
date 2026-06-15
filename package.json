@@ -1,7 +1,7 @@
 {
   "devDependencies": {
     "cssnano": "^8.0.1",
-    "esbuild": "^0.28.0",
+    "esbuild": "^0.28.1",
     "postcss": "^8.5.15",
     "postcss-cli": "^11.0.1",
     "postcss-import": "^16.1.1",
@@ -17,7 +17,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:css": "postcss apps/web/static/css/styles/styles.css -o apps/web/static/css/dist/styles.min.css",
+    "build:css": "postcss apps/web/static/css/styles/styles.css -o apps/web/static/css/dist/styles.min.css && postcss apps/web/static/css/styles/swagger.css -o apps/web/static/css/dist/swagger.min.css",
     "build:js": "node build-js.mjs"
   },
   "repository": {

@@ -6,6 +6,24 @@ from apps.core.views import BaseView
 
 
 @method_decorator(ensure_csrf_cookie, name="dispatch")
+class SetPasswordView(BaseView):
+    template_name = "auth/set_password.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect("/dashboard/")
+        token = request.GET.get("token", "")
+        if not token:
+            return redirect("/login/")
+        from apps.auth.services import AdminPasswordResetService
+
+        token_obj = AdminPasswordResetService().validate_token(token)
+        if token_obj is None:
+            return redirect("/login/")
+        return super().dispatch(request, *args, **kwargs)
+
+
+@method_decorator(ensure_csrf_cookie, name="dispatch")
 class LoginView(BaseView):
     template_name = "auth/login.html"
 

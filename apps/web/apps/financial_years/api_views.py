@@ -20,6 +20,7 @@ from apps.financial_years.services import (
 )
 
 
+@extend_schema(tags=["Financial Years"])
 class FinancialYearViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
     service_class = FinancialYearService
     import_service_class = FinancialYearImportService

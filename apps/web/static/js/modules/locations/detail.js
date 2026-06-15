@@ -1,6 +1,6 @@
 "use strict";
 
-import { esc } from "../../components/utils.js";
+import { esc, setBreadcrumbs } from "../../components/utils.js";
 import { apiFetch, formatDate } from "../utils/utils.js";
 import { toast } from "../utils/toast.js";
 import { API_URLS, UI_URLS } from "../main/urls.js";
@@ -34,10 +34,12 @@ async function loadLocationDetails() {
     const titleEl = document.getElementById("rp-location-detail-title");
     if (titleEl) titleEl.textContent = label;
 
-    const breadcrumbs = document.getElementById("app-breadcrumbs");
-    if (breadcrumbs?.setCrumbs) {
-      breadcrumbs.setCrumbs([{ label: "Locations", href: UI_URLS.locations.list() }, { label }]);
-    }
+    setBreadcrumbs([
+      { label: "Organisation" },
+      { label: "Configurations" },
+      { label: "Locations", href: UI_URLS.locations.list() },
+      { label },
+    ]);
 
     const setView = (id, val) => {
       const el = document.getElementById(id);
@@ -69,6 +71,7 @@ async function loadLocationDetails() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  if (!locationCode) return;
   loadLocationDetails();
   if (hasPermission("auth.view_user")) {
     document.getElementById("rp-location-members-col")?.removeAttribute("hidden");

@@ -6,6 +6,7 @@ from apps.meta.serializers import MetaSerializer
 from apps.meta.services import MetaService
 
 
+@extend_schema(tags=["Metadata: Users"])
 class MetaViewSet(BaseViewSet):
     permission_classes = [AllowAny]
     http_method_names = ["get", "head", "options"]

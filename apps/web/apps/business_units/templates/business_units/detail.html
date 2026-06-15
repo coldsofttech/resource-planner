@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Business Unit
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/business-units.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Business Unit
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <span id="rp-bu-detail-title">Business Unit</span>
+{% endblock page_title %}
+{% block content %}
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <section-panel>
+        <panel-body>
+          <view-field id="rp-bu-detail-name" label="Name"></view-field>
+          <view-field id="rp-bu-detail-short-name" label="Short Name" code></view-field>
+          <view-field id="rp-bu-detail-code" label="Code" code></view-field>
+          <view-field id="rp-bu-detail-status" label="Status"></view-field>
+          <view-field id="rp-bu-detail-created" label="Created" meta></view-field>
+          <view-field id="rp-bu-detail-created-by" label="Created by" meta></view-field>
+        </panel-body>
+      </section-panel>
+    </div>
+  </div>
+{% endblock content %}

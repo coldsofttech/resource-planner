@@ -1,0 +1,14 @@
+name: mypy
+description: Run mypy type checker
+
+inputs:
+  path:
+    description: Path to check
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: mypy
+      shell: bash
+      run: mypy ${{ inputs.path }}

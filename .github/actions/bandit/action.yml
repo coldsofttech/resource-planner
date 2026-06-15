@@ -1,0 +1,14 @@
+name: Bandit
+description: Run Bandit security scanner
+
+inputs:
+  path:
+    description: Space-separated path(s) to scan recursively
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Bandit
+      shell: bash
+      run: bandit -r ${{ inputs.path }} --configfile pyproject.toml

@@ -63,6 +63,26 @@ class ForgotPasswordResetSerializer(WriteMixin, BaseSerializer):
         return attrs
 
 
+class SetPasswordSerializer(WriteMixin, BaseSerializer):
+    token = serializers.CharField(min_length=1)
+    new_password = serializers.CharField(min_length=12)
+    confirm_password = serializers.CharField(min_length=12)
+
+    def validate_new_password(self, value):
+        try:
+            validate_password(value)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(list(exc.messages)) from exc
+        return value
+
+    def validate(self, attrs):
+        if attrs["new_password"] != attrs["confirm_password"]:
+            raise serializers.ValidationError(
+                {"confirm_password": "Passwords do not match."}
+            )
+        return attrs
+
+
 class MeSerializer(BaseSerializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()

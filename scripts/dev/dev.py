@@ -1269,23 +1269,21 @@ def _sync_keycloak_postgresql(env: dict, oauth_config: dict, saml_config: dict) 
 def _print_sync_result(oauth_count: int, saml_count: int) -> None:
     if oauth_count:
         print(
-            f"  {GREEN}Synced {oauth_count} OAuth provider(s) with updated "
-            f"Keycloak endpoints.{RESET}"
+            f"  {GREEN}OAuth providers synced with updated Keycloak endpoints.{RESET}"
         )
     else:
         print(
-            f"  {YELLOW}No OAuth provider found — update endpoints manually "
-            f"if needed.{RESET}"
+            f"  {YELLOW}No OAuth provider found — update endpoints manually if needed."
+            f"{RESET}"
         )
     if saml_count:
         print(
-            f"  {GREEN}Synced {saml_count} SAML provider(s) with new Keycloak "
-            f"cert/endpoints.{RESET}"
+            f"  {GREEN}SAML providers synced with new Keycloak cert/endpoints.{RESET}"
         )
     else:
         print(
-            f"  {YELLOW}No SAML provider found — update IDP fields manually "
-            f"if needed.{RESET}"
+            f"  {YELLOW}No SAML provider found — update IDP fields manually if needed."
+            f"{RESET}"
         )
 
 
@@ -1323,7 +1321,8 @@ def configure_keycloak():
 
     print("\n--- OAuth 2.0 (OIDC) ---")
     for key, val in oauth_config.items():
-        print(f"  {key:<22}: {val}")
+        display_val = "[hidden]" if key == "client_secret" else val
+        print(f"  {key:<22}: {display_val}")
 
     print("\n--- SAML 2.0 ---")
     for key, val in saml_config.items():
@@ -1333,12 +1332,12 @@ def configure_keycloak():
         else:
             print(f"  {key:<22}: {val}")
 
-    cert = saml_config.get("idp_x509_cert", "")
-    if cert:
-        print("\n  Full IdP Certificate (paste into sp_assertion_url field):")
+    pem = saml_config.get("idp_x509_cert", "")
+    if pem:
+        print("\n  Full IdP Certificate:")
         print("  -----BEGIN CERTIFICATE-----")
-        for i in range(0, len(cert), 64):
-            print(f"  {cert[i : i + 64]}")
+        for i in range(0, len(pem), 64):
+            print(f"  {pem[i : i + 64]}")
         print("  -----END CERTIFICATE-----")
 
     print(f"\n{sep}")
@@ -1571,8 +1570,10 @@ def _discover_package_test_dirs() -> list[Path]:
 def _run_django_tests(path: str = "", report: str = "django-report.html") -> int:
     # --override-ini=addopts= clears the root pyproject.toml addopts (which sets
     # its own --html flag) so our explicit report name is the only one used.
+    # --no-migrations creates tables directly from model state (syncdb-style) instead
+    # of replaying every migration per worker — significantly faster for large schemas.
     cmd = (
-        f"pytest -v -n auto --dist=loadfile "
+        f"pytest -v -n auto --dist=loadfile --no-migrations --durations=30 "
         f"--override-ini=addopts= {_html_flags(report)}"
     )
     if path:
@@ -1586,7 +1587,7 @@ def _run_django_unit_tests(
     # Unit tests use SimpleTestCase (no DB) — dist=load gives pure load-balancing
     # without the file-grouping constraint that loadfile adds for DB isolation.
     cmd = (
-        f"pytest -v -n auto --dist=load -m unit "
+        f"pytest -v -n auto --dist=load -m unit --durations=30 "
         f"--override-ini=addopts= {_html_flags(report)}"
     )
     if path:
@@ -1599,9 +1600,11 @@ def _run_django_integration_tests(
 ) -> int:
     # Integration tests hit the DB — loadfile keeps tests in the same file on the
     # same worker so they share DB state correctly.
+    # --no-migrations creates tables directly from model state (syncdb-style) instead
+    # of replaying every migration per worker — significantly faster for large schemas.
     cmd = (
-        f"pytest -v -n auto --dist=loadfile -m integration "
-        f"--override-ini=addopts= {_html_flags(report)}"
+        f"pytest -v -n auto --dist=loadfile -m integration --no-migrations "
+        f"--durations=30 --override-ini=addopts= {_html_flags(report)}"
     )
     if path:
         cmd += f" {path}"
@@ -2106,7 +2109,7 @@ def docker_postgres() -> None:
     print(f"  {'Port':<20}: {port}")
     print(f"  {'Database':<20}: {db_name}")
     print(f"  {'Username':<20}: {user}")
-    print(f"  {'Password':<20}: {password or '(none)'}")
+    print(f"  {'Password':<20}: {'[set]' if password else '(none)'}")
     print(f"  {sep}")
 
     started_services: list[tuple[str, str, list[str]]] = []
@@ -2162,7 +2165,7 @@ def docker_email() -> None:
     print(f"  {'Encryption':<20}: None")
     print(f"  {'Port':<20}: {smtp_port}")
     print(f"  {'Username':<20}: {username or '(none)'}")
-    print(f"  {'Password':<20}: {password or '(none)'}")
+    print(f"  {'Password':<20}: {'[set]' if password else '(none)'}")
     print(f"  {sep}")
     print("  Web UI   : http://localhost:8025")
 
@@ -2275,7 +2278,7 @@ def docker_keycloak_oauth() -> None:
         oauth, _ = kc_result
         print(f"  {'Provider Name':<26}: {provider_name}")
         print(f"  {'Client ID':<26}: {oauth['client_id']}")
-        print(f"  {'Client Secret':<26}: {oauth['client_secret']}")
+        print(f"  {'Client Secret':<26}: [hidden]")
         print(f"  {'Auth Endpoint':<26}: {oauth['auth_endpoint']}")
         print(f"  {'Token Endpoint':<26}: {oauth['token_endpoint']}")
         print(f"  {'User Info Endpoint':<26}: {oauth['userinfo_endpoint']}")
@@ -2353,18 +2356,18 @@ def docker_keycloak_saml() -> None:
 
     if kc_result:
         _, saml = kc_result
-        cert = saml.get("idp_x509_cert", "")
-        cert_preview = (cert[:40] + "...") if len(cert) > 40 else cert
+        pem = saml.get("idp_x509_cert", "")
+        pem_preview = (pem[:40] + "...") if len(pem) > 40 else pem
         print(f"  {'Provider Name':<26}: {provider_name}")
         print(f"  {'IDP Entity ID':<26}: {saml['idp_entity_id']}")
         print(f"  {'IDP SSO URL':<26}: {saml['idp_sso_url']}")
-        print(f"  {'IDP X.509 Cert':<26}: {cert_preview}")
+        print(f"  {'IDP X.509 Cert':<26}: {pem_preview}")
         print(f"  {'SP Entity ID':<26}: {sp_entity_id}")
         print(f"  {'Assertion Consumer URL':<26}: {sp_assertion_url}")
-        if cert:
+        if pem:
             print("\n  Full IDP X.509 Certificate:")
-            for i in range(0, len(cert), 64):
-                print(f"    {cert[i : i + 64]}")
+            for i in range(0, len(pem), 64):
+                print(f"    {pem[i : i + 64]}")
     else:
         print(f"  {YELLOW}Config unavailable — Keycloak may still be starting.{RESET}")
         print("  Use Django Tools → Keycloak Dev Config once it is ready.")

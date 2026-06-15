@@ -1,0 +1,18 @@
+name: Ruff
+description: Run Ruff linter and formatter check
+
+inputs:
+  path:
+    description: Path to check
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Ruff
+      shell: bash
+      run: ruff check ${{ inputs.path }}
+
+    - name: Ruff Format
+      shell: bash
+      run: ruff format --check ${{ inputs.path }}

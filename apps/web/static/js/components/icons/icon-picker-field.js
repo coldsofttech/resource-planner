@@ -417,9 +417,21 @@ class IconPickerField extends BaseField {
     if (query) icons = icons.filter((n) => n.includes(query));
 
     if (!icons.length) {
-      grid.innerHTML = `<div class="rp-iconpick-empty"><i class="bi bi-search"></i>${
-        query ? `No icons match "<strong>${query}</strong>"` : "No icons in this category."
-      }</div>`;
+      const empty = document.createElement("div");
+      empty.className = "rp-iconpick-empty";
+      const searchIcon = document.createElement("i");
+      searchIcon.className = "bi bi-search";
+      empty.appendChild(searchIcon);
+      if (query) {
+        empty.appendChild(document.createTextNode('No icons match "'));
+        const strong = document.createElement("strong");
+        strong.textContent = query;
+        empty.appendChild(strong);
+        empty.appendChild(document.createTextNode('"'));
+      } else {
+        empty.appendChild(document.createTextNode("No icons in this category."));
+      }
+      grid.replaceChildren(empty);
       return;
     }
 

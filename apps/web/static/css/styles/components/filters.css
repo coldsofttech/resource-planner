@@ -45,12 +45,18 @@ filter-panel search-field .rp-input-affix {
   width: 100%;
 }
 
-/* Dropdown filters stay at fixed width and don't shrink */
+/* Dropdown filters stay at fixed width and don't shrink.
+   !important overrides Bootstrap column classes (e.g. .col-auto, .col-md-6)
+   that BaseField applies via this.className = this._col. */
 filter-panel is-active-field,
-filter-panel dropdown-field {
-  display: block;
-  flex-shrink: 0;
-  width: 170px;
+filter-panel dropdown-field,
+filter-panel role-field,
+filter-panel employment-type-field,
+filter-panel location-field,
+filter-panel team-field {
+  display: block !important;
+  flex-shrink: 0 !important;
+  width: 170px !important;
 }
 
 /* Mobile: stack all fields full-width */
@@ -61,7 +67,11 @@ filter-panel dropdown-field {
     gap: 8px;
   }
   filter-panel is-active-field,
-  filter-panel dropdown-field {
+  filter-panel dropdown-field,
+  filter-panel role-field,
+  filter-panel employment-type-field,
+  filter-panel location-field,
+  filter-panel team-field {
     width: 100%;
   }
 }

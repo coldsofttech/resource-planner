@@ -1,5 +1,6 @@
 django~=6.0.5
 djangorestframework~=3.17.1
+anthropic>=0.40
 boto3~=1.43.12
 psycopg2-binary~=2.9
 cryptography~=46.0
@@ -13,3 +14,4 @@ reportlab~=4.2
 -e ./packages/otpcore
 -e ./packages/exportcore
 -e ./packages/storagecore
+-e ./packages/aicore

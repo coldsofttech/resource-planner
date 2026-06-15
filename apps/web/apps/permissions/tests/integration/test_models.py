@@ -24,7 +24,7 @@ class PermissionCategoryCodeTest(TestCase):
 
     def test_code_is_unique_across_categories(self):
         cat1 = make_permission_category(module="projects", codename="view")
-        cat2 = make_permission_category(module="sprints", codename="view")
+        cat2 = make_permission_category(module="resources", codename="view")
         self.assertNotEqual(cat1.code, cat2.code)
 
 
@@ -52,7 +52,7 @@ class PermissionCategoryConstraintTest(TestCase):
 
     def test_same_codename_different_module_is_allowed(self):
         make_permission_category(module="projects", codename="view")
-        cat = make_permission_category(module="sprints", codename="view")
+        cat = make_permission_category(module="resources", codename="view")
         self.assertIsNotNone(cat.pk)
 
     def test_different_codename_same_module_is_allowed(self):
@@ -63,16 +63,16 @@ class PermissionCategoryConstraintTest(TestCase):
 
 class PermissionCategoryOrderingTest(TestCase):
     def test_ordered_by_module_then_order(self):
-        make_permission_category(module="sprints", codename="view", order=1)
+        make_permission_category(module="resources", codename="view", order=1)
         make_permission_category(module="projects", codename="view", order=1)
         make_permission_category(module="projects", codename="edit", order=2)
         codes = list(
             PermissionCategory.objects.filter(
-                module__in=["projects", "sprints"]
+                module__in=["projects", "resources"]
             ).values_list("module", "order")
         )
         self.assertEqual(codes[0][0], "projects")
-        self.assertEqual(codes[2][0], "sprints")
+        self.assertEqual(codes[2][0], "resources")
 
 
 # ── GroupPermissionCategory ───────────────────────────────────────────────────

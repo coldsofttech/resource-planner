@@ -5,17 +5,17 @@
   font-size: var(--rp-fs-13);
   color: var(--rp-text-muted);
 }
-.rp-breadcrumbs a {
+.rp-breadcrumbs .crumb {
   color: var(--rp-text-muted);
   text-decoration: none;
 }
-.rp-breadcrumbs a:hover {
+.rp-breadcrumbs a.crumb:hover {
   color: var(--rp-text);
 }
 .rp-breadcrumbs .sep {
   color: var(--rp-text-subtle);
 }
-.rp-breadcrumbs .current {
-  color: var(--rp-text);
+.rp-breadcrumbs .crumb-current {
+  color: var(--rp-accent);
   font-weight: 600;
 }

@@ -1,6 +1,11 @@
 from django.urls import path
 
-from apps.auth.api_views import AuthViewSet, ForgotPasswordViewSet, RegisterViewSet
+from apps.auth.api_views import (
+    AuthViewSet,
+    ForgotPasswordViewSet,
+    RegisterViewSet,
+    SetPasswordViewSet,
+)
 
 urlpatterns = [
     path(
@@ -37,5 +42,10 @@ urlpatterns = [
         "auth/me/",
         AuthViewSet.as_view({"get": "me"}),
         name="auth-me",
+    ),
+    path(
+        "auth/set-password/",
+        SetPasswordViewSet.as_view({"post": "set_password"}),
+        name="auth-set-password",
     ),
 ]

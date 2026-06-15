@@ -152,7 +152,7 @@ class TestSecretsManagerGet:
             with pytest.raises(ClientError):
                 manager.get("missing/secret")
 
-        assert "missing/secret" in caplog.text
+        assert "Failed to retrieve secret" in caplog.text
 
 
 # ---------------------------------------------------------------------------
@@ -179,7 +179,7 @@ class TestSecretsManagerPut:
         manager = _make_manager()
         with caplog.at_level(logging.INFO, logger="awscore.secrets"):
             manager.put("myapp/key", "value")
-        assert "myapp/key" in caplog.text
+        assert "Secret created." in caplog.text
 
     def test_raises_and_logs_on_client_error(self, caplog):
         manager = _make_manager()
@@ -191,7 +191,7 @@ class TestSecretsManagerPut:
             with pytest.raises(ClientError):
                 manager.put("myapp/key", "value")
 
-        assert "myapp/key" in caplog.text
+        assert "Failed to create secret" in caplog.text
 
 
 # ---------------------------------------------------------------------------
@@ -211,7 +211,7 @@ class TestSecretsManagerUpdate:
         manager = _make_manager()
         with caplog.at_level(logging.INFO, logger="awscore.secrets"):
             manager.update("myapp/key", "new_value")
-        assert "myapp/key" in caplog.text
+        assert "Secret updated." in caplog.text
 
     def test_raises_and_logs_on_client_error(self, caplog):
         manager = _make_manager()
@@ -223,7 +223,7 @@ class TestSecretsManagerUpdate:
             with pytest.raises(ClientError):
                 manager.update("missing/key", "value")
 
-        assert "missing/key" in caplog.text
+        assert "Failed to update secret" in caplog.text
 
 
 # ---------------------------------------------------------------------------

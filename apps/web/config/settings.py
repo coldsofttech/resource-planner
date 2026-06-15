@@ -75,7 +75,11 @@ INSTALLED_APPS = [
     "apps.financial_years.apps.FinancialYearConfig",
     "apps.holidays.apps.HolidayConfig",
     "apps.leaves.apps.LeaveConfig",
+    "apps.sprints.apps.SprintConfig",
+    "apps.projects.apps.ProjectConfig",
     "apps.dashboard.apps.DashboardConfig",
+    "apps.business_units.apps.BusinessUnitConfig",
+    "apps.tags.apps.TagConfig",
 ]
 
 MIDDLEWARE = [
@@ -185,6 +189,184 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "Resource Planner API",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "DESCRIPTION": (
+        "## Resource Planner API\n\n"
+        "A comprehensive REST API for managing projects, resources,"
+        " teams, and planning workflows.\n\n"
+        "### Authentication\n\n"
+        "All private endpoints require a **Bearer Token** in the"
+        " `Authorization` header:\n\n"
+        "```\nAuthorization: Bearer <token>\n```\n\n"
+        "Obtain a token via the **Login** endpoint under"
+        " **Authentication: Classic**.\n\n"
+        "### Pagination\n\n"
+        "All list endpoints return a paginated envelope:\n\n"
+        "```json\n"
+        "{\n"
+        '  "success": true,\n'
+        '  "data": {\n'
+        '    "results": [...],\n'
+        '    "pagination": {\n'
+        '      "total_count": 100,\n'
+        '      "total_pages": 5,\n'
+        '      "current_page": 1,\n'
+        '      "page_size": 25,\n'
+        '      "has_next": true,\n'
+        '      "has_previous": false\n'
+        "    }\n"
+        "  }\n"
+        "}\n"
+        "```\n\n"
+        "### Filtering & Sorting\n\n"
+        "Use `search`, `sort`, `order_by` (ASC/DESC), `page`,"
+        " and `page_size` query parameters on list endpoints."
+    ),
+    "TAGS": [
+        # ── Authentication & Access ──
+        {
+            "name": "Authentication: Classic",
+            "description": "Login, logout, and password reset flows.",
+        },
+        {
+            "name": "Authentication: OAuth",
+            "description": "OAuth2 provider connection and callback handling.",
+        },
+        {
+            "name": "Authentication: SAML",
+            "description": "SAML SSO configuration and IdP-initiated flows.",
+        },
+        # ── Platform ──
+        {
+            "name": "Setup",
+            "description": "Application setup wizard — run once on installation.",
+        },
+        {
+            "name": "Metadata: Users",
+            "description": "App metadata available to authenticated users.",
+        },
+        {
+            "name": "Permissions",
+            "description": "System-wide permission definitions and queries.",
+        },
+        {
+            "name": "Permissions: Users",
+            "description": "Permission assignments and overrides per user.",
+        },
+        {
+            "name": "Permissions: Groups",
+            "description": "Permission assignments and overrides per group.",
+        },
+        # ── People & Organisation ──
+        {
+            "name": "Users",
+            "description": "User account management, profiles, and admin.",
+        },
+        {
+            "name": "Members",
+            "description": "Team member assignments, skills, and availability.",
+        },
+        {
+            "name": "Groups",
+            "description": "User groups and group-level permission management.",
+        },
+        {
+            "name": "Teams",
+            "description": "Team management, members, and configuration.",
+        },
+        # ── Master Data ──
+        {
+            "name": "Skills",
+            "description": "Resource skills and competency catalog.",
+        },
+        {
+            "name": "Locations",
+            "description": "Office locations and site configuration.",
+        },
+        {
+            "name": "Employment Types",
+            "description": "Employment type definitions (full-time, contractor…).",
+        },
+        {
+            "name": "Roles",
+            "description": "Job roles and functional role catalog.",
+        },
+        {
+            "name": "Business Units",
+            "description": "Business unit hierarchy and structure.",
+        },
+        {
+            "name": "Tags",
+            "description": "Free-form labels for planning entities.",
+        },
+        # ── Planning ──
+        {
+            "name": "Financial Years",
+            "description": "Financial year and planning period configuration.",
+        },
+        {
+            "name": "Holidays",
+            "description": "Holiday calendars by location.",
+        },
+        {
+            "name": "Leaves",
+            "description": "Leave types and entitlement configuration.",
+        },
+        {
+            "name": "Sprints",
+            "description": "Sprint lifecycle management and capacity planning.",
+        },
+        # ── Projects & Programmes ──
+        {
+            "name": "Programmes",
+            "description": "Programme management — groups of related projects.",
+        },
+        {
+            "name": "Projects",
+            "description": "Project tracking, governance, and resource allocation.",
+        },
+        {
+            "name": "Projects: Budgets",
+            "description": "Budget management for projects.",
+        },
+        {
+            "name": "Projects: Estimates",
+            "description": "Effort and cost estimates for project work.",
+        },
+        {
+            "name": "Projects: Labels",
+            "description": "Label management for projects.",
+        },
+        {
+            "name": "Projects: Statuses",
+            "description": "Project status definitions and workflow configuration.",
+        },
+        {
+            "name": "Projects: Tags",
+            "description": "Tag assignments on projects.",
+        },
+        {
+            "name": "Projects: Types",
+            "description": "Project type definitions and category configuration.",
+        },
+    ],
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": True,
+        "persistAuthorization": True,
+        "displayOperationId": False,
+        "docExpansion": "list",
+        "filter": True,
+        "defaultModelsExpandDepth": -1,
+        "defaultModelExpandDepth": 3,
+        "tryItOutEnabled": False,
+        "displayRequestDuration": True,
+    },
+    "COMPONENT_SPLIT_REQUEST": True,
+    "SORT_OPERATIONS": True,
+    "SECURITY": [
+        {
+            "BearerAuth": [],
+        }
+    ],
 }
 
 SILENCED_SYSTEM_CHECKS = [

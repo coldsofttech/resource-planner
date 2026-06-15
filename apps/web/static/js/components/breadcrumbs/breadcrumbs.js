@@ -83,15 +83,24 @@ class Breadcrumbs extends HTMLElement {
     return crumbs;
   }
 
+  _trunc(label, max = 40) {
+    return label.length > max ? label.slice(0, 22) + "…" : label;
+  }
+
   _render() {
     const crumbs = this._crumbs;
     const parts = [];
     crumbs.forEach((c, i) => {
       if (i > 0) parts.push(`<span class="sep">/</span>`);
-      if (c.current || !c.href) {
-        parts.push(`<span class="current">${esc(c.label)}</span>`);
+      const display = this._trunc(c.label);
+      const needsTitle = display !== c.label;
+      const titleAttr = needsTitle ? ` title="${esc(c.label)}"` : "";
+      if (c.current) {
+        parts.push(`<span class="crumb-current"${titleAttr}>${esc(display)}</span>`);
+      } else if (c.href) {
+        parts.push(`<a class="crumb" href="${esc(c.href)}"${titleAttr}>${esc(display)}</a>`);
       } else {
-        parts.push(`<a href="${esc(c.href)}">${esc(c.label)}</a>`);
+        parts.push(`<span class="crumb"${titleAttr}>${esc(display)}</span>`);
       }
     });
     this.innerHTML = parts.join("");

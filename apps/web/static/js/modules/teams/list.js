@@ -1,6 +1,6 @@
 "use strict";
 
-import { esc } from "../../components/utils.js";
+import { esc, setBreadcrumbs } from "../../components/utils.js";
 import {
   apiFetch,
   formatDate,
@@ -315,6 +315,12 @@ function initExportView() {
 document.addEventListener("DOMContentLoaded", () => {
   const table = document.getElementById("rp-teams-table");
   if (!table) return;
+
+  setBreadcrumbs([
+    { label: "Organisation" },
+    { label: "People" },
+    { label: "Teams", href: UI_URLS.teams.list() },
+  ]);
 
   initActions(table);
   initRowNavigation(table);

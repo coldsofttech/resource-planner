@@ -4,7 +4,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
-from apps.core.models import AuditableModel, CodeModel
+from apps.core.models import ActivatableModel, AuditableModel, CodeModel
 from apps.users.constants import ThemeChoices
 
 User = get_user_model()
@@ -111,7 +111,7 @@ class UserAvatar(AuditableModel):
         ordering = ["-created_at"]
 
 
-class GroupProfile(AuditableModel, CodeModel):
+class GroupProfile(ActivatableModel, AuditableModel, CodeModel):
     MODEL_CODE = "USRGRP"
 
     group = models.OneToOneField(
@@ -123,6 +123,14 @@ class GroupProfile(AuditableModel, CodeModel):
 
     class Meta:
         ordering = ["group"]
+        permissions = [
+            ("view_group", "Can view groups"),
+            ("add_group", "Can add groups"),
+            ("change_group", "Can change groups"),
+            ("delete_group", "Can delete groups"),
+            ("import_group", "Can import groups"),
+            ("export_group", "Can export groups"),
+        ]
 
     def __str__(self):
         return self.group.name

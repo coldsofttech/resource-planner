@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Sprint
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/sprints.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Planning
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <span id="rp-sprint-detail-title">Sprint</span>
+{% endblock page_title %}
+{% block page_actions %}
+  <secondary-button id="rp-sprint-forecast-btn" label="Forecast" prefix-icon="bi-graph-up"></secondary-button>
+  <secondary-button id="rp-sprint-actuals-btn" label="Actuals" prefix-icon="bi-receipt"></secondary-button>
+  {% if can_change_sprint %}
+    <engine-button id="rp-sprint-rebuild-btn" label="Rebuild Capacity" prefix-icon="bi-arrow-clockwise"></engine-button>
+  {% endif %}
+{% endblock page_actions %}
+{% block content %}
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <section-panel>
+        <panel-body>
+          <view-field id="rp-sprint-detail-number" label="Sprint Number"></view-field>
+          <view-field id="rp-sprint-detail-name" label="Name"></view-field>
+          <view-field id="rp-sprint-detail-fy" label="Financial Year"></view-field>
+          <view-field id="rp-sprint-detail-code" label="Code" code></view-field>
+          <view-field id="rp-sprint-detail-start" label="Start Date"></view-field>
+          <view-field id="rp-sprint-detail-end" label="End Date"></view-field>
+          <view-field id="rp-sprint-detail-month" label="Month"></view-field>
+          <view-field id="rp-sprint-detail-status" label="Status"></view-field>
+          <view-field id="rp-sprint-detail-closed" label="Closed"></view-field>
+          <view-field id="rp-sprint-detail-note" label="Note" desc></view-field>
+          <view-field id="rp-sprint-detail-created" label="Created" meta></view-field>
+          <view-field id="rp-sprint-detail-created-by" label="Created by" meta></view-field>
+        </panel-body>
+      </section-panel>
+      <section-panel class="mt-4">
+        <panel-title>Sprint Timer</panel-title>
+        <panel-body>
+          <div id="rp-sprint-timer-content">
+            <progress-bar id="rp-sprint-progress"></progress-bar>
+            <div class="mt-2" style="font-size:12px;color:var(--rp-text-muted)" id="rp-sprint-timer-meta"></div>
+          </div>
+        </panel-body>
+      </section-panel>
+    </div>
+    <div class="col-lg-8">
+      <section-panel>
+        <panel-title>Capacity</panel-title>
+        <panel-body>
+          <filter-panel id="rp-sprint-capacity-filters" class="mb-3">
+            <search-field id="rp-sprint-capacity-search" name="search" shortcut="/" placeholder="Search members..." show-label></search-field>
+            <team-field id="rp-sprint-capacity-team" name="team" col="col-auto" allow-all show-label></team-field>
+          </filter-panel>
+          <data-table id="rp-sprint-capacity-table"
+                      url="/api/v1/sprints/{{ sprint_code }}/capacity/"
+                      page-size="25"
+                      row-template="renderSprintCapacityRow"
+                      empty-message="No capacity data found for this sprint.">
+            <table-columns>
+              <table-column label="Member" key="member" sortable>
+              </table-column>
+              <table-column label="Team" key="team" hide-mobile>
+              </table-column>
+              <table-column label="Location" key="location" hide-mobile>
+              </table-column>
+              <table-column label="Working Days" key="working_days" hide-mobile>
+              </table-column>
+              <table-column label="Holidays" key="holiday_days" hide-mobile>
+              </table-column>
+              <table-column label="Leaves" key="leave_days" hide-mobile>
+              </table-column>
+              <table-column label="Net Capacity" key="net_capacity" sortable>
+              </table-column>
+            </table-columns>
+          </data-table>
+        </panel-body>
+      </section-panel>
+    </div>
+  </div>
+{% endblock content %}

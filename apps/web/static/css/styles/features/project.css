@@ -1,0 +1,89 @@
+/* ── Sub-status table ────────────────────────────────────────────────────── */
+
+.rp-substatus-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.rp-substatus-table th {
+  padding: 6px 8px;
+  color: var(--rp-text-muted);
+  font-weight: 500;
+  border-bottom: 1px solid var(--rp-border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.rp-substatus-table td {
+  padding: 8px;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--rp-border-light, var(--rp-border));
+}
+
+.rp-substatus-row:last-child td {
+  border-bottom: none;
+}
+
+/* ── Reorder cell ────────────────────────────────────────────────────────── */
+
+.rp-reorder-cell {
+  /* override the .rp-table tbody td padding so the cell doesn't drive row height */
+  padding: 0 !important;
+}
+
+.rp-reorder-btns {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.rp-reorder-cell .rp-iconbtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  padding: 2px 0;
+  border: none;
+  background: transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  color: var(--rp-text-muted);
+  line-height: 0;
+  font-size: 0.65rem;
+}
+
+.rp-reorder-cell .rp-iconbtn:hover {
+  background: var(--rp-bg-hover, rgba(0, 0, 0, 0.06));
+  color: var(--rp-text);
+}
+
+/* ── Sub-status row actions ──────────────────────────────────────────────── */
+
+.rp-substatus-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.rp-substatus-actions .rp-iconbtn {
+  padding: 4px 6px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--rp-text-muted);
+  line-height: 1;
+}
+
+.rp-substatus-actions .rp-iconbtn:hover {
+  background: var(--rp-bg-hover, rgba(0, 0, 0, 0.06));
+  color: var(--rp-text);
+}
+
+.rp-substatus-actions .rp-iconbtn.danger:hover {
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+}

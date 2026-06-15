@@ -6,7 +6,6 @@ import { API_URLS } from "../../../modules/main/urls.js";
  *
  * Dropdown field pre-wired to the financial years API.
  * Active financial years are fetched from GET /api/v1/fy/options/ on first connect.
- * Options display the long_fy label (e.g. "FY2024-2025").
  * Inherits all attributes and public API from DropdownField / BaseField.
  *
  * Defaults applied when the attribute is absent:
@@ -17,15 +16,18 @@ import { API_URLS } from "../../../modules/main/urls.js";
  *   allow-all  – prepends an "All Financial Years" option (value="") selected by default;
  *                used in filter contexts.
  *   show-label – when present, renders "Financial Year" as the visible field label.
+ *   show-long  – display option labels using data.long_fy (e.g. "FY2024-2025").
+ *   show-short – display option labels using data.short_fy. Takes priority over show-long.
+ *                When neither is set, defaults to long_fy.
  *
  * Usage:
  *   <financial-year-field id="plan-fy" required col="col-md-6"></financial-year-field>
- *   <financial-year-field id="plan-fy" value="FY-1"></financial-year-field>
- *   <financial-year-field id="filter-fy" name="fy" allow-all show-label></financial-year-field>
+ *   <financial-year-field id="plan-fy" value="FY-1" show-short></financial-year-field>
+ *   <financial-year-field id="filter-fy" name="fy" allow-all show-label show-long></financial-year-field>
  */
 class FinancialYearField extends DropdownField {
   static get observedAttributes() {
-    return [...super.observedAttributes, "show-label", "allow-all"];
+    return [...super.observedAttributes, "show-label", "allow-all", "show-long", "show-short"];
   }
 
   get _label() {
@@ -35,9 +37,19 @@ class FinancialYearField extends DropdownField {
     return super._label;
   }
 
+  get _displayKey() {
+    if (this.hasAttribute("show-short")) return "short_fy";
+    return "long_fy";
+  }
+
   attributeChangedCallback(name, oldVal, newVal) {
-    if (name === "allow-all" && this._connected && this._fyOptions !== undefined) {
-      this._initialOptions = this._buildOptions();
+    if (
+      (name === "allow-all" || name === "show-long" || name === "show-short") &&
+      this._connected &&
+      this._fyData !== undefined
+    ) {
+      this._updateFyOptions();
+      this._initialOptions = this._buildOptionsList();
       this._doRender();
     } else {
       super.attributeChangedCallback(name, oldVal, newVal);
@@ -74,16 +86,9 @@ class FinancialYearField extends DropdownField {
       const res = await apiFetch(href, { method });
       if (this._loadId !== id) return;
 
-      const fys = res?.data ?? [];
-      this._fyOptions = fys.map((fy) => ({
-        id: fy.code,
-        label: fy.long_fy,
-        value: fy.code,
-        selected: false,
-        disabled: false,
-      }));
-
-      this._initialOptions = this._buildOptions();
+      this._fyData = res?.data ?? [];
+      this._updateFyOptions();
+      this._initialOptions = this._buildOptionsList();
       this._doRender();
     } catch {
       if (this._loadId !== id) return;
@@ -91,7 +96,18 @@ class FinancialYearField extends DropdownField {
     }
   }
 
-  _buildOptions() {
+  _updateFyOptions() {
+    const key = this._displayKey;
+    this._fyOptions = (this._fyData || []).map((fy) => ({
+      id: fy.code,
+      label: fy[key] || fy.long_fy,
+      value: fy.code,
+      selected: false,
+      disabled: false,
+    }));
+  }
+
+  _buildOptionsList() {
     const hasAllOpt = this.hasAttribute("allow-all");
     return [
       ...(hasAllOpt

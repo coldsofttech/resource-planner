@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Tags
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/tags.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Administration
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Tags
+{% endblock page_title %}
+{% block page_sub %}
+  Browse and export tags used across the platform.
+{% endblock page_sub %}
+{% block page_actions %}
+  {% if can_export_tag %}
+    <secondary-button id="rp-tags-export-btn" label="Export" prefix-icon="bi-download"></secondary-button>
+  {% endif %}
+{% endblock page_actions %}
+{% block content %}
+  <list-view show-active-filters>
+    <filter-panel id="rp-tags-filter-panel">
+      <search-field id="rp-tags-search" name="search" placeholder="Search tags..." shortcut="/" show-label></search-field>
+    </filter-panel>
+    <data-table
+      id="rp-tags-table"
+      url="/api/v1/tags/"
+      paginated
+      page-size="25"
+      row-template="renderTagRow"
+      empty-message="No tags found."
+    >
+      <table-columns>
+        <table-column label="Tag" key="name" sortable></table-column>
+        <table-column label="Code" key="code" mono width="140px" hide-mobile></table-column>
+        <table-column label="Created" key="created_at" sortable hide-mobile></table-column>
+        <table-column label="Created By" key="created_by" hide-mobile></table-column>
+      </table-columns>
+    </data-table>
+  </list-view>
+  {% if can_export_tag %}
+    <export-view id="rp-tags-export-view" title="Export Tags" eyebrow="Tags" active-filter-id="rp-tags-filter-panel"></export-view>
+  {% endif %}
+{% endblock content %}

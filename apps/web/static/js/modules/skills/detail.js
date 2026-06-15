@@ -1,6 +1,6 @@
 "use strict";
 
-import { esc } from "../../components/utils.js";
+import { esc, setBreadcrumbs } from "../../components/utils.js";
 import { apiFetch, formatDate } from "../utils/utils.js";
 import { toast } from "../utils/toast.js";
 import { API_URLS, UI_URLS } from "../main/urls.js";
@@ -32,13 +32,12 @@ async function loadSkillDetails() {
     const titleEl = document.getElementById("rp-skill-detail-title");
     if (titleEl) titleEl.textContent = skill.skill;
 
-    const breadcrumbs = document.getElementById("app-breadcrumbs");
-    if (breadcrumbs?.setCrumbs) {
-      breadcrumbs.setCrumbs([
-        { label: "Skills", href: UI_URLS.skills.list() },
-        { label: skill.skill },
-      ]);
-    }
+    setBreadcrumbs([
+      { label: "Organisation" },
+      { label: "Configurations" },
+      { label: "Skills", href: UI_URLS.skills.list() },
+      { label: skill.skill },
+    ]);
 
     const setView = (id, val) => {
       const el = document.getElementById(id);
@@ -70,6 +69,7 @@ async function loadSkillDetails() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  if (!skillCode) return;
   loadSkillDetails();
   if (hasPermission("auth.view_user")) {
     document.getElementById("rp-skill-members-col")?.removeAttribute("hidden");

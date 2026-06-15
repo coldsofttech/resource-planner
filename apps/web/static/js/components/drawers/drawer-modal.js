@@ -159,7 +159,7 @@ class DrawerModal extends HTMLElement {
     const badgeHTML = h?.badge
       ? ` <span class="rp-badge rp-badge-soft rp-badge-${esc(h.badgeVariant)}">${esc(h.badge)}</span>`
       : "";
-    const titleHTML = h?.title ? `<h3>${esc(h.title)}${badgeHTML}</h3>` : "";
+    const titleHTML = `<h3>${h?.title ? esc(h.title) : ""}${badgeHTML}</h3>`;
     const sizesHTML = h?.noSizes
       ? ""
       : `<div class="rp-rdrawer-sizes" title="Drawer width">

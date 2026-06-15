@@ -251,6 +251,186 @@ _HOLIDAYS_DEFAULTS = {
 }
 
 
+_SPRINT_DEFAULTS = {
+    "SPRINT_NAME_PREFIX": {
+        "label": "Sprint Name Prefix",
+        "value": "Sprint",
+        "description": (
+            "Prefix used when auto-generating sprint names. "
+            "For example, 'Sprint', 'SP', etc."
+        ),
+        "data_type": "string",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "sprints",
+    },
+    "SPRINT_START_NUMBER": {
+        "label": "Sprint Start Number",
+        "value": "1",
+        "description": (
+            "The starting number used when generating the first sprint of "
+            "a financial year if no existing sprints are found."
+        ),
+        "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "sprints",
+    },
+    "SPRINT_DURATION_DAYS": {
+        "label": "Sprint Duration (days)",
+        "value": "14",
+        "description": (
+            "Number of calendar days in a sprint. Typically set to 14 days (2 weeks)."
+        ),
+        "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "sprints",
+    },
+    "SPRINT_POINT_PRICE": {
+        "label": "Sprint Point Price (£)",
+        "value": "1150",
+        "description": (
+            "Day rate in GBP (£) used for calculating sprint cost "
+            "based on story points. "
+        ),
+        "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "sprints",
+    },
+}
+
+
+_USERS_DEFAULTS = {
+    "PASSWORD_RESET_TIMEOUT": {
+        "label": "Admin Password Reset Timeout (minutes)",
+        "value": "120",
+        "description": (
+            "Number of minutes before an admin-initiated password reset link expires. "
+            "Default is 120 minutes (2 hours)."
+        ),
+        "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "users",
+    },
+}
+
+
+_AI_DEFAULTS = {
+    "AI_ENABLED": {
+        "label": "AI Enabled",
+        "value": "false",
+        "description": (
+            "Master switch for AI-powered features. "
+            "Set to 'true' to enable. When false, all features fall back to "
+            "their deterministic implementations. Accepted values: true, false."
+        ),
+        "data_type": "boolean",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "ai",
+    },
+    "AI_PROVIDER": {
+        "label": "AI Provider",
+        "value": "anthropic",
+        "description": (
+            "AI provider to use. "
+            "Accepted values: 'anthropic' (Anthropic API), 'bedrock' (AWS Bedrock). "
+            "When set to 'bedrock', the AI_BEDROCK_* configs are also required."
+        ),
+        "data_type": "string",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "ai",
+    },
+    "AI_MODEL": {
+        "label": "AI Model",
+        "value": "",
+        "description": (
+            "Model identifier string. "
+            "Anthropic example: claude-sonnet-4-20250514. "
+            "Bedrock example: anthropic.claude-3-5-sonnet-20241022-v2:0 "
+            "(full Bedrock model ID including version suffix)."
+        ),
+        "data_type": "string",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "ai",
+    },
+    "AI_ANTHROPIC_API_KEY": {
+        "label": "Anthropic API Key",
+        "value": "",
+        "description": (
+            "Anthropic API key (sk-ant-...). "
+            "Required only when AI_PROVIDER=anthropic. "
+            "Stored encrypted at rest."
+        ),
+        "data_type": "string",
+        "is_secret": True,
+        "is_admin": False,
+        "module": "ai",
+    },
+    "AI_BEDROCK_REGION": {
+        "label": "Bedrock Region",
+        "value": "us-east-1",
+        "description": (
+            "AWS region for Bedrock API calls. "
+            "Required when AI_PROVIDER=bedrock. "
+            "Must be a region where the chosen model is available. "
+            "Examples: us-east-1, eu-west-2, ap-southeast-1."
+        ),
+        "data_type": "string",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "ai",
+    },
+    "AI_BEDROCK_AUTH_MODE": {
+        "label": "Bedrock Auth Mode",
+        "value": "role",
+        "description": (
+            "Authentication mode for AWS Bedrock. "
+            "'role' — no credentials stored; boto3 resolves via instance profile, "
+            "ECS task role, or AWS_* environment variables. "
+            "'user' — explicit IAM user credentials stored in AI_BEDROCK_IAM_KEY "
+            "and AI_BEDROCK_IAM_SECRET. Use 'user' for local or on-premise deployments."
+        ),
+        "data_type": "string",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "ai",
+    },
+    "AI_BEDROCK_IAM_KEY": {
+        "label": "Bedrock IAM Access Key ID",
+        "value": "",
+        "description": (
+            "AWS IAM user access key ID. "
+            "Required only when AI_PROVIDER=bedrock and AI_BEDROCK_AUTH_MODE=user. "
+            "The IAM user must have bedrock:InvokeModel permission on the chosen "
+            "model. Stored encrypted at rest."
+        ),
+        "data_type": "string",
+        "is_secret": True,
+        "is_admin": False,
+        "module": "ai",
+    },
+    "AI_BEDROCK_IAM_SECRET": {
+        "label": "Bedrock IAM Secret Access Key",
+        "value": "",
+        "description": (
+            "AWS IAM user secret access key. "
+            "Required only when AI_PROVIDER=bedrock and AI_BEDROCK_AUTH_MODE=user. "
+            "Stored encrypted at rest."
+        ),
+        "data_type": "string",
+        "is_secret": True,
+        "is_admin": False,
+        "module": "ai",
+    },
+}
+
+
 CONFIGURATION_DEFAULTS = {
     **_SETUP_DEFAULTS,
     **_GENERAL_DEFAULTS,
@@ -259,4 +439,7 @@ CONFIGURATION_DEFAULTS = {
     **_EMAIL_DEFAULTS,
     **_FINANCIAL_YEAR_DEFAULTS,
     **_HOLIDAYS_DEFAULTS,
+    **_SPRINT_DEFAULTS,
+    **_USERS_DEFAULTS,
+    **_AI_DEFAULTS,
 }

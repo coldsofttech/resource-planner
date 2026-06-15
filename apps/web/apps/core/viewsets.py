@@ -3,6 +3,11 @@ import io
 from dataclasses import asdict
 
 from django.http import HttpResponse
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiResponse,
+    extend_schema,
+)
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -371,6 +376,23 @@ class StatisticsMixin:
         """Uses HTTP 200 OK by default. Implement in child ViewSet to override."""
         return status.HTTP_200_OK
 
+    @extend_schema(
+        summary="Statistics",
+        description=(
+            "Returns aggregate counts and statistics for the resource. "
+            "Use the `fields` parameter to limit which stat keys are returned."
+        ),
+        parameters=[
+            OpenApiParameter(
+                name="fields",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Comma-separated list of stat field names to include.",
+                required=False,
+            ),
+        ],
+        responses={200: OpenApiResponse(description="Statistics data.")},
+    )
     @action(detail=False, methods=["get"], url_path="stats")
     def statistics(self, request):
         """GET /module/stats/"""
@@ -398,6 +420,23 @@ class OptionsMixin:
         """Uses HTTP 200 OK by default. Implement in child ViewSet to override."""
         return status.HTTP_200_OK
 
+    @extend_schema(
+        summary="Options",
+        description=(
+            "Returns a lightweight list of active records (code + name) "
+            "suitable for picker and dropdown fields."
+        ),
+        parameters=[
+            OpenApiParameter(
+                name="fields",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Comma-separated list of fields to include in each option.",
+                required=False,
+            ),
+        ],
+        responses={200: OpenApiResponse(description="List of options.")},
+    )
     @action(detail=False, methods=["get"], url_path="options")
     def option_choices(self, request):
         """GET /module/options/"""
@@ -429,6 +468,21 @@ class ImportMixin:
         """Uses HTTP 200 OK by default. Implement in child ViewSet to override."""
         return status.HTTP_200_OK
 
+    @extend_schema(
+        summary="Import specifications",
+        description=(
+            "Returns the import format specification: supported formats,"
+            " max row count, max file size, field definitions, and notes."
+        ),
+        responses={
+            200: OpenApiResponse(
+                description=(
+                    "Spec including `supported_formats`, `max_rows`,"
+                    " `max_file_size_mb`, `fields`, and `notes`."
+                )
+            )
+        },
+    )
     @action(detail=False, methods=["get"], url_path="import/specs")
     def import_specs(self, request):
         """GET /module/import/specs"""
@@ -445,6 +499,14 @@ class ImportMixin:
             status_code=self.get_import_specs_status_code(),
         )
 
+    @extend_schema(
+        summary="Download import template",
+        description=(
+            "Returns a sample CSV file with column headers and an example"
+            " row. Use as a fill-in template before uploading."
+        ),
+        responses={200: OpenApiResponse(description="Sample CSV file attachment.")},
+    )
     @action(detail=False, methods=["get"], url_path="import/sample")
     def import_sample(self, request):
         """GET /module/import/sample/"""
@@ -482,6 +544,50 @@ class ImportMixin:
         """
         return status.HTTP_207_MULTI_STATUS
 
+    @extend_schema(
+        summary="Bulk import",
+        description=(
+            "Upload a CSV or Excel file to bulk-import records. "
+            "Pass `validate=true` for a dry-run (validates without saving). "
+            "Returns per-row results with success/error counts."
+        ),
+        parameters=[
+            OpenApiParameter(
+                name="validate",
+                type=bool,
+                location=OpenApiParameter.QUERY,
+                description=(
+                    "If `true`, validates rows without saving (dry run)."
+                    " Defaults to `false`."
+                ),
+                required=False,
+            ),
+        ],
+        request={
+            "multipart/form-data": {
+                "type": "object",
+                "properties": {
+                    "file": {
+                        "type": "string",
+                        "format": "binary",
+                        "description": "CSV or Excel (.xlsx) file to import.",
+                    }
+                },
+                "required": ["file"],
+            }
+        },
+        responses={
+            207: OpenApiResponse(
+                description=(
+                    "Multi-status result with `success_count`,"
+                    " `error_count`, and per-row status."
+                )
+            ),
+            400: OpenApiResponse(
+                description="No file uploaded or file validation failed."
+            ),
+        },
+    )
     @action(detail=False, methods=["post"], url_path="import")
     def import_bulk(self, request):
         """POST /module/import/"""
@@ -522,6 +628,18 @@ class ExportMixin:
         """Uses HTTP 200 OK by default. Implement in child ViewSet to override."""
         return status.HTTP_200_OK
 
+    @extend_schema(
+        summary="Export specifications",
+        description=(
+            "Returns the available export columns with their keys,"
+            " labels, and whether each is included by default."
+        ),
+        responses={
+            200: OpenApiResponse(
+                description=("Column specs with `key`, `label`, and `default` flag.")
+            )
+        },
+    )
     @action(detail=False, methods=["get"], url_path="export/specs")
     def export_specs(self, request):
         """GET /module/export/specs/"""
@@ -542,6 +660,39 @@ class ExportMixin:
         """Uses HTTP 200 OK by default. Implement in child ViewSet to override."""
         return status.HTTP_200_OK
 
+    @extend_schema(
+        summary="Export data",
+        description=(
+            "Exports resource data as a downloadable file. "
+            "Formats: `csv` (default), `xlsx`, `pdf`, `json`. "
+            "Use `fields` to select columns; list filters are also applied."
+        ),
+        parameters=[
+            OpenApiParameter(
+                name="type",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description=(
+                    "Export format: `csv`, `xlsx`, `pdf`, or `json`. Defaults to `csv`."
+                ),
+                required=False,
+                enum=["csv", "xlsx", "pdf", "json"],
+            ),
+            OpenApiParameter(
+                name="fields",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description=(
+                    "Comma-separated column keys to include."
+                    " See export/specs for available keys."
+                ),
+                required=False,
+            ),
+        ],
+        responses={
+            200: OpenApiResponse(description="Exported file as a binary attachment.")
+        },
+    )
     @action(detail=False, methods=["get"], url_path="export")
     def export(self, request):
         """GET /module/export/?type=csv|xlsx|pdf|json&fields=f1,f2"""

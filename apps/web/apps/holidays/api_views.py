@@ -18,6 +18,7 @@ from apps.holidays.services import (
 )
 
 
+@extend_schema(tags=["Holidays"])
 class HolidayViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
     service_class = HolidayService
     import_service_class = HolidayImportService

@@ -7,110 +7,113 @@ permissions:
   contents: read
 
 jobs:
-  lint:
-    name: Lint
+  gitleaks:
+    name: Secret Scan (Gitleaks)
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
       - uses: actions/checkout@v6
-
-      - uses: actions/setup-python@v6
         with:
-          python-version: "3.14"
+          fetch-depth: 0
 
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements/base.txt
-          pip install -r requirements/dev.txt
-          pip install build
+      - uses: ./.github/actions/gitleaks
 
-      - name: Install packages
-        run: |
-          pip install -e packages/awscore
-          pip install -e packages/pycore
-          pip install -e packages/emailcore
-          pip install -e packages/otpcore
-          pip install -e packages/exportcore
-          pip install -e packages/storagecore
-
-      - name: Ruff
-        run: ruff check packages
-
-      - name: Ruff Format
-        run: ruff format --check packages
-
-      - name: mypy
-        run: mypy packages
-
-      - name: Bandit
-        run: bandit -r packages --configfile pyproject.toml
-
-      - name: pip-audit
-        run: pip-audit --skip-editable
-
-  test:
-    name: Test (${{ matrix.package }})
-    needs: lint
+  lint:
+    name: Lint (${{ matrix.package }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        package:
+        package: &packages
+          - aicore
           - awscore
-          - pycore
           - emailcore
-          - otpcore
           - exportcore
+          - otpcore
+          - pycore
           - storagecore
 
     steps:
       - uses: actions/checkout@v6
 
-      - uses: actions/setup-python@v6
+      - uses: ./.github/actions/setup-python
+
+      - uses: ./.github/actions/install-python-deps
+
+      - uses: ./.github/actions/install-packages
         with:
-          python-version: "3.14"
+          package: ${{ matrix.package }}
 
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements/base.txt
-          pip install -r requirements/dev.txt
-          pip install build
-
-      - name: Install packages
-        run: |
-          pip install -e packages/awscore
-          pip install -e packages/pycore
-          pip install -e packages/emailcore
-          pip install -e packages/otpcore
-          pip install -e packages/exportcore
-          pip install -e packages/storagecore
-
-      - name: pytest (${{ matrix.package }})
-        run: |
-          mkdir -p .pytest-reports
-          set +e
-          pytest -n auto --dist=loadfile -m integration -p no:django --override-ini=addopts= --import-mode=importlib \
-            --junit-xml=.pytest-reports/junit-${{ matrix.package }}.xml \
-            --html=.pytest-reports/test-report-${{ matrix.package }}.html \
-            --self-contained-html \
-            packages/${{ matrix.package }}/tests/
-          EXIT_CODE=$?
-          set -e
-          if [ $EXIT_CODE -eq 5 ]; then
-            printf '<?xml version="1.0" encoding="utf-8"?>\n<testsuites/>\n' > .pytest-reports/junit-${{ matrix.package }}.xml
-            printf '<!DOCTYPE html><html><body><p>No integration tests collected for ${{ matrix.package }}.</p></body></html>\n' > .pytest-reports/test-report-${{ matrix.package }}.html
-          elif [ $EXIT_CODE -ne 0 ]; then
-            exit $EXIT_CODE
-          fi
-
-      - name: Upload test report
-        if: always()
-        uses: actions/upload-artifact@v7
+      - uses: ./.github/actions/ruff
         with:
-          name: packages-test-report-${{ matrix.package }}
-          path: .pytest-reports/
+          path: packages/${{ matrix.package }}
 
-      - name: Build Validation
-        run: python -m build packages/${{ matrix.package }}
+      - uses: ./.github/actions/mypy
+        with:
+          path: packages/${{ matrix.package }}
+
+      - uses: ./.github/actions/bandit
+        with:
+          path: packages/${{ matrix.package }}
+
+      - uses: ./.github/actions/pip-audit
+
+  unit-tests:
+    name: Unit Tests (${{ matrix.package }})
+    needs: [lint]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: *packages
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-python
+
+      - uses: ./.github/actions/install-python-deps
+
+      - uses: ./.github/actions/install-packages
+        with:
+          package: ${{ matrix.package }}
+
+      - uses: ./.github/actions/unit-test
+        with:
+          path: packages/${{ matrix.package }}/tests/
+          name: ${{ matrix.package }}
+          extra-args: "-n auto --dist=loadfile -p no:django --import-mode=importlib"
+          artifact-name: packages-unit-test-report-${{ matrix.package }}
+
+  test:
+    name: Integration Test (${{ matrix.package }})
+    needs: [unit-tests]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: *packages
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-python
+
+      - uses: ./.github/actions/install-python-deps
+
+      - uses: ./.github/actions/install-packages
+        with:
+          package: ${{ matrix.package }}
+
+      - uses: ./.github/actions/integration-test
+        with:
+          path: packages/${{ matrix.package }}/tests/
+          name: ${{ matrix.package }}
+          extra-args: "-n auto --dist=loadfile -p no:django --import-mode=importlib"
+          artifact-name: packages-test-report-${{ matrix.package }}
+
+      - uses: ./.github/actions/build-validate
+        with:
+          package: ${{ matrix.package }}

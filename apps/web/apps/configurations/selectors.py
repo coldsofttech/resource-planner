@@ -164,3 +164,61 @@ class FinancialYear:
     @staticmethod
     def get_fy_expiry_warning_days() -> int:
         return int(get_config_value("FY_EXPIRY_WARNING_DAYS"))
+
+
+class Users:
+    @staticmethod
+    def get_password_reset_timeout() -> int:
+        return int(get_config_value("PASSWORD_RESET_TIMEOUT"))
+
+
+class Sprint:
+    @staticmethod
+    def get_sprint_name_prefix() -> str:
+        return get_config_value("SPRINT_NAME_PREFIX")
+
+    @staticmethod
+    def get_sprint_start_number() -> int:
+        return int(get_config_value("SPRINT_START_NUMBER"))
+
+    @staticmethod
+    def get_sprint_duration_days() -> int:
+        return int(get_config_value("SPRINT_DURATION_DAYS"))
+
+    @staticmethod
+    def get_sprint_point_price() -> int:
+        return int(get_config_value("SPRINT_POINT_PRICE"))
+
+
+class AI:
+    @staticmethod
+    def is_ai_enabled() -> bool:
+        return get_bool(get_config_value("AI_ENABLED"), False)
+
+    @staticmethod
+    def get_ai_provider() -> str:
+        return get_config_value("AI_PROVIDER")
+
+    @staticmethod
+    def get_ai_model() -> str:
+        return get_config_value("AI_MODEL")
+
+    @staticmethod
+    def get_anthropic_api_key() -> str:
+        return get_config_value("AI_ANTHROPIC_API_KEY")
+
+    @staticmethod
+    def get_bedrock_region() -> str:
+        return get_config_value("AI_BEDROCK_REGION")
+
+    @staticmethod
+    def get_bedrock_auth_mode() -> str:
+        return get_config_value("AI_BEDROCK_AUTH_MODE")
+
+    @staticmethod
+    def get_bedrock_iam_key() -> str:
+        return get_config_value("AI_BEDROCK_IAM_KEY")
+
+    @staticmethod
+    def get_bedrock_iam_secret() -> str:
+        return get_config_value("AI_BEDROCK_IAM_SECRET")

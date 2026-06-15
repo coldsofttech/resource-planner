@@ -21,6 +21,7 @@ _SESSION_PROVIDER = "oauth_provider_code"
 _SESSION_REDIRECT = "oauth_redirect_uri"
 
 
+@extend_schema(tags=["Authentication: OAuth"])
 class OAuthViewSet(BaseViewSet):
     service_class = OAuthService
 
