@@ -93,9 +93,6 @@ def _fast_password_hasher(settings):
 
 
 def pytest_configure(config: pytest.Config) -> None:
-    import os
-
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
     config.pluginmanager.register(_SlowTestReporter(), "rp_slow_test_reporter")
 
 

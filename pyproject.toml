@@ -30,12 +30,16 @@ exclude_dirs = ["tests"]
 skips = ["B101", "B105", "B106", "B107"]
 
 [tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
 pythonpath = ["apps/web"]
 testpaths = ["apps/web"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-n auto --dist=loadfile --html=.pytest-reports/test-report.html --self-contained-html"
+filterwarnings = [
+    "ignore:Unknown config option.*DJANGO_SETTINGS_MODULE:pytest.PytestConfigWarning",
+]
 markers = [
     "unit: fast tests using SimpleTestCase — no database",
     "integration: tests that require a database",
