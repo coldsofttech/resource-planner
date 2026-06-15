@@ -1287,6 +1287,58 @@ def _print_sync_result(oauth_count: int, saml_count: int) -> None:
         )
 
 
+def _display_keycloak_oauth_config(
+    client_id: str,
+    auth_endpoint: str,
+    token_endpoint: str,
+    userinfo_endpoint: str,
+    scope: str,
+    label_width: int = 26,
+    name: str = "",
+) -> None:
+    w = label_width
+    if name:
+        print(f"  {'Provider Name':<{w}}: {name}")
+    print(f"  {'Client ID':<{w}}: {client_id}")
+    print(f"  {'Client Secret':<{w}}: [hidden]")
+    print(f"  {'Auth Endpoint':<{w}}: {auth_endpoint}")
+    print(f"  {'Token Endpoint':<{w}}: {token_endpoint}")
+    print(f"  {'User Info Endpoint':<{w}}: {userinfo_endpoint}")
+    print(f"  {'Scope':<{w}}: {scope}")
+
+
+def _display_keycloak_saml_config(
+    entity_id: str,
+    sso_url: str,
+    signing_data: str,
+    label_width: int = 26,
+    name: str = "",
+    sp_entity_id: str = "",
+    sp_assertion_url: str = "",
+    show_cert_markers: bool = False,
+    cert_indent: str = "    ",
+) -> None:
+    w = label_width
+    preview = (signing_data[:68] + "...") if len(signing_data) > 68 else signing_data
+    if name:
+        print(f"  {'Provider Name':<{w}}: {name}")
+    print(f"  {'IDP Entity ID':<{w}}: {entity_id}")
+    print(f"  {'IDP SSO URL':<{w}}: {sso_url}")
+    print(f"  {'IDP X.509 Cert':<{w}}: {preview}")
+    if sp_entity_id:
+        print(f"  {'SP Entity ID':<{w}}: {sp_entity_id}")
+    if sp_assertion_url:
+        print(f"  {'Assertion Consumer URL':<{w}}: {sp_assertion_url}")
+    if signing_data:
+        print("\n  Full IDP X.509 Certificate:")
+        if show_cert_markers:
+            print("  -----BEGIN CERTIFICATE-----")
+        for i in range(0, len(signing_data), 64):
+            print(f"{cert_indent}{signing_data[i : i + 64]}")
+        if show_cert_markers:
+            print("  -----END CERTIFICATE-----")
+
+
 def configure_keycloak():
     """
     Print ready-to-use OAuth and SAML configuration values from the local Keycloak.
@@ -1320,25 +1372,28 @@ def configure_keycloak():
     print("  Test user      :  sso@example.com / Test1234!")
 
     print("\n--- OAuth 2.0 (OIDC) ---")
-    for key, val in oauth_config.items():
-        display_val = "[hidden]" if key == "client_secret" else val
-        print(f"  {key:<22}: {display_val}")
+    _display_keycloak_oauth_config(
+        name=str(oauth_config.get("name", "")),
+        client_id=str(oauth_config.get("client_id", "")),
+        auth_endpoint=str(oauth_config.get("auth_endpoint", "")),
+        token_endpoint=str(oauth_config.get("token_endpoint", "")),
+        userinfo_endpoint=str(oauth_config.get("userinfo_endpoint", "")),
+        scope=str(oauth_config.get("scope", "")),
+        label_width=22,
+    )
 
     print("\n--- SAML 2.0 ---")
-    for key, val in saml_config.items():
-        if key == "idp_x509_cert":
-            preview = (val[:68] + "...") if len(val) > 68 else val
-            print(f"  {key:<22}: {preview}")
-        else:
-            print(f"  {key:<22}: {val}")
-
-    pem = saml_config.get("idp_x509_cert", "")
-    if pem:
-        print("\n  Full IdP Certificate:")
-        print("  -----BEGIN CERTIFICATE-----")
-        for i in range(0, len(pem), 64):
-            print(f"  {pem[i : i + 64]}")
-        print("  -----END CERTIFICATE-----")
+    _display_keycloak_saml_config(
+        name=str(saml_config.get("name", "")),
+        entity_id=str(saml_config.get("idp_entity_id", "")),
+        sso_url=str(saml_config.get("idp_sso_url", "")),
+        signing_data=str(saml_config.get("idp_x509_cert", "")),
+        sp_entity_id=str(saml_config.get("sp_entity_id", "")),
+        sp_assertion_url=str(saml_config.get("sp_assertion_url", "")),
+        label_width=22,
+        show_cert_markers=True,
+        cert_indent="  ",
+    )
 
     print(f"\n{sep}")
     pause()
@@ -2276,13 +2331,14 @@ def docker_keycloak_oauth() -> None:
 
     if kc_result:
         oauth, _ = kc_result
-        print(f"  {'Provider Name':<26}: {provider_name}")
-        print(f"  {'Client ID':<26}: {oauth['client_id']}")
-        print(f"  {'Client Secret':<26}: [hidden]")
-        print(f"  {'Auth Endpoint':<26}: {oauth['auth_endpoint']}")
-        print(f"  {'Token Endpoint':<26}: {oauth['token_endpoint']}")
-        print(f"  {'User Info Endpoint':<26}: {oauth['userinfo_endpoint']}")
-        print(f"  {'Scope':<26}: {oauth['scope']}")
+        _display_keycloak_oauth_config(
+            name=provider_name,
+            client_id=str(oauth.get("client_id", "")),
+            auth_endpoint=str(oauth.get("auth_endpoint", "")),
+            token_endpoint=str(oauth.get("token_endpoint", "")),
+            userinfo_endpoint=str(oauth.get("userinfo_endpoint", "")),
+            scope=str(oauth.get("scope", "")),
+        )
     else:
         print(f"  {YELLOW}Config unavailable — Keycloak may still be starting.{RESET}")
         print("  Use Django Tools → Keycloak Dev Config once it is ready.")
@@ -2356,18 +2412,14 @@ def docker_keycloak_saml() -> None:
 
     if kc_result:
         _, saml = kc_result
-        pem = saml.get("idp_x509_cert", "")
-        pem_preview = (pem[:40] + "...") if len(pem) > 40 else pem
-        print(f"  {'Provider Name':<26}: {provider_name}")
-        print(f"  {'IDP Entity ID':<26}: {saml['idp_entity_id']}")
-        print(f"  {'IDP SSO URL':<26}: {saml['idp_sso_url']}")
-        print(f"  {'IDP X.509 Cert':<26}: {pem_preview}")
-        print(f"  {'SP Entity ID':<26}: {sp_entity_id}")
-        print(f"  {'Assertion Consumer URL':<26}: {sp_assertion_url}")
-        if pem:
-            print("\n  Full IDP X.509 Certificate:")
-            for i in range(0, len(pem), 64):
-                print(f"    {pem[i : i + 64]}")
+        _display_keycloak_saml_config(
+            name=provider_name,
+            entity_id=str(saml.get("idp_entity_id", "")),
+            sso_url=str(saml.get("idp_sso_url", "")),
+            signing_data=str(saml.get("idp_x509_cert", "")),
+            sp_entity_id=sp_entity_id,
+            sp_assertion_url=sp_assertion_url,
+        )
     else:
         print(f"  {YELLOW}Config unavailable — Keycloak may still be starting.{RESET}")
         print("  Use Django Tools → Keycloak Dev Config once it is ready.")
