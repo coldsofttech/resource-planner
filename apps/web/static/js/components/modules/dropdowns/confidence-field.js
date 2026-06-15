@@ -1,0 +1,105 @@
+import { DropdownField } from "../../dropdowns/dropdown-field.js";
+import { apiFetch } from "../../../modules/utils/utils.js";
+import { API_URLS } from "../../../modules/main/urls.js";
+
+/* ConfidenceField  <confidence-field>
+ *
+ * Dropdown field pre-wired to the project confidence options API.
+ * Options are fetched from GET /api/v1/projects/options/?fields=confidence on
+ * first connect. Inherits all attributes and public API from DropdownField.
+ *
+ * Defaults applied when the attribute is absent:
+ *   label       → "Confidence"
+ *   placeholder → "Select confidence..."
+ *
+ * Attributes:
+ *   allow-all  – prepends an "All Confidence Levels" option (value="")
+ *                selected by default; used in filter contexts.
+ *   show-label – when present, renders "Confidence" as the visible field label.
+ *
+ * Usage:
+ *   <confidence-field id="proj-confidence" required col="col-md-6"></confidence-field>
+ *
+ *   <!-- Filter context -->
+ *   <confidence-field id="filter-confidence" name="confidence" allow-all></confidence-field>
+ */
+class ConfidenceField extends DropdownField {
+  static get observedAttributes() {
+    return [...super.observedAttributes, "show-label"];
+  }
+
+  get _label() {
+    if (this.hasAttribute("show-label")) return this.getAttribute("label") || "Confidence";
+    return super._label;
+  }
+
+  connectedCallback() {
+    if (!this.hasAttribute("placeholder")) this.setAttribute("placeholder", "Select confidence...");
+
+    const firstConnect = this._initialOptions === undefined;
+    if (firstConnect) {
+      this._initialOptions = [];
+      this._loadId = Symbol();
+    }
+
+    super.connectedCallback();
+
+    if (firstConnect) {
+      const select = this.querySelector(".rp-input");
+      if (select) select.disabled = true;
+      this._fetchOptions(this._loadId);
+    }
+  }
+
+  disconnectedCallback() {
+    this._loadId = Symbol();
+  }
+
+  async _fetchOptions(id) {
+    try {
+      const { href, method } = API_URLS.projects.confidenceOptions();
+      const res = await apiFetch(href, { method });
+      if (this._loadId !== id) return;
+
+      const items = res?.data ?? [];
+      const hasAllOpt = this.hasAttribute("allow-all");
+      const hasNotSet = this.hasAttribute("not-set");
+      this._initialOptions = [
+        ...(hasAllOpt
+          ? [{ id: "", label: "All Confidence Levels", value: "", selected: true, disabled: false }]
+          : []),
+        ...(hasNotSet
+          ? [{ id: "", label: "Not Set", value: "", selected: true, disabled: false }]
+          : []),
+        ...items.map((t) => ({
+          id: t.code,
+          label: t.name,
+          value: t.code,
+          selected: false,
+          disabled: false,
+        })),
+      ];
+
+      this._doRender();
+    } catch {
+      if (this._loadId !== id) return;
+      this._setFetchError();
+    }
+  }
+
+  _setFetchError() {
+    const select = this.querySelector(".rp-input");
+    const errEl = this.querySelector("[data-rp-error]");
+    if (select) {
+      select.disabled = true;
+      select.innerHTML =
+        '<option value="" disabled selected>Could not load confidence options</option>';
+    }
+    if (errEl) {
+      errEl.textContent = "Could not load confidence options. Refresh the page to retry.";
+      errEl.hidden = false;
+    }
+  }
+}
+
+customElements.define("confidence-field", ConfidenceField);

@@ -20,6 +20,7 @@ from apps.users.serializers import MemberMiniListSerializer
 from apps.users.services import MembersService
 
 
+@extend_schema(tags=["Locations"])
 class LocationViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
     service_class = LocationService
     import_service_class = LocationImportService

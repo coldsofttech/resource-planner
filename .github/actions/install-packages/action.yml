@@ -1,0 +1,14 @@
+name: Install Package
+description: Install a package from the packages directory in editable mode
+
+inputs:
+  package:
+    description: Package name (directory under packages/)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Install ${{ inputs.package }}
+      shell: bash
+      run: pip install -e packages/${{ inputs.package }}

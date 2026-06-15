@@ -1,0 +1,29 @@
+name: Semgrep
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  schedule:
+    - cron: "31 19 * * 1"
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: semgrep/semgrep-action@v1
+        with:
+          config: p/security-audit
+          generateSarif: "1"
+
+      - uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif

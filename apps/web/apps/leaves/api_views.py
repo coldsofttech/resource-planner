@@ -17,6 +17,7 @@ from apps.leaves.services import (
 )
 
 
+@extend_schema(tags=["Leaves"])
 class LeaveViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
     service_class = LeaveService
     import_service_class = LeaveImportService

@@ -14,8 +14,10 @@ from apps.auth.serializers import (
     LoginSerializer,
     MeSerializer,
     RegisterSerializer,
+    SetPasswordSerializer,
 )
 from apps.auth.services import (
+    AdminPasswordResetService,
     AuthService,
     ForgotPasswordService,
     RegisterService,
@@ -75,6 +77,7 @@ class AuthViewSet(BaseViewSet):
                 description="Account deactivated, or classic login not enabled."
             ),
         },
+        tags=["Authentication: Classic"],
     )
     @action(detail=False, methods=["post"], url_path="login", url_name="login")
     def login(self, request: Request):
@@ -104,6 +107,7 @@ class AuthViewSet(BaseViewSet):
         responses={
             200: OpenApiResponse(description="Signed out successfully."),
         },
+        tags=["Authentication"],
     )
     @action(detail=False, methods=["post"], url_path="logout", url_name="logout")
     def logout(self, request: Request):
@@ -122,6 +126,7 @@ class AuthViewSet(BaseViewSet):
             200: OpenApiResponse(description="User identity returned."),
             401: OpenApiResponse(description="Authentication required."),
         },
+        tags=["Authentication"],
     )
     @action(detail=False, methods=["get"], url_path="me", url_name="me")
     def me(self, request: Request):
@@ -131,6 +136,7 @@ class AuthViewSet(BaseViewSet):
         return self.response(data=serializer.data)
 
 
+@extend_schema(tags=["Authentication: Classic"])
 class RegisterViewSet(BaseViewSet):
     authentication_classes: list[type] = []
     permission_classes = [AllowAny]
@@ -180,6 +186,7 @@ class RegisterViewSet(BaseViewSet):
         )
 
 
+@extend_schema(tags=["Authentication: Classic"])
 class ForgotPasswordViewSet(BaseViewSet):
     authentication_classes: list[type] = []
     permission_classes = [AllowAny]
@@ -285,5 +292,49 @@ class ForgotPasswordViewSet(BaseViewSet):
         )
         return self.response(
             message="Password reset successfully. Please sign in.",
+            status_code=status.HTTP_200_OK,
+        )
+
+
+@extend_schema(tags=["Authentication: Classic"])
+class SetPasswordViewSet(BaseViewSet):
+    authentication_classes: list[type] = []
+    permission_classes = [AllowAny]
+
+    @extend_schema(
+        summary="Complete admin password reset",
+        description=(
+            "Validates the admin-issued reset token and sets a new password. "
+            "The token is single-use and expires after the configured timeout."
+        ),
+        request=SetPasswordSerializer,
+        responses={
+            200: OpenApiResponse(description="Password set successfully."),
+            400: OpenApiResponse(
+                description=(
+                    "Invalid or expired token, passwords do not match, "
+                    "or new password is too weak."
+                )
+            ),
+        },
+    )
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="set-password",
+        url_name="set-password",
+    )
+    def set_password(self, request: Request):
+        """POST /auth/set-password/"""
+        serializer = SetPasswordSerializer(
+            data=request.data, context=self.get_serializer_context()
+        )
+        serializer.is_valid(raise_exception=True)
+        AdminPasswordResetService().complete_reset(
+            raw_token=serializer.validated_data["token"],
+            new_password=serializer.validated_data["new_password"],
+        )
+        return self.response(
+            message="Password set successfully. Please sign in.",
             status_code=status.HTTP_200_OK,
         )

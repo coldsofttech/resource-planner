@@ -35,10 +35,10 @@ def _resolve_db_password() -> str:
         except ClientError as exc:
             import logging
 
+            code = exc.response.get("Error", {}).get("Code", "UnknownError")
             logging.getLogger(__name__).error(
-                "Failed to fetch DB password from AWS Secrets Manager (%s): %s",
-                secret_name,
-                exc,
+                "Failed to fetch DB password from AWS Secrets Manager: %s",
+                code,
             )
             return ""
 

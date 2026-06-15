@@ -20,6 +20,7 @@ from apps.users.serializers import MemberMiniListSerializer
 from apps.users.services import MembersService
 
 
+@extend_schema(tags=["Roles"])
 class RoleViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
     service_class = RoleService
     import_service_class = RoleImportService

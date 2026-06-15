@@ -1,3 +1,46 @@
+_BUSINESS_UNITS_CATEGORIES = {
+    "module": "business_units",
+    "entries": [
+        {
+            "name": "View",
+            "codename": "view",
+            "order": 1,
+            "perms": [
+                "business_units.view_businessunit",
+            ],
+        },
+        {
+            "name": "Manage",
+            "codename": "manage",
+            "order": 2,
+            "perms": [
+                "business_units.view_businessunit",
+                "business_units.add_businessunit",
+                "business_units.change_businessunit",
+                "business_units.delete_businessunit",
+            ],
+        },
+        {
+            "name": "Import",
+            "codename": "import",
+            "order": 3,
+            "perms": [
+                "business_units.view_businessunit",
+                "business_units.import_businessunit",
+            ],
+        },
+        {
+            "name": "Export",
+            "codename": "export",
+            "order": 4,
+            "perms": [
+                "business_units.view_businessunit",
+                "business_units.export_businessunit",
+            ],
+        },
+    ],
+}
+
 _PERMISSIONS_CATEGORIES = {
     "module": "permissions",
     "entries": [
@@ -102,7 +145,6 @@ _TEAMS_CATEGORIES = {
     ],
 }
 
-
 _SKILLS_CATEGORIES = {
     "module": "skills",
     "entries": [
@@ -145,7 +187,6 @@ _SKILLS_CATEGORIES = {
         },
     ],
 }
-
 
 _LOCATIONS_CATEGORIES = {
     "module": "locations",
@@ -190,7 +231,6 @@ _LOCATIONS_CATEGORIES = {
     ],
 }
 
-
 _EMPLOYMENT_TYPES_CATEGORIES = {
     "module": "employment_types",
     "entries": [
@@ -233,7 +273,6 @@ _EMPLOYMENT_TYPES_CATEGORIES = {
         },
     ],
 }
-
 
 _USERS_CATEGORIES = {
     "module": "users",
@@ -280,6 +319,49 @@ _USERS_CATEGORIES = {
     ],
 }
 
+_GROUPS_CATEGORIES = {
+    "module": "groups",
+    "entries": [
+        {
+            "name": "View",
+            "codename": "view",
+            "order": 1,
+            "perms": [
+                "users.view_group",
+            ],
+        },
+        {
+            "name": "Manage",
+            "codename": "manage",
+            "order": 2,
+            "perms": [
+                "users.view_group",
+                "users.add_group",
+                "users.change_group",
+                "users.delete_group",
+            ],
+        },
+        {
+            "name": "Import",
+            "codename": "import",
+            "order": 3,
+            "perms": [
+                "users.view_group",
+                "users.add_group",
+                "users.import_group",
+            ],
+        },
+        {
+            "name": "Export",
+            "codename": "export",
+            "order": 4,
+            "perms": [
+                "users.view_group",
+                "users.export_group",
+            ],
+        },
+    ],
+}
 
 _FINANCIAL_YEARS_CATEGORIES = {
     "module": "financial_years",
@@ -324,7 +406,6 @@ _FINANCIAL_YEARS_CATEGORIES = {
     ],
 }
 
-
 _HOLIDAYS_CATEGORIES = {
     "module": "holidays",
     "entries": [
@@ -367,7 +448,6 @@ _HOLIDAYS_CATEGORIES = {
         },
     ],
 }
-
 
 _LEAVES_CATEGORIES = {
     "module": "leaves",
@@ -412,7 +492,6 @@ _LEAVES_CATEGORIES = {
     ],
 }
 
-
 _PROJECT_STATUSES_CATEGORIES = {
     "module": "project_statuses",
     "entries": [
@@ -435,7 +514,6 @@ _PROJECT_STATUSES_CATEGORIES = {
         },
     ],
 }
-
 
 _PROJECT_SUB_STATUSES_CATEGORIES = {
     "module": "project_sub_statuses",
@@ -480,7 +558,6 @@ _PROJECT_SUB_STATUSES_CATEGORIES = {
     ],
 }
 
-
 _PROJECT_TYPES_CATEGORIES = {
     "module": "project_types",
     "entries": [
@@ -524,7 +601,6 @@ _PROJECT_TYPES_CATEGORIES = {
     ],
 }
 
-
 _PROGRAMMES_CATEGORIES = {
     "module": "programmes",
     "entries": [
@@ -567,7 +643,6 @@ _PROGRAMMES_CATEGORIES = {
         },
     ],
 }
-
 
 _SPRINTS_CATEGORIES = {
     "module": "sprints",
@@ -630,20 +705,21 @@ _SPRINTS_CATEGORIES = {
     ],
 }
 
-
 PERMISSION_CATEGORIES = [
-    _PERMISSIONS_CATEGORIES,
-    _TEAMS_CATEGORIES,
-    _SKILLS_CATEGORIES,
-    _LOCATIONS_CATEGORIES,
+    _BUSINESS_UNITS_CATEGORIES,
     _EMPLOYMENT_TYPES_CATEGORIES,
     _FINANCIAL_YEARS_CATEGORIES,
+    _GROUPS_CATEGORIES,
     _HOLIDAYS_CATEGORIES,
     _LEAVES_CATEGORIES,
-    _SPRINTS_CATEGORIES,
+    _LOCATIONS_CATEGORIES,
+    _PERMISSIONS_CATEGORIES,
     _PROGRAMMES_CATEGORIES,
-    _PROJECT_TYPES_CATEGORIES,
     _PROJECT_STATUSES_CATEGORIES,
     _PROJECT_SUB_STATUSES_CATEGORIES,
+    _PROJECT_TYPES_CATEGORIES,
+    _SKILLS_CATEGORIES,
+    _SPRINTS_CATEGORIES,
+    _TEAMS_CATEGORIES,
     _USERS_CATEGORIES,
 ]

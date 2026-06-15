@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Groups
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/users.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Administration
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Groups
+{% endblock page_title %}
+{% block page_sub %}
+  Manage permission groups and their members.
+{% endblock page_sub %}
+{% block page_actions %}
+  <secondary-button id="rp-groups-import-btn" label="Import" prefix-icon="bi-upload" hidden></secondary-button>
+  <secondary-button id="rp-groups-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+  <primary-button id="rp-groups-add-btn" label="New Group" prefix-icon="bi-plus-lg" hidden></primary-button>
+{% endblock page_actions %}
+{% block screen_label %}
+  groups-admin
+{% endblock screen_label %}
+{% block content %}
+  <list-view show-active-filters>
+  <filter-panel id="rp-groups-filter-panel">
+    <search-field id="rp-groups-search" name="search" placeholder="Search groups..." shortcut="/" show-label></search-field>
+    <is-active-field id="rp-groups-status" name="is_active" value="true" show-label></is-active-field>
+  </filter-panel>
+  <data-table id="rp-groups-table" url="/api/v1/groups/" paginated page-size="25" row-template="renderGroupsRow" empty-message="No groups found.">
+    <table-columns>
+      <table-column label="Name" key="name" sortable></table-column>
+      <table-column label="Code" key="code" width="150px"></table-column>
+      <table-column label="Members" key="member_count" width="110px"></table-column>
+      <table-column label="Type" key="is_admin_group" width="110px" hide-mobile></table-column>
+      <table-column label="Status" key="is_active" width="110px"></table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_group %}
+        <table-action icon="bi-pencil" label="Edit" event="rp:group:edit"></table-action>
+        <table-action icon="bi-toggle-on" label="Toggle" event="rp:group:toggle" color-key="is_active"></table-action>
+        <table-action icon="bi-person-plus" label="Assign Member" event="rp:group:assign-member"></table-action>
+        <table-action icon="bi-shield-plus" label="Assign Permissions" event="rp:group:assign-permissions"></table-action>
+      {% endif %}
+      {% if can_delete_group %}
+        <table-action icon="bi-trash" label="Delete" event="rp:group:delete" danger></table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </list-view>
+
+  <!-- Create drawer -->
+  <drawer-modal id="rp-group-create-drawer" width="900">
+    <drawer-header eyebrow="New record" title="Create group" no-sizes></drawer-header>
+    <drawer-panel>
+      <div class="row g-3">
+        <text-field id="rp-new-group-name" col="col-12" label="Group name" placeholder="e.g. Project Managers" required maxlength="150"></text-field>
+        <text-field id="rp-new-group-description" col="col-12" cols="3" label="Description" placeholder="Optional description" maxlength="255"></text-field>
+      </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Create group" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+
+  <!-- Edit drawer -->
+  <drawer-modal id="rp-group-edit-drawer" width="900">
+    <drawer-header eyebrow="Edit record" title="Edit group" no-sizes></drawer-header>
+    <drawer-panel>
+      <div class="row g-3">
+        <text-field id="rp-edit-group-name" col="col-12" label="Group name" required maxlength="150"></text-field>
+        <text-field id="rp-edit-group-description" col="col-12" cols="3" label="Description" maxlength="255"></text-field>
+      </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+
+  <!-- Assign Permissions drawer -->
+  <drawer-modal id="rp-group-assign-permissions-drawer" width="900">
+    <drawer-header eyebrow="Group" title="Assign permissions" no-sizes></drawer-header>
+    <drawer-panel>
+      <permissions-panel id="rp-group-permissions-panel" subject-type="group"></permissions-panel>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Save permissions" primary-icon="bi-shield-check"></drawer-footer>
+  </drawer-modal>
+
+  <!-- Assign Member drawer -->
+  <drawer-modal id="rp-group-assign-member-drawer" width="900">
+    <drawer-header eyebrow="Group" title="Assign member" no-sizes></drawer-header>
+    <drawer-panel>
+      <div class="row g-3">
+        <member-field id="rp-assign-group-member-field" col="col-12" label="Member" required show-label></member-field>
+      </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Assign member" primary-icon="bi-person-check"></drawer-footer>
+  </drawer-modal>
+
+  <!-- Modals -->
+  <delete-modal id="rp-group-delete-modal" action-label="Delete group"></delete-modal>
+  <activate-modal id="rp-group-activate-modal"></activate-modal>
+  <deactivate-modal id="rp-group-deactivate-modal"></deactivate-modal>
+
+  <!-- Import -->
+  <import-view id="rp-groups-import-view" title="Import Groups" eyebrow="Groups"></import-view>
+
+  <!-- Export -->
+  <export-view id="rp-groups-export-view" title="Export Groups" eyebrow="Groups" active-filter-id="rp-groups-filter-panel"></export-view>
+{% endblock content %}

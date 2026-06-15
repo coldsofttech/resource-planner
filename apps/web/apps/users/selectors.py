@@ -1,9 +1,10 @@
-from django.db.models import QuerySet
+from django.db.models import Count, QuerySet
 
 from apps.users.models import (
     GROUP_ADMINISTRATORS,
     GROUP_GUESTS,
     Group,
+    GroupProfile,
     User,
     UserProfile,
 )
@@ -74,3 +75,52 @@ def get_member_by_code(code: str) -> UserProfile | None:
         )
     except UserProfile.DoesNotExist:
         return None
+
+
+def get_all_users() -> QuerySet[UserProfile]:
+    return UserProfile.objects.select_related(
+        "user",
+        "sso_provider_content_type",
+        "created_by",
+        "updated_by",
+    ).order_by("user__last_name", "user__first_name")
+
+
+def get_user_by_profile_code(code: str) -> UserProfile | None:
+    try:
+        return UserProfile.objects.select_related(
+            "user",
+            "sso_provider_content_type",
+            "created_by",
+            "updated_by",
+        ).get(code=code)
+    except UserProfile.DoesNotExist:
+        return None
+
+
+def get_all_groups() -> QuerySet[GroupProfile]:
+    return (
+        GroupProfile.objects.select_related("group", "created_by", "updated_by")
+        .annotate(member_count=Count("group__user"))
+        .order_by("group__name")
+    )
+
+
+def get_group_by_code(code: str) -> GroupProfile | None:
+    try:
+        return (
+            GroupProfile.objects.select_related("group", "created_by", "updated_by")
+            .annotate(member_count=Count("group__user"))
+            .get(code=code)
+        )
+    except GroupProfile.DoesNotExist:
+        return None
+
+
+def get_group_members(code: str) -> QuerySet[UserProfile]:
+    return (
+        UserProfile.objects.filter(user__groups__profile__code=code)
+        .select_related("user", "created_by", "updated_by")
+        .prefetch_related("user__avatars")
+        .order_by("user__last_name", "user__first_name")
+    )

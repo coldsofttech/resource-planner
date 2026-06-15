@@ -14,6 +14,7 @@ from apps.saml.serializers import SAMLCreateSerializer, SAMLSerializer
 from apps.saml.services import SAMLFlowService, SAMLService
 
 
+@extend_schema(tags=["Authentication: SAML"])
 class SAMLViewSet(BaseViewSet):
     service_class = SAMLService
 

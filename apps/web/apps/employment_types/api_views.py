@@ -20,6 +20,7 @@ from apps.users.serializers import MemberMiniListSerializer
 from apps.users.services import MembersService
 
 
+@extend_schema(tags=["Employment Types"])
 class EmploymentTypeViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
     service_class = EmploymentTypeService
     import_service_class = EmploymentTypeImportService

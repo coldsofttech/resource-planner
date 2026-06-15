@@ -409,17 +409,19 @@ class DataTable extends HTMLElement {
         })
         .join("");
 
-      moreHTML = `
-        <span class="rp-table-more-wrap">
-          <button
-            class="rp-iconbtn rp-table-more-btn"
-            title="More actions"
-            aria-label="More actions"
-            aria-haspopup="true"
-          ><i class="bi bi-three-dots"></i></button>
-          <div class="rp-dd-panel dd-right rp-table-more-menu">${items}</div>
-        </span>
-      `;
+      if (items.trim()) {
+        moreHTML = `
+          <span class="rp-table-more-wrap">
+            <button
+              class="rp-iconbtn rp-table-more-btn"
+              title="More actions"
+              aria-label="More actions"
+              aria-haspopup="true"
+            ><i class="bi bi-three-dots"></i></button>
+            <div class="rp-dd-panel dd-right rp-table-more-menu">${items}</div>
+          </span>
+        `;
+      }
     }
 
     return `<td class="rp-td-actions"><span class="rp-icon-row">${inlineBtns}${moreHTML}</span></td>`;

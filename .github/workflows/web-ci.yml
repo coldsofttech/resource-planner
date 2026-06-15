@@ -11,88 +11,58 @@ permissions:
   contents: read
 
 jobs:
+  gitleaks:
+    name: Secret Scan (Gitleaks)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: ./.github/actions/gitleaks
+
   lint:
     name: Lint & Build
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-python
 
-      - uses: actions/setup-python@v6
+      - uses: ./.github/actions/setup-node
+
+      - uses: ./.github/actions/install-python-deps
+
+      - uses: ./.github/actions/install-node-deps
+
+      - uses: ./.github/actions/build-frontend-assets
+
+      - uses: ./.github/actions/ruff
         with:
-          python-version: "3.14"
+          path: "."
 
-      - uses: actions/setup-node@v6
+      - uses: ./.github/actions/mypy
         with:
-          node-version: "24"
+          path: apps/web
 
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements/base.txt
-          pip install -r requirements/dev.txt
+      - uses: ./.github/actions/bandit
+        with:
+          path: "apps/web packages"
 
-      - name: Install Node dependencies
-        run: npm ci
+      - uses: ./.github/actions/pip-audit
 
-      - name: Build frontend assets (CSS + JS)
-        run: |
-          npm run build:css
-          npm run build:js
+      - uses: ./.github/actions/django-check
 
-      - name: Verify frontend build outputs
-        run: |
-          test -f apps/web/static/css/dist/styles.min.css
-          test -f apps/web/static/js/dist/auth.min.js
-          test -f apps/web/static/js/dist/components.min.js
-          test -f apps/web/static/js/dist/emp-types.min.js
-          test -f apps/web/static/js/dist/financial-years.min.js
-          test -f apps/web/static/js/dist/holidays.min.js
-          test -f apps/web/static/js/dist/leaves.min.js
-          test -f apps/web/static/js/dist/locations.min.js
-          test -f apps/web/static/js/dist/main.min.js
-          test -f apps/web/static/js/dist/programmes.min.js
-          test -f apps/web/static/js/dist/project-statuses.min.js
-          test -f apps/web/static/js/dist/project-types.min.js
-          test -f apps/web/static/js/dist/roles.min.js
-          test -f apps/web/static/js/dist/setup.min.js
-          test -f apps/web/static/js/dist/skills.min.js
-          test -f apps/web/static/js/dist/sprints.min.js
-          test -f apps/web/static/js/dist/teams.min.js
-          test -f apps/web/static/js/dist/theme-init.min.js
-          test -f apps/web/static/js/dist/users.min.js
-          test -f apps/web/static/js/dist/utils.min.js
+      - uses: ./.github/actions/openapi-validation
 
-      - name: Ruff
-        run: ruff check .
-
-      - name: Ruff Format
-        run: ruff format --check .
-
-      - name: mypy
-        run: mypy apps/web
-
-      - name: Bandit
-        run: bandit -r apps/web packages --configfile pyproject.toml
-
-      - name: pip-audit
-        run: pip-audit --skip-editable
-
-      - name: Django Security Checks
-        run: |
-          cd apps/web
-          python manage.py check --deploy
-
-  integration-tests:
-    name: Integration Tests (${{ matrix.app }})
-    needs: lint
+  unit-tests:
+    name: Unit Tests (${{ matrix.app }})
+    needs: [lint]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        app:
+        app: &apps
           - audit
           - auth
+          - business_units
           - configurations
           - employment_types
           - financial_years
@@ -108,43 +78,37 @@ jobs:
           - setup
           - skills
           - sprints
+          - tags
           - teams
           - users
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-python
 
-      - uses: actions/setup-python@v6
+      - uses: ./.github/actions/install-python-deps
+
+      - uses: ./.github/actions/unit-test
         with:
-          python-version: "3.14"
+          path: apps/web/apps/${{ matrix.app }}/tests/
+          name: ${{ matrix.app }}
+          artifact-name: unit-test-report-${{ matrix.app }}
 
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements/base.txt
-          pip install -r requirements/dev.txt
+  integration-tests:
+    name: Integration Tests (${{ matrix.app }})
+    needs: [unit-tests]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: *apps
 
-      - name: pytest (integration — ${{ matrix.app }})
-        run: |
-          mkdir -p .pytest-reports
-          set +e
-          pytest --override-ini=addopts= -m integration \
-            --junit-xml=.pytest-reports/junit-${{ matrix.app }}.xml \
-            --html=.pytest-reports/test-report-${{ matrix.app }}.html \
-            --self-contained-html \
-            apps/web/apps/${{ matrix.app }}/tests/
-          EXIT_CODE=$?
-          set -e
-          if [ $EXIT_CODE -eq 5 ]; then
-            printf '<?xml version="1.0" encoding="utf-8"?>\n<testsuites/>\n' > .pytest-reports/junit-${{ matrix.app }}.xml
-            printf '<!DOCTYPE html><html><body><p>No integration tests collected for ${{ matrix.app }}.</p></body></html>\n' > .pytest-reports/test-report-${{ matrix.app }}.html
-          elif [ $EXIT_CODE -ne 0 ]; then
-            exit $EXIT_CODE
-          fi
+    steps:
+      - uses: ./.github/actions/setup-python
 
-      - name: Upload test report
-        if: always()
-        uses: actions/upload-artifact@v7
+      - uses: ./.github/actions/install-python-deps
+
+      - uses: ./.github/actions/integration-test
         with:
-          name: test-report-${{ matrix.app }}
-          path: .pytest-reports/
+          path: apps/web/apps/${{ matrix.app }}/tests/
+          name: ${{ matrix.app }}
+          artifact-name: test-report-${{ matrix.app }}

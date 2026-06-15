@@ -23,6 +23,7 @@ from apps.permissions.services import (
 )
 
 
+@extend_schema(tags=["Permissions"])
 class PermissionCategoryViewSet(BaseViewSet):
     service_class = PermissionCategoryService
     permission_classes = [IsAuthenticated]
@@ -65,6 +66,7 @@ class PermissionCategoryViewSet(BaseViewSet):
         )
 
 
+@extend_schema(tags=["Permissions: Groups"])
 class GroupPermissionCategoryViewSet(BaseViewSet):
     service_class = GroupPermissionCategoryService
     permission_classes = [IsAuthenticated]
@@ -175,6 +177,7 @@ class GroupPermissionCategoryViewSet(BaseViewSet):
         )
 
 
+@extend_schema(tags=["Permissions: Users"])
 class UserPermissionCategoryViewSet(BaseViewSet):
     service_class = UserPermissionCategoryService
     permission_classes = [IsAuthenticated]

@@ -2,11 +2,17 @@ from django.urls import path
 
 from apps.projects.api_views import (
     ProgrammeViewSet,
+    ProjectBudgetViewSet,
+    ProjectEstimateViewSet,
+    ProjectFollowerViewSet,
+    ProjectLabelViewSet,
     ProjectStatusViewSet,
     ProjectSubStatusFlatOptionsViewSet,
     ProjectSubStatusGlobalViewSet,
     ProjectSubStatusViewSet,
+    ProjectTagViewSet,
     ProjectTypeViewSet,
+    ProjectViewSet,
 )
 
 urlpatterns = [
@@ -248,5 +254,188 @@ urlpatterns = [
         "projects/sub-statuses/export/",
         ProjectSubStatusGlobalViewSet.as_view({"get": "export"}),
         name="project-sub-statuses-global-export",
+    ),
+    # Project routes
+    path(
+        "projects/",
+        ProjectViewSet.as_view({"get": "list", "post": "create"}),
+        name="projects-list",
+    ),
+    path(
+        "projects/stats/",
+        ProjectViewSet.as_view({"get": "statistics"}),
+        name="projects-stats",
+    ),
+    path(
+        "projects/options/",
+        ProjectViewSet.as_view({"get": "options"}),
+        name="projects-options",
+    ),
+    path(
+        "projects/import/specs/",
+        ProjectViewSet.as_view({"get": "import_specs"}),
+        name="projects-import-specs",
+    ),
+    path(
+        "projects/import/sample/",
+        ProjectViewSet.as_view({"get": "import_sample"}),
+        name="projects-import-sample",
+    ),
+    path(
+        "projects/import/",
+        ProjectViewSet.as_view({"post": "import_bulk"}),
+        name="projects-import",
+    ),
+    path(
+        "projects/export/specs/",
+        ProjectViewSet.as_view({"get": "export_specs"}),
+        name="projects-export-specs",
+    ),
+    path(
+        "projects/export/",
+        ProjectViewSet.as_view({"get": "export"}),
+        name="projects-export",
+    ),
+    path(
+        "projects/<str:code>/",
+        ProjectViewSet.as_view(
+            {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
+        ),
+        name="projects-detail",
+    ),
+    path(
+        "projects/<str:code>/activate/",
+        ProjectViewSet.as_view({"post": "activate"}),
+        name="projects-activate",
+    ),
+    path(
+        "projects/<str:code>/deactivate/",
+        ProjectViewSet.as_view({"post": "deactivate"}),
+        name="projects-deactivate",
+    ),
+    path(
+        "projects/<str:code>/collaborators/",
+        ProjectViewSet.as_view({"get": "collaborators", "post": "collaborators"}),
+        name="projects-collaborators",
+    ),
+    path(
+        "projects/<str:code>/collaborators/<str:team_code>/",
+        ProjectViewSet.as_view({"delete": "remove_collaborator"}),
+        name="projects-collaborators-remove",
+    ),
+    # Project label nested routes
+    path(
+        "projects/<str:code>/labels/",
+        ProjectLabelViewSet.as_view({"get": "list", "post": "create"}),
+        name="project-labels-list",
+    ),
+    path(
+        "projects/<str:code>/labels/suggest/",
+        ProjectLabelViewSet.as_view({"get": "suggest"}),
+        name="project-labels-suggest",
+    ),
+    path(
+        "projects/<str:code>/labels/<str:label_code>/",
+        ProjectLabelViewSet.as_view(
+            {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
+        ),
+        name="project-labels-detail",
+    ),
+    path(
+        "projects/<str:code>/labels/<str:label_code>/set-default/",
+        ProjectLabelViewSet.as_view({"post": "set_default"}),
+        name="project-labels-set-default",
+    ),
+    # Project tag nested routes
+    path(
+        "projects/<str:code>/tags/",
+        ProjectTagViewSet.as_view({"get": "list", "post": "create"}),
+        name="project-tags-list",
+    ),
+    path(
+        "projects/<str:code>/tags/<str:tag_code>/",
+        ProjectTagViewSet.as_view(
+            {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
+        ),
+        name="project-tags-detail",
+    ),
+    # Project follower nested routes
+    path(
+        "projects/<str:code>/followers/",
+        ProjectFollowerViewSet.as_view({"get": "list", "post": "create"}),
+        name="project-followers-list",
+    ),
+    path(
+        "projects/<str:code>/followers/<str:follower_code>/",
+        ProjectFollowerViewSet.as_view(
+            {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
+        ),
+        name="project-followers-detail",
+    ),
+    # Project estimate nested routes
+    path(
+        "projects/<str:code>/estimates/",
+        ProjectEstimateViewSet.as_view({"get": "list", "post": "create"}),
+        name="project-estimates-list",
+    ),
+    path(
+        "projects/<str:code>/estimates/export/specs/",
+        ProjectEstimateViewSet.as_view({"get": "export_specs"}),
+        name="project-estimates-export-specs",
+    ),
+    path(
+        "projects/<str:code>/estimates/export/",
+        ProjectEstimateViewSet.as_view({"get": "export"}),
+        name="project-estimates-export",
+    ),
+    path(
+        "projects/<str:code>/estimates/<str:estimate_code>/",
+        ProjectEstimateViewSet.as_view(
+            {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
+        ),
+        name="project-estimates-detail",
+    ),
+    path(
+        "projects/<str:code>/estimates/<str:estimate_code>/activate/",
+        ProjectEstimateViewSet.as_view({"post": "activate"}),
+        name="project-estimates-activate",
+    ),
+    path(
+        "projects/<str:code>/estimates/<str:estimate_code>/deactivate/",
+        ProjectEstimateViewSet.as_view({"post": "deactivate"}),
+        name="project-estimates-deactivate",
+    ),
+    path(
+        "projects/<str:code>/estimates/<str:estimate_code>/history/",
+        ProjectEstimateViewSet.as_view({"get": "history"}),
+        name="project-estimates-history",
+    ),
+    # Project budget nested routes
+    path(
+        "projects/<str:code>/budgets/",
+        ProjectBudgetViewSet.as_view({"get": "list", "post": "create"}),
+        name="project-budgets-list",
+    ),
+    path(
+        "projects/<str:code>/budgets/export/specs/",
+        ProjectBudgetViewSet.as_view({"get": "export_specs"}),
+        name="project-budgets-export-specs",
+    ),
+    path(
+        "projects/<str:code>/budgets/export/",
+        ProjectBudgetViewSet.as_view({"get": "export"}),
+        name="project-budgets-export",
+    ),
+    path(
+        "projects/<str:code>/budgets/<str:budget_code>/",
+        ProjectBudgetViewSet.as_view(
+            {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
+        ),
+        name="project-budgets-detail",
+    ),
+    path(
+        "projects/<str:code>/budgets/<str:budget_code>/history/",
+        ProjectBudgetViewSet.as_view({"get": "history"}),
+        name="project-budgets-history",
     ),
 ]

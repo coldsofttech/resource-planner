@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Projects
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/projects.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Project
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Projects
+{% endblock page_title %}
+{% block page_sub %}
+  Manage and govern all projects across your organisation.
+{% endblock page_sub %}
+{% block page_actions %}
+  {% if can_add_project %}
+    <primary-button id="rp-projects-add-btn" label="Add Project" prefix-icon="bi-plus-lg" hidden></primary-button>
+  {% endif %}
+{% endblock page_actions %}
+{% block content %}
+  <list-view show-active-filters>
+  <filter-panel id="rp-projects-filter-panel">
+    <search-field id="rp-projects-search" name="search" placeholder="Search projects..." shortcut="/" show-label></search-field>
+    <is-active-field id="rp-projects-status" name="is_active" value="true" show-label></is-active-field>
+  </filter-panel>
+  <data-table id="rp-projects-table" url="/api/v1/projects/" paginated page-size="25" row-template="renderProjectsRow" empty-message="No projects found.">
+    <table-columns>
+      <table-column width="52px"></table-column>
+      <table-column label="ID" key="code" mono width="130px" hide-mobile></table-column>
+      <table-column label="Name" key="name" sortable></table-column>
+      <table-column label="Programme" key="programme_name" sortable hide-mobile></table-column>
+      <table-column label="Project Type" key="project_type_name" sortable hide-mobile></table-column>
+      <table-column label="Status" key="status_name"></table-column>
+      <table-column label="Assigned Team" key="assigned_team_name" hide-mobile></table-column>
+      <table-column label="Confidence" key="confidence" hide-mobile></table-column>
+      <table-column label="Priority" key="priority" hide-mobile></table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_project %}
+        <table-action icon="bi-person-check" label="Assign Team" event="rp:project:assign-team"></table-action>
+        <table-action icon="bi-toggle-on" label="Toggle" event="rp:project:toggle" color-key="is_active"></table-action>
+      {% endif %}
+      {% if can_delete_project %}
+        <table-action icon="bi-trash" label="Delete" event="rp:project:delete" danger></table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </list-view>
+  <!-- Create drawer -->
+  {% if can_add_project %}
+  <drawer-modal id="rp-project-create-drawer" width="900">
+    <drawer-header eyebrow="New record" title="Create project" no-sizes></drawer-header>
+    <drawer-panel>
+      <div class="row g-3">
+        <text-field id="rp-new-project-name" col="col-12" label="Project Name" placeholder="e.g. Digital Transformation" required maxlength="255" show-counter></text-field>
+        <project-type-field id="rp-new-project-type" col="col-12 col-md-6" required show-label></project-type-field>
+        <programme-field id="rp-new-project-programme" col="col-12 col-md-6" show-label searchable></programme-field>
+        <project-status-field id="rp-new-project-status" col="col-12 col-md-6" value="new" required show-label></project-status-field>
+        <project-substatus-field id="rp-new-project-sub-status" col="col-12 col-md-6" status-id="rp-new-project-status" show-label></project-substatus-field>
+        <confidence-field id="rp-new-project-confidence" col="col-12 col-md-6" show-label not-set></confidence-field>
+        <priority-field id="rp-new-project-priority" col="col-12 col-md-6" show-label not-set></priority-field>
+        <date-field id="rp-new-project-start-date" col="col-12 col-md-6" label="Tentative Start Date"></date-field>
+        <date-field id="rp-new-project-end-date" col="col-12 col-md-6" label="Tentative End Date"></date-field>
+        <text-field id="rp-new-project-description" col="col-12" cols="3" label="Description" placeholder="Optional project description" maxlength="500"></text-field>
+      </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Create project" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  {% endif %}
+  <!-- Assign Team drawer -->
+  <drawer-modal id="rp-project-assign-team-drawer" width="700">
+    <drawer-header eyebrow="Project" title="Assign Team" no-sizes></drawer-header>
+    <drawer-panel>
+      <div class="row g-3">
+        <team-field id="rp-assign-project-team" col="col-12" label="Team" show-label unassign></team-field>
+      </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Save" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <delete-modal id="rp-project-delete-modal" action-label="Delete project"></delete-modal>
+  <activate-modal id="rp-project-activate-modal"></activate-modal>
+  <deactivate-modal id="rp-project-deactivate-modal"></deactivate-modal>
+{% endblock content %}

@@ -141,3 +141,7 @@ export function formatMeta(row) {
   const by = row.updated_by?.email ?? "—";
   return `Updated ${formatDate(row.updated_at)} · ${by}`;
 }
+
+export function formatCurrency(value) {
+  return `£${Number(value).toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}

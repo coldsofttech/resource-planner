@@ -1,0 +1,18 @@
+name: Build Validation
+description: Build a package distribution and validate it
+
+inputs:
+  package:
+    description: Package name (directory under packages/)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Install build
+      shell: bash
+      run: pip install build
+
+    - name: Build ${{ inputs.package }}
+      shell: bash
+      run: python -m build packages/${{ inputs.package }}

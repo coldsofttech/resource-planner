@@ -3,6 +3,7 @@ import "./banners/index.js";
 import "./buttons/index.js";
 import "./dropdowns/index.js";
 import "./fields/index.js";
+import "./permissions/index.js";
 import "./pills/index.js";
 import "./users/index.js";
 import "./views/index.js";

@@ -1,5 +1,14 @@
 from apps.projects import selectors as project_selectors
-from apps.projects.models import Programme, ProjectStatus, ProjectSubStatus, ProjectType
+from apps.projects.models import (
+    Programme,
+    Project,
+    ProjectCollaborator,
+    ProjectStatus,
+    ProjectSubStatus,
+    ProjectTag,
+    ProjectType,
+)
+from apps.tags.models import Tag
 
 
 def make_project_type(
@@ -60,6 +69,51 @@ def make_project_substatus(
         is_active=is_active,
         **overrides,
     )
+
+
+def make_project(
+    name: str = "Test Project",
+    project_type: ProjectType | None = None,
+    status: ProjectStatus | None = None,
+    programme: Programme | None = None,
+    is_active: bool = True,
+    **overrides,
+) -> Project:
+    if project_type is None:
+        project_type = make_project_type(f"Type for {name}")
+    if status is None:
+        status = make_project_status(f"Status for {name}")
+    return Project.objects.create(
+        name=name,
+        project_type=project_type,
+        status=status,
+        programme=programme,
+        is_active=is_active,
+        **overrides,
+    )
+
+
+def make_project_collaborator(
+    project: Project,
+    team,
+) -> ProjectCollaborator:
+    return ProjectCollaborator.objects.create(project=project, team=team)
+
+
+def make_tag(name: str = "#test", **overrides) -> Tag:
+    return Tag.objects.create(name=name, **overrides)
+
+
+def make_project_tag(
+    project: Project | None = None,
+    tag: Tag | None = None,
+    **overrides,
+) -> ProjectTag:
+    if project is None:
+        project = make_project()
+    if tag is None:
+        tag = make_tag()
+    return ProjectTag.objects.create(project=project, tag=tag, **overrides)
 
 
 def make_csv_file(content: str, name: str = "programmes.csv"):

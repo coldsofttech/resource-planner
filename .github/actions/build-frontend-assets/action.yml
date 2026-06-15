@@ -1,0 +1,38 @@
+name: Build Frontend Assets
+description: Build CSS and JS assets and verify all expected outputs exist
+
+runs:
+  using: composite
+  steps:
+    - name: Build frontend assets (CSS + JS)
+      shell: bash
+      run: |
+        npm run build:css
+        npm run build:js
+
+    - name: Verify frontend build outputs
+      shell: bash
+      run: |
+        test -f apps/web/static/css/dist/styles.min.css
+        test -f apps/web/static/css/dist/swagger.min.css
+        test -f apps/web/static/js/dist/auth.min.js
+        test -f apps/web/static/js/dist/business-units.min.js
+        test -f apps/web/static/js/dist/components.min.js
+        test -f apps/web/static/js/dist/emp-types.min.js
+        test -f apps/web/static/js/dist/financial-years.min.js
+        test -f apps/web/static/js/dist/holidays.min.js
+        test -f apps/web/static/js/dist/leaves.min.js
+        test -f apps/web/static/js/dist/locations.min.js
+        test -f apps/web/static/js/dist/main.min.js
+        test -f apps/web/static/js/dist/programmes.min.js
+        test -f apps/web/static/js/dist/project-statuses.min.js
+        test -f apps/web/static/js/dist/project-types.min.js
+        test -f apps/web/static/js/dist/projects.min.js
+        test -f apps/web/static/js/dist/roles.min.js
+        test -f apps/web/static/js/dist/setup.min.js
+        test -f apps/web/static/js/dist/skills.min.js
+        test -f apps/web/static/js/dist/sprints.min.js
+        test -f apps/web/static/js/dist/teams.min.js
+        test -f apps/web/static/js/dist/theme-init.min.js
+        test -f apps/web/static/js/dist/users.min.js
+        test -f apps/web/static/js/dist/utils.min.js

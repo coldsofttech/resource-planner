@@ -2,6 +2,7 @@ import esbuild from "esbuild";
 
 const esmModules = [
   "auth",
+  "business-units",
   "emp-types",
   "financial-years",
   "holidays",
@@ -11,6 +12,7 @@ const esmModules = [
   "programmes",
   "project-statuses",
   "project-types",
+  "projects",
   "roles",
   "setup",
   "skills",

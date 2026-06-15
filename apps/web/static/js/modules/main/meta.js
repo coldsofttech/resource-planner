@@ -10,7 +10,7 @@ function htmlToText(html) {
 }
 
 function toInitials(name) {
-  const text = name.replace(/<[^>]+>/g, "").replace(/([a-z])([A-Z])/g, "$1 $2");
+  const text = htmlToText(name).replace(/([a-z])([A-Z])/g, "$1 $2");
 
   return text
     .split(/\s+/)

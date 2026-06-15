@@ -1,0 +1,46 @@
+name: Unit Test
+description: Run pytest unit tests and upload the report
+
+inputs:
+  path:
+    description: Path to the tests directory
+    required: true
+  name:
+    description: Display name used in report filenames
+    required: true
+  extra-args:
+    description: Additional pytest arguments (e.g. -n auto --dist=loadfile)
+    required: false
+    default: ""
+  artifact-name:
+    description: Name of the uploaded artifact
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: pytest (unit — ${{ inputs.name }})
+      shell: bash
+      run: |
+        mkdir -p .pytest-reports
+        set +e
+        pytest --override-ini=addopts= -m unit ${{ inputs.extra-args }} \
+          --junit-xml=.pytest-reports/junit-unit-${{ inputs.name }}.xml \
+          --html=.pytest-reports/test-report-unit-${{ inputs.name }}.html \
+          --self-contained-html \
+          ${{ inputs.path }}
+        EXIT_CODE=$?
+        set -e
+        if [ $EXIT_CODE -eq 5 ]; then
+          printf '<?xml version="1.0" encoding="utf-8"?>\n<testsuites/>\n' > .pytest-reports/junit-unit-${{ inputs.name }}.xml
+          printf '<!DOCTYPE html><html><body><p>No unit tests collected for ${{ inputs.name }}.</p></body></html>\n' > .pytest-reports/test-report-unit-${{ inputs.name }}.html
+        elif [ $EXIT_CODE -ne 0 ]; then
+          exit $EXIT_CODE
+        fi
+
+    - name: Upload test report
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: .pytest-reports/

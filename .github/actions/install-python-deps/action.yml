@@ -1,0 +1,12 @@
+name: Install Python Dependencies
+description: Upgrade pip and install Python requirements
+
+runs:
+  using: composite
+  steps:
+    - name: Install Python dependencies
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements/base.txt
+        pip install -r requirements/dev.txt

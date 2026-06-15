@@ -506,7 +506,10 @@ class Handler(BaseHTTPRequestHandler):
                 return self._file(BASE_DIR / "index.html")
 
             if p.startswith("/static/"):
-                return self._file(BASE_DIR / p.lstrip("/"))
+                requested = (BASE_DIR / p.lstrip("/")).resolve()
+                if not requested.is_relative_to(BASE_DIR.resolve()):
+                    return self._json({"error": "forbidden"}, 403)
+                return self._file(requested)
 
             if p == "/api/modules":
                 return self._json(api_modules())

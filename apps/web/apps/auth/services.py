@@ -1,5 +1,7 @@
+import hashlib
 import logging
 import re
+import secrets
 from datetime import timedelta
 
 from django.contrib.auth import authenticate
@@ -202,3 +204,79 @@ class ForgotPasswordService(ContextService):
         user.set_password(new_password)
         user.save(update_fields=["password"])
         logger.info("Password reset successfully for '%s'.", email)
+
+
+class AdminPasswordResetService:
+    """Admin-initiated password reset via tokenized link (not OTP)."""
+
+    @staticmethod
+    def _hash_token(raw_token: str) -> str:
+        return hashlib.sha256(raw_token.encode()).hexdigest()
+
+    def send_reset_link(self, user) -> None:
+        from apps.auth.models import AdminPasswordResetToken
+        from apps.configurations.selectors import General, Users
+
+        timeout_minutes = Users.get_password_reset_timeout()
+
+        AdminPasswordResetToken.objects.filter(user=user, is_used=False).update(
+            is_used=True
+        )
+
+        raw_token = secrets.token_urlsafe(48)
+        token_hash = self._hash_token(raw_token)
+        AdminPasswordResetToken.objects.create(
+            user=user,
+            token_hash=token_hash,
+            expires_at=timezone.now() + timedelta(minutes=timeout_minutes),
+        )
+
+        app_url = General.get_app_url().rstrip("/")
+        app_name = _strip_html(General.get_app_name())
+        reset_url = f"{app_url}/auth/set-password/?token={raw_token}"
+
+        subject = f"[{app_name}] Set your password"
+        body = (
+            f"An administrator has requested a password reset for your account.\n\n"
+            f"Click the link below to set a new password:\n{reset_url}\n\n"
+            f"This link expires in {timeout_minutes} minutes.\n\n"
+            f"If you did not expect this email, please contact your administrator."
+        )
+        try:
+            build_email_sender().send(to=user.email, subject=subject, body=body)
+        except Exception:
+            logger.exception(
+                "Failed to send admin password reset email to '%s'.", user.email
+            )
+
+    def validate_token(self, raw_token: str):
+        """Return the AdminPasswordResetToken for the raw token, or None."""
+        from apps.auth.models import AdminPasswordResetToken
+
+        token_hash = self._hash_token(raw_token)
+        return (
+            AdminPasswordResetToken.objects.filter(
+                token_hash=token_hash,
+                is_used=False,
+                expires_at__gt=timezone.now(),
+            )
+            .select_related("user")
+            .first()
+        )
+
+    def complete_reset(self, raw_token: str, new_password: str) -> None:
+        token = self.validate_token(raw_token)
+        if token is None:
+            raise ValidationException("Invalid or expired reset link.")
+
+        user = token.user
+        token.is_used = True
+        token.save(update_fields=["is_used", "updated_at"])
+
+        user.set_password(new_password)
+        profile = getattr(user, "profile", None)
+        if profile is not None:
+            profile.must_change_password = False
+            profile.save(update_fields=["must_change_password", "updated_at"])
+        user.save(update_fields=["password"])
+        logger.info("Admin-initiated password reset completed for '%s'.", user.email)

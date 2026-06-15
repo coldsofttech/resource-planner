@@ -40,6 +40,14 @@ export const UI_URLS = {
   members: {
     list: () => "/members/",
   },
+  users: {
+    list: () => "/users/",
+    detail: (code) => `/users/${code}/`,
+  },
+  groups: {
+    list: () => "/groups/",
+    detail: (code) => `/groups/${code}/`,
+  },
   fy: {
     list: () => "/fy/",
   },
@@ -50,11 +58,18 @@ export const UI_URLS = {
   programmes: {
     list: () => "/programmes/",
   },
+  businessUnits: {
+    list: () => "/bu/",
+  },
   projectTypes: {
     list: () => "/projects/types/",
   },
   projectStatuses: {
     list: () => "/projects/statuses/",
+  },
+  projects: {
+    list: () => "/projects/",
+    detail: (code) => `/projects/${code}/`,
   },
 };
 
@@ -96,6 +111,20 @@ export const API_URLS = {
     avatar: () => ({ method: "GET", href: `${API_BASE}users/me/avatar/` }),
     uploadAvatar: () => ({ method: "POST", href: `${API_BASE}users/me/avatar/upload/` }),
     options: () => ({ method: "GET", href: `${API_BASE}users/options/` }),
+    setPassword: () => ({ method: "POST", href: `${API_BASE}auth/set-password/` }),
+    adminList: () => ({ method: "GET", href: `${API_BASE}users/` }),
+    adminCreate: () => ({ method: "POST", href: `${API_BASE}users/` }),
+    adminStats: () => ({ method: "GET", href: `${API_BASE}users/stats/` }),
+    adminDetail: (code) => ({ method: "GET", href: `${API_BASE}users/${code}/` }),
+    adminDelete: (code) => ({ method: "DELETE", href: `${API_BASE}users/${code}/` }),
+    adminActivate: (code) => ({ method: "POST", href: `${API_BASE}users/${code}/activate/` }),
+    adminDeactivate: (code) => ({ method: "POST", href: `${API_BASE}users/${code}/deactivate/` }),
+    adminResetPassword: (code) => ({
+      method: "POST",
+      href: `${API_BASE}users/${code}/reset-password/`,
+    }),
+    adminExportSpecs: () => ({ method: "GET", href: `${API_BASE}users/export/specs/` }),
+    adminExport: () => ({ method: "GET", href: `${API_BASE}users/export/` }),
   },
   teams: {
     list: () => ({ method: "GET", href: `${API_BASE}teams/` }),
@@ -220,6 +249,66 @@ export const API_URLS = {
     exportSpecs: () => ({ method: "GET", href: `${API_BASE}members/export/specs/` }),
     export: () => ({ method: "GET", href: `${API_BASE}members/export/` }),
     assignTeam: (code) => ({ method: "POST", href: `${API_BASE}members/${code}/assign-team/` }),
+  },
+  groups: {
+    list: () => ({ method: "GET", href: `${API_BASE}groups/` }),
+    create: () => ({ method: "POST", href: `${API_BASE}groups/` }),
+    stats: () => ({ method: "GET", href: `${API_BASE}groups/stats/` }),
+    detail: (code) => ({ method: "GET", href: `${API_BASE}groups/${code}/` }),
+    update: (code) => ({ method: "PATCH", href: `${API_BASE}groups/${code}/` }),
+    delete: (code) => ({ method: "DELETE", href: `${API_BASE}groups/${code}/` }),
+    activate: (code) => ({ method: "POST", href: `${API_BASE}groups/${code}/activate/` }),
+    deactivate: (code) => ({ method: "POST", href: `${API_BASE}groups/${code}/deactivate/` }),
+    members: (code) => ({ method: "GET", href: `${API_BASE}groups/${code}/members/` }),
+    assignMember: (code) => ({ method: "POST", href: `${API_BASE}groups/${code}/members/` }),
+    unassignMember: (code, memberCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}groups/${code}/members/${memberCode}/`,
+    }),
+    importSpecs: () => ({ method: "GET", href: `${API_BASE}groups/import/specs/` }),
+    importSample: () => ({ method: "GET", href: `${API_BASE}groups/import/sample/` }),
+    import: () => ({ method: "POST", href: `${API_BASE}groups/import/` }),
+    exportSpecs: () => ({ method: "GET", href: `${API_BASE}groups/export/specs/` }),
+    export: () => ({ method: "GET", href: `${API_BASE}groups/export/` }),
+  },
+  permissions: {
+    categories: () => ({ method: "GET", href: `${API_BASE}permissions/categories/` }),
+    groupList: (groupCode) => ({
+      method: "GET",
+      href: `${API_BASE}permissions/groups/${groupCode}/`,
+    }),
+    groupAssign: (groupCode) => ({
+      method: "POST",
+      href: `${API_BASE}permissions/groups/${groupCode}/`,
+    }),
+    groupUpdate: (groupCode, code) => ({
+      method: "PATCH",
+      href: `${API_BASE}permissions/groups/${groupCode}/${code}/`,
+    }),
+    groupRemove: (groupCode, code) => ({
+      method: "DELETE",
+      href: `${API_BASE}permissions/groups/${groupCode}/${code}/`,
+    }),
+    userList: (userCode) => ({
+      method: "GET",
+      href: `${API_BASE}permissions/users/${userCode}/`,
+    }),
+    userAssign: (userCode) => ({
+      method: "POST",
+      href: `${API_BASE}permissions/users/${userCode}/`,
+    }),
+    userUpdate: (userCode, code) => ({
+      method: "PATCH",
+      href: `${API_BASE}permissions/users/${userCode}/${code}/`,
+    }),
+    userRemove: (userCode, code) => ({
+      method: "DELETE",
+      href: `${API_BASE}permissions/users/${userCode}/${code}/`,
+    }),
+    userEffective: (userCode) => ({
+      method: "GET",
+      href: `${API_BASE}permissions/users/${userCode}/effective/`,
+    }),
   },
   fy: {
     list: () => ({ method: "GET", href: `${API_BASE}fy/` }),
@@ -359,6 +448,22 @@ export const API_URLS = {
     }),
     exportAll: () => ({ method: "GET", href: `${API_BASE}projects/sub-statuses/export/` }),
   },
+  businessUnits: {
+    list: () => ({ method: "GET", href: `${API_BASE}bu/` }),
+    create: () => ({ method: "POST", href: `${API_BASE}bu/` }),
+    stats: () => ({ method: "GET", href: `${API_BASE}bu/stats/` }),
+    options: () => ({ method: "GET", href: `${API_BASE}bu/options/` }),
+    detail: (code) => ({ method: "GET", href: `${API_BASE}bu/${code}/` }),
+    update: (code) => ({ method: "PATCH", href: `${API_BASE}bu/${code}/` }),
+    delete: (code) => ({ method: "DELETE", href: `${API_BASE}bu/${code}/` }),
+    activate: (code) => ({ method: "POST", href: `${API_BASE}bu/${code}/activate/` }),
+    deactivate: (code) => ({ method: "POST", href: `${API_BASE}bu/${code}/deactivate/` }),
+    importSpecs: () => ({ method: "GET", href: `${API_BASE}bu/import/specs/` }),
+    importSample: () => ({ method: "GET", href: `${API_BASE}bu/import/sample/` }),
+    import: () => ({ method: "POST", href: `${API_BASE}bu/import/` }),
+    exportSpecs: () => ({ method: "GET", href: `${API_BASE}bu/export/specs/` }),
+    export: () => ({ method: "GET", href: `${API_BASE}bu/export/` }),
+  },
   programmes: {
     list: () => ({ method: "GET", href: `${API_BASE}programmes/` }),
     create: () => ({ method: "POST", href: `${API_BASE}programmes/` }),
@@ -374,6 +479,105 @@ export const API_URLS = {
     import: () => ({ method: "POST", href: `${API_BASE}programmes/import/` }),
     exportSpecs: () => ({ method: "GET", href: `${API_BASE}programmes/export/specs/` }),
     export: () => ({ method: "GET", href: `${API_BASE}programmes/export/` }),
+  },
+  projects: {
+    list: () => ({ method: "GET", href: `${API_BASE}projects/` }),
+    create: () => ({ method: "POST", href: `${API_BASE}projects/` }),
+    stats: () => ({ method: "GET", href: `${API_BASE}projects/stats/` }),
+    options: () => ({ method: "GET", href: `${API_BASE}projects/options/` }),
+    confidenceOptions: () => ({
+      method: "GET",
+      href: `${API_BASE}projects/options/?fields=confidence`,
+    }),
+    priorityOptions: () => ({
+      method: "GET",
+      href: `${API_BASE}projects/options/?fields=priority`,
+    }),
+    detail: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/` }),
+    update: (code) => ({ method: "PATCH", href: `${API_BASE}projects/${code}/` }),
+    delete: (code) => ({ method: "DELETE", href: `${API_BASE}projects/${code}/` }),
+    activate: (code) => ({ method: "POST", href: `${API_BASE}projects/${code}/activate/` }),
+    deactivate: (code) => ({ method: "POST", href: `${API_BASE}projects/${code}/deactivate/` }),
+    importSpecs: () => ({ method: "GET", href: `${API_BASE}projects/import/specs/` }),
+    importSample: () => ({ method: "GET", href: `${API_BASE}projects/import/sample/` }),
+    import: () => ({ method: "POST", href: `${API_BASE}projects/import/` }),
+    exportSpecs: () => ({ method: "GET", href: `${API_BASE}projects/export/specs/` }),
+    export: () => ({ method: "GET", href: `${API_BASE}projects/export/` }),
+    collaborators: (code) => ({
+      method: "GET",
+      href: `${API_BASE}projects/${code}/collaborators/`,
+    }),
+    addCollaborator: (code) => ({
+      method: "POST",
+      href: `${API_BASE}projects/${code}/collaborators/`,
+    }),
+    removeCollaborator: (code, teamCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}projects/${code}/collaborators/${teamCode}/`,
+    }),
+  },
+  projectFollowers: {
+    list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/followers/` }),
+    create: (code) => ({ method: "POST", href: `${API_BASE}projects/${code}/followers/` }),
+    delete: (code, followerCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}projects/${code}/followers/${followerCode}/`,
+    }),
+  },
+  projectTags: {
+    list: (projectCode) => ({ method: "GET", href: `${API_BASE}projects/${projectCode}/tags/` }),
+    create: (projectCode) => ({ method: "POST", href: `${API_BASE}projects/${projectCode}/tags/` }),
+    delete: (projectCode, tagCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}projects/${projectCode}/tags/${tagCode}/`,
+    }),
+  },
+  projectEstimates: {
+    list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/estimates/` }),
+    create: (code) => ({ method: "POST", href: `${API_BASE}projects/${code}/estimates/` }),
+    detail: (code, estCode) => ({
+      method: "GET",
+      href: `${API_BASE}projects/${code}/estimates/${estCode}/`,
+    }),
+    update: (code, estCode) => ({
+      method: "PATCH",
+      href: `${API_BASE}projects/${code}/estimates/${estCode}/`,
+    }),
+    delete: (code, estCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}projects/${code}/estimates/${estCode}/`,
+    }),
+    history: (code, estCode) => ({
+      method: "GET",
+      href: `${API_BASE}projects/${code}/estimates/${estCode}/history/`,
+    }),
+  },
+  projectLabels: {
+    list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/labels/` }),
+    create: (code) => ({ method: "POST", href: `${API_BASE}projects/${code}/labels/` }),
+    suggest: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/labels/suggest/` }),
+    detail: (code, labelCode) => ({
+      method: "GET",
+      href: `${API_BASE}projects/${code}/labels/${labelCode}/`,
+    }),
+    update: (code, labelCode) => ({
+      method: "PATCH",
+      href: `${API_BASE}projects/${code}/labels/${labelCode}/`,
+    }),
+    delete: (code, labelCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}projects/${code}/labels/${labelCode}/`,
+    }),
+    setDefault: (code, labelCode) => ({
+      method: "POST",
+      href: `${API_BASE}projects/${code}/labels/${labelCode}/set-default/`,
+    }),
+  },
+  tags: {
+    list: () => ({ method: "GET", href: `${API_BASE}tags/` }),
+    create: () => ({ method: "POST", href: `${API_BASE}tags/` }),
+    exportSpecs: () => ({ method: "GET", href: `${API_BASE}tags/export/specs/` }),
+    export: () => ({ method: "GET", href: `${API_BASE}tags/export/` }),
   },
   setup: {
     defaults: () => ({ method: "GET", href: `${API_BASE}setup/` }),

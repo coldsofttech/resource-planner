@@ -4,7 +4,7 @@
  *
  * Attributes:
  *   name     – Display name used to derive initials and colour palette seed. Required.
- *   variant  – "monogram" (default) | "initials"
+ *   variant  – "monogram" (default) | "initials" | "geometric"
  *   size     – "sm" | "md" (default) | "lg" | "xl"
  *   shape    – "rounded" (default for monogram) | "circle" (default for initials)
  *   bordered – Boolean. Adds a subtle ring shadow around the identicon.
@@ -16,6 +16,8 @@
  *   <identicon-field name="Platform" size="lg" shape="circle"></identicon-field>
  *   <identicon-field name="Alpha Team" variant="monogram" size="sm" bordered></identicon-field>
  */
+
+import { escSvg } from "../utils.js";
 
 // Curated palettes (pleasing hue combinations)
 const PALETTES = [
@@ -76,7 +78,7 @@ function renderMonogram(name) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true">
     <rect width="64" height="64" fill="${pal[1]}" opacity="0.16"/>
     <rect x="6" y="6" width="52" height="52" rx="12" fill="${pal[0]}" opacity="0.92"/>
-    <text x="32" y="42" text-anchor="middle" font-family="Plus Jakarta Sans, system-ui, sans-serif" font-size="22" font-weight="800" fill="#fff" letter-spacing="-0.5">${text}</text>
+    <text x="32" y="42" text-anchor="middle" font-family="Plus Jakarta Sans, system-ui, sans-serif" font-size="22" font-weight="800" fill="#fff" letter-spacing="-0.5">${escSvg(text)}</text>
   </svg>`;
 }
 
@@ -89,13 +91,35 @@ function renderInitials(name) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true">
     <defs><linearGradient id="${id}" gradientTransform="rotate(135)"><stop offset="0" stop-color="${pal[0]}"/><stop offset="1" stop-color="${pal[1]}"/></linearGradient></defs>
     <rect width="64" height="64" fill="url(#${id})"/>
-    <text x="32" y="42" text-anchor="middle" font-family="Plus Jakarta Sans, system-ui, sans-serif" font-size="26" font-weight="700" fill="#fff" letter-spacing="-0.5">${text}</text>
+    <text x="32" y="42" text-anchor="middle" font-family="Plus Jakarta Sans, system-ui, sans-serif" font-size="26" font-weight="700" fill="#fff" letter-spacing="-0.5">${escSvg(text)}</text>
   </svg>`;
+}
+
+function renderGeometric(name) {
+  const seed = hash(String(name || "x"));
+  const r = rng(seed);
+  const pal = PALETTES[Math.floor(r() * PALETTES.length)];
+  const cells = 5;
+  const cellSize = 64 / cells;
+  let cellsSvg = "";
+  for (let y = 0; y < cells; y++) {
+    for (let x = 0; x < Math.ceil(cells / 2); x++) {
+      if (r() > 0.5) {
+        const mx = cells - 1 - x;
+        const color = r() > 0.7 ? pal[0] : pal[1];
+        cellsSvg += `<rect x="${x * cellSize}" y="${y * cellSize}" width="${cellSize}" height="${cellSize}" fill="${color}"/>`;
+        if (x !== mx)
+          cellsSvg += `<rect x="${mx * cellSize}" y="${y * cellSize}" width="${cellSize}" height="${cellSize}" fill="${color}"/>`;
+      }
+    }
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" fill="${pal[1]}" opacity="0.18"/>${cellsSvg}</svg>`;
 }
 
 const VARIANTS = {
   monogram: renderMonogram,
   initials: renderInitials,
+  geometric: renderGeometric,
 };
 
 const SIZE_CLASSES = new Set(["sm", "lg", "xl"]);
@@ -137,7 +161,8 @@ export class IdenticonField extends HTMLElement {
     this.setAttribute("aria-label", label || "identicon");
 
     const fn = VARIANTS[variant] ?? VARIANTS.monogram;
-    this.innerHTML = fn(name);
+    const doc = new DOMParser().parseFromString(fn(name), "image/svg+xml");
+    this.replaceChildren(doc.documentElement);
     this._rendered = true;
   }
 }

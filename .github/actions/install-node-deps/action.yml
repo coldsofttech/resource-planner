@@ -1,0 +1,9 @@
+name: Install Node Dependencies
+description: Install Node.js dependencies via npm ci
+
+runs:
+  using: composite
+  steps:
+    - name: Install Node dependencies
+      shell: bash
+      run: npm ci

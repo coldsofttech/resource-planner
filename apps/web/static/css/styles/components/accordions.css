@@ -5,7 +5,6 @@ accordion-panel {
   border: 1px solid var(--rp-border);
   border-radius: 8px;
   margin-bottom: 8px;
-  overflow: hidden;
 }
 
 .rp-acc-panel-hd {
@@ -16,6 +15,11 @@ accordion-panel {
   cursor: pointer;
   user-select: none;
   transition: background 0.15s;
+  border-radius: 8px;
+}
+
+accordion-panel[data-open="true"] .rp-acc-panel-hd {
+  border-radius: 8px 8px 0 0;
 }
 
 .rp-acc-panel-hd:hover {

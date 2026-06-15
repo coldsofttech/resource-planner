@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Business Units
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/business-units.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Organisations
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Business Units
+{% endblock page_title %}
+{% block page_sub %}
+  Manage your organisation's business units.
+{% endblock page_sub %}
+{% block page_actions %}
+  <secondary-button id="rp-business-units-import-btn" label="Import" prefix-icon="bi-upload" hidden></secondary-button>
+  <secondary-button id="rp-business-units-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+  <primary-button id="rp-business-units-add-btn" label="Add Business Unit" prefix-icon="bi-plus-lg" hidden></primary-button>
+{% endblock page_actions %}
+{% block content %}
+  <list-view show-active-filters>
+  <filter-panel id="rp-business-units-filter-panel">
+  <search-field id="rp-business-units-search" name="search" placeholder="Search business units..." shortcut="/" show-label></search-field>
+  <is-active-field id="rp-business-units-status" name="is_active" value="true" show-label></is-active-field>
+  </filter-panel>
+  <data-table id="rp-business-units-table"
+              url="/api/v1/bu/"
+              paginated
+              page-size="25"
+              row-template="renderBusinessUnitsRow"
+              empty-message="No business units found.">
+    <table-columns>
+      <table-column width="52px">
+      </table-column>
+      <table-column label="Name" key="name" sortable>
+      </table-column>
+      <table-column label="Code" key="code" mono width="130px" hide-mobile>
+      </table-column>
+      <table-column label="Short Name" key="short_name" hide-mobile>
+      </table-column>
+      <table-column label="Status" key="is_active">
+      </table-column>
+      <table-column label="Created" key="created_at" hide-mobile sortable>
+      </table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_businessunit %}
+        <table-action icon="bi-pencil" label="Edit" event="rp:business-unit:edit">
+        </table-action>
+        <table-action icon="bi-toggle-on" label="Toggle" event="rp:business-unit:toggle" color-key="is_active">
+        </table-action>
+      {% endif %}
+      {% if can_delete_businessunit %}
+        <table-action icon="bi-trash" label="Delete" event="rp:business-unit:delete" danger>
+        </table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </list-view>
+  <!-- Create drawer -->
+  <drawer-modal id="rp-business-unit-create-drawer" width="900">
+  <drawer-header eyebrow="New record" title="Create business unit" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-new-business-unit-name" col="col-md-12" label="Business unit name" placeholder="e.g. Finance" required maxlength="255" show-counter></text-field>
+    <text-field id="rp-new-business-unit-short-name" col="col-md-12" label="Short name" placeholder="e.g. FIN" required maxlength="10" show-counter></text-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Create business unit" primary-icon="bi-check2"> </drawer-footer>
+  </drawer-modal>
+  <!-- Edit drawer -->
+  <drawer-modal id="rp-business-unit-edit-drawer" width="900">
+  <drawer-header eyebrow="Edit record" title="Edit business unit" no-sizes>
+  <identicon-field id="rp-edit-business-unit-identicon" size="lg"></identicon-field>
+  </drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-edit-business-unit-name" col="col-md-12" label="Business unit name" placeholder="e.g. Finance" required maxlength="255" show-counter></text-field>
+    <text-field id="rp-edit-business-unit-short-name" col="col-md-12" label="Short name" placeholder="e.g. FIN" required maxlength="10" show-counter></text-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"> </drawer-footer>
+  </drawer-modal>
+  <!-- View drawer -->
+  <drawer-modal id="rp-business-unit-view-drawer" width="900">
+  <drawer-header eyebrow="Business Unit" title="Business Unit" no-sizes>
+  <identicon-field id="rp-view-business-unit-identicon" size="lg"></identicon-field>
+  </drawer-header>
+  <drawer-panel>
+  <view-field id="rp-view-business-unit-name" label="Name"></view-field>
+  <view-field id="rp-view-business-unit-short-name" label="Short Name" code></view-field>
+  <view-field id="rp-view-business-unit-code" label="Code" code></view-field>
+  <view-field id="rp-view-business-unit-status" label="Status"></view-field>
+  <view-field id="rp-view-business-unit-created" label="Created" meta></view-field>
+  <view-field id="rp-view-business-unit-created-by" label="Created by" meta></view-field>
+  </drawer-panel>
+  {% if can_change_businessunit %}
+    <drawer-footer close="Close" primary="Edit business unit" primary-icon="bi-pencil"> </drawer-footer>
+  {% else %}
+    <drawer-footer close="Close"> </drawer-footer>
+  {% endif %}
+  </drawer-modal>
+  <delete-modal id="rp-business-unit-delete-modal" action-label="Delete business unit"></delete-modal>
+  <activate-modal id="rp-business-unit-activate-modal"></activate-modal>
+  <deactivate-modal id="rp-business-unit-deactivate-modal"></deactivate-modal>
+  <import-view id="rp-business-units-import-view" title="Import Business Units" eyebrow="Business Units"></import-view>
+  <export-view id="rp-business-units-export-view" title="Export Business Units" eyebrow="Business Units" active-filter-id="rp-business-units-filter-panel"></export-view>
+{% endblock content %}

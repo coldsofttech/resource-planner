@@ -1,10 +1,17 @@
+import "./auth-type-field.js";
+import "./business-unit-field.js";
+import "./confidence-field.js";
 import "./employment-type-field.js";
 import "./financial-year-field.js";
 import "./fy-status-field.js";
 import "./is-active-field.js";
 import "./location-field.js";
 import "./member-field.js";
+import "./priority-field.js";
 import "./programme-field.js";
+import "./project-estimate-status-field.js";
+import "./project-field.js";
+import "./project-tags-field.js";
 import "./project-status-field.js";
 import "./project-substatus-field.js";
 import "./project-type-field.js";

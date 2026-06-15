@@ -23,6 +23,20 @@ class PasswordResetToken(TimeStampedModel):
         ordering = ["-created_at"]
 
 
+class AdminPasswordResetToken(TimeStampedModel):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="admin_password_reset_tokens",
+    )
+    token_hash = models.CharField(max_length=64, db_index=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False, db_index=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+
 class UserToken(TimeStampedModel):
     user = models.ForeignKey(
         User,

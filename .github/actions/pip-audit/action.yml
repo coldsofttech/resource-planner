@@ -1,0 +1,9 @@
+name: pip-audit
+description: Audit Python dependencies for known vulnerabilities
+
+runs:
+  using: composite
+  steps:
+    - name: pip-audit
+      shell: bash
+      run: pip-audit --skip-editable

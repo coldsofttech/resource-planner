@@ -59,6 +59,11 @@ class ProjectStatusField extends DropdownField {
     this._loadId = Symbol();
   }
 
+  refresh() {
+    this._loadId = Symbol();
+    this._fetchOptions(this._loadId);
+  }
+
   async _fetchOptions(id) {
     try {
       const { href, method } = API_URLS.projectStatuses.options();
@@ -81,6 +86,16 @@ class ProjectStatusField extends DropdownField {
       ];
 
       this._doRender();
+
+      // If no value is currently selected (value attr didn't match any option),
+      // auto-select the first real option so the create drawer never shows null.
+      if (!hasAllOpt) {
+        const select = this.querySelector(".rp-input");
+        if (select && !select.value) {
+          const first = this._initialOptions.find((o) => o.value);
+          if (first) this.value = first.value;
+        }
+      }
     } catch {
       if (this._loadId !== id) return;
       this._setFetchError();

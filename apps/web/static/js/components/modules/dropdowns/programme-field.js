@@ -59,6 +59,21 @@ class ProgrammeField extends DropdownField {
     this._loadId = Symbol();
   }
 
+  refresh() {
+    this._loadId = Symbol();
+    this._fetchOptions(this._loadId);
+  }
+
+  // Preserve the typed text on blur when no existing option was selected.
+  // This allows free-form programme creation via the inputText property.
+  _doComboBlur(input) {
+    this._closeComboDropdown();
+    if (this._comboValue) input.value = this._comboLabel || "";
+    // else: leave input.value unchanged so inputText reflects what the user typed
+    this._touched = true;
+    this._updateError();
+  }
+
   async _fetchOptions(id) {
     try {
       const { href, method } = API_URLS.programmes.options();

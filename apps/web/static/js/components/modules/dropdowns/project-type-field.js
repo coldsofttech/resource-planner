@@ -60,6 +60,11 @@ class ProjectTypeField extends DropdownField {
     this._loadId = Symbol();
   }
 
+  refresh() {
+    this._loadId = Symbol();
+    this._fetchOptions(this._loadId);
+  }
+
   async _fetchOptions(id) {
     try {
       const { href, method } = API_URLS.projectTypes.options();

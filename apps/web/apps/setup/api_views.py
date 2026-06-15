@@ -21,6 +21,7 @@ from apps.setup.services import SetupService
 logger = logging.getLogger(__name__)
 
 
+@extend_schema(tags=["Setup"])
 class SetupViewSet(BaseViewSet):
     authentication_classes: list[type] = []
     permission_classes = [AllowAny]

@@ -63,12 +63,17 @@
           <menu-items>
             <menu-item name="Dashboard" href="/dashboard" icon="bi-speedometer2"></menu-item>
               <menu-group name="Organisation" icon="bi-diagram-3">
+                {% if "business_units.view_businessunit" in rp_permissions %}
+                  <menu-section label="Structure">
+                    <menu-item name="Business Units" href="/bu/" icon="bi-building"></menu-item>
+                  </menu-section>
+                {% endif %}
                 <menu-section label="People">
                   {% if "teams.view_team" in rp_permissions %}
                     <menu-item name="Teams" href="/teams" icon="bi-people"></menu-item>
                     {% endif %}
                     {% if "auth.view_user" in rp_permissions %}
-                      <menu-item name="Members" href="/members/" icon="bi-person-lines-fill"></menu-item>
+                      <menu-item name="Members" href="/members" icon="bi-person-lines-fill"></menu-item>
                       {% endif %}
                     </menu-section>
                     <menu-section label="Holidays">
@@ -94,11 +99,16 @@
                                   {% endif %}
                                 </menu-section>
                               </menu-group>
-                              {% if "sprints.view_sprint" in rp_permissions or "projects.view_programme" in rp_permissions or "projects.view_projecttype" in rp_permissions or "projects.view_projectstatus" in rp_permissions %}
+                              {% if "sprints.view_sprint" in rp_permissions or "projects.view_project" in rp_permissions or "projects.view_programme" in rp_permissions or "projects.view_projecttype" in rp_permissions or "projects.view_projectstatus" in rp_permissions %}
                                 <menu-group name="Project" icon="bi-kanban">
-                                  {% if "projects.view_programme" in rp_permissions %}
+                                  {% if "projects.view_project" in rp_permissions or "projects.view_programme" in rp_permissions %}
                                     <menu-section label="Projects">
-                                      <menu-item name="Programmes" href="/programmes/" icon="bi-collection"></menu-item>
+                                      {% if "projects.view_project" in rp_permissions %}
+                                        <menu-item name="Projects" href="/projects/" icon="bi-kanban"></menu-item>
+                                      {% endif %}
+                                      {% if "projects.view_programme" in rp_permissions %}
+                                        <menu-item name="Programmes" href="/programmes/" icon="bi-collection"></menu-item>
+                                      {% endif %}
                                     </menu-section>
                                   {% endif %}
                                   {% if "sprints.view_sprint" in rp_permissions %}
@@ -118,13 +128,30 @@
                                   {% endif %}
                                 </menu-group>
                               {% endif %}
-                              {% if "financial_years.view_financialyear" in rp_permissions %}
-                                <menu-group name="Administration" icon="bi-calendar2-range">
+                              {% if "financial_years.view_financialyear" in rp_permissions or "auth.view_user" in rp_permissions or "users.view_group" in rp_permissions or "tags.view_tag" in rp_permissions %}
+                                <menu-group name="Administration" icon="bi-gear">
+                                  {% if "financial_years.view_financialyear" in rp_permissions %}
                                   <menu-section label="Planning">
                                     <menu-item name="Financial Years" href="/fy/" icon="bi-calendar2-range"></menu-item>
-                                    </menu-section>
-                                  </menu-group>
-                                {% endif %}
+                                  </menu-section>
+                                  {% endif %}
+                                  {% if "tags.view_tag" in rp_permissions %}
+                                  <menu-section label="Content">
+                                    <menu-item name="Tags" href="/tags/" icon="bi-hash"></menu-item>
+                                  </menu-section>
+                                  {% endif %}
+                                  {% if "auth.view_user" in rp_permissions or "users.view_group" in rp_permissions %}
+                                  <menu-section label="Users">
+                                    {% if "auth.view_user" in rp_permissions %}
+                                    <menu-item name="Users" href="/users/" icon="bi-people"></menu-item>
+                                    {% endif %}
+                                    {% if "users.view_group" in rp_permissions %}
+                                    <menu-item name="Groups" href="/groups/" icon="bi-shield-lock"></menu-item>
+                                    {% endif %}
+                                  </menu-section>
+                                  {% endif %}
+                                </menu-group>
+                              {% endif %}
                               </menu-items>
                             </menu-bar>
                           </header>

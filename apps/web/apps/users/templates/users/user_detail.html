@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  User
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/users.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Administration
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <span id="rp-user-detail-title">User</span>
+{% endblock page_title %}
+{% block page_actions %}
+  {% if can_change_user %}
+    <secondary-button id="rp-user-detail-reset-password-btn" label="Reset Password" prefix-icon="bi-key" hidden></secondary-button>
+  {% endif %}
+  {% if can_manage_user_permissions %}
+    <primary-button id="rp-user-detail-assign-permissions-btn" label="Assign Permissions" prefix-icon="bi-shield-plus" hidden></primary-button>
+  {% endif %}
+{% endblock page_actions %}
+{% block content %}
+  <div class="row g-4 align-items-lg-start">
+    <!-- Left: user details -->
+    <div class="col-12 col-lg-4">
+      <section-panel>
+        <panel-body>
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <user-avatar id="rp-user-detail-avatar" name="" avatar-url="" size="lg"></user-avatar>
+          </div>
+          <view-field id="rp-user-detail-first-name" label="First name" hidden></view-field>
+          <view-field id="rp-user-detail-last-name" label="Last name" hidden></view-field>
+          <view-field id="rp-user-detail-display-name" label="Display name" hidden></view-field>
+          <view-field id="rp-user-detail-email" label="Email address"></view-field>
+          <view-field id="rp-user-detail-groups" label="Groups" tags="rp-badge rp-badge-soft" hidden></view-field>
+          <view-field id="rp-user-detail-location" label="Location" hidden></view-field>
+          <view-field id="rp-user-detail-role" label="Role" hidden></view-field>
+          <view-field id="rp-user-detail-emp-type" label="Employment type" hidden></view-field>
+          <view-field id="rp-user-detail-last-login" label="Last login" meta></view-field>
+          <view-field id="rp-user-detail-created-at" label="Created" meta></view-field>
+          <view-field id="rp-user-detail-created-by" label="Created by" meta hidden></view-field>
+        </panel-body>
+      </section-panel>
+    </div>
+    <!-- Right: effective permissions -->
+    {% if can_view_user_permissions %}
+    <div class="col-12 col-lg-8">
+      <section-panel>
+        <panel-title>Effective Permissions</panel-title>
+        <panel-body>
+          <permissions-panel id="rp-user-detail-permissions" subject-type="user"></permissions-panel>
+        </panel-body>
+      </section-panel>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Assign Permissions drawer -->
+  {% if can_manage_user_permissions %}
+  <drawer-modal id="rp-user-detail-assign-permissions-drawer" width="900">
+    <drawer-header eyebrow="User" title="Assign permissions" no-sizes></drawer-header>
+    <drawer-panel>
+      <permissions-panel id="rp-user-detail-permissions-panel" subject-type="user"></permissions-panel>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Save permissions" primary-icon="bi-shield-check"></drawer-footer>
+  </drawer-modal>
+  {% endif %}
+
+  <!-- Reset password modal -->
+  {% if can_change_user %}
+  <status-modal id="rp-user-detail-reset-password-modal"></status-modal>
+  {% endif %}
+{% endblock content %}

@@ -1,0 +1,11 @@
+name: OpenAPI Validation
+description: Validate OpenAPI schema using drf-spectacular
+
+runs:
+  using: composite
+  steps:
+    - name: OpenAPI Schema Validation
+      shell: bash
+      run: |
+        cd apps/web
+        python manage.py spectacular --validate

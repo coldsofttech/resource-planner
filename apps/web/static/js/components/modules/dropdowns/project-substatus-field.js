@@ -103,11 +103,7 @@ class ProjectSubStatusField extends DropdownField {
     statusEl.addEventListener("change", this._statusChangeHandler);
 
     const currentCode = this._getStatusValue(statusEl);
-    if (currentCode) {
-      this._fetchOptions(currentCode, this._loadId);
-    } else {
-      this._clearOptions();
-    }
+    this._fetchOptions(currentCode || null, this._loadId);
   }
 
   _detachStatusWatcher() {
@@ -128,11 +124,7 @@ class ProjectSubStatusField extends DropdownField {
   _onStatusChange(statusCode) {
     this._loadId = Symbol();
     const id = this._loadId;
-    if (statusCode) {
-      this._fetchOptions(statusCode, id);
-    } else {
-      this._clearOptions();
-    }
+    this._fetchOptions(statusCode || null, id);
   }
 
   _clearOptions() {

@@ -19,9 +19,25 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path(
+        "api/docs/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
+    ),
+    path(
+        "api/redoc/",
+        SpectacularRedocView.as_view(url_name="schema"),
+        name="redoc",
+    ),
     path("setup/", include("apps.setup.urls")),
     path("", include("apps.auth.urls")),
     path("", include("apps.users.urls")),
@@ -36,6 +52,8 @@ urlpatterns = [
     path("", include("apps.leaves.urls")),
     path("", include("apps.sprints.urls")),
     path("", include("apps.projects.urls")),
+    path("", include("apps.business_units.urls")),
+    path("", include("apps.tags.urls")),
     path("api/v1/", include("apps.setup.api_urls")),
     path("api/v1/", include("apps.meta.api_urls")),
     path("api/v1/", include("apps.auth.api_urls")),
@@ -53,4 +71,6 @@ urlpatterns = [
     path("api/v1/", include("apps.leaves.api_urls")),
     path("api/v1/", include("apps.sprints.api_urls")),
     path("api/v1/", include("apps.projects.api_urls")),
+    path("api/v1/", include("apps.business_units.api_urls")),
+    path("api/v1/", include("apps.tags.api_urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

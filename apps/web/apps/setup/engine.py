@@ -50,7 +50,4 @@ class DatabaseEngineService(ContextService):
                 f"Database migration failed after switching to PostgreSQL: {exc}"
             ) from exc
 
-        logger.info(
-            "Active database switched to PostgreSQL (%s) and migrations applied.",
-            new_databases["default"].get("NAME"),
-        )
+        logger.info("Active database switched to PostgreSQL and migrations applied.")

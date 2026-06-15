@@ -251,9 +251,7 @@ class SetupService(ContextService):
                     password,
                     description="Database password for Resource Planner",
                 )
-                logger.info(
-                    "DB password stored in Secrets Manager as '%s'.", db_secret_name
-                )
+                logger.info("DB password stored in Secrets Manager.")
             else:
                 env.write("DB_PASSWORD", password)
                 os.environ["DB_PASSWORD"] = password

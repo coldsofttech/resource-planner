@@ -55,7 +55,8 @@ class DotEnv:
             new_lines.append(f"{key}={value}\n")
 
         self._path.parent.mkdir(parents=True, exist_ok=True)
-        with open(self._path, "w", encoding="utf-8") as fh:
+        fd = os.open(str(self._path), os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
             fh.writelines(new_lines)
 
     def delete(self, key: str) -> bool:
@@ -75,7 +76,8 @@ class DotEnv:
                     continue
             new_lines.append(line)
         if removed:
-            with open(self._path, "w", encoding="utf-8") as fh:
+            fd = os.open(str(self._path), os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+            with os.fdopen(fd, "w", encoding="utf-8") as fh:
                 fh.writelines(new_lines)
         return removed
 
