@@ -1,0 +1,299 @@
+{
+  "module": {
+    "slug": "project-labels",
+    "name": "Project Labels",
+    "sort_order": 3,
+    "parent": {
+      "slug": "projects",
+      "name": "Projects",
+      "sort_order": 2
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-PLB-100",
+      "name": "Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-PLB-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user cannot access project labels",
+          "steps": "1. Open a project detail page URL without being logged in.",
+          "expected": "The browser redirects to the login page. Label management is not accessible."
+        },
+        {
+          "id": "TC-PLB-102",
+          "severity": "P1",
+          "scenario": "Labels panel on the Operational tab is visible to all authenticated users",
+          "steps": "1. Log in as any user.\n2. Open a project detail page and click the Operational tab.",
+          "expected": "The Labels panel is shown with existing label badges (if any). Labels are displayed in read-only mode."
+        },
+        {
+          "id": "TC-PLB-103",
+          "severity": "P1",
+          "scenario": "Labels accordion in the edit drawer is only accessible with 'can_change_project'",
+          "steps": "1. Log in as a user with 'can_change_project'.\n2. Open a project detail page and click 'Edit Project'.",
+          "expected": "The edit drawer opens and includes a 'Labels' accordion section."
+        },
+        {
+          "id": "TC-PLB-104",
+          "severity": "P1",
+          "scenario": "Add Label button inside the edit drawer is not available without 'can_change_project'",
+          "steps": "1. Log in as a user without 'can_change_project'.\n2. Open a project detail page.",
+          "expected": "The 'Edit Project' button is not available. Labels cannot be added or removed."
+        }
+      ]
+    },
+    {
+      "id": "TC-PLB-200",
+      "name": "Viewing Labels",
+      "test_cases": [
+        {
+          "id": "TC-PLB-201",
+          "severity": "P1",
+          "scenario": "Labels panel on the Operational tab shows all labels as badges",
+          "steps": "1. Open a project that has one or more labels.\n2. Click the Operational tab.",
+          "expected": "The Labels panel on the right shows each label as a badge."
+        },
+        {
+          "id": "TC-PLB-202",
+          "severity": "P1",
+          "scenario": "Labels accordion in the edit drawer shows existing labels as removable badges",
+          "steps": "1. Open the edit drawer for a project that has labels.\n2. Expand the Labels accordion.",
+          "expected": "Existing labels are shown as badges inside the accordion. Each badge can be removed."
+        },
+        {
+          "id": "TC-PLB-203",
+          "severity": "P2",
+          "scenario": "Empty state is shown in the Labels accordion when no labels exist",
+          "steps": "1. Open the edit drawer for a project with no labels.\n2. Expand the Labels accordion.",
+          "expected": "'No labels added yet.' is shown inside the accordion."
+        },
+        {
+          "id": "TC-PLB-204",
+          "severity": "P2",
+          "scenario": "Labels panel shows an empty state when no labels are on the project",
+          "steps": "1. Open a project with no labels.\n2. Click the Operational tab.",
+          "expected": "The Labels panel is empty or shows a placeholder indicating no labels exist."
+        }
+      ]
+    },
+    {
+      "id": "TC-PLB-300",
+      "name": "Adding a Label",
+      "test_cases": [
+        {
+          "id": "TC-PLB-301",
+          "severity": "P0",
+          "scenario": "Clicking 'Add Label' opens the Add Label modal",
+          "steps": "1. Open the edit drawer for a project.\n2. Expand the Labels accordion.\n3. Click the 'Add Label' button.",
+          "expected": "The Add Label modal opens with a 'Label' text field, a 'Mark as Primary' toggle, a 'Suggest Label' engine button, and Cancel / Save Label buttons."
+        },
+        {
+          "id": "TC-PLB-302",
+          "severity": "P0",
+          "scenario": "Entering a valid label name and saving adds the label",
+          "steps": "1. Open the Add Label modal.\n2. Enter 'FEATURE' in the Label field.\n3. Click 'Save Label'.",
+          "expected": "The modal closes. The label 'FEATURE' appears as a badge in the Labels accordion."
+        },
+        {
+          "id": "TC-PLB-303",
+          "severity": "P0",
+          "scenario": "Label field is required — saving without a value shows a validation error",
+          "steps": "1. Open the Add Label modal.\n2. Leave the Label field empty.\n3. Click 'Save Label'.",
+          "expected": "A validation error appears on the Label field. The modal remains open. No label is added."
+        },
+        {
+          "id": "TC-PLB-304",
+          "severity": "P1",
+          "scenario": "Label field enforces uppercase letters, digits, and underscores only",
+          "steps": "1. Open the Add Label modal.\n2. Enter a label containing lowercase letters or special characters (e.g. 'feature-flag').",
+          "expected": "A validation error appears: 'Uppercase letters (A–Z), digits (0–9), and underscores only.' The label is not saved."
+        },
+        {
+          "id": "TC-PLB-305",
+          "severity": "P1",
+          "scenario": "Label field enforces a maximum of 50 characters",
+          "steps": "1. Open the Add Label modal.\n2. Enter a label name longer than 50 characters.",
+          "expected": "The character counter reflects the limit. A validation error is shown if submitted over the limit."
+        },
+        {
+          "id": "TC-PLB-306",
+          "severity": "P1",
+          "scenario": "Character counter on the Label field shows remaining characters",
+          "steps": "1. Open the Add Label modal.\n2. Type in the Label field.",
+          "expected": "A character counter is visible and updates as text is entered, showing remaining characters up to the 50-character limit."
+        },
+        {
+          "id": "TC-PLB-307",
+          "severity": "P1",
+          "scenario": "Cancelling the Add Label modal discards the input",
+          "steps": "1. Open the Add Label modal.\n2. Type a label name.\n3. Click 'Cancel'.",
+          "expected": "The modal closes. No label is added to the project."
+        },
+        {
+          "id": "TC-PLB-308",
+          "severity": "P2",
+          "scenario": "Closing the Add Label modal via the X button discards the input",
+          "steps": "1. Open the Add Label modal.\n2. Type a label name.\n3. Click the X close button.",
+          "expected": "The modal closes. No label is added."
+        },
+        {
+          "id": "TC-PLB-309",
+          "severity": "P2",
+          "scenario": "Multiple labels can be added sequentially",
+          "steps": "1. Add a label via the modal.\n2. Click 'Add Label' again.\n3. Add a second label.",
+          "expected": "Both labels appear as separate badges in the Labels accordion."
+        }
+      ]
+    },
+    {
+      "id": "TC-PLB-400",
+      "name": "AI Label Suggestion",
+      "test_cases": [
+        {
+          "id": "TC-PLB-401",
+          "severity": "P1",
+          "scenario": "'Suggest Label' engine button is visible in the Add Label modal",
+          "steps": "1. Open the Add Label modal.",
+          "expected": "A 'Suggest Label' button with a lightbulb icon is visible in the modal footer."
+        },
+        {
+          "id": "TC-PLB-402",
+          "severity": "P1",
+          "scenario": "Clicking 'Suggest Label' populates the Label field with a suggested value",
+          "steps": "1. Open the Add Label modal.\n2. Click the 'Suggest Label' button.",
+          "expected": "The Label field is populated with a suggested label value (uppercase, valid format). The user can accept or modify the suggestion."
+        },
+        {
+          "id": "TC-PLB-403",
+          "severity": "P2",
+          "scenario": "Suggested label can be edited before saving",
+          "steps": "1. Open the Add Label modal.\n2. Click 'Suggest Label'.\n3. Modify the suggested value.\n4. Click 'Save Label'.",
+          "expected": "The modified value is saved as the label."
+        },
+        {
+          "id": "TC-PLB-404",
+          "severity": "P2",
+          "scenario": "'Suggest Label' shows a loading state while the suggestion is being generated",
+          "steps": "1. Open the Add Label modal.\n2. Click 'Suggest Label' and observe the button.",
+          "expected": "The 'Suggest Label' button shows a loading/busy indicator while the suggestion is being fetched. It becomes re-enabled when the suggestion is ready."
+        }
+      ]
+    },
+    {
+      "id": "TC-PLB-500",
+      "name": "Mark as Primary (Default)",
+      "test_cases": [
+        {
+          "id": "TC-PLB-501",
+          "severity": "P1",
+          "scenario": "'Mark as Primary' toggle is available in the Add Label modal",
+          "steps": "1. Open the Add Label modal.",
+          "expected": "A 'Mark as Primary' toggle field is visible beneath the Label input."
+        },
+        {
+          "id": "TC-PLB-502",
+          "severity": "P1",
+          "scenario": "Adding a label with 'Mark as Primary' enabled sets it as the primary label",
+          "steps": "1. Open the Add Label modal.\n2. Enter a valid label.\n3. Enable the 'Mark as Primary' toggle.\n4. Click 'Save Label'.",
+          "expected": "The label is added and visually marked as the primary label (e.g. different badge style or a star/indicator)."
+        },
+        {
+          "id": "TC-PLB-503",
+          "severity": "P2",
+          "scenario": "Only one label can be marked as primary at a time",
+          "steps": "1. Add a label and mark it as primary.\n2. Add a second label and mark it as primary.",
+          "expected": "The second label becomes the primary. The first label is no longer marked as primary. Only one primary label exists per project."
+        }
+      ]
+    },
+    {
+      "id": "TC-PLB-600",
+      "name": "Removing a Label",
+      "test_cases": [
+        {
+          "id": "TC-PLB-601",
+          "severity": "P0",
+          "scenario": "Removing a label badge from the Labels accordion removes it from the list",
+          "steps": "1. Open the edit drawer for a project with labels.\n2. Expand the Labels accordion.\n3. Click the remove/delete control on a label badge.",
+          "expected": "The label badge is removed from the accordion. After saving, the label no longer appears on the project."
+        },
+        {
+          "id": "TC-PLB-602",
+          "severity": "P1",
+          "scenario": "Saving the edit drawer after removing a label persists the removal",
+          "steps": "1. Remove a label in the Labels accordion.\n2. Click 'Save changes'.",
+          "expected": "The removed label no longer appears on the Operational tab Labels panel or in the edit drawer."
+        },
+        {
+          "id": "TC-PLB-603",
+          "severity": "P1",
+          "scenario": "Cancelling after removing a label badge does not remove the label",
+          "steps": "1. Open the edit drawer.\n2. Remove a label from the Labels accordion.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. The label is still present on the project."
+        }
+      ]
+    },
+    {
+      "id": "TC-PLB-700",
+      "name": "Non-Functional",
+      "test_cases": [
+        {
+          "id": "TC-PLB-701",
+          "severity": "P2",
+          "scenario": "Adding a duplicate label name is handled gracefully",
+          "steps": "1. Add a label named 'FEATURE' to a project.\n2. Open the Add Label modal again and enter 'FEATURE'.\n3. Click 'Save Label'.",
+          "expected": "The system either prevents the duplicate or shows an error. The project does not end up with two identical labels."
+        },
+        {
+          "id": "TC-PLB-702",
+          "severity": "P2",
+          "scenario": "Label badges are visually distinct from tags on the detail page",
+          "steps": "1. Open a project with both labels and tags.\n2. View the Operational tab (Labels panel) and General tab (Tags panel).",
+          "expected": "Labels and tags are clearly visually separated in different panels with distinct headings."
+        }
+      ]
+    },
+    {
+      "id": "TC-PLB-800",
+      "name": "Desktop",
+      "test_cases": [
+        {
+          "id": "TC-PLB-801",
+          "severity": "P1",
+          "scenario": "Labels badges and the Add Label button are clearly laid out on desktop",
+          "steps": "1. Open the edit drawer on a desktop browser.\n2. Expand the Labels accordion with multiple labels.",
+          "expected": "Labels appear as a wrapping row of badges. The 'Add Label' button is clearly positioned below the badges."
+        },
+        {
+          "id": "TC-PLB-802",
+          "severity": "P1",
+          "scenario": "Add Label modal is centred and fully visible on desktop",
+          "steps": "1. Open the Add Label modal on a desktop browser.",
+          "expected": "The modal is centred on screen. All fields and buttons are visible without scrolling."
+        }
+      ]
+    },
+    {
+      "id": "TC-PLB-900",
+      "name": "Mobile",
+      "test_cases": [
+        {
+          "id": "TC-PLB-901",
+          "severity": "P1",
+          "scenario": "Labels panel on the Operational tab is readable on mobile",
+          "steps": "1. Open a project detail page on a mobile device.\n2. Tap the Operational tab.",
+          "expected": "The Labels panel is visible. Label badges wrap to multiple lines as needed. The panel is readable."
+        },
+        {
+          "id": "TC-PLB-902",
+          "severity": "P2",
+          "scenario": "Add Label modal is usable on mobile",
+          "steps": "1. Open the edit drawer on a mobile device.\n2. Expand the Labels accordion.\n3. Tap 'Add Label'.",
+          "expected": "The Add Label modal opens. The Label field, Mark as Primary toggle, and action buttons are all accessible. The keyboard appears on mobile when the Label field is tapped."
+        }
+      ]
+    }
+  ]
+}

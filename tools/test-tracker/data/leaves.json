@@ -1,0 +1,933 @@
+{
+  "module": {
+    "slug": "leaves",
+    "name": "Leaves",
+    "sort_order": 20,
+    "parent": {
+      "slug": "calendar",
+      "name": "Calendar",
+      "sort_order": 5
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-LV-100",
+      "name": "Page Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-LV-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user cannot access the Leaves page",
+          "steps": "1. Open a browser with no active session (or use incognito).\n2. Navigate directly to the Leaves page URL.",
+          "expected": "The user is redirected to the login page. No leave data is visible."
+        },
+        {
+          "id": "TC-LV-102",
+          "severity": "P0",
+          "scenario": "Authenticated user with view permission can access the Leaves page",
+          "steps": "1. Log in with a valid account.\n2. Navigate to Calendar > Leaves from the main menu.",
+          "expected": "The Leaves page loads. The page title reads 'Leaves' and the eyebrow reads 'Holidays'. The leave table is visible."
+        },
+        {
+          "id": "TC-LV-103",
+          "severity": "P1",
+          "scenario": "Page subtitle is shown correctly",
+          "steps": "1. Navigate to the Leaves page.",
+          "expected": "The subtitle 'Track and manage time-off records for members across your organisation.' is visible below the page title."
+        },
+        {
+          "id": "TC-LV-104",
+          "severity": "P1",
+          "scenario": "Add Leave button is visible for users with create permission",
+          "steps": "1. Log in as a user with leave create permission.\n2. Navigate to the Leaves page.",
+          "expected": "The 'Add Leave' button is displayed in the page header actions area."
+        },
+        {
+          "id": "TC-LV-105",
+          "severity": "P1",
+          "scenario": "Add Leave button is not visible for read-only users",
+          "steps": "1. Log in as a user with read-only (view) access.\n2. Navigate to the Leaves page.",
+          "expected": "The 'Add Leave' button is not present on the page."
+        },
+        {
+          "id": "TC-LV-106",
+          "severity": "P1",
+          "scenario": "Edit action is not visible for users without change permission",
+          "steps": "1. Log in as a read-only user.\n2. Navigate to the Leaves page.\n3. Observe the row actions.",
+          "expected": "No Edit action button appears on any leave row."
+        },
+        {
+          "id": "TC-LV-107",
+          "severity": "P1",
+          "scenario": "Delete action is not visible for users without delete permission",
+          "steps": "1. Log in as a user without leave delete permission.\n2. Navigate to the Leaves page.\n3. Observe the row actions.",
+          "expected": "No Delete action button appears on any leave row."
+        },
+        {
+          "id": "TC-LV-108",
+          "severity": "P1",
+          "scenario": "View drawer Edit button is hidden for read-only users",
+          "steps": "1. Log in as a read-only user.\n2. Navigate to the Leaves page.\n3. Click a leave row to open the view drawer.",
+          "expected": "The view drawer opens and shows leave details. The 'Edit leave' button is not present in the footer — only 'Close' is shown."
+        },
+        {
+          "id": "TC-LV-109",
+          "severity": "P2",
+          "scenario": "Breadcrumb reflects Calendar > Leaves hierarchy",
+          "steps": "1. Navigate to the Leaves page.",
+          "expected": "The breadcrumb trail reflects the correct navigation path to the Leaves page."
+        }
+      ]
+    },
+    {
+      "id": "TC-LV-200",
+      "name": "Browsing & Filtering Leaves",
+      "test_cases": [
+        {
+          "id": "TC-LV-201",
+          "severity": "P0",
+          "scenario": "Leave records load and display in the table on page open",
+          "steps": "1. Navigate to the Leaves page.",
+          "expected": "All existing leave records are displayed in the table. The table renders without errors."
+        },
+        {
+          "id": "TC-LV-202",
+          "severity": "P1",
+          "scenario": "Table displays the correct columns on desktop",
+          "steps": "1. Navigate to the Leaves page on a desktop viewport.\n2. Observe the column headers.",
+          "expected": "Columns appear in this order: Member, Start Date, End Date, Days, Type, Code. Start Date, End Date, and Days have sort indicators."
+        },
+        {
+          "id": "TC-LV-203",
+          "severity": "P1",
+          "scenario": "Search field filters records by member name",
+          "steps": "1. Navigate to the Leaves page.\n2. Type part of a member's name into the search field.",
+          "expected": "The table updates to show only leave records for members whose name matches the search term."
+        },
+        {
+          "id": "TC-LV-204",
+          "severity": "P1",
+          "scenario": "Member filter dropdown narrows results to the selected member",
+          "steps": "1. Navigate to the Leaves page.\n2. Click the Member filter dropdown and select a specific member.",
+          "expected": "The table updates to show only leave records belonging to the selected member. Records for all other members are hidden."
+        },
+        {
+          "id": "TC-LV-205",
+          "severity": "P2",
+          "scenario": "Member filter set to 'All' restores the full list",
+          "steps": "1. Apply a Member filter.\n2. Change the Member filter back to 'All'.",
+          "expected": "The table shows leave records for all members again."
+        },
+        {
+          "id": "TC-LV-206",
+          "severity": "P1",
+          "scenario": "Combining search and Member filter narrows results by both criteria",
+          "steps": "1. Select a member from the Member filter.\n2. Also type text into the search field.",
+          "expected": "The table shows only leaves that match both the selected member and the search text simultaneously."
+        },
+        {
+          "id": "TC-LV-207",
+          "severity": "P2",
+          "scenario": "Empty search result shows appropriate empty state message",
+          "steps": "1. Type a term that does not match any member name.",
+          "expected": "The table shows an empty state message indicating no records were found. No data rows are shown."
+        },
+        {
+          "id": "TC-LV-208",
+          "severity": "P2",
+          "scenario": "Clearing the search field restores all records",
+          "steps": "1. Enter a search term that filters the table.\n2. Clear the search field completely.",
+          "expected": "The full list of leave records is restored without any search filter applied."
+        },
+        {
+          "id": "TC-LV-209",
+          "severity": "P1",
+          "scenario": "Table can be sorted by Start Date ascending and descending",
+          "steps": "1. Click the Start Date column header once.\n2. Click it again.",
+          "expected": "First click sorts leaves from earliest start date to latest. Second click reverses to latest first."
+        },
+        {
+          "id": "TC-LV-210",
+          "severity": "P1",
+          "scenario": "Table can be sorted by End Date ascending and descending",
+          "steps": "1. Click the End Date column header once.\n2. Click it again.",
+          "expected": "First click sorts by end date ascending. Second click sorts descending."
+        },
+        {
+          "id": "TC-LV-211",
+          "severity": "P2",
+          "scenario": "Table can be sorted by Days count ascending and descending",
+          "steps": "1. Click the Days column header once.\n2. Click it again.",
+          "expected": "The table sorts by number of leave days from fewest to most, then reverses."
+        },
+        {
+          "id": "TC-LV-212",
+          "severity": "P2",
+          "scenario": "Type column correctly shows Full Day or Half Day (AM/PM) for each row",
+          "steps": "1. Ensure both full-day and half-day leaves exist.\n2. Navigate to the Leaves page and observe the Type column.",
+          "expected": "Full-day leaves show 'Full Day'. Half-day leaves show 'Half Day' with AM or PM indicated."
+        },
+        {
+          "id": "TC-LV-213",
+          "severity": "P1",
+          "scenario": "Clicking a leave row opens the view drawer",
+          "steps": "1. Click anywhere on a leave row, not on an action button.",
+          "expected": "The view drawer slides open from the right, displaying the full details of the selected leave record."
+        },
+        {
+          "id": "TC-LV-214",
+          "severity": "P1",
+          "scenario": "Pagination controls navigate between pages of leave records",
+          "steps": "1. Ensure more leave records exist than the default page size.\n2. Click the next page button.\n3. Click the previous page button.",
+          "expected": "Page navigation works correctly. Each page shows the expected subset of records."
+        },
+        {
+          "id": "TC-LV-215",
+          "severity": "P2",
+          "scenario": "Active filter chip appears when Member filter is applied",
+          "steps": "1. Select a member from the Member filter dropdown.",
+          "expected": "An active filter chip or tag is shown indicating the applied filter. Clicking the chip clears the Member filter."
+        }
+      ]
+    },
+    {
+      "id": "TC-LV-300",
+      "name": "Creating a Leave Record",
+      "test_cases": [
+        {
+          "id": "TC-LV-301",
+          "severity": "P0",
+          "scenario": "Clicking Add Leave opens the create drawer",
+          "steps": "1. Navigate to the Leaves page.\n2. Click the 'Add Leave' button.",
+          "expected": "The create drawer slides open with a blank form. The drawer title reads 'Add leave'."
+        },
+        {
+          "id": "TC-LV-302",
+          "severity": "P1",
+          "scenario": "Create drawer contains all expected form fields",
+          "steps": "1. Open the Add Leave drawer.\n2. Observe the form fields.",
+          "expected": "The form contains: Member (required), Start Date (required), End Date (required), Half Day toggle (off by default), and Note (optional)."
+        },
+        {
+          "id": "TC-LV-303",
+          "severity": "P0",
+          "scenario": "A full-day leave is created successfully with all required fields",
+          "steps": "1. Open the Add Leave drawer.\n2. Select a member.\n3. Set a Start Date.\n4. Set an End Date on or after the Start Date.\n5. Leave the Half Day toggle off.\n6. Click the submit button.",
+          "expected": "The drawer closes. A success toast appears. The new leave record is visible in the table with the correct member, start date, end date, days count, and 'Full Day' type."
+        },
+        {
+          "id": "TC-LV-304",
+          "severity": "P0",
+          "scenario": "A half-day AM leave is created successfully",
+          "steps": "1. Open the Add Leave drawer.\n2. Select a member.\n3. Set the same date for both Start Date and End Date.\n4. Toggle ON the Half Day toggle.\n5. Select 'Morning (AM)' from the Half Day Period dropdown.\n6. Click the submit button.",
+          "expected": "The leave is created. The Type column in the table shows 'Half Day' with AM. The Days column shows '0.5'."
+        },
+        {
+          "id": "TC-LV-305",
+          "severity": "P0",
+          "scenario": "A half-day PM leave is created successfully",
+          "steps": "1. Open the Add Leave drawer.\n2. Select a member.\n3. Set the same date for Start Date and End Date.\n4. Toggle ON the Half Day toggle.\n5. Select 'Afternoon (PM)'.\n6. Click the submit button.",
+          "expected": "The leave is created. The Type column shows 'Half Day' with PM. The Days column shows '0.5'."
+        },
+        {
+          "id": "TC-LV-306",
+          "severity": "P1",
+          "scenario": "Member field is required — validation error shown when empty",
+          "steps": "1. Open the Add Leave drawer.\n2. Set Start Date and End Date but leave Member unselected.\n3. Click the submit button.",
+          "expected": "The form does not submit. An inline validation error appears under the Member field indicating it is required."
+        },
+        {
+          "id": "TC-LV-307",
+          "severity": "P1",
+          "scenario": "Start Date is required — validation error shown when empty",
+          "steps": "1. Open the Add Leave drawer.\n2. Select a member and set End Date but leave Start Date empty.\n3. Click the submit button.",
+          "expected": "The form does not submit. An inline validation error appears under the Start Date field indicating it is required."
+        },
+        {
+          "id": "TC-LV-308",
+          "severity": "P1",
+          "scenario": "End Date is required — validation error shown when empty",
+          "steps": "1. Open the Add Leave drawer.\n2. Select a member and set Start Date but leave End Date empty.\n3. Click the submit button.",
+          "expected": "The form does not submit. An inline validation error appears under the End Date field indicating it is required."
+        },
+        {
+          "id": "TC-LV-309",
+          "severity": "P1",
+          "scenario": "End Date set before Start Date triggers a validation error",
+          "steps": "1. Open the Add Leave drawer.\n2. Set Start Date to a future date (e.g. next Friday).\n3. Set End Date to a date before the Start Date.\n4. Click the submit button.",
+          "expected": "A validation error is shown indicating the End Date must be on or after the Start Date. The leave is not created."
+        },
+        {
+          "id": "TC-LV-310",
+          "severity": "P1",
+          "scenario": "Half Day toggle ON makes the Half Day Period dropdown appear",
+          "steps": "1. Open the Add Leave drawer.\n2. Toggle the Half Day switch ON.",
+          "expected": "The Half Day Period dropdown becomes visible below the toggle, offering 'Morning (AM)' and 'Afternoon (PM)' as options."
+        },
+        {
+          "id": "TC-LV-311",
+          "severity": "P1",
+          "scenario": "Half Day Period is required when Half Day toggle is ON",
+          "steps": "1. Open the Add Leave drawer.\n2. Toggle ON the Half Day toggle.\n3. Do not select a period from the dropdown.\n4. Fill in the other required fields and click submit.",
+          "expected": "A validation error appears under the Half Day Period field. The leave is not created."
+        },
+        {
+          "id": "TC-LV-312",
+          "severity": "P2",
+          "scenario": "Half Day toggle OFF hides the Half Day Period dropdown",
+          "steps": "1. Open the Add Leave drawer.\n2. Toggle ON the Half Day toggle.\n3. Toggle it back OFF.",
+          "expected": "The Half Day Period dropdown disappears when the toggle is turned off."
+        },
+        {
+          "id": "TC-LV-313",
+          "severity": "P2",
+          "scenario": "Note field is optional — form submits without it",
+          "steps": "1. Open the Add Leave drawer.\n2. Fill in Member, Start Date, and End Date.\n3. Leave the Note field empty.\n4. Click submit.",
+          "expected": "The leave is created successfully. The Note is not required for submission."
+        },
+        {
+          "id": "TC-LV-314",
+          "severity": "P2",
+          "scenario": "Note field accepts up to 500 characters",
+          "steps": "1. Open the Add Leave drawer.\n2. Type exactly 500 characters into the Note field.\n3. Fill in required fields and submit.",
+          "expected": "The leave is created with the full 500-character note saved correctly."
+        },
+        {
+          "id": "TC-LV-315",
+          "severity": "P2",
+          "scenario": "Note field does not accept more than 500 characters",
+          "steps": "1. Open the Add Leave drawer.\n2. Attempt to type or paste more than 500 characters into the Note field.",
+          "expected": "Input is capped at 500 characters. Characters beyond the limit are not entered or are trimmed."
+        },
+        {
+          "id": "TC-LV-316",
+          "severity": "P2",
+          "scenario": "Single full-day leave shows 1 in the Days column",
+          "steps": "1. Create a leave where Start Date and End Date are the same day, with Half Day off.\n2. Observe the Days column in the table.",
+          "expected": "The Days column shows '1' for the single full-day leave."
+        },
+        {
+          "id": "TC-LV-317",
+          "severity": "P2",
+          "scenario": "Half-day leave shows 0.5 in the Days column",
+          "steps": "1. Create a half-day leave (AM or PM) with Start Date = End Date.\n2. Observe the Days column.",
+          "expected": "The Days column shows '0.5' for the half-day leave."
+        },
+        {
+          "id": "TC-LV-318",
+          "severity": "P2",
+          "scenario": "Multi-day leave shows the correct day count",
+          "steps": "1. Create a leave from Monday to Friday of a single week (Start = Monday, End = Friday).\n2. Observe the Days column.",
+          "expected": "The Days column shows the correct count of working days for the leave period."
+        },
+        {
+          "id": "TC-LV-319",
+          "severity": "P2",
+          "scenario": "Member dropdown shows only active members",
+          "steps": "1. Open the Add Leave drawer.\n2. Click the Member dropdown to see available options.",
+          "expected": "Only active/current members appear as options. Deactivated or deleted members are not listed."
+        },
+        {
+          "id": "TC-LV-320",
+          "severity": "P2",
+          "scenario": "Closing the create drawer without submitting discards all entered data",
+          "steps": "1. Open the Add Leave drawer.\n2. Fill in some or all fields.\n3. Click the close or Cancel button without submitting.",
+          "expected": "The drawer closes. No leave is created. If reopened, the form is blank."
+        },
+        {
+          "id": "TC-LV-321",
+          "severity": "P1",
+          "scenario": "Submit button shows a busy/loading state while the leave is being created",
+          "steps": "1. Open the Add Leave drawer.\n2. Fill in all required fields.\n3. Click the submit button and observe it immediately.",
+          "expected": "The submit button shows a loading indicator and becomes non-clickable while the request processes."
+        },
+        {
+          "id": "TC-LV-322",
+          "severity": "P1",
+          "scenario": "Success toast appears and drawer closes after successful leave creation",
+          "steps": "1. Create a leave with valid required data and submit.",
+          "expected": "The drawer closes automatically. A success toast notification appears confirming the leave was created."
+        }
+      ]
+    },
+    {
+      "id": "TC-LV-400",
+      "name": "View Drawer",
+      "test_cases": [
+        {
+          "id": "TC-LV-401",
+          "severity": "P0",
+          "scenario": "Clicking a leave row (not an action button) opens the view drawer",
+          "steps": "1. Navigate to the Leaves page.\n2. Click anywhere on a leave table row, avoiding the action buttons.",
+          "expected": "The view drawer slides open showing the full details of the selected leave record."
+        },
+        {
+          "id": "TC-LV-402",
+          "severity": "P1",
+          "scenario": "View drawer displays all expected detail fields",
+          "steps": "1. Click on a leave row to open the view drawer.\n2. Observe all fields shown.",
+          "expected": "The view drawer shows: Member, Start Date, End Date, Days, Type, Note (description), Code (code/mono style), Created (meta), Created by (meta)."
+        },
+        {
+          "id": "TC-LV-403",
+          "severity": "P1",
+          "scenario": "View drawer shows half-day type with AM or PM correctly",
+          "steps": "1. Click on a half-day leave row to open the view drawer.\n2. Check the Type field.",
+          "expected": "The Type field shows 'Half Day' and indicates whether it is AM or PM."
+        },
+        {
+          "id": "TC-LV-404",
+          "severity": "P2",
+          "scenario": "View drawer Note field is blank or empty for leaves created without a note",
+          "steps": "1. Create a leave without entering a note.\n2. Open the view drawer for that leave.",
+          "expected": "The Note field is empty or shows a blank/placeholder state. No error is displayed."
+        },
+        {
+          "id": "TC-LV-405",
+          "severity": "P2",
+          "scenario": "View drawer Note field shows the saved note for leaves with a note",
+          "steps": "1. Create a leave with a note.\n2. Open the view drawer for that leave.",
+          "expected": "The Note field in the view drawer shows the saved note text exactly as entered."
+        },
+        {
+          "id": "TC-LV-406",
+          "severity": "P2",
+          "scenario": "Code field in the view drawer is rendered in monospace/code style",
+          "steps": "1. Open the view drawer for any leave.\n2. Observe the Code field.",
+          "expected": "The Code is displayed in a monospace or code-styled format, visually distinct from regular text."
+        },
+        {
+          "id": "TC-LV-407",
+          "severity": "P2",
+          "scenario": "Created and Created by metadata fields show accurate values",
+          "steps": "1. Create a new leave.\n2. Open the view drawer for that leave.\n3. Check the Created and Created by fields.",
+          "expected": "Created shows the date and time the leave was recorded. Created by shows the name of the user who created it."
+        },
+        {
+          "id": "TC-LV-408",
+          "severity": "P1",
+          "scenario": "Edit leave button in the view drawer footer opens the edit drawer",
+          "steps": "1. Open the view drawer for a leave (as a user with edit permission).\n2. Click the 'Edit leave' button in the footer.",
+          "expected": "The view drawer closes and the edit drawer opens, pre-populated with the selected leave's current data."
+        },
+        {
+          "id": "TC-LV-409",
+          "severity": "P2",
+          "scenario": "Close button in the view drawer closes it without making changes",
+          "steps": "1. Open the view drawer for a leave.\n2. Click the 'Close' button in the footer.",
+          "expected": "The view drawer closes. No changes are made to the leave record. The user is returned to the leave list."
+        }
+      ]
+    },
+    {
+      "id": "TC-LV-500",
+      "name": "Editing a Leave Record",
+      "test_cases": [
+        {
+          "id": "TC-LV-501",
+          "severity": "P0",
+          "scenario": "Clicking the Edit action opens the edit drawer pre-populated with current data",
+          "steps": "1. Navigate to the Leaves page.\n2. Click the Edit action button on a leave row.",
+          "expected": "The edit drawer opens. All fields are pre-populated with the leave's current values: Start Date, End Date, Half Day toggle state, Half Day Period (if applicable), and Note."
+        },
+        {
+          "id": "TC-LV-502",
+          "severity": "P1",
+          "scenario": "Member field is read-only in the edit drawer",
+          "steps": "1. Open the edit drawer for any leave record.\n2. Observe the Member field.",
+          "expected": "The Member field is displayed as a non-editable read-only view field. It cannot be changed in edit mode — the member a leave belongs to cannot be reassigned."
+        },
+        {
+          "id": "TC-LV-503",
+          "severity": "P0",
+          "scenario": "Start Date can be updated and saved successfully",
+          "steps": "1. Open the edit drawer for a leave.\n2. Change the Start Date to a different valid date.\n3. Click the save button.",
+          "expected": "The drawer closes. A success toast appears. The updated Start Date is reflected in the table immediately."
+        },
+        {
+          "id": "TC-LV-504",
+          "severity": "P0",
+          "scenario": "End Date can be updated and saved successfully",
+          "steps": "1. Open the edit drawer for a leave.\n2. Change the End Date to a different valid date (on or after Start Date).\n3. Click the save button.",
+          "expected": "The drawer closes. A success toast appears. The updated End Date is reflected in the table."
+        },
+        {
+          "id": "TC-LV-505",
+          "severity": "P1",
+          "scenario": "Clearing Start Date shows a validation error and prevents saving",
+          "steps": "1. Open the edit drawer.\n2. Clear the Start Date field.\n3. Click the save button.",
+          "expected": "An inline validation error appears under Start Date. The drawer does not close and the change is not saved."
+        },
+        {
+          "id": "TC-LV-506",
+          "severity": "P1",
+          "scenario": "Setting End Date before Start Date shows a validation error in edit mode",
+          "steps": "1. Open the edit drawer.\n2. Set the End Date to a date before the Start Date.\n3. Click the save button.",
+          "expected": "A validation error is shown indicating the End Date must be on or after the Start Date. The change is not saved."
+        },
+        {
+          "id": "TC-LV-507",
+          "severity": "P1",
+          "scenario": "Half Day can be toggled ON for an existing full-day leave",
+          "steps": "1. Open the edit drawer for a full-day leave.\n2. Toggle ON the Half Day toggle.\n3. Select AM or PM from the Half Day Period dropdown.\n4. Click save.",
+          "expected": "The leave is updated to half-day. The Type column in the table changes to reflect the new half-day type with the correct period."
+        },
+        {
+          "id": "TC-LV-508",
+          "severity": "P1",
+          "scenario": "Half Day can be toggled OFF for an existing half-day leave",
+          "steps": "1. Open the edit drawer for a half-day leave.\n2. Toggle OFF the Half Day toggle.\n3. Click save.",
+          "expected": "The leave is updated to full-day. The Type column changes to 'Full Day'. The Half Day Period dropdown is hidden."
+        },
+        {
+          "id": "TC-LV-509",
+          "severity": "P1",
+          "scenario": "Half Day Period is still required when Half Day is ON in edit mode",
+          "steps": "1. Open the edit drawer for a full-day leave.\n2. Toggle ON the Half Day toggle.\n3. Do not select a period.\n4. Click save.",
+          "expected": "A validation error appears under the Half Day Period field. The change is not saved."
+        },
+        {
+          "id": "TC-LV-510",
+          "severity": "P2",
+          "scenario": "Note can be added to a leave that had no note",
+          "steps": "1. Open the edit drawer for a leave with no note.\n2. Type a new note.\n3. Click save.",
+          "expected": "The note is saved. The view drawer for that leave now shows the note text."
+        },
+        {
+          "id": "TC-LV-511",
+          "severity": "P2",
+          "scenario": "Note can be cleared from an existing leave",
+          "steps": "1. Open the edit drawer for a leave that has a note.\n2. Clear the note field completely.\n3. Click save.",
+          "expected": "The note is removed. The view drawer for that leave shows no note."
+        },
+        {
+          "id": "TC-LV-512",
+          "severity": "P2",
+          "scenario": "Days count in the table updates after extending the date range in edit mode",
+          "steps": "1. Open the edit drawer for a 2-day leave.\n2. Extend the End Date by 3 more days.\n3. Save.",
+          "expected": "The Days column in the table updates to reflect the new 5-day total without requiring a page refresh."
+        },
+        {
+          "id": "TC-LV-513",
+          "severity": "P2",
+          "scenario": "Closing the edit drawer without saving discards all changes",
+          "steps": "1. Open the edit drawer for a leave.\n2. Change the Start Date.\n3. Click Cancel or close the drawer.",
+          "expected": "The drawer closes. The leave record in the table is unchanged from before the edit drawer was opened."
+        },
+        {
+          "id": "TC-LV-514",
+          "severity": "P1",
+          "scenario": "Success toast appears after successfully saving changes",
+          "steps": "1. Open the edit drawer.\n2. Make a valid change.\n3. Click save.",
+          "expected": "A success toast notification appears confirming the leave was updated."
+        }
+      ]
+    },
+    {
+      "id": "TC-LV-600",
+      "name": "Deleting a Leave Record",
+      "test_cases": [
+        {
+          "id": "TC-LV-601",
+          "severity": "P0",
+          "scenario": "Clicking the Delete action opens a confirmation modal",
+          "steps": "1. Navigate to the Leaves page.\n2. Click the Delete action button on any leave row.",
+          "expected": "A delete confirmation modal appears. It references the leave being deleted and prompts the user to confirm."
+        },
+        {
+          "id": "TC-LV-602",
+          "severity": "P0",
+          "scenario": "Confirming deletion permanently removes the leave record",
+          "steps": "1. Click Delete on a leave.\n2. Type the required confirmation text in the modal.\n3. Click the confirm delete button.",
+          "expected": "The modal closes. The leave record is removed from the table immediately. A success toast confirms the deletion."
+        },
+        {
+          "id": "TC-LV-603",
+          "severity": "P1",
+          "scenario": "Delete confirm button is disabled until the correct text is typed",
+          "steps": "1. Click Delete on a leave.\n2. Observe the confirm button before typing anything.\n3. Type an incorrect value into the confirmation field.",
+          "expected": "The confirm button remains disabled when the confirmation field is empty or contains incorrect text."
+        },
+        {
+          "id": "TC-LV-604",
+          "severity": "P1",
+          "scenario": "Delete confirm button becomes enabled after typing the correct confirmation text",
+          "steps": "1. Click Delete on a leave.\n2. Type the exact confirmation text shown in the modal.",
+          "expected": "The confirm delete button becomes enabled once the correct text is entered."
+        },
+        {
+          "id": "TC-LV-605",
+          "severity": "P1",
+          "scenario": "Cancelling the delete modal keeps the leave intact",
+          "steps": "1. Click Delete on a leave.\n2. Click Cancel in the confirmation modal.",
+          "expected": "The modal closes. The leave record remains in the table unchanged."
+        },
+        {
+          "id": "TC-LV-606",
+          "severity": "P2",
+          "scenario": "No Activate or Deactivate option exists for leave records",
+          "steps": "1. Navigate to the Leaves page.\n2. Check available row actions for any leave.",
+          "expected": "Only Edit and Delete actions are available. There are no Activate or Deactivate actions since leave records have no active/inactive status."
+        },
+        {
+          "id": "TC-LV-607",
+          "severity": "P3",
+          "scenario": "Delete confirmation modal warns that the action is permanent",
+          "steps": "1. Click Delete on any leave.\n2. Read the body text of the confirmation modal.",
+          "expected": "The modal clearly communicates that the deletion is permanent and cannot be undone."
+        }
+      ]
+    },
+    {
+      "id": "TC-LV-700",
+      "name": "Importing Leaves",
+      "test_cases": [
+        {
+          "id": "TC-LV-701",
+          "severity": "P1",
+          "scenario": "Import button is visible on the Leaves page",
+          "steps": "1. Navigate to the Leaves page with manage permissions.",
+          "expected": "An Import button is visible in the page header actions area."
+        },
+        {
+          "id": "TC-LV-702",
+          "severity": "P1",
+          "scenario": "Clicking Import opens the import view",
+          "steps": "1. Click the Import button on the Leaves page.",
+          "expected": "The import view opens with options to download a sample file and upload a file."
+        },
+        {
+          "id": "TC-LV-703",
+          "severity": "P2",
+          "scenario": "Sample import file can be downloaded from the import view",
+          "steps": "1. Open the import view.\n2. Click the sample file download link or button.",
+          "expected": "A CSV sample file is downloaded. It includes columns for: member, start_date, end_date, is_half_day, half_day_period, note."
+        },
+        {
+          "id": "TC-LV-704",
+          "severity": "P0",
+          "scenario": "A valid CSV of leave records imports successfully",
+          "steps": "1. Prepare a correctly formatted CSV with valid member, start_date, and end_date values.\n2. Upload it in the import view and confirm the import.",
+          "expected": "The import completes successfully. A success message shows the count of imported records. The table refreshes and shows the imported leaves."
+        },
+        {
+          "id": "TC-LV-705",
+          "severity": "P1",
+          "scenario": "Uploading a non-CSV file is rejected",
+          "steps": "1. Open the import view.\n2. Attempt to upload a .xlsx, .pdf, or image file.",
+          "expected": "The import view rejects the file and shows an error message indicating the file type is not supported."
+        },
+        {
+          "id": "TC-LV-706",
+          "severity": "P1",
+          "scenario": "Importing a row with an unrecognised member email shows a row-level error",
+          "steps": "1. Prepare a CSV with a member field referencing an email address not in the system.\n2. Import it.",
+          "expected": "The import reports an error for that specific row. The row is skipped. Valid rows in the same file may still import."
+        },
+        {
+          "id": "TC-LV-707",
+          "severity": "P1",
+          "scenario": "Importing a row where End Date is before Start Date shows a row-level validation error",
+          "steps": "1. Prepare a CSV row with end_date set to a date before start_date.\n2. Import it.",
+          "expected": "The import reports a date validation error for that row. The row is not imported."
+        },
+        {
+          "id": "TC-LV-708",
+          "severity": "P1",
+          "scenario": "Importing a half-day row without a period value shows a row-level error",
+          "steps": "1. Prepare a CSV row with is_half_day=true but no half_day_period value.\n2. Import it.",
+          "expected": "The import reports a validation error for that row indicating the half-day period is required."
+        },
+        {
+          "id": "TC-LV-709",
+          "severity": "P2",
+          "scenario": "Importing a note exceeding 500 characters shows a row-level error",
+          "steps": "1. Prepare a CSV row with a note column containing more than 500 characters.\n2. Import it.",
+          "expected": "The import reports a validation error for that row. The row is skipped."
+        },
+        {
+          "id": "TC-LV-710",
+          "severity": "P1",
+          "scenario": "Table refreshes automatically after a successful import",
+          "steps": "1. Import a valid CSV with new leave records.\n2. Observe the table after the import completes.",
+          "expected": "The table refreshes automatically and shows the newly imported leave records without a manual page reload."
+        }
+      ]
+    },
+    {
+      "id": "TC-LV-800",
+      "name": "Exporting Leaves",
+      "test_cases": [
+        {
+          "id": "TC-LV-801",
+          "severity": "P1",
+          "scenario": "Export button is visible on the Leaves page",
+          "steps": "1. Navigate to the Leaves page with manage permissions.",
+          "expected": "An Export button is visible in the page header actions area."
+        },
+        {
+          "id": "TC-LV-802",
+          "severity": "P1",
+          "scenario": "Clicking Export opens the export view",
+          "steps": "1. Click the Export button on the Leaves page.",
+          "expected": "The export configuration panel opens."
+        },
+        {
+          "id": "TC-LV-803",
+          "severity": "P0",
+          "scenario": "Leaves can be exported and a file is downloaded",
+          "steps": "1. Open the export view.\n2. Configure the export and click Export/Download.",
+          "expected": "A file is downloaded to the user's device containing leave data."
+        },
+        {
+          "id": "TC-LV-804",
+          "severity": "P1",
+          "scenario": "Exported file contains the expected columns",
+          "steps": "1. Export all leave records.\n2. Open the downloaded file.",
+          "expected": "The exported file includes columns for: Member, Start Date, End Date, Days, Type (or is_half_day/half_day_period), and Code at minimum."
+        },
+        {
+          "id": "TC-LV-805",
+          "severity": "P1",
+          "scenario": "Export respects the active Member filter",
+          "steps": "1. Filter the Leaves page by a specific member.\n2. Export.",
+          "expected": "The exported file contains only leave records for the filtered member, not all members."
+        },
+        {
+          "id": "TC-LV-806",
+          "severity": "P2",
+          "scenario": "Half-day leaves are accurately represented in the export",
+          "steps": "1. Ensure half-day leaves exist.\n2. Export the leave records.\n3. Open the file and inspect half-day rows.",
+          "expected": "Half-day leave rows show the correct is_half_day value (true) and the correct period (AM or PM)."
+        },
+        {
+          "id": "TC-LV-807",
+          "severity": "P2",
+          "scenario": "Export view can be closed without exporting",
+          "steps": "1. Open the export view.\n2. Close it without initiating a download.",
+          "expected": "The export view closes cleanly. No file is downloaded and no data is changed."
+        }
+      ]
+    },
+    {
+      "id": "TC-LV-900",
+      "name": "Non-Functional & Accessibility",
+      "test_cases": [
+        {
+          "id": "TC-LV-901",
+          "severity": "P1",
+          "scenario": "All interactive elements on the Leaves page are keyboard accessible",
+          "steps": "1. Navigate to the Leaves page.\n2. Use only Tab and Enter/Space keys to reach and activate all controls: filters, buttons, table rows, row actions.",
+          "expected": "Every interactive element is reachable and operable via keyboard navigation alone."
+        },
+        {
+          "id": "TC-LV-902",
+          "severity": "P1",
+          "scenario": "Full leave creation flow can be completed via keyboard only",
+          "steps": "1. Use keyboard to click the Add Leave button.\n2. Tab through the Member, Start Date, End Date, Half Day toggle, and Note fields.\n3. Submit using the keyboard.",
+          "expected": "A leave is created successfully without touching the mouse."
+        },
+        {
+          "id": "TC-LV-903",
+          "severity": "P2",
+          "scenario": "Focus is trapped within open drawers",
+          "steps": "1. Open the Add Leave drawer.\n2. Press Tab repeatedly.",
+          "expected": "Focus cycles within the drawer and does not escape to the page behind. Pressing Tab on the last focusable element wraps back to the first."
+        },
+        {
+          "id": "TC-LV-904",
+          "severity": "P2",
+          "scenario": "Delete confirmation modal is keyboard accessible",
+          "steps": "1. Trigger the delete modal via keyboard.\n2. Tab between Cancel and Confirm buttons.\n3. Press Enter on Confirm.",
+          "expected": "Focus is properly managed inside the modal. Cancel and Confirm are reachable by Tab. Pressing Enter activates the focused button."
+        },
+        {
+          "id": "TC-LV-905",
+          "severity": "P2",
+          "scenario": "Validation error messages are clear and descriptive",
+          "steps": "1. Submit the create form with all required fields empty.\n2. Read the validation messages.",
+          "expected": "Each error message is human-readable and clearly explains what the user needs to provide (e.g. 'Member is required', 'Start Date is required')."
+        },
+        {
+          "id": "TC-LV-906",
+          "severity": "P1",
+          "scenario": "No internal error details or stack traces are exposed to the user",
+          "steps": "1. Trigger various error conditions on the Leaves page (invalid input, network errors).\n2. Observe any error messages displayed.",
+          "expected": "Error messages are user-friendly and do not expose stack traces, database errors, internal IDs, or server configuration."
+        },
+        {
+          "id": "TC-LV-907",
+          "severity": "P0",
+          "scenario": "Session expiry redirects user to login when attempting a leave action",
+          "steps": "1. Allow the session to expire or clear the session cookie.\n2. Attempt to create or edit a leave.",
+          "expected": "The user is redirected to the login page. No leave data is altered."
+        },
+        {
+          "id": "TC-LV-908",
+          "severity": "P2",
+          "scenario": "Page renders correctly in dark theme",
+          "steps": "1. Navigate to the Leaves page.\n2. Toggle to dark theme using the theme toggle.",
+          "expected": "All elements — table, filters, drawers, modals, and toasts — render correctly in dark theme with no visual breakage."
+        },
+        {
+          "id": "TC-LV-909",
+          "severity": "P3",
+          "scenario": "Leave list page loads within an acceptable time",
+          "steps": "1. Navigate to the Leaves page on a standard internet connection.",
+          "expected": "The page and leave data load within a reasonable time (typically under 3 seconds)."
+        }
+      ]
+    },
+    {
+      "id": "TC-LV-1000",
+      "name": "Desktop Layout",
+      "test_cases": [
+        {
+          "id": "TC-LV-1001",
+          "severity": "P1",
+          "scenario": "All table columns are visible on desktop viewports",
+          "steps": "1. Open the Leaves page on a desktop browser (viewport ≥ 1024px).",
+          "expected": "All columns are visible: Member, Start Date, End Date, Days, Type, Code."
+        },
+        {
+          "id": "TC-LV-1002",
+          "severity": "P2",
+          "scenario": "Search and Member filter are displayed inline in the filter bar on desktop",
+          "steps": "1. Open the Leaves page on a desktop viewport.",
+          "expected": "The Search field and Member filter are displayed in a horizontal filter bar above the table, not stacked or hidden."
+        },
+        {
+          "id": "TC-LV-1003",
+          "severity": "P2",
+          "scenario": "Start Date and End Date fields appear side by side in the create drawer on desktop",
+          "steps": "1. Open the Add Leave drawer on a desktop viewport.",
+          "expected": "The Start Date and End Date fields are positioned side by side (two columns) rather than stacked vertically."
+        },
+        {
+          "id": "TC-LV-1004",
+          "severity": "P2",
+          "scenario": "Drawers open as a side panel overlay on desktop",
+          "steps": "1. Open any drawer (create, edit, or view) on a desktop browser.",
+          "expected": "The drawer slides in from the right as a side panel. The main page content remains partially visible behind it."
+        },
+        {
+          "id": "TC-LV-1005",
+          "severity": "P2",
+          "scenario": "Import, Export, and Add Leave buttons are aligned in the top-right on desktop",
+          "steps": "1. Open the Leaves page on a desktop viewport.",
+          "expected": "All three header action buttons (Import, Export, Add Leave) are aligned horizontally in the top-right area without overflow."
+        }
+      ]
+    },
+    {
+      "id": "TC-LV-1100",
+      "name": "Mobile & Responsive",
+      "test_cases": [
+        {
+          "id": "TC-LV-1101",
+          "severity": "P1",
+          "scenario": "Secondary columns are hidden on mobile viewports",
+          "steps": "1. Open the Leaves page on a mobile viewport (≤ 767px).",
+          "expected": "End Date, Days, Type, and Code columns are hidden. Only Member and Start Date remain visible."
+        },
+        {
+          "id": "TC-LV-1102",
+          "severity": "P1",
+          "scenario": "Add Leave drawer is fully usable on mobile",
+          "steps": "1. Open the Add Leave drawer on a mobile device.\n2. Fill in Member, Start Date, and End Date.\n3. Submit.",
+          "expected": "The drawer opens and all fields are accessible on mobile. The leave is created successfully without layout issues."
+        },
+        {
+          "id": "TC-LV-1103",
+          "severity": "P2",
+          "scenario": "Start Date and End Date fields stack vertically in the create drawer on mobile",
+          "steps": "1. Open the Add Leave drawer on a mobile viewport.",
+          "expected": "Start Date and End Date fields are stacked vertically (full width each) rather than side by side, making them easier to tap."
+        },
+        {
+          "id": "TC-LV-1104",
+          "severity": "P2",
+          "scenario": "View drawer is fully readable on mobile",
+          "steps": "1. Tap a leave row on a mobile device.",
+          "expected": "The view drawer opens and all fields — Member, Dates, Days, Type, Note, Code — are readable without horizontal scrolling."
+        },
+        {
+          "id": "TC-LV-1105",
+          "severity": "P2",
+          "scenario": "Member filter is accessible and usable on mobile",
+          "steps": "1. Open the Leaves page on a mobile viewport.\n2. Tap the Member filter.",
+          "expected": "The Member filter dropdown opens correctly on mobile. A member can be selected and the list filters accordingly."
+        },
+        {
+          "id": "TC-LV-1106",
+          "severity": "P2",
+          "scenario": "Delete confirmation modal is usable on mobile",
+          "steps": "1. On a mobile device, tap Delete for a leave.\n2. Interact with the confirmation modal.",
+          "expected": "The confirmation modal displays properly on mobile. The text input and Cancel/Confirm buttons are tappable and work correctly."
+        },
+        {
+          "id": "TC-LV-1107",
+          "severity": "P3",
+          "scenario": "Page header does not overflow on small mobile viewports",
+          "steps": "1. Open the Leaves page on a 375px-wide viewport.",
+          "expected": "The title and action buttons do not overflow, overlap, or extend beyond the screen edge."
+        }
+      ]
+    },
+    {
+      "id": "TC-LV-1200",
+      "name": "Integration with Other Modules",
+      "test_cases": [
+        {
+          "id": "TC-LV-1201",
+          "severity": "P1",
+          "scenario": "Leave days reduce member capacity in sprint and resource planning views",
+          "steps": "1. Record a 3-day leave for a member during a sprint period.\n2. Navigate to the sprint or resource plan that covers those dates.",
+          "expected": "The member's available capacity for that sprint is reduced by 3 days to reflect the recorded leave."
+        },
+        {
+          "id": "TC-LV-1202",
+          "severity": "P1",
+          "scenario": "A half-day leave reduces member capacity by 0.5 days in planning views",
+          "steps": "1. Record a half-day AM leave for a member on a specific date.\n2. Navigate to the sprint or capacity plan covering that date.",
+          "expected": "The member's capacity is reduced by 0.5 days for that date, not a full day."
+        },
+        {
+          "id": "TC-LV-1203",
+          "severity": "P1",
+          "scenario": "Member dropdown in the create drawer reflects only active organisation members",
+          "steps": "1. Open the Add Leave drawer.\n2. Click the Member dropdown and inspect the options.",
+          "expected": "Only currently active members of the organisation appear. Deactivated or deleted members are not shown."
+        },
+        {
+          "id": "TC-LV-1204",
+          "severity": "P2",
+          "scenario": "Leaves are accessible from the Calendar section alongside Holidays",
+          "steps": "1. Open the main navigation.\n2. Expand or navigate to the Calendar section.",
+          "expected": "Both 'Holidays' and 'Leaves' are listed in the Calendar section. Clicking Leaves navigates to the Leaves page."
+        },
+        {
+          "id": "TC-LV-1205",
+          "severity": "P1",
+          "scenario": "All leave records for a member are shown when filtering by that member",
+          "steps": "1. Create multiple leave records for Member A across different date ranges.\n2. Navigate to the Leaves page.\n3. Filter by Member A.",
+          "expected": "All leave records for Member A are displayed. No records for other members are shown."
+        },
+        {
+          "id": "TC-LV-1206",
+          "severity": "P2",
+          "scenario": "Deactivating a member does not cause visible errors on the Leaves page",
+          "steps": "1. Create several leave records for a member.\n2. Deactivate that member in the Users/Members module.\n3. Navigate to the Leaves page.",
+          "expected": "Existing leave records for the deactivated member are still visible in the table without errors. The deactivated member's name is shown."
+        },
+        {
+          "id": "TC-LV-1207",
+          "severity": "P3",
+          "scenario": "Public holidays in the Holidays module do not double-count capacity reduction",
+          "steps": "1. Add a public holiday for a date.\n2. Also create a leave record for a member on that same date.\n3. Navigate to the capacity or sprint plan covering that date.",
+          "expected": "The capacity for that day is not double-reduced. The system treats the day as a non-working day only once."
+        }
+      ]
+    }
+  ]
+}

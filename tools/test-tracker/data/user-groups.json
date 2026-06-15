@@ -1,0 +1,553 @@
+{
+  "module": {
+    "slug": "user-groups",
+    "name": "User Groups",
+    "sort_order": 20,
+    "parent": {
+      "slug": "administration",
+      "name": "Administration",
+      "sort_order": 8
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-GR-100",
+      "name": "Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-GR-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user is redirected from the Groups page",
+          "steps": "1. Open the Groups page URL without being logged in.",
+          "expected": "The browser redirects to the login page. The Groups list is not shown."
+        },
+        {
+          "id": "TC-GR-102",
+          "severity": "P1",
+          "scenario": "User with 'can_change_group' sees Edit, Toggle, Assign Member, and Assign Permissions actions",
+          "steps": "1. Log in as a user with 'can_change_group' permission.\n2. Navigate to Administration > Groups.\n3. Expand a row's action menu.",
+          "expected": "Edit, Toggle (activate/deactivate), Assign Member, and Assign Permissions actions are all visible."
+        },
+        {
+          "id": "TC-GR-103",
+          "severity": "P1",
+          "scenario": "User with 'can_delete_group' sees the Delete action on rows",
+          "steps": "1. Log in as a user with 'can_delete_group' permission.\n2. Navigate to Administration > Groups.\n3. Expand a row's action menu.",
+          "expected": "A Delete action (danger-styled) is visible in the row actions."
+        },
+        {
+          "id": "TC-GR-104",
+          "severity": "P1",
+          "scenario": "User without management permissions sees no row actions",
+          "steps": "1. Log in as a user with view-only access.\n2. Navigate to Administration > Groups.",
+          "expected": "No Edit, Toggle, Assign Member, Assign Permissions, or Delete actions appear on any group row."
+        },
+        {
+          "id": "TC-GR-105",
+          "severity": "P1",
+          "scenario": "New Group, Import, and Export buttons are available regardless of specific role",
+          "steps": "1. Navigate to Administration > Groups.\n2. Check the page header buttons.",
+          "expected": "New Group, Import, and Export buttons are visible in the page header when the page is loaded."
+        }
+      ]
+    },
+    {
+      "id": "TC-GR-200",
+      "name": "Browsing & Filtering",
+      "test_cases": [
+        {
+          "id": "TC-GR-201",
+          "severity": "P0",
+          "scenario": "Groups page loads with the correct layout and table",
+          "steps": "1. Navigate to Administration > Groups.",
+          "expected": "The page shows 'Administration' eyebrow, 'Groups' heading, and subtitle 'Manage permission groups and their members.' The filter panel and table are visible with columns: Name, Code, Members, Type, Status."
+        },
+        {
+          "id": "TC-GR-202",
+          "severity": "P1",
+          "scenario": "Default filter shows only active groups",
+          "steps": "1. Navigate to Administration > Groups.\n2. Check the Is Active filter.",
+          "expected": "Is Active is set to 'Active' by default. Only active groups are shown."
+        },
+        {
+          "id": "TC-GR-203",
+          "severity": "P1",
+          "scenario": "Search by group name filters the list",
+          "steps": "1. Navigate to Administration > Groups.\n2. Type a group name in the search field.",
+          "expected": "Only groups whose names match the search term are shown."
+        },
+        {
+          "id": "TC-GR-204",
+          "severity": "P1",
+          "scenario": "Is Active filter set to 'All' shows both active and inactive groups",
+          "steps": "1. Navigate to Administration > Groups.\n2. Change Is Active to 'All'.",
+          "expected": "Both active and inactive groups are listed."
+        },
+        {
+          "id": "TC-GR-205",
+          "severity": "P2",
+          "scenario": "Table can be sorted by Name column",
+          "steps": "1. Navigate to Administration > Groups.\n2. Click the Name column header.",
+          "expected": "Groups are sorted alphabetically by name. Clicking again reverses the direction."
+        },
+        {
+          "id": "TC-GR-206",
+          "severity": "P2",
+          "scenario": "Members column shows the count of users in each group",
+          "steps": "1. Navigate to Administration > Groups.\n2. Read the Members column for several groups.",
+          "expected": "The Members column shows the numeric count of users assigned to each group."
+        },
+        {
+          "id": "TC-GR-207",
+          "severity": "P2",
+          "scenario": "Type column distinguishes admin groups from regular groups",
+          "steps": "1. Navigate to Administration > Groups.\n2. View the Type column.",
+          "expected": "Admin groups are marked with a badge or label distinguishing them from standard permission groups."
+        },
+        {
+          "id": "TC-GR-208",
+          "severity": "P2",
+          "scenario": "Pressing '/' focuses the search field",
+          "steps": "1. Navigate to Administration > Groups.\n2. Press '/' on the keyboard.",
+          "expected": "The search field receives focus."
+        },
+        {
+          "id": "TC-GR-209",
+          "severity": "P2",
+          "scenario": "Empty state shown when no groups match the search",
+          "steps": "1. Navigate to Administration > Groups.\n2. Search for a name that matches no group.",
+          "expected": "'No groups found.' message is displayed in the table area."
+        }
+      ]
+    },
+    {
+      "id": "TC-GR-300",
+      "name": "Creating Groups",
+      "test_cases": [
+        {
+          "id": "TC-GR-301",
+          "severity": "P0",
+          "scenario": "Clicking New Group opens the create group drawer",
+          "steps": "1. Navigate to Administration > Groups.\n2. Click 'New Group'.",
+          "expected": "The create group drawer opens with Group name and Description fields."
+        },
+        {
+          "id": "TC-GR-302",
+          "severity": "P0",
+          "scenario": "Creating a group with a valid name adds it to the list",
+          "steps": "1. Open the create group drawer.\n2. Enter a group name (e.g., 'Project Managers').\n3. Click 'Create group'.",
+          "expected": "The drawer closes, a success toast appears, and the new group is shown in the table."
+        },
+        {
+          "id": "TC-GR-303",
+          "severity": "P1",
+          "scenario": "Group name is required — cannot create without it",
+          "steps": "1. Open the create group drawer.\n2. Leave the Group name blank.\n3. Click 'Create group'.",
+          "expected": "A validation error appears on the Group name field. The group is not created."
+        },
+        {
+          "id": "TC-GR-304",
+          "severity": "P2",
+          "scenario": "Group name has a maximum length of 150 characters",
+          "steps": "1. Open the create group drawer.\n2. Enter more than 150 characters in the Group name field.",
+          "expected": "The field enforces the 150-character limit. Input beyond the limit is rejected or flagged."
+        },
+        {
+          "id": "TC-GR-305",
+          "severity": "P2",
+          "scenario": "Description is optional — group can be created without it",
+          "steps": "1. Open the create group drawer.\n2. Enter a group name but leave Description blank.\n3. Click 'Create group'.",
+          "expected": "The group is created successfully without a description."
+        },
+        {
+          "id": "TC-GR-306",
+          "severity": "P2",
+          "scenario": "Description has a maximum length of 255 characters",
+          "steps": "1. Open the create group drawer.\n2. Enter more than 255 characters in the Description field.",
+          "expected": "The field enforces the 255-character limit."
+        },
+        {
+          "id": "TC-GR-307",
+          "severity": "P1",
+          "scenario": "Cancel button closes the create group drawer without saving",
+          "steps": "1. Open the create group drawer.\n2. Enter some details.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. No group is created."
+        },
+        {
+          "id": "TC-GR-308",
+          "severity": "P1",
+          "scenario": "Duplicate group name is rejected",
+          "steps": "1. Open the create group drawer.\n2. Enter a name that already exists.\n3. Click 'Create group'.",
+          "expected": "An error toast or inline error appears indicating the name is already taken."
+        }
+      ]
+    },
+    {
+      "id": "TC-GR-400",
+      "name": "Editing Groups",
+      "test_cases": [
+        {
+          "id": "TC-GR-401",
+          "severity": "P1",
+          "scenario": "Edit action opens the edit drawer with the group's current name and description",
+          "steps": "1. Navigate to Administration > Groups.\n2. Click the Edit action on a group.",
+          "expected": "The edit group drawer opens. The Group name and Description fields are pre-filled with the current values."
+        },
+        {
+          "id": "TC-GR-402",
+          "severity": "P1",
+          "scenario": "Saving changes updates the group's name and description",
+          "steps": "1. Open the edit drawer for a group.\n2. Change the Group name and/or Description.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes. A success toast appears. The Name column in the table reflects the updated name."
+        },
+        {
+          "id": "TC-GR-403",
+          "severity": "P1",
+          "scenario": "Group name cannot be cleared in the edit drawer",
+          "steps": "1. Open the edit drawer for a group.\n2. Clear the Group name field.\n3. Click 'Save changes'.",
+          "expected": "A validation error appears on the Group name field. The group is not saved with an empty name."
+        },
+        {
+          "id": "TC-GR-404",
+          "severity": "P1",
+          "scenario": "Cancel button in edit drawer discards changes",
+          "steps": "1. Open the edit drawer for a group.\n2. Change the name.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. The group name in the table is unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-GR-500",
+      "name": "Group Detail Page",
+      "test_cases": [
+        {
+          "id": "TC-GR-501",
+          "severity": "P1",
+          "scenario": "Clicking a group row navigates to the group detail page",
+          "steps": "1. Navigate to Administration > Groups.\n2. Click on any group row.",
+          "expected": "The browser navigates to the group detail page for the selected group."
+        },
+        {
+          "id": "TC-GR-502",
+          "severity": "P1",
+          "scenario": "Group detail page shows the group's key information in the left panel",
+          "steps": "1. Navigate to a group's detail page.",
+          "expected": "The left panel shows: Name, Code (monospace), Status, Type (admin or regular), Members count, Description, Created, and Created by. Below it, a Permissions panel shows the group's assigned permissions."
+        },
+        {
+          "id": "TC-GR-503",
+          "severity": "P1",
+          "scenario": "Group detail page shows the members table in the right panel",
+          "steps": "1. Navigate to a group's detail page.",
+          "expected": "The right panel shows a 'Members' section with a searchable, filterable table showing assigned members (Name, Email, Auth Type, Status)."
+        },
+        {
+          "id": "TC-GR-504",
+          "severity": "P1",
+          "scenario": "Members table on detail page shows only active members by default",
+          "steps": "1. Navigate to a group's detail page.\n2. Check the Is Active filter in the Members section.",
+          "expected": "The Is Active filter defaults to 'Active'. Only active members of the group are shown."
+        },
+        {
+          "id": "TC-GR-505",
+          "severity": "P1",
+          "scenario": "Unassign action removes a member from the group",
+          "steps": "1. Navigate to a group's detail page.\n2. Click the 'Unassign' action on a member in the Members table.\n3. Confirm the action in the confirmation modal.",
+          "expected": "The member is removed from the group. A success toast appears. The member no longer appears in the group's member list."
+        },
+        {
+          "id": "TC-GR-506",
+          "severity": "P1",
+          "scenario": "Assign Permissions button on detail page opens the permissions drawer",
+          "steps": "1. Navigate to a group's detail page.\n2. Click 'Assign Permissions' in the page header.",
+          "expected": "The Assign Permissions drawer opens for this group."
+        },
+        {
+          "id": "TC-GR-507",
+          "severity": "P1",
+          "scenario": "Assign Member button on detail page opens the assign member drawer",
+          "steps": "1. Navigate to a group's detail page.\n2. Click 'Assign Member' in the page header.",
+          "expected": "The Assign Member drawer opens, allowing a member to be selected and added to the group."
+        },
+        {
+          "id": "TC-GR-508",
+          "severity": "P2",
+          "scenario": "Empty state shown in members table when no members are assigned",
+          "steps": "1. Navigate to the detail page of a group with no members.",
+          "expected": "'No members assigned to this group.' is shown in the members table."
+        }
+      ]
+    },
+    {
+      "id": "TC-GR-600",
+      "name": "Activating & Deactivating Groups",
+      "test_cases": [
+        {
+          "id": "TC-GR-601",
+          "severity": "P1",
+          "scenario": "Toggle action on an active group opens a deactivation confirmation",
+          "steps": "1. Navigate to Administration > Groups.\n2. Click Toggle on an active group.",
+          "expected": "A deactivation confirmation modal appears."
+        },
+        {
+          "id": "TC-GR-602",
+          "severity": "P1",
+          "scenario": "Confirming deactivation changes the group's status to Inactive",
+          "steps": "1. Click Toggle on an active group.\n2. Confirm in the modal.",
+          "expected": "The modal closes. A success toast appears. The group's Status column shows 'Inactive'."
+        },
+        {
+          "id": "TC-GR-603",
+          "severity": "P1",
+          "scenario": "Toggle action on an inactive group opens an activation confirmation",
+          "steps": "1. Find an inactive group (set Is Active to 'All').\n2. Click Toggle on it.",
+          "expected": "An activation confirmation modal appears."
+        },
+        {
+          "id": "TC-GR-604",
+          "severity": "P1",
+          "scenario": "Confirming activation changes the group's status to Active",
+          "steps": "1. Click Toggle on an inactive group.\n2. Confirm in the modal.",
+          "expected": "The group's Status column updates to 'Active'."
+        }
+      ]
+    },
+    {
+      "id": "TC-GR-700",
+      "name": "Assigning Permissions to Groups",
+      "test_cases": [
+        {
+          "id": "TC-GR-701",
+          "severity": "P1",
+          "scenario": "Assign Permissions action on a group row opens the permissions drawer",
+          "steps": "1. Navigate to Administration > Groups.\n2. Click 'Assign Permissions' on a group row.",
+          "expected": "The Assign Permissions drawer opens with the group's current permissions shown."
+        },
+        {
+          "id": "TC-GR-702",
+          "severity": "P1",
+          "scenario": "Saving permissions updates the group's access rights",
+          "steps": "1. Open the Assign Permissions drawer for a group.\n2. Toggle permissions on or off.\n3. Click 'Save permissions'.",
+          "expected": "The drawer closes with a success toast. Group members now have the updated permissions."
+        },
+        {
+          "id": "TC-GR-703",
+          "severity": "P1",
+          "scenario": "Cancelling the permissions drawer does not save changes",
+          "steps": "1. Open the Assign Permissions drawer.\n2. Change some permissions.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. The group's permissions are unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-GR-800",
+      "name": "Assigning & Unassigning Members",
+      "test_cases": [
+        {
+          "id": "TC-GR-801",
+          "severity": "P1",
+          "scenario": "Assign Member action on a group row opens the assign member drawer",
+          "steps": "1. Navigate to Administration > Groups.\n2. Click 'Assign Member' on a group row.",
+          "expected": "The Assign Member drawer opens with a member selection field."
+        },
+        {
+          "id": "TC-GR-802",
+          "severity": "P1",
+          "scenario": "Member is required — cannot assign without selecting one",
+          "steps": "1. Open the Assign Member drawer.\n2. Leave the Member field empty.\n3. Click 'Assign member'.",
+          "expected": "A validation error appears on the Member field. No assignment is made."
+        },
+        {
+          "id": "TC-GR-803",
+          "severity": "P1",
+          "scenario": "Selecting a member and confirming adds them to the group",
+          "steps": "1. Open the Assign Member drawer for a group.\n2. Select a member from the dropdown.\n3. Click 'Assign member'.",
+          "expected": "The drawer closes. A success toast appears. The group's Members count increments and the member appears in the group's detail page."
+        },
+        {
+          "id": "TC-GR-804",
+          "severity": "P1",
+          "scenario": "Cancel button closes the assign member drawer without adding anyone",
+          "steps": "1. Open the Assign Member drawer.\n2. Select a member.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. No member is added to the group."
+        },
+        {
+          "id": "TC-GR-805",
+          "severity": "P1",
+          "scenario": "Unassigning a member from the group detail page removes them",
+          "steps": "1. Navigate to a group's detail page.\n2. Click 'Unassign' on a member in the Members table.\n3. Confirm the removal in the confirmation modal.",
+          "expected": "The member is removed from the group's member list. The Members count decreases."
+        }
+      ]
+    },
+    {
+      "id": "TC-GR-900",
+      "name": "Deleting Groups",
+      "test_cases": [
+        {
+          "id": "TC-GR-901",
+          "severity": "P1",
+          "scenario": "Delete action opens a confirmation modal",
+          "steps": "1. Navigate to Administration > Groups.\n2. Click Delete on a group.",
+          "expected": "A delete confirmation modal appears with the group's name. The user must confirm before deletion proceeds."
+        },
+        {
+          "id": "TC-GR-902",
+          "severity": "P0",
+          "scenario": "Confirming deletion permanently removes the group",
+          "steps": "1. Click Delete on a group.\n2. Confirm in the modal.",
+          "expected": "The modal closes. A success toast appears. The group is removed from the table. Members that were in this group lose any permissions granted by it."
+        },
+        {
+          "id": "TC-GR-903",
+          "severity": "P1",
+          "scenario": "Cancelling deletion leaves the group unchanged",
+          "steps": "1. Click Delete on a group.\n2. Click Cancel in the modal.",
+          "expected": "The modal closes. The group remains in the table with all its members and permissions intact."
+        }
+      ]
+    },
+    {
+      "id": "TC-GR-1000",
+      "name": "Importing & Exporting",
+      "test_cases": [
+        {
+          "id": "TC-GR-1001",
+          "severity": "P1",
+          "scenario": "Clicking Import opens the import panel",
+          "steps": "1. Navigate to Administration > Groups.\n2. Click the 'Import' button.",
+          "expected": "The import view opens, allowing the user to upload a file to import groups."
+        },
+        {
+          "id": "TC-GR-1002",
+          "severity": "P1",
+          "scenario": "Clicking Export opens the export panel",
+          "steps": "1. Navigate to Administration > Groups.\n2. Click the 'Export' button.",
+          "expected": "The export configuration panel opens."
+        },
+        {
+          "id": "TC-GR-1003",
+          "severity": "P1",
+          "scenario": "Export respects the active filter",
+          "steps": "1. Apply a search filter to show only certain groups.\n2. Click Export.",
+          "expected": "The exported file contains only the groups matching the current filter."
+        },
+        {
+          "id": "TC-GR-1004",
+          "severity": "P2",
+          "scenario": "Table refreshes after a successful import",
+          "steps": "1. Click Import and upload a valid groups file.\n2. Complete the import.",
+          "expected": "The table refreshes and newly imported groups appear in the list."
+        }
+      ]
+    },
+    {
+      "id": "TC-GR-1100",
+      "name": "Non-Functional",
+      "test_cases": [
+        {
+          "id": "TC-GR-1101",
+          "severity": "P2",
+          "scenario": "Groups page loads within an acceptable time",
+          "steps": "1. Navigate to Administration > Groups in an environment with many groups.",
+          "expected": "The page loads and table populates within 3 seconds."
+        },
+        {
+          "id": "TC-GR-1102",
+          "severity": "P1",
+          "scenario": "Session expiry during an action redirects to login",
+          "steps": "1. Open the create or edit group drawer.\n2. Allow the session to expire.\n3. Attempt to save.",
+          "expected": "The browser redirects to login. No partial data is saved."
+        },
+        {
+          "id": "TC-GR-1103",
+          "severity": "P2",
+          "scenario": "Group detail page loads members with correct counts",
+          "steps": "1. Navigate to a group detail page.\n2. Verify the Members count shown in the info panel matches the members table.",
+          "expected": "The count in the info panel and the number of rows in the members table are consistent."
+        }
+      ]
+    },
+    {
+      "id": "TC-GR-1200",
+      "name": "Desktop",
+      "test_cases": [
+        {
+          "id": "TC-GR-1201",
+          "severity": "P1",
+          "scenario": "All table columns are visible on desktop",
+          "steps": "1. Open Administration > Groups on a desktop browser.",
+          "expected": "Name, Code, Members, Type, and Status columns are all visible."
+        },
+        {
+          "id": "TC-GR-1202",
+          "severity": "P2",
+          "scenario": "Group detail page two-column layout is correct on desktop",
+          "steps": "1. Open a group detail page on a desktop browser.",
+          "expected": "The left column (col-lg-4) shows group info and permissions. The right column (col-lg-8) shows the members table. Both columns are visible side by side."
+        },
+        {
+          "id": "TC-GR-1203",
+          "severity": "P2",
+          "scenario": "All row actions are visible without overflow on desktop",
+          "steps": "1. Open Administration > Groups on a desktop and hover over a row.",
+          "expected": "Edit, Toggle, Assign Member, Assign Permissions, and Delete actions are all accessible inline without needing an overflow menu."
+        }
+      ]
+    },
+    {
+      "id": "TC-GR-1300",
+      "name": "Mobile",
+      "test_cases": [
+        {
+          "id": "TC-GR-1301",
+          "severity": "P1",
+          "scenario": "Type column hidden on mobile; Name, Code, Members, Status visible",
+          "steps": "1. Open Administration > Groups on a mobile device.",
+          "expected": "The Type column (hide-mobile) is not shown. Name, Code, Members, and Status columns are visible."
+        },
+        {
+          "id": "TC-GR-1302",
+          "severity": "P2",
+          "scenario": "Row actions accessible via overflow menu on mobile",
+          "steps": "1. Open Administration > Groups on a mobile device.\n2. Tap a row's overflow menu.",
+          "expected": "A dropdown appears with permitted actions (Edit, Toggle, Assign Member, Assign Permissions, Delete)."
+        },
+        {
+          "id": "TC-GR-1303",
+          "severity": "P2",
+          "scenario": "Group detail page stacks into single column on mobile",
+          "steps": "1. Open a group's detail page on a mobile device.",
+          "expected": "The info panel, permissions panel, and members table stack vertically. All content is readable and accessible without horizontal scrolling."
+        }
+      ]
+    },
+    {
+      "id": "TC-GR-1400",
+      "name": "Integration",
+      "test_cases": [
+        {
+          "id": "TC-GR-1401",
+          "severity": "P1",
+          "scenario": "Permissions assigned to a group are inherited by all group members",
+          "steps": "1. Assign a specific permission to a group.\n2. Log in as a user who is a member of that group.\n3. Attempt to access the feature controlled by that permission.",
+          "expected": "The user can access the feature because they inherit the group's permissions."
+        },
+        {
+          "id": "TC-GR-1402",
+          "severity": "P1",
+          "scenario": "Member assigned to a group via the Groups page appears in the group's detail",
+          "steps": "1. Assign a member to a group via the Assign Member drawer on the Groups list page.\n2. Navigate to that group's detail page.",
+          "expected": "The newly assigned member appears in the group's Members table and the Members count increments."
+        },
+        {
+          "id": "TC-GR-1403",
+          "severity": "P2",
+          "scenario": "Deactivating a group removes its permissions from members until reactivated",
+          "steps": "1. Deactivate a group that has permissions assigned.\n2. Log in as a member of that group.\n3. Attempt to access a feature granted by the group's permissions.",
+          "expected": "The member can no longer access the feature while the group is inactive."
+        }
+      ]
+    }
+  ]
+}

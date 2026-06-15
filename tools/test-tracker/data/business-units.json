@@ -1,0 +1,798 @@
+{
+  "module": {
+    "slug": "business-units",
+    "name": "Business Units",
+    "sort_order": 1,
+    "parent": {
+      "slug": "organisations",
+      "name": "Organisations",
+      "sort_order": 0
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-BU-100",
+      "name": "Page Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-BU-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user is redirected away from the Business Units page",
+          "steps": "1. Open a browser with no active session.\n2. Navigate directly to /business-units/.",
+          "expected": "The user is redirected to the login page and the Business Units page is not shown."
+        },
+        {
+          "id": "TC-BU-102",
+          "severity": "P0",
+          "scenario": "Authenticated user with view permission can access the Business Units page",
+          "steps": "1. Log in as a user who has permission to view business units.\n2. Navigate to Organisations > Business Units.",
+          "expected": "The Business Units page loads successfully showing the title 'Business Units', eyebrow 'Organisations', and the data table."
+        },
+        {
+          "id": "TC-BU-103",
+          "severity": "P1",
+          "scenario": "Add Business Unit button is hidden for users without create permission",
+          "steps": "1. Log in as a user who does NOT have permission to create business units.\n2. Navigate to the Business Units page.",
+          "expected": "The 'Add Business Unit' button is not visible on the page."
+        },
+        {
+          "id": "TC-BU-104",
+          "severity": "P1",
+          "scenario": "Add Business Unit button is visible for users with create permission",
+          "steps": "1. Log in as a user who has permission to create business units.\n2. Navigate to the Business Units page.",
+          "expected": "The 'Add Business Unit' button is visible in the top-right action area."
+        },
+        {
+          "id": "TC-BU-105",
+          "severity": "P1",
+          "scenario": "Edit and Toggle actions are hidden for users without change permission",
+          "steps": "1. Log in as a user who does NOT have permission to change business units.\n2. Navigate to the Business Units page.\n3. Observe the row action buttons.",
+          "expected": "The Edit (pencil) and Toggle (activate/deactivate) action buttons are not shown on any row."
+        },
+        {
+          "id": "TC-BU-106",
+          "severity": "P1",
+          "scenario": "Delete action is hidden for users without delete permission",
+          "steps": "1. Log in as a user who does NOT have permission to delete business units.\n2. Navigate to the Business Units page.\n3. Observe the row action buttons.",
+          "expected": "The Delete (bin) action button is not visible on any row."
+        },
+        {
+          "id": "TC-BU-107",
+          "severity": "P1",
+          "scenario": "Import and Export buttons are hidden for users without the relevant permission",
+          "steps": "1. Log in as a user without import or export permissions.\n2. Navigate to the Business Units page.",
+          "expected": "The Import and Export buttons are not visible in the page header."
+        },
+        {
+          "id": "TC-BU-108",
+          "severity": "P2",
+          "scenario": "View drawer Edit button is hidden for users without change permission",
+          "steps": "1. Log in as a user without change permission.\n2. Click any business unit row to open the view drawer.",
+          "expected": "The view drawer opens but the 'Edit business unit' button is not shown in the footer. Only the 'Close' button is visible."
+        },
+        {
+          "id": "TC-BU-109",
+          "severity": "P2",
+          "scenario": "Page subtitle is correct",
+          "steps": "1. Log in and navigate to the Business Units page.",
+          "expected": "The subtitle reads 'Manage your organisation's business units.'"
+        }
+      ]
+    },
+    {
+      "id": "TC-BU-200",
+      "name": "Browsing & Discovering Business Units",
+      "test_cases": [
+        {
+          "id": "TC-BU-201",
+          "severity": "P1",
+          "scenario": "Business units list loads with active units shown by default",
+          "steps": "1. Navigate to the Business Units page.\n2. Observe the table on first load.",
+          "expected": "The table displays active business units by default. The Status filter is pre-set to 'Active'."
+        },
+        {
+          "id": "TC-BU-202",
+          "severity": "P1",
+          "scenario": "Business units table shows the correct columns",
+          "steps": "1. Navigate to the Business Units page on a desktop viewport.\n2. Observe the column headers in the table.",
+          "expected": "The table displays: an identicon/icon column, Name, Code, Short Name, Status, and Created."
+        },
+        {
+          "id": "TC-BU-203",
+          "severity": "P1",
+          "scenario": "Each business unit row shows an identicon avatar",
+          "steps": "1. Navigate to the Business Units page.\n2. Observe the first column of any row.",
+          "expected": "Each row displays a small identicon or avatar icon in the first column, uniquely representing that business unit."
+        },
+        {
+          "id": "TC-BU-204",
+          "severity": "P1",
+          "scenario": "Searching for a business unit by name filters the table",
+          "steps": "1. Navigate to the Business Units page.\n2. Type a partial name into the search field.\n3. Wait for the table to update.",
+          "expected": "The table updates to show only business units whose name matches the search term."
+        },
+        {
+          "id": "TC-BU-205",
+          "severity": "P2",
+          "scenario": "Search field can be focused with the / shortcut key",
+          "steps": "1. Navigate to the Business Units page.\n2. Press the '/' key on the keyboard.",
+          "expected": "The search input field receives focus automatically."
+        },
+        {
+          "id": "TC-BU-206",
+          "severity": "P1",
+          "scenario": "Status filter shows all business units when set to 'All'",
+          "steps": "1. Navigate to the Business Units page.\n2. Change the Status filter to 'All'.",
+          "expected": "The table displays both active and inactive business units."
+        },
+        {
+          "id": "TC-BU-207",
+          "severity": "P1",
+          "scenario": "Status filter shows only inactive units when set to 'Inactive'",
+          "steps": "1. Navigate to the Business Units page.\n2. Change the Status filter to 'Inactive'.",
+          "expected": "The table displays only inactive business units."
+        },
+        {
+          "id": "TC-BU-208",
+          "severity": "P2",
+          "scenario": "Searching for a value with no matches shows the empty state",
+          "steps": "1. Navigate to the Business Units page.\n2. Type a search term that matches no units (e.g. 'zzznomatch').",
+          "expected": "The table shows the empty message 'No business units found.' and no data rows are displayed."
+        },
+        {
+          "id": "TC-BU-209",
+          "severity": "P1",
+          "scenario": "Clicking a business unit row opens the view drawer",
+          "steps": "1. Navigate to the Business Units page.\n2. Click on a business unit row (not on an action button).",
+          "expected": "A view drawer slides in from the right showing the business unit's details including name, short name, code, and status."
+        }
+      ]
+    },
+    {
+      "id": "TC-BU-300",
+      "name": "Creating a Business Unit",
+      "test_cases": [
+        {
+          "id": "TC-BU-301",
+          "severity": "P1",
+          "scenario": "Clicking Add Business Unit opens the create drawer",
+          "steps": "1. Navigate to the Business Units page.\n2. Click the 'Add Business Unit' button.",
+          "expected": "The Create business unit drawer slides in with the title 'Create business unit' and eyebrow 'New record'."
+        },
+        {
+          "id": "TC-BU-302",
+          "severity": "P0",
+          "scenario": "A business unit can be created with a name and short name",
+          "steps": "1. Open the Create business unit drawer.\n2. Enter a unique name in 'Business unit name'.\n3. Enter a short name (e.g. 'FIN').\n4. Click 'Create business unit'.",
+          "expected": "The drawer closes, a success toast appears, and the new business unit appears in the table."
+        },
+        {
+          "id": "TC-BU-303",
+          "severity": "P1",
+          "scenario": "Business unit name is a required field",
+          "steps": "1. Open the Create business unit drawer.\n2. Leave the name field empty.\n3. Enter a short name.\n4. Click 'Create business unit'.",
+          "expected": "An inline validation error appears below the name field. The unit is not created."
+        },
+        {
+          "id": "TC-BU-304",
+          "severity": "P1",
+          "scenario": "Short name is a required field",
+          "steps": "1. Open the Create business unit drawer.\n2. Enter a name.\n3. Leave the Short name field empty.\n4. Click 'Create business unit'.",
+          "expected": "An inline validation error appears below the Short name field. The unit is not created."
+        },
+        {
+          "id": "TC-BU-305",
+          "severity": "P1",
+          "scenario": "Business unit name field enforces a maximum length of 255 characters",
+          "steps": "1. Open the Create business unit drawer.\n2. Paste a string of 256 characters into the name field.",
+          "expected": "The field does not accept more than 255 characters. The counter shows '255/255' at the limit."
+        },
+        {
+          "id": "TC-BU-306",
+          "severity": "P1",
+          "scenario": "Short name field enforces a maximum length of 10 characters",
+          "steps": "1. Open the Create business unit drawer.\n2. Type more than 10 characters into the Short name field.",
+          "expected": "The field does not accept more than 10 characters. The counter shows '10/10' at the limit."
+        },
+        {
+          "id": "TC-BU-307",
+          "severity": "P2",
+          "scenario": "Character counters update in real time for both fields",
+          "steps": "1. Open the Create business unit drawer.\n2. Type a 7-character name and a 3-character short name.",
+          "expected": "The name counter shows '7/255' and the short name counter shows '3/10' as characters are typed."
+        },
+        {
+          "id": "TC-BU-308",
+          "severity": "P1",
+          "scenario": "Duplicate business unit name is rejected",
+          "steps": "1. Open the Create business unit drawer.\n2. Enter a name that already exists.\n3. Click 'Create business unit'.",
+          "expected": "An error message indicates the name already exists. The unit is not created."
+        },
+        {
+          "id": "TC-BU-309",
+          "severity": "P1",
+          "scenario": "Duplicate short name is rejected",
+          "steps": "1. Open the Create business unit drawer.\n2. Enter a unique name but a short name that already exists.\n3. Click 'Create business unit'.",
+          "expected": "An error message indicates the short name is already in use. The unit is not created."
+        },
+        {
+          "id": "TC-BU-310",
+          "severity": "P2",
+          "scenario": "Newly created business unit is assigned a unique Code automatically",
+          "steps": "1. Create a new business unit.\n2. Observe the Code column in the table for the new row.",
+          "expected": "The new business unit has a system-generated code in the Code column."
+        },
+        {
+          "id": "TC-BU-311",
+          "severity": "P2",
+          "scenario": "Clicking Cancel on the create drawer discards the form",
+          "steps": "1. Open the Create business unit drawer.\n2. Enter a name and short name.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. No business unit is created. The table is unchanged."
+        },
+        {
+          "id": "TC-BU-312",
+          "severity": "P2",
+          "scenario": "Newly created business unit is active by default",
+          "steps": "1. Create a new business unit.\n2. Observe the Status column in the table.",
+          "expected": "The new business unit shows an 'Active' status badge."
+        },
+        {
+          "id": "TC-BU-313",
+          "severity": "P2",
+          "scenario": "Create button shows a loading state during submission",
+          "steps": "1. Open the Create business unit drawer.\n2. Enter valid name and short name.\n3. Click 'Create business unit' and observe the button.",
+          "expected": "The 'Create business unit' button shows a loading indicator and is disabled while the request is in progress."
+        }
+      ]
+    },
+    {
+      "id": "TC-BU-400",
+      "name": "View Drawer",
+      "test_cases": [
+        {
+          "id": "TC-BU-401",
+          "severity": "P1",
+          "scenario": "View drawer shows the correct business unit details",
+          "steps": "1. Click on a business unit row in the table.",
+          "expected": "The view drawer shows: Name, Short Name (in code style), Code (in code style), Status, Created date, and Created by."
+        },
+        {
+          "id": "TC-BU-402",
+          "severity": "P1",
+          "scenario": "View drawer shows an identicon for the business unit",
+          "steps": "1. Click on any business unit row to open the view drawer.",
+          "expected": "An identicon avatar is displayed in the drawer header representing that business unit."
+        },
+        {
+          "id": "TC-BU-403",
+          "severity": "P1",
+          "scenario": "View drawer 'Edit business unit' button opens the edit drawer",
+          "steps": "1. Open the view drawer for a business unit (user has edit permission).\n2. Click the 'Edit business unit' button in the drawer footer.",
+          "expected": "The view drawer closes and the edit drawer opens pre-populated with that business unit's details."
+        },
+        {
+          "id": "TC-BU-404",
+          "severity": "P2",
+          "scenario": "View drawer can be closed with the Close button",
+          "steps": "1. Click on a business unit row to open the view drawer.\n2. Click the 'Close' button in the footer.",
+          "expected": "The view drawer closes and the user returns to the main Business Units list."
+        },
+        {
+          "id": "TC-BU-405",
+          "severity": "P2",
+          "scenario": "Clicking an action button on a row does not open the view drawer",
+          "steps": "1. Click the Edit (pencil) action button on a business unit row.",
+          "expected": "The edit drawer opens directly. The view drawer is not shown."
+        },
+        {
+          "id": "TC-BU-406",
+          "severity": "P2",
+          "scenario": "View drawer reflects the current active status of the business unit",
+          "steps": "1. Open the view drawer for an inactive business unit.",
+          "expected": "The Status field in the view drawer shows 'Inactive'."
+        }
+      ]
+    },
+    {
+      "id": "TC-BU-500",
+      "name": "Business Unit Detail Page",
+      "test_cases": [
+        {
+          "id": "TC-BU-501",
+          "severity": "P1",
+          "scenario": "Navigating to a business unit detail page shows the information panel",
+          "steps": "1. Navigate to /business-units/<code>/.",
+          "expected": "The detail page loads showing the left information panel with: Name, Short Name (code style), Code (code style), Status, Created, and Created by."
+        },
+        {
+          "id": "TC-BU-502",
+          "severity": "P2",
+          "scenario": "Detail page title reflects the business unit name",
+          "steps": "1. Navigate to the detail page of a business unit named 'Finance'.",
+          "expected": "The page title updates to 'Finance' after the data loads."
+        },
+        {
+          "id": "TC-BU-503",
+          "severity": "P2",
+          "scenario": "Detail page eyebrow shows 'Business Unit'",
+          "steps": "1. Navigate to any business unit detail page.",
+          "expected": "The eyebrow text shows 'Business Unit' above the page title."
+        },
+        {
+          "id": "TC-BU-504",
+          "severity": "P2",
+          "scenario": "Detail page does not show a members panel",
+          "steps": "1. Navigate to any business unit detail page.",
+          "expected": "No members or people panel is shown. The page shows only the information panel."
+        },
+        {
+          "id": "TC-BU-505",
+          "severity": "P2",
+          "scenario": "Short name is displayed in code style on the detail page",
+          "steps": "1. Navigate to a business unit detail page.\n2. Observe the Short Name field.",
+          "expected": "The short name value is rendered in a monospace/code style, distinguishing it from regular text."
+        }
+      ]
+    },
+    {
+      "id": "TC-BU-600",
+      "name": "Editing a Business Unit",
+      "test_cases": [
+        {
+          "id": "TC-BU-601",
+          "severity": "P1",
+          "scenario": "Clicking the Edit action opens the edit drawer pre-populated",
+          "steps": "1. Navigate to the Business Units page.\n2. Click the Edit (pencil) action on a business unit row.",
+          "expected": "The edit drawer opens pre-populated with the business unit's current name and short name."
+        },
+        {
+          "id": "TC-BU-602",
+          "severity": "P1",
+          "scenario": "Edit drawer shows an identicon in the header",
+          "steps": "1. Open the edit drawer for any business unit.",
+          "expected": "An identicon avatar is displayed in the edit drawer header representing that business unit."
+        },
+        {
+          "id": "TC-BU-603",
+          "severity": "P0",
+          "scenario": "Business unit name can be updated successfully",
+          "steps": "1. Open the edit drawer for a business unit.\n2. Clear the name field and enter a new name.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes, a success toast appears, and the updated name is shown in the table."
+        },
+        {
+          "id": "TC-BU-604",
+          "severity": "P0",
+          "scenario": "Short name can be updated successfully",
+          "steps": "1. Open the edit drawer for a business unit.\n2. Clear the short name field and enter a new short name.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes, a success toast appears, and the updated short name is shown in the table."
+        },
+        {
+          "id": "TC-BU-605",
+          "severity": "P1",
+          "scenario": "Clearing the name field and saving shows a validation error",
+          "steps": "1. Open the edit drawer for a business unit.\n2. Clear the name field.\n3. Click 'Save changes'.",
+          "expected": "An inline error appears below the name field. The change is not saved."
+        },
+        {
+          "id": "TC-BU-606",
+          "severity": "P1",
+          "scenario": "Clearing the short name field and saving shows a validation error",
+          "steps": "1. Open the edit drawer for a business unit.\n2. Clear the short name field.\n3. Click 'Save changes'.",
+          "expected": "An inline error appears below the short name field. The change is not saved."
+        },
+        {
+          "id": "TC-BU-607",
+          "severity": "P1",
+          "scenario": "Name field enforces 255-character limit in the edit drawer",
+          "steps": "1. Open the edit drawer.\n2. Paste a string of 256 characters into the name field.",
+          "expected": "The field does not accept more than 255 characters."
+        },
+        {
+          "id": "TC-BU-608",
+          "severity": "P1",
+          "scenario": "Short name field enforces 10-character limit in the edit drawer",
+          "steps": "1. Open the edit drawer.\n2. Type more than 10 characters into the short name field.",
+          "expected": "The field does not accept more than 10 characters."
+        },
+        {
+          "id": "TC-BU-609",
+          "severity": "P1",
+          "scenario": "Renaming to a duplicate name shows a conflict error",
+          "steps": "1. Open the edit drawer for Business Unit A.\n2. Change the name to match Business Unit B's name.\n3. Click 'Save changes'.",
+          "expected": "An error is shown indicating the name is already in use. The change is not saved."
+        },
+        {
+          "id": "TC-BU-610",
+          "severity": "P2",
+          "scenario": "Saving with unchanged values does not cause a conflict error",
+          "steps": "1. Open the edit drawer for a business unit.\n2. Do not change any field.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes with a success toast. No conflict error is shown."
+        },
+        {
+          "id": "TC-BU-611",
+          "severity": "P2",
+          "scenario": "Clicking Cancel on the edit drawer discards changes",
+          "steps": "1. Open the edit drawer.\n2. Modify the name.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. The business unit name in the table is unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-BU-700",
+      "name": "Activating & Deactivating a Business Unit",
+      "test_cases": [
+        {
+          "id": "TC-BU-701",
+          "severity": "P1",
+          "scenario": "An active business unit can be deactivated via the Toggle action",
+          "steps": "1. Navigate to the Business Units page.\n2. Find an active business unit.\n3. Click the Toggle action on that row.",
+          "expected": "A deactivate confirmation modal appears asking the user to confirm deactivation."
+        },
+        {
+          "id": "TC-BU-702",
+          "severity": "P0",
+          "scenario": "Confirming deactivation changes the business unit status to Inactive",
+          "steps": "1. Click the Toggle action on an active business unit.\n2. In the deactivate modal, click the confirm button.",
+          "expected": "The modal closes, a success toast appears, and the business unit's status badge changes to 'Inactive'."
+        },
+        {
+          "id": "TC-BU-703",
+          "severity": "P2",
+          "scenario": "Cancelling the deactivate modal leaves the business unit active",
+          "steps": "1. Click the Toggle action on an active business unit.\n2. Click 'Cancel' in the deactivate modal.",
+          "expected": "The modal closes. The business unit remains active and unchanged."
+        },
+        {
+          "id": "TC-BU-704",
+          "severity": "P1",
+          "scenario": "An inactive business unit can be activated via the Toggle action",
+          "steps": "1. Navigate to the Business Units page (Status filter set to All or Inactive).\n2. Click the Toggle action on an inactive business unit.",
+          "expected": "An activate confirmation modal appears asking the user to confirm activation."
+        },
+        {
+          "id": "TC-BU-705",
+          "severity": "P0",
+          "scenario": "Confirming activation changes the business unit status to Active",
+          "steps": "1. Click the Toggle action on an inactive business unit.\n2. In the activate modal, click the confirm button.",
+          "expected": "The modal closes, a success toast appears, and the status badge changes to 'Active'."
+        },
+        {
+          "id": "TC-BU-706",
+          "severity": "P2",
+          "scenario": "Deactivating a unit removes it from the default Active filter view",
+          "steps": "1. Ensure the Status filter is set to 'Active'.\n2. Deactivate a business unit.\n3. Confirm deactivation.",
+          "expected": "The business unit disappears from the table after deactivation."
+        }
+      ]
+    },
+    {
+      "id": "TC-BU-800",
+      "name": "Deleting a Business Unit",
+      "test_cases": [
+        {
+          "id": "TC-BU-801",
+          "severity": "P1",
+          "scenario": "Clicking the Delete action opens a confirmation modal",
+          "steps": "1. Navigate to the Business Units page.\n2. Click the Delete (bin) action on a business unit row.",
+          "expected": "A delete confirmation modal appears with the business unit name and a typed-confirmation input."
+        },
+        {
+          "id": "TC-BU-802",
+          "severity": "P0",
+          "scenario": "A business unit is permanently deleted after typed confirmation",
+          "steps": "1. Click Delete on a business unit.\n2. Type the business unit name exactly.\n3. Click 'Delete business unit'.",
+          "expected": "The modal closes, a success toast appears, and the business unit is removed from the table."
+        },
+        {
+          "id": "TC-BU-803",
+          "severity": "P1",
+          "scenario": "Delete button is disabled until the correct name is typed",
+          "steps": "1. Click Delete on a business unit.\n2. Leave the confirmation field empty or type an incorrect value.\n3. Observe the 'Delete business unit' button.",
+          "expected": "The 'Delete business unit' button remains disabled until the exact name is typed."
+        },
+        {
+          "id": "TC-BU-804",
+          "severity": "P2",
+          "scenario": "Cancelling the delete modal leaves the business unit intact",
+          "steps": "1. Click Delete on a business unit.\n2. Click 'Cancel'.",
+          "expected": "The modal closes. The business unit remains in the table."
+        },
+        {
+          "id": "TC-BU-805",
+          "severity": "P1",
+          "scenario": "Typed confirmation is case-sensitive",
+          "steps": "1. Click Delete on a business unit named 'Finance'.\n2. Type 'finance' in the confirmation field.",
+          "expected": "The 'Delete business unit' button remains disabled when the case does not match exactly."
+        },
+        {
+          "id": "TC-BU-806",
+          "severity": "P3",
+          "scenario": "Delete modal warns that the action is permanent",
+          "steps": "1. Click Delete on any business unit.\n2. Read the body text of the modal.",
+          "expected": "The modal body warns the user that this action is permanent and cannot be undone."
+        }
+      ]
+    },
+    {
+      "id": "TC-BU-900",
+      "name": "Importing Business Units",
+      "test_cases": [
+        {
+          "id": "TC-BU-901",
+          "severity": "P1",
+          "scenario": "Clicking Import opens the import view",
+          "steps": "1. Navigate to the Business Units page.\n2. Click the 'Import' button.",
+          "expected": "The import view opens, allowing the user to upload a file."
+        },
+        {
+          "id": "TC-BU-902",
+          "severity": "P1",
+          "scenario": "A sample CSV can be downloaded from the import view",
+          "steps": "1. Open the import view.\n2. Click the sample CSV download link.",
+          "expected": "A CSV file is downloaded with the correct headers (e.g. name, short_name, is_active)."
+        },
+        {
+          "id": "TC-BU-903",
+          "severity": "P0",
+          "scenario": "A valid CSV file with new business units can be imported successfully",
+          "steps": "1. Prepare a valid CSV with name and short_name columns.\n2. Upload it in the import view and complete the import.",
+          "expected": "The import completes with a success message. The imported business units appear in the table."
+        },
+        {
+          "id": "TC-BU-904",
+          "severity": "P1",
+          "scenario": "Non-CSV file types are rejected",
+          "steps": "1. Open the import view.\n2. Attempt to upload a .xlsx or .pdf file.",
+          "expected": "The import view rejects the file and shows an error indicating only CSV files are accepted."
+        },
+        {
+          "id": "TC-BU-905",
+          "severity": "P1",
+          "scenario": "Importing a name exceeding 255 characters shows a row-level error",
+          "steps": "1. Prepare a CSV with a name longer than 255 characters.\n2. Import the file.",
+          "expected": "The import reports an error for that row indicating the name is too long."
+        },
+        {
+          "id": "TC-BU-906",
+          "severity": "P1",
+          "scenario": "Importing a short name exceeding 10 characters shows a row-level error",
+          "steps": "1. Prepare a CSV with a short_name longer than 10 characters.\n2. Import the file.",
+          "expected": "The import reports an error for that row indicating the short name is too long."
+        },
+        {
+          "id": "TC-BU-907",
+          "severity": "P1",
+          "scenario": "Importing a duplicate name shows a row-level conflict",
+          "steps": "1. Prepare a CSV with a name that already exists.\n2. Import the file.",
+          "expected": "The import reports a conflict for that row. No duplicate is created."
+        },
+        {
+          "id": "TC-BU-908",
+          "severity": "P2",
+          "scenario": "After a successful import the table refreshes automatically",
+          "steps": "1. Import a valid CSV.\n2. Close the import view and observe the table.",
+          "expected": "The table refreshes and newly imported business units are visible without reloading the page."
+        }
+      ]
+    },
+    {
+      "id": "TC-BU-1000",
+      "name": "Exporting Business Units",
+      "test_cases": [
+        {
+          "id": "TC-BU-1001",
+          "severity": "P1",
+          "scenario": "Clicking Export opens the export view",
+          "steps": "1. Navigate to the Business Units page.\n2. Click the 'Export' button.",
+          "expected": "The export configuration panel opens."
+        },
+        {
+          "id": "TC-BU-1002",
+          "severity": "P0",
+          "scenario": "Business units can be exported to CSV",
+          "steps": "1. Open the export view.\n2. Select CSV format and at least one field.\n3. Click Export.",
+          "expected": "A CSV file is downloaded containing the selected business unit data."
+        },
+        {
+          "id": "TC-BU-1003",
+          "severity": "P1",
+          "scenario": "Exported CSV contains Name, Short Name, Code and Status columns",
+          "steps": "1. Export business units with all fields selected.\n2. Open the downloaded file.",
+          "expected": "The CSV contains columns for Name, Short Name, Code, and Status with values matching the table."
+        },
+        {
+          "id": "TC-BU-1004",
+          "severity": "P1",
+          "scenario": "Export respects the active status filter",
+          "steps": "1. Set the Status filter to 'Active'.\n2. Export.",
+          "expected": "The exported file contains only active business units."
+        },
+        {
+          "id": "TC-BU-1005",
+          "severity": "P2",
+          "scenario": "Export respects the current search filter",
+          "steps": "1. Enter a search term.\n2. Open the export view and export.",
+          "expected": "The exported file contains only business units matching the current search."
+        }
+      ]
+    },
+    {
+      "id": "TC-BU-1100",
+      "name": "Non-Functional & Accessibility",
+      "test_cases": [
+        {
+          "id": "TC-BU-1101",
+          "severity": "P1",
+          "scenario": "All interactive elements are keyboard accessible",
+          "steps": "1. Navigate to the Business Units page.\n2. Use only Tab to move through all interactive elements.\n3. Use Enter/Space to activate buttons.",
+          "expected": "All buttons, filters, table actions, and drawer controls can be reached and activated via keyboard."
+        },
+        {
+          "id": "TC-BU-1102",
+          "severity": "P1",
+          "scenario": "Create business unit drawer can be completed entirely via keyboard",
+          "steps": "1. Open the create drawer using keyboard.\n2. Tab to the name field and type a name.\n3. Tab to the short name field and type a value.\n4. Tab to 'Create business unit' and press Enter.",
+          "expected": "The business unit is created successfully using keyboard only."
+        },
+        {
+          "id": "TC-BU-1103",
+          "severity": "P2",
+          "scenario": "Focus is trapped inside open drawers",
+          "steps": "1. Open the create business unit drawer.\n2. Press Tab repeatedly.",
+          "expected": "Focus cycles only through elements inside the drawer and does not reach the page behind."
+        },
+        {
+          "id": "TC-BU-1104",
+          "severity": "P2",
+          "scenario": "Business Units page works correctly in dark theme",
+          "steps": "1. Navigate to the Business Units page.\n2. Toggle to dark theme.\n3. Open a view drawer.",
+          "expected": "All elements including identicons, drawers, and table rows render correctly in dark theme."
+        },
+        {
+          "id": "TC-BU-1105",
+          "severity": "P2",
+          "scenario": "Pagination controls work correctly on the table",
+          "steps": "1. Ensure more than 25 business units exist.\n2. Navigate to the Business Units page.\n3. Use pagination controls.",
+          "expected": "The table navigates to the next page correctly. The page indicator updates."
+        },
+        {
+          "id": "TC-BU-1106",
+          "severity": "P2",
+          "scenario": "Active filter chip appears when a filter is applied",
+          "steps": "1. Enter a search term on the Business Units page.",
+          "expected": "An active filter chip appears below the filter bar. Clicking it clears the filter."
+        },
+        {
+          "id": "TC-BU-1107",
+          "severity": "P3",
+          "scenario": "Long business unit names wrap gracefully in the table",
+          "steps": "1. Create a business unit with a name near 255 characters.\n2. View it in the table.",
+          "expected": "The name wraps or truncates without breaking the row layout."
+        }
+      ]
+    },
+    {
+      "id": "TC-BU-1200",
+      "name": "Desktop Layout",
+      "test_cases": [
+        {
+          "id": "TC-BU-1201",
+          "severity": "P1",
+          "scenario": "All table columns are visible on a desktop viewport",
+          "steps": "1. Open the Business Units page on a desktop browser (viewport ≥ 1024px).",
+          "expected": "All columns are visible: identicon, Name, Code, Short Name, Status, Created."
+        },
+        {
+          "id": "TC-BU-1202",
+          "severity": "P1",
+          "scenario": "View drawer and edit drawer are full-width on desktop without overflow",
+          "steps": "1. Open the view drawer and then the edit drawer on a desktop viewport.",
+          "expected": "Both drawers occupy up to 900px width and all fields are visible without horizontal scrolling."
+        },
+        {
+          "id": "TC-BU-1203",
+          "severity": "P2",
+          "scenario": "Business unit detail page shows the info panel at col-lg-5 width",
+          "steps": "1. Navigate to a business unit detail page on a desktop browser.",
+          "expected": "The info panel takes approximately 5/12 of the page width on large viewports."
+        },
+        {
+          "id": "TC-BU-1204",
+          "severity": "P2",
+          "scenario": "Page header buttons are correctly spaced on desktop",
+          "steps": "1. Open the Business Units page on a desktop browser.\n2. Observe the Import, Export, and Add Business Unit buttons.",
+          "expected": "The buttons are aligned in a row in the top-right area with consistent spacing."
+        },
+        {
+          "id": "TC-BU-1205",
+          "severity": "P2",
+          "scenario": "Identicons are rendered correctly at desktop resolution",
+          "steps": "1. Open the Business Units page on a desktop viewport.\n2. Observe the identicon column.",
+          "expected": "Each identicon is clearly rendered at the correct size with no pixelation or layout shifts."
+        }
+      ]
+    },
+    {
+      "id": "TC-BU-1300",
+      "name": "Mobile & Responsive",
+      "test_cases": [
+        {
+          "id": "TC-BU-1301",
+          "severity": "P1",
+          "scenario": "Secondary columns are hidden on mobile viewports",
+          "steps": "1. Open the Business Units page on a mobile device or viewport ≤ 767px.",
+          "expected": "Code, Short Name, and Created columns are hidden. The identicon, Name, and Status remain visible."
+        },
+        {
+          "id": "TC-BU-1302",
+          "severity": "P1",
+          "scenario": "Create and edit drawers are usable on a mobile viewport",
+          "steps": "1. Open the create drawer on a mobile viewport.\n2. Fill in the name and short name.\n3. Submit.",
+          "expected": "The drawer opens correctly and the business unit can be created without layout issues."
+        },
+        {
+          "id": "TC-BU-1303",
+          "severity": "P2",
+          "scenario": "View drawer is fully readable on mobile",
+          "steps": "1. Tap a business unit row on a mobile viewport.\n2. Observe the view drawer.",
+          "expected": "The view drawer opens and all fields (Name, Short Name, Code, Status, Created) are readable without horizontal scrolling."
+        },
+        {
+          "id": "TC-BU-1304",
+          "severity": "P2",
+          "scenario": "Delete modal is fully visible on mobile",
+          "steps": "1. Trigger the delete modal on a mobile viewport.",
+          "expected": "The modal is fully visible with the confirmation input and buttons accessible without scrolling."
+        },
+        {
+          "id": "TC-BU-1305",
+          "severity": "P3",
+          "scenario": "Page header does not overflow on small mobile viewports",
+          "steps": "1. Open the Business Units page on a 375px-wide viewport.",
+          "expected": "The title and action buttons do not overflow or overlap."
+        }
+      ]
+    },
+    {
+      "id": "TC-BU-1400",
+      "name": "Integration with Other Modules",
+      "test_cases": [
+        {
+          "id": "TC-BU-1401",
+          "severity": "P1",
+          "scenario": "Business units appear as options in project or team assignment forms",
+          "steps": "1. Ensure active business units exist.\n2. Navigate to a module that allows assigning a business unit (e.g. Projects or Teams).\n3. Open the business unit dropdown.",
+          "expected": "Active business units appear as selectable options."
+        },
+        {
+          "id": "TC-BU-1402",
+          "severity": "P1",
+          "scenario": "Inactive business units do not appear in assignment dropdowns",
+          "steps": "1. Deactivate a business unit.\n2. Navigate to a form that uses business unit selection.\n3. Open the dropdown.",
+          "expected": "The deactivated business unit does not appear as an option."
+        },
+        {
+          "id": "TC-BU-1403",
+          "severity": "P2",
+          "scenario": "Business Units module is accessible from the Organisations navigation section",
+          "steps": "1. Log in and open the main navigation.\n2. Look for the Organisations section and Business Units link.",
+          "expected": "A 'Business Units' link is present in the Organisations navigation section and navigates to /business-units/."
+        },
+        {
+          "id": "TC-BU-1404",
+          "severity": "P2",
+          "scenario": "Deactivating a business unit does not break existing assignments in other modules",
+          "steps": "1. Ensure a business unit is assigned to at least one project or team.\n2. Deactivate the business unit.\n3. Navigate to the assigned project or team.",
+          "expected": "The assignment remains intact. The deactivation does not break existing references."
+        },
+        {
+          "id": "TC-BU-1405",
+          "severity": "P3",
+          "scenario": "Business unit short name appears in cross-module views where space is limited",
+          "steps": "1. Navigate to a module that lists business unit references (e.g. a dashboard or report).\n2. Observe how the business unit is labelled.",
+          "expected": "In compact views, the short name is used instead of the full name to save space."
+        }
+      ]
+    }
+  ]
+}

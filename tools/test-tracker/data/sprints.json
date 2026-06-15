@@ -1,0 +1,1048 @@
+{
+  "module": {
+    "slug": "sprints",
+    "name": "Sprints",
+    "sort_order": 20,
+    "parent": {
+      "slug": "planning",
+      "name": "Planning",
+      "sort_order": 6
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-SP-100",
+      "name": "Page Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-SP-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user cannot access the Sprints page",
+          "steps": "1. Open a browser with no active session.\n2. Navigate directly to the Sprints page URL.",
+          "expected": "The user is redirected to the login page. No sprint data is visible."
+        },
+        {
+          "id": "TC-SP-102",
+          "severity": "P0",
+          "scenario": "Authenticated user with view permission can access the Sprints page",
+          "steps": "1. Log in with a valid account.\n2. Navigate to Planning > Sprints from the main menu.",
+          "expected": "The Sprints page loads. The eyebrow reads 'Planning', the title reads 'Sprints', and the subtitle reads 'Manage sprint periods, their status, and lifecycle within each financial year.'"
+        },
+        {
+          "id": "TC-SP-103",
+          "severity": "P1",
+          "scenario": "Add Sprint button is visible for users with create permission",
+          "steps": "1. Log in as a user with sprint create permission.\n2. Navigate to the Sprints page.",
+          "expected": "The 'Add Sprint' button is visible in the page header."
+        },
+        {
+          "id": "TC-SP-104",
+          "severity": "P1",
+          "scenario": "Generate Sprints button is visible only for users with generate permission",
+          "steps": "1. Log in as a user with generate sprint permission.\n2. Navigate to the Sprints page.",
+          "expected": "The 'Generate Sprints' button is visible in the header. A user without this permission does not see it."
+        },
+        {
+          "id": "TC-SP-105",
+          "severity": "P1",
+          "scenario": "Edit, Toggle Active, and Set Active actions are hidden for read-only users",
+          "steps": "1. Log in as a read-only user.\n2. Navigate to the Sprints page.\n3. Observe row actions.",
+          "expected": "No Edit, Toggle Active, or Set Active action buttons appear on any row."
+        },
+        {
+          "id": "TC-SP-106",
+          "severity": "P1",
+          "scenario": "Lock / Unlock action is only visible for users with the close sprint permission",
+          "steps": "1. Log in as a user with can_close_sprint permission.\n2. Navigate to the Sprints page.\n3. Observe row actions.",
+          "expected": "The 'Lock / Unlock' action is visible. A user without can_close_sprint does not see this action."
+        },
+        {
+          "id": "TC-SP-107",
+          "severity": "P1",
+          "scenario": "Delete action is only visible for users with delete permission",
+          "steps": "1. Log in as a user with sprint delete permission.\n2. Navigate to the Sprints page.",
+          "expected": "The Delete action button is visible. A user without delete permission does not see it."
+        },
+        {
+          "id": "TC-SP-108",
+          "severity": "P1",
+          "scenario": "Detail page is accessible by clicking a sprint row",
+          "steps": "1. Navigate to the Sprints page.\n2. Click on any sprint row (not an action button).",
+          "expected": "The user is navigated to the sprint's detail page showing the full sprint information and capacity table."
+        },
+        {
+          "id": "TC-SP-109",
+          "severity": "P1",
+          "scenario": "Rebuild Capacity button on the detail page is only visible for users with change permission",
+          "steps": "1. Navigate to a sprint detail page as a user with change permission.",
+          "expected": "The 'Rebuild Capacity' button is visible. A read-only user does not see it."
+        },
+        {
+          "id": "TC-SP-110",
+          "severity": "P2",
+          "scenario": "Breadcrumb on the sprints list page reflects Planning > Sprints",
+          "steps": "1. Navigate to the Sprints page.",
+          "expected": "The breadcrumb trail correctly reflects the Planning > Sprints path."
+        }
+      ]
+    },
+    {
+      "id": "TC-SP-200",
+      "name": "Browsing, Search & Filtering",
+      "test_cases": [
+        {
+          "id": "TC-SP-201",
+          "severity": "P0",
+          "scenario": "Sprint records load and display in the table on page open",
+          "steps": "1. Navigate to the Sprints page.",
+          "expected": "All existing sprint records are displayed in the table without errors."
+        },
+        {
+          "id": "TC-SP-202",
+          "severity": "P1",
+          "scenario": "Table displays the correct columns on desktop",
+          "steps": "1. Navigate to the Sprints page on a desktop viewport.\n2. Observe column headers.",
+          "expected": "Columns appear in order: Name, Financial Year, Code, Start Date, End Date, Month, Status, Closed, Active, Created."
+        },
+        {
+          "id": "TC-SP-203",
+          "severity": "P1",
+          "scenario": "Search field filters sprints by name",
+          "steps": "1. Navigate to the Sprints page.\n2. Type part of a sprint name into the search field.",
+          "expected": "The table updates to show only sprints whose names match the search term."
+        },
+        {
+          "id": "TC-SP-204",
+          "severity": "P2",
+          "scenario": "Search with no matching results shows the empty state",
+          "steps": "1. Type a term that matches no sprint name.",
+          "expected": "The table shows 'No sprints found.' with no data rows."
+        },
+        {
+          "id": "TC-SP-205",
+          "severity": "P2",
+          "scenario": "Clearing the search field restores the full list",
+          "steps": "1. Apply a search term.\n2. Clear the search field.",
+          "expected": "The full list of sprints is restored."
+        },
+        {
+          "id": "TC-SP-206",
+          "severity": "P1",
+          "scenario": "Sprint Status filter shows only sprints with the selected status",
+          "steps": "1. Click the Status filter and select a specific sprint status.",
+          "expected": "The table shows only sprints matching the selected status. Others are hidden."
+        },
+        {
+          "id": "TC-SP-207",
+          "severity": "P1",
+          "scenario": "Financial Year filter shows only sprints belonging to that financial year",
+          "steps": "1. Click the Financial Year filter and select a specific financial year.",
+          "expected": "The table shows only sprints belonging to the selected financial year."
+        },
+        {
+          "id": "TC-SP-208",
+          "severity": "P1",
+          "scenario": "Is Active filter set to Active shows only active sprints",
+          "steps": "1. Set the Active filter to 'Active'.",
+          "expected": "Only sprints where is_active is true are shown."
+        },
+        {
+          "id": "TC-SP-209",
+          "severity": "P1",
+          "scenario": "Is Active filter set to Inactive shows only inactive sprints",
+          "steps": "1. Set the Active filter to 'Inactive'.",
+          "expected": "Only sprints where is_active is false are shown."
+        },
+        {
+          "id": "TC-SP-210",
+          "severity": "P1",
+          "scenario": "All four filters can be combined to narrow results",
+          "steps": "1. Type a search term.\n2. Select a Sprint Status.\n3. Select a Financial Year.\n4. Set Is Active to 'Active'.",
+          "expected": "The table shows only sprints that satisfy all four criteria simultaneously."
+        },
+        {
+          "id": "TC-SP-211",
+          "severity": "P2",
+          "scenario": "Active filter chips appear for each applied filter",
+          "steps": "1. Apply the Status filter and the Financial Year filter.",
+          "expected": "Active filter chips appear for each applied filter. Clicking a chip removes that filter."
+        },
+        {
+          "id": "TC-SP-212",
+          "severity": "P1",
+          "scenario": "Table can be sorted by Name ascending and descending",
+          "steps": "1. Click the Name column header.\n2. Click it again.",
+          "expected": "Sprints sort alphabetically by name, then reverse."
+        },
+        {
+          "id": "TC-SP-213",
+          "severity": "P1",
+          "scenario": "Table can be sorted by Start Date and End Date",
+          "steps": "1. Click Start Date header, then End Date header.\n2. Click each again.",
+          "expected": "Sprints sort by the selected date column in ascending then descending order."
+        },
+        {
+          "id": "TC-SP-214",
+          "severity": "P2",
+          "scenario": "Table can be sorted by Month and Created",
+          "steps": "1. Click the Month header.\n2. Click the Created header.",
+          "expected": "Sprints sort by month and by creation date respectively."
+        },
+        {
+          "id": "TC-SP-215",
+          "severity": "P1",
+          "scenario": "Clicking a sprint row navigates to the sprint detail page",
+          "steps": "1. Click anywhere on a sprint row (not on an action button).",
+          "expected": "The browser navigates to the sprint's detail page. The page title updates to the sprint's name."
+        },
+        {
+          "id": "TC-SP-216",
+          "severity": "P1",
+          "scenario": "Pagination controls work when many sprints exist",
+          "steps": "1. Ensure more than 25 sprints exist.\n2. Use the next and previous page controls.",
+          "expected": "Page navigation works correctly. Each page shows the expected subset of records."
+        }
+      ]
+    },
+    {
+      "id": "TC-SP-300",
+      "name": "Generating Sprints",
+      "test_cases": [
+        {
+          "id": "TC-SP-301",
+          "severity": "P1",
+          "scenario": "Clicking Generate Sprints opens the generate drawer",
+          "steps": "1. Navigate to the Sprints page (as a user with generate permission).\n2. Click the 'Generate Sprints' button.",
+          "expected": "The Generate Sprints drawer slides open. The drawer title reads 'Generate Sprints' with eyebrow 'Engine'."
+        },
+        {
+          "id": "TC-SP-302",
+          "severity": "P1",
+          "scenario": "Generate drawer contains the Financial Year field and a hint",
+          "steps": "1. Open the Generate Sprints drawer.\n2. Observe the form.",
+          "expected": "The drawer contains a required Financial Year dropdown and a hint reading 'Sprints are auto-generated based on the configured sprint duration. The selected financial year must have no existing sprints.'"
+        },
+        {
+          "id": "TC-SP-303",
+          "severity": "P0",
+          "scenario": "Selecting a financial year with no existing sprints and generating creates all sprints for that year",
+          "steps": "1. Open the Generate Sprints drawer.\n2. Select a financial year that has no existing sprints.\n3. Click 'Generate Sprints'.",
+          "expected": "The drawer closes or shows a success state. All sprints for the selected financial year are created automatically based on the configured sprint duration. The sprint list refreshes to show the generated sprints."
+        },
+        {
+          "id": "TC-SP-304",
+          "severity": "P1",
+          "scenario": "Financial Year is required in the generate drawer",
+          "steps": "1. Open the Generate Sprints drawer.\n2. Leave the Financial Year field unselected.\n3. Click 'Generate Sprints'.",
+          "expected": "A validation error appears indicating the Financial Year is required. No sprints are generated."
+        },
+        {
+          "id": "TC-SP-305",
+          "severity": "P1",
+          "scenario": "Selecting a financial year that already has sprints shows an error",
+          "steps": "1. Open the Generate Sprints drawer.\n2. Select a financial year that already has sprints.\n3. Click 'Generate Sprints'.",
+          "expected": "An error message is shown indicating the selected financial year already has sprints and generation cannot proceed."
+        },
+        {
+          "id": "TC-SP-306",
+          "severity": "P2",
+          "scenario": "Generate Sprints button is not visible for users without generate permission",
+          "steps": "1. Log in as a user without the generate sprint permission.\n2. Navigate to the Sprints page.",
+          "expected": "The 'Generate Sprints' button is not visible in the page header."
+        },
+        {
+          "id": "TC-SP-307",
+          "severity": "P2",
+          "scenario": "Closing the generate drawer without submitting makes no changes",
+          "steps": "1. Open the Generate Sprints drawer.\n2. Select a financial year.\n3. Click Cancel.",
+          "expected": "The drawer closes. No sprints are generated."
+        }
+      ]
+    },
+    {
+      "id": "TC-SP-400",
+      "name": "Creating a Sprint",
+      "test_cases": [
+        {
+          "id": "TC-SP-401",
+          "severity": "P0",
+          "scenario": "Clicking Add Sprint opens the create drawer",
+          "steps": "1. Navigate to the Sprints page.\n2. Click the 'Add Sprint' button.",
+          "expected": "The create drawer slides open with a blank form. The drawer title reads 'Create Sprint'."
+        },
+        {
+          "id": "TC-SP-402",
+          "severity": "P1",
+          "scenario": "Create drawer contains all expected form fields",
+          "steps": "1. Open the Add Sprint drawer.\n2. Observe the form fields.",
+          "expected": "The form contains: Financial Year (required), Sprint Number (required), Name (optional — auto-generated if blank), Start Date (required), End Date (required), Note (optional)."
+        },
+        {
+          "id": "TC-SP-403",
+          "severity": "P0",
+          "scenario": "A sprint is created successfully with all required fields",
+          "steps": "1. Open the Add Sprint drawer.\n2. Select a Financial Year.\n3. Enter a Sprint Number.\n4. Set a Start Date and End Date.\n5. Click 'Create Sprint'.",
+          "expected": "The drawer closes. A success toast appears. The new sprint appears in the table with correct financial year, code, dates, and status."
+        },
+        {
+          "id": "TC-SP-404",
+          "severity": "P1",
+          "scenario": "Sprint Name is auto-generated when left blank",
+          "steps": "1. Open the Add Sprint drawer.\n2. Fill in Financial Year, Sprint Number, Start Date, and End Date.\n3. Leave the Name field blank.\n4. Click 'Create Sprint'.",
+          "expected": "The sprint is created with an auto-generated name. The Name field in the table is populated automatically."
+        },
+        {
+          "id": "TC-SP-405",
+          "severity": "P2",
+          "scenario": "Custom sprint name is used when provided",
+          "steps": "1. Open the Add Sprint drawer.\n2. Enter a custom name in the Name field.\n3. Fill in all required fields and submit.",
+          "expected": "The sprint is created with the custom name shown in the table."
+        },
+        {
+          "id": "TC-SP-406",
+          "severity": "P1",
+          "scenario": "Financial Year is required — validation error shown when empty",
+          "steps": "1. Open the Add Sprint drawer.\n2. Leave Financial Year unselected.\n3. Fill in other fields and click 'Create Sprint'.",
+          "expected": "A validation error appears under Financial Year. The sprint is not created."
+        },
+        {
+          "id": "TC-SP-407",
+          "severity": "P1",
+          "scenario": "Sprint Number is required — validation error shown when empty",
+          "steps": "1. Open the Add Sprint drawer.\n2. Leave Sprint Number empty.\n3. Fill in other required fields and submit.",
+          "expected": "A validation error appears under Sprint Number. The sprint is not created."
+        },
+        {
+          "id": "TC-SP-408",
+          "severity": "P1",
+          "scenario": "Start Date is required — validation error shown when empty",
+          "steps": "1. Open the Add Sprint drawer.\n2. Leave Start Date empty.\n3. Fill in other required fields and submit.",
+          "expected": "A validation error appears under Start Date. The sprint is not created."
+        },
+        {
+          "id": "TC-SP-409",
+          "severity": "P1",
+          "scenario": "End Date is required — validation error shown when empty",
+          "steps": "1. Open the Add Sprint drawer.\n2. Leave End Date empty.\n3. Fill in other required fields and submit.",
+          "expected": "A validation error appears under End Date. The sprint is not created."
+        },
+        {
+          "id": "TC-SP-410",
+          "severity": "P1",
+          "scenario": "End Date set before Start Date shows a validation error",
+          "steps": "1. Open the Add Sprint drawer.\n2. Set a Start Date.\n3. Set End Date to a date before the Start Date.\n4. Click 'Create Sprint'.",
+          "expected": "A validation error is shown indicating the End Date must be on or after the Start Date."
+        },
+        {
+          "id": "TC-SP-411",
+          "severity": "P2",
+          "scenario": "Note is optional and the sprint can be created without it",
+          "steps": "1. Open the Add Sprint drawer.\n2. Fill in all required fields.\n3. Leave Note blank.\n4. Submit.",
+          "expected": "The sprint is created without a note."
+        },
+        {
+          "id": "TC-SP-412",
+          "severity": "P2",
+          "scenario": "Closing the create drawer without submitting discards entered data",
+          "steps": "1. Open the Add Sprint drawer.\n2. Fill in some fields.\n3. Click Cancel.",
+          "expected": "The drawer closes. No sprint is created. The form is blank when reopened."
+        },
+        {
+          "id": "TC-SP-413",
+          "severity": "P1",
+          "scenario": "Success toast appears and drawer closes after creating a sprint",
+          "steps": "1. Create a sprint with all required fields and submit.",
+          "expected": "The drawer closes automatically. A success toast appears confirming the sprint was created."
+        }
+      ]
+    },
+    {
+      "id": "TC-SP-500",
+      "name": "Sprint Detail Page",
+      "test_cases": [
+        {
+          "id": "TC-SP-501",
+          "severity": "P0",
+          "scenario": "Clicking a sprint row navigates to the detail page",
+          "steps": "1. Click on any sprint row on the Sprints page.",
+          "expected": "The browser navigates to the sprint detail page. The page title shows the sprint's name."
+        },
+        {
+          "id": "TC-SP-502",
+          "severity": "P1",
+          "scenario": "Detail page left panel shows all sprint information fields",
+          "steps": "1. Navigate to any sprint detail page.\n2. Observe the left info panel.",
+          "expected": "The info panel shows: Sprint Number, Name, Financial Year, Code (code style), Start Date, End Date, Month, Status, Closed, Note, Created, and Created by."
+        },
+        {
+          "id": "TC-SP-503",
+          "severity": "P1",
+          "scenario": "Sprint Timer panel shows a progress bar for the current sprint period",
+          "steps": "1. Navigate to the detail page of a sprint that is currently in progress.\n2. Observe the Sprint Timer panel.",
+          "expected": "A progress bar is visible showing how much of the sprint period has elapsed. Meta text below the bar shows relevant timing information."
+        },
+        {
+          "id": "TC-SP-504",
+          "severity": "P2",
+          "scenario": "Sprint Timer progress bar reflects correct completion percentage",
+          "steps": "1. Navigate to the detail page of a sprint that started several days ago and has several days remaining.",
+          "expected": "The progress bar fills proportionally to the percentage of the sprint period that has elapsed."
+        },
+        {
+          "id": "TC-SP-505",
+          "severity": "P0",
+          "scenario": "Detail page right panel shows the Capacity table",
+          "steps": "1. Navigate to any sprint detail page.\n2. Observe the Capacity section.",
+          "expected": "A Capacity table is visible showing columns: Member, Team, Location, Working Days, Holidays, Leaves, Net Capacity."
+        },
+        {
+          "id": "TC-SP-506",
+          "severity": "P1",
+          "scenario": "Capacity table shows correct net capacity for each member",
+          "steps": "1. Navigate to a sprint detail page.\n2. Review the Net Capacity column for listed members.",
+          "expected": "Net Capacity for each member reflects working days minus holidays and leaves for the sprint period."
+        },
+        {
+          "id": "TC-SP-507",
+          "severity": "P1",
+          "scenario": "Capacity table search filters by member name",
+          "steps": "1. On the sprint detail page, type a member name into the Capacity search field.",
+          "expected": "The capacity table filters to show only the matching member(s)."
+        },
+        {
+          "id": "TC-SP-508",
+          "severity": "P1",
+          "scenario": "Capacity table Team filter shows only members from the selected team",
+          "steps": "1. On the sprint detail page, select a team from the Team filter in the Capacity section.",
+          "expected": "The capacity table updates to show only members belonging to the selected team."
+        },
+        {
+          "id": "TC-SP-509",
+          "severity": "P2",
+          "scenario": "Capacity table shows empty state when no members are assigned",
+          "steps": "1. Navigate to a sprint detail page for a sprint with no team members assigned.",
+          "expected": "The capacity table shows 'No capacity data found for this sprint.'"
+        },
+        {
+          "id": "TC-SP-510",
+          "severity": "P1",
+          "scenario": "Forecast button on the detail page opens the forecast view",
+          "steps": "1. Navigate to a sprint detail page.\n2. Click the 'Forecast' button.",
+          "expected": "The forecast view or panel opens for the selected sprint."
+        },
+        {
+          "id": "TC-SP-511",
+          "severity": "P1",
+          "scenario": "Actuals button on the detail page opens the actuals view",
+          "steps": "1. Navigate to a sprint detail page.\n2. Click the 'Actuals' button.",
+          "expected": "The actuals view or panel opens for the selected sprint."
+        },
+        {
+          "id": "TC-SP-512",
+          "severity": "P1",
+          "scenario": "Rebuild Capacity button regenerates capacity data for the sprint",
+          "steps": "1. Navigate to a sprint detail page (as a user with change permission).\n2. Click 'Rebuild Capacity'.",
+          "expected": "The capacity data is recalculated. The Capacity table refreshes with updated values reflecting current member assignments, holidays, and leaves."
+        },
+        {
+          "id": "TC-SP-513",
+          "severity": "P2",
+          "scenario": "Breadcrumb on the detail page links back to the Sprints list",
+          "steps": "1. Navigate to a sprint detail page.\n2. Click the Sprints breadcrumb link.",
+          "expected": "The user is navigated back to the Sprints list page."
+        }
+      ]
+    },
+    {
+      "id": "TC-SP-600",
+      "name": "Editing a Sprint",
+      "test_cases": [
+        {
+          "id": "TC-SP-601",
+          "severity": "P0",
+          "scenario": "Clicking the Edit action opens the edit drawer pre-populated",
+          "steps": "1. Click the Edit action button on a sprint row.",
+          "expected": "The edit drawer opens with the sprint's current Name, Start Date, End Date, and Note pre-filled."
+        },
+        {
+          "id": "TC-SP-602",
+          "severity": "P1",
+          "scenario": "Financial Year and Sprint Number are not editable after creation",
+          "steps": "1. Open the edit drawer for any sprint.\n2. Observe the available fields.",
+          "expected": "The edit drawer shows only Name, Start Date, End Date, and Note. Financial Year and Sprint Number are not present — they cannot be changed after creation."
+        },
+        {
+          "id": "TC-SP-603",
+          "severity": "P1",
+          "scenario": "Name is required in edit mode — validation error shown when cleared",
+          "steps": "1. Open the edit drawer for a sprint.\n2. Clear the Name field.\n3. Click 'Save changes'.",
+          "expected": "A validation error appears under Name. The change is not saved."
+        },
+        {
+          "id": "TC-SP-604",
+          "severity": "P0",
+          "scenario": "Name can be updated successfully",
+          "steps": "1. Open the edit drawer.\n2. Change the Name to a new value.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes. A success toast appears. The updated name is reflected in the table."
+        },
+        {
+          "id": "TC-SP-605",
+          "severity": "P0",
+          "scenario": "Start Date can be updated successfully",
+          "steps": "1. Open the edit drawer.\n2. Change Start Date to a valid new date.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes. The updated Start Date is reflected in the table."
+        },
+        {
+          "id": "TC-SP-606",
+          "severity": "P0",
+          "scenario": "End Date can be updated successfully",
+          "steps": "1. Open the edit drawer.\n2. Change End Date to a valid new date.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes. The updated End Date is reflected in the table."
+        },
+        {
+          "id": "TC-SP-607",
+          "severity": "P1",
+          "scenario": "Clearing Start Date shows a validation error",
+          "steps": "1. Open the edit drawer.\n2. Clear Start Date.\n3. Click 'Save changes'.",
+          "expected": "An inline validation error appears. The change is not saved."
+        },
+        {
+          "id": "TC-SP-608",
+          "severity": "P1",
+          "scenario": "Setting End Date before Start Date in edit mode shows a validation error",
+          "steps": "1. Open the edit drawer.\n2. Set End Date to a date before Start Date.\n3. Click 'Save changes'.",
+          "expected": "A validation error is shown. The change is not saved."
+        },
+        {
+          "id": "TC-SP-609",
+          "severity": "P2",
+          "scenario": "Note can be added or updated in edit mode",
+          "steps": "1. Open the edit drawer for a sprint with no note.\n2. Enter a note.\n3. Save.",
+          "expected": "The note is saved and visible on the sprint detail page."
+        },
+        {
+          "id": "TC-SP-610",
+          "severity": "P2",
+          "scenario": "Closing the edit drawer without saving discards changes",
+          "steps": "1. Open the edit drawer.\n2. Change the Name.\n3. Click Cancel.",
+          "expected": "The drawer closes. The sprint retains its original name."
+        },
+        {
+          "id": "TC-SP-611",
+          "severity": "P1",
+          "scenario": "Success toast appears after saving sprint edits",
+          "steps": "1. Make a valid change in the edit drawer and save.",
+          "expected": "A success toast appears confirming the sprint was updated."
+        }
+      ]
+    },
+    {
+      "id": "TC-SP-700",
+      "name": "Activate & Deactivate (Toggle Active)",
+      "test_cases": [
+        {
+          "id": "TC-SP-701",
+          "severity": "P1",
+          "scenario": "Toggle Active on an active sprint shows a deactivate confirmation modal",
+          "steps": "1. Find an active sprint.\n2. Click the Toggle Active action.",
+          "expected": "A deactivation confirmation modal appears."
+        },
+        {
+          "id": "TC-SP-702",
+          "severity": "P1",
+          "scenario": "Toggle Active on an inactive sprint shows an activate confirmation modal",
+          "steps": "1. Find an inactive sprint.\n2. Click the Toggle Active action.",
+          "expected": "An activation confirmation modal appears."
+        },
+        {
+          "id": "TC-SP-703",
+          "severity": "P0",
+          "scenario": "Confirming deactivation marks the sprint as inactive",
+          "steps": "1. Click Toggle Active on an active sprint.\n2. Confirm deactivation.",
+          "expected": "The modal closes. The sprint's Active column changes to inactive. A success toast confirms the change."
+        },
+        {
+          "id": "TC-SP-704",
+          "severity": "P0",
+          "scenario": "Confirming activation marks the sprint as active",
+          "steps": "1. Click Toggle Active on an inactive sprint.\n2. Confirm activation.",
+          "expected": "The modal closes. The sprint's Active column changes to active. A success toast confirms the change."
+        },
+        {
+          "id": "TC-SP-705",
+          "severity": "P1",
+          "scenario": "Cancelling the activate/deactivate modal leaves the sprint unchanged",
+          "steps": "1. Click Toggle Active on any sprint.\n2. Click Cancel in the modal.",
+          "expected": "The modal closes. The sprint's active state is unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-SP-800",
+      "name": "Set Active (Mark as In Progress)",
+      "test_cases": [
+        {
+          "id": "TC-SP-801",
+          "severity": "P1",
+          "scenario": "Set Active action is visible for sprints not currently in progress",
+          "steps": "1. Find a sprint whose Status is not 'In Progress'.\n2. Observe the row actions.",
+          "expected": "The 'Set Active' action button is visible for that sprint."
+        },
+        {
+          "id": "TC-SP-802",
+          "severity": "P1",
+          "scenario": "Set Active action is hidden for sprints already in progress",
+          "steps": "1. Find a sprint whose Status is 'In Progress'.\n2. Observe the row actions.",
+          "expected": "The 'Set Active' action button is not visible for the in-progress sprint."
+        },
+        {
+          "id": "TC-SP-803",
+          "severity": "P0",
+          "scenario": "Clicking Set Active marks the sprint as the current in-progress sprint",
+          "steps": "1. Click 'Set Active' on a sprint that is not currently in progress.\n2. Confirm if prompted.",
+          "expected": "The sprint's Status updates to 'In Progress'. A success toast confirms the change. The Set Active action disappears for this sprint."
+        },
+        {
+          "id": "TC-SP-804",
+          "severity": "P1",
+          "scenario": "Only one sprint per financial year can be in progress at a time",
+          "steps": "1. Note which sprint is currently in progress.\n2. Click Set Active on a different sprint in the same financial year.",
+          "expected": "The new sprint becomes 'In Progress'. The previously in-progress sprint's status is updated. Only one sprint is in progress at any given time."
+        },
+        {
+          "id": "TC-SP-805",
+          "severity": "P2",
+          "scenario": "The in-progress sprint is reflected in the sprint pill in the page header",
+          "steps": "1. Set a sprint as active (In Progress).\n2. Observe the sprint pill/indicator in the application header.",
+          "expected": "The sprint pill in the header updates to show the name and remaining time of the newly activated sprint."
+        }
+      ]
+    },
+    {
+      "id": "TC-SP-900",
+      "name": "Lock & Unlock (Close Sprint)",
+      "test_cases": [
+        {
+          "id": "TC-SP-901",
+          "severity": "P1",
+          "scenario": "Lock / Unlock action is visible for users with the close sprint permission",
+          "steps": "1. Log in as a user with can_close_sprint permission.\n2. Navigate to the Sprints page.",
+          "expected": "A 'Lock / Unlock' action button (lock icon) is visible on sprint rows."
+        },
+        {
+          "id": "TC-SP-902",
+          "severity": "P0",
+          "scenario": "Clicking Lock / Unlock on an open sprint locks it",
+          "steps": "1. Find a sprint where is_closed is false.\n2. Click the Lock / Unlock action.\n3. Confirm if prompted.",
+          "expected": "The sprint's Closed column updates to show locked/closed. A success toast confirms the sprint is now locked."
+        },
+        {
+          "id": "TC-SP-903",
+          "severity": "P0",
+          "scenario": "Clicking Lock / Unlock on a locked sprint unlocks it",
+          "steps": "1. Find a sprint where is_closed is true.\n2. Click the Lock / Unlock action.\n3. Confirm if prompted.",
+          "expected": "The sprint's Closed column updates to show unlocked/open. A success toast confirms the sprint is now unlocked."
+        },
+        {
+          "id": "TC-SP-904",
+          "severity": "P1",
+          "scenario": "Lock / Unlock action is not visible for users without the close permission",
+          "steps": "1. Log in as a user with change permission but WITHOUT can_close_sprint.\n2. Navigate to the Sprints page.",
+          "expected": "The Lock / Unlock action is not shown on any sprint row."
+        },
+        {
+          "id": "TC-SP-905",
+          "severity": "P2",
+          "scenario": "The Closed column in the table reflects the locked/unlocked state",
+          "steps": "1. Lock a sprint.\n2. Observe the Closed column for that sprint.",
+          "expected": "The Closed column shows a locked indicator. After unlocking, it shows an unlocked indicator."
+        },
+        {
+          "id": "TC-SP-906",
+          "severity": "P2",
+          "scenario": "Locked sprint's closed state is visible on the sprint detail page",
+          "steps": "1. Lock a sprint.\n2. Navigate to the sprint detail page.",
+          "expected": "The Closed field in the info panel on the detail page shows the locked/closed state."
+        }
+      ]
+    },
+    {
+      "id": "TC-SP-1000",
+      "name": "Deleting a Sprint",
+      "test_cases": [
+        {
+          "id": "TC-SP-1001",
+          "severity": "P0",
+          "scenario": "Clicking Delete shows a confirmation modal",
+          "steps": "1. Click the Delete action on a sprint row.",
+          "expected": "A delete confirmation modal appears referencing the selected sprint."
+        },
+        {
+          "id": "TC-SP-1002",
+          "severity": "P0",
+          "scenario": "Confirming deletion permanently removes the sprint",
+          "steps": "1. Click Delete on a sprint.\n2. Type the required confirmation text.\n3. Click the confirm delete button.",
+          "expected": "The modal closes. The sprint is removed from the table. A success toast confirms the deletion."
+        },
+        {
+          "id": "TC-SP-1003",
+          "severity": "P1",
+          "scenario": "Delete confirm button is disabled until correct confirmation text is typed",
+          "steps": "1. Click Delete on a sprint.\n2. Leave the confirmation field empty or type incorrect text.",
+          "expected": "The confirm delete button remains disabled."
+        },
+        {
+          "id": "TC-SP-1004",
+          "severity": "P1",
+          "scenario": "Cancelling the delete modal keeps the sprint intact",
+          "steps": "1. Click Delete on a sprint.\n2. Click Cancel.",
+          "expected": "The modal closes. The sprint remains in the table."
+        },
+        {
+          "id": "TC-SP-1005",
+          "severity": "P3",
+          "scenario": "Delete confirmation modal warns the action is permanent",
+          "steps": "1. Click Delete on any sprint.\n2. Read the modal body text.",
+          "expected": "The modal warns that deletion is permanent and cannot be undone."
+        }
+      ]
+    },
+    {
+      "id": "TC-SP-1100",
+      "name": "Importing Sprints",
+      "test_cases": [
+        {
+          "id": "TC-SP-1101",
+          "severity": "P1",
+          "scenario": "Import button is visible on the Sprints page",
+          "steps": "1. Navigate to the Sprints page with manage permissions.",
+          "expected": "An Import button is visible in the page header."
+        },
+        {
+          "id": "TC-SP-1102",
+          "severity": "P1",
+          "scenario": "Clicking Import opens the import view",
+          "steps": "1. Click the Import button.",
+          "expected": "The import view opens with options to download a sample file and upload a file."
+        },
+        {
+          "id": "TC-SP-1103",
+          "severity": "P2",
+          "scenario": "Sample import file can be downloaded",
+          "steps": "1. Open the import view.\n2. Click the sample file download link.",
+          "expected": "A CSV sample file is downloaded with the expected import columns."
+        },
+        {
+          "id": "TC-SP-1104",
+          "severity": "P0",
+          "scenario": "A valid CSV imports sprints successfully",
+          "steps": "1. Prepare a valid CSV with financial_year, sprint_number, start_date, and end_date.\n2. Upload it and confirm the import.",
+          "expected": "The import completes. A success message shows the count of records imported. The table shows the new sprints."
+        },
+        {
+          "id": "TC-SP-1105",
+          "severity": "P1",
+          "scenario": "Uploading an invalid file format is rejected",
+          "steps": "1. Attempt to upload a .pdf or image file.",
+          "expected": "The import view rejects the file and shows an error message."
+        },
+        {
+          "id": "TC-SP-1106",
+          "severity": "P1",
+          "scenario": "Importing a row with an invalid financial year shows a row-level error",
+          "steps": "1. Prepare a CSV with a financial_year value that does not exist in the system.\n2. Import it.",
+          "expected": "The import reports an error for that row. The row is skipped."
+        },
+        {
+          "id": "TC-SP-1107",
+          "severity": "P1",
+          "scenario": "Importing a row where End Date is before Start Date shows a row-level error",
+          "steps": "1. Prepare a CSV row where end_date is before start_date.\n2. Import it.",
+          "expected": "A date validation error is reported for that row. The row is not imported."
+        },
+        {
+          "id": "TC-SP-1108",
+          "severity": "P1",
+          "scenario": "Table refreshes after a successful import",
+          "steps": "1. Import a valid CSV.\n2. Observe the table.",
+          "expected": "The sprint table refreshes and shows the newly imported sprints."
+        }
+      ]
+    },
+    {
+      "id": "TC-SP-1200",
+      "name": "Exporting Sprints",
+      "test_cases": [
+        {
+          "id": "TC-SP-1201",
+          "severity": "P1",
+          "scenario": "Export button is visible on the Sprints page",
+          "steps": "1. Navigate to the Sprints page with manage permissions.",
+          "expected": "An Export button is visible in the page header."
+        },
+        {
+          "id": "TC-SP-1202",
+          "severity": "P1",
+          "scenario": "Clicking Export opens the export view",
+          "steps": "1. Click the Export button.",
+          "expected": "The export configuration panel opens."
+        },
+        {
+          "id": "TC-SP-1203",
+          "severity": "P0",
+          "scenario": "Sprints can be exported and a file is downloaded",
+          "steps": "1. Open the export view.\n2. Configure and initiate the export.",
+          "expected": "A file is downloaded containing sprint data."
+        },
+        {
+          "id": "TC-SP-1204",
+          "severity": "P1",
+          "scenario": "Exported file contains expected columns",
+          "steps": "1. Export all sprints.\n2. Open the file.",
+          "expected": "The file includes: Name, Financial Year, Code, Start Date, End Date, Month, Status, Closed, Active at minimum."
+        },
+        {
+          "id": "TC-SP-1205",
+          "severity": "P1",
+          "scenario": "Export respects active Financial Year filter",
+          "steps": "1. Filter by a specific financial year.\n2. Export.",
+          "expected": "The exported file contains only sprints from the filtered financial year."
+        },
+        {
+          "id": "TC-SP-1206",
+          "severity": "P2",
+          "scenario": "Export view can be closed without exporting",
+          "steps": "1. Open the export view.\n2. Close without downloading.",
+          "expected": "The export view closes. No file is downloaded."
+        }
+      ]
+    },
+    {
+      "id": "TC-SP-1300",
+      "name": "Non-Functional & Accessibility",
+      "test_cases": [
+        {
+          "id": "TC-SP-1301",
+          "severity": "P1",
+          "scenario": "All interactive elements on the Sprints page are keyboard accessible",
+          "steps": "1. Navigate to the Sprints page.\n2. Use only Tab and Enter/Space to reach and activate all controls: filters, buttons, row actions.",
+          "expected": "Every interactive element is reachable and operable by keyboard."
+        },
+        {
+          "id": "TC-SP-1302",
+          "severity": "P1",
+          "scenario": "Full sprint creation can be completed via keyboard only",
+          "steps": "1. Use keyboard to open the Add Sprint drawer.\n2. Tab through Financial Year, Sprint Number, Name, Start Date, End Date.\n3. Submit via keyboard.",
+          "expected": "A sprint is created successfully without using the mouse."
+        },
+        {
+          "id": "TC-SP-1303",
+          "severity": "P2",
+          "scenario": "Focus is trapped within open drawers",
+          "steps": "1. Open the Add Sprint drawer.\n2. Press Tab repeatedly.",
+          "expected": "Focus cycles within the drawer and does not escape to the page behind."
+        },
+        {
+          "id": "TC-SP-1304",
+          "severity": "P2",
+          "scenario": "Delete confirmation modal is keyboard accessible",
+          "steps": "1. Trigger the delete modal via keyboard.\n2. Tab between Cancel and Confirm.\n3. Activate via Enter.",
+          "expected": "Focus is managed inside the modal. Both buttons are keyboard reachable."
+        },
+        {
+          "id": "TC-SP-1305",
+          "severity": "P2",
+          "scenario": "Validation error messages are clear and descriptive",
+          "steps": "1. Submit the create form with all required fields empty.\n2. Read the error messages.",
+          "expected": "Each error clearly states what field is required or invalid."
+        },
+        {
+          "id": "TC-SP-1306",
+          "severity": "P1",
+          "scenario": "No internal error details are exposed to the user",
+          "steps": "1. Trigger error conditions (invalid input, network errors).\n2. Observe error messages.",
+          "expected": "Messages are user-friendly and do not expose stack traces, database errors, or server details."
+        },
+        {
+          "id": "TC-SP-1307",
+          "severity": "P0",
+          "scenario": "Session expiry prevents sprint actions",
+          "steps": "1. Allow the session to expire.\n2. Attempt to create or edit a sprint.",
+          "expected": "The user is redirected to login. No data is changed."
+        },
+        {
+          "id": "TC-SP-1308",
+          "severity": "P2",
+          "scenario": "Both sprints list page and detail page render correctly in dark theme",
+          "steps": "1. Navigate to the Sprints page and then to a detail page.\n2. Toggle to dark theme.",
+          "expected": "All elements render correctly in dark mode — table, filters, drawers, capacity table, progress bar."
+        },
+        {
+          "id": "TC-SP-1309",
+          "severity": "P3",
+          "scenario": "Sprints page and detail page load within an acceptable time",
+          "steps": "1. Navigate to the Sprints page and then to a detail page.",
+          "expected": "Both pages and their data load within a reasonable time (typically under 3 seconds)."
+        }
+      ]
+    },
+    {
+      "id": "TC-SP-1400",
+      "name": "Desktop Layout",
+      "test_cases": [
+        {
+          "id": "TC-SP-1401",
+          "severity": "P1",
+          "scenario": "All table columns are visible on desktop viewports",
+          "steps": "1. Open the Sprints page on a desktop browser (viewport ≥ 1024px).",
+          "expected": "All columns are visible: Name, Financial Year, Code, Start Date, End Date, Month, Status, Closed, Active, Created."
+        },
+        {
+          "id": "TC-SP-1402",
+          "severity": "P2",
+          "scenario": "All four filters are displayed inline in the filter bar on desktop",
+          "steps": "1. View the Sprints page on a desktop viewport.",
+          "expected": "Search, Sprint Status, Financial Year, and Is Active filters are shown horizontally in the filter bar above the table."
+        },
+        {
+          "id": "TC-SP-1403",
+          "severity": "P2",
+          "scenario": "Detail page shows left info panel and right capacity panel side by side on desktop",
+          "steps": "1. Navigate to a sprint detail page on desktop.",
+          "expected": "The sprint information panel occupies the left column and the Capacity section occupies the wider right column."
+        },
+        {
+          "id": "TC-SP-1404",
+          "severity": "P2",
+          "scenario": "Forecast, Actuals, and Rebuild Capacity buttons are aligned in the detail page header on desktop",
+          "steps": "1. Navigate to a sprint detail page on desktop.",
+          "expected": "Forecast, Actuals, and Rebuild Capacity buttons are aligned horizontally in the page header without overflow."
+        },
+        {
+          "id": "TC-SP-1405",
+          "severity": "P2",
+          "scenario": "Drawers open as a wide side panel on desktop",
+          "steps": "1. Open the create drawer on a desktop browser.",
+          "expected": "The drawer opens at 900px width as a side panel. Financial Year, Sprint Number, Start Date, and End Date are shown in a two-column grid."
+        }
+      ]
+    },
+    {
+      "id": "TC-SP-1500",
+      "name": "Mobile & Responsive",
+      "test_cases": [
+        {
+          "id": "TC-SP-1501",
+          "severity": "P1",
+          "scenario": "Secondary columns are hidden on mobile viewports",
+          "steps": "1. Open the Sprints page on a mobile viewport (≤ 767px).",
+          "expected": "Financial Year, Code, Start Date, End Date, Month, Closed, Active, and Created are hidden. Name and Status remain visible."
+        },
+        {
+          "id": "TC-SP-1502",
+          "severity": "P1",
+          "scenario": "Add Sprint drawer is usable on mobile",
+          "steps": "1. Open the Add Sprint drawer on a mobile device.\n2. Fill in required fields.\n3. Submit.",
+          "expected": "The drawer is fully functional on mobile. The sprint is created without layout issues."
+        },
+        {
+          "id": "TC-SP-1503",
+          "severity": "P2",
+          "scenario": "Start Date and End Date stack vertically in the create drawer on mobile",
+          "steps": "1. Open the Add Sprint drawer on a mobile viewport.",
+          "expected": "Start Date and End Date are stacked vertically on small screens."
+        },
+        {
+          "id": "TC-SP-1504",
+          "severity": "P2",
+          "scenario": "Sprint detail page stacks info panel above capacity panel on mobile",
+          "steps": "1. Navigate to a sprint detail page on a mobile viewport.",
+          "expected": "The info panel stacks above the Capacity section. Both sections are scrollable and fully readable."
+        },
+        {
+          "id": "TC-SP-1505",
+          "severity": "P2",
+          "scenario": "Capacity table secondary columns are hidden on mobile",
+          "steps": "1. Navigate to a sprint detail page on a mobile viewport.\n2. Observe the Capacity table.",
+          "expected": "Team, Location, Working Days, Holidays, and Leaves columns are hidden. Member and Net Capacity remain visible."
+        },
+        {
+          "id": "TC-SP-1506",
+          "severity": "P2",
+          "scenario": "Filters are accessible on mobile",
+          "steps": "1. Open the Sprints page on a mobile viewport.\n2. Tap each filter dropdown.",
+          "expected": "All four filters (Search, Sprint Status, Financial Year, Is Active) are accessible and functional on mobile."
+        },
+        {
+          "id": "TC-SP-1507",
+          "severity": "P3",
+          "scenario": "Page header does not overflow on small mobile viewports",
+          "steps": "1. Open the Sprints page on a 375px-wide viewport.",
+          "expected": "Title and action buttons do not overflow or overlap."
+        }
+      ]
+    },
+    {
+      "id": "TC-SP-1600",
+      "name": "Integration with Other Modules",
+      "test_cases": [
+        {
+          "id": "TC-SP-1601",
+          "severity": "P1",
+          "scenario": "Sprint capacity accounts for member leaves during the sprint period",
+          "steps": "1. Record a leave for a member during a sprint period.\n2. Navigate to the sprint detail page.",
+          "expected": "The member's Leaves column in the capacity table shows the correct leave days. Net Capacity is reduced accordingly."
+        },
+        {
+          "id": "TC-SP-1602",
+          "severity": "P1",
+          "scenario": "Sprint capacity accounts for public holidays during the sprint period",
+          "steps": "1. Ensure a public holiday exists during a sprint period for a member's location.\n2. Navigate to the sprint detail page.",
+          "expected": "The member's Holidays column shows the correct holiday count. Net Capacity reflects the reduction."
+        },
+        {
+          "id": "TC-SP-1603",
+          "severity": "P1",
+          "scenario": "Rebuild Capacity updates capacity after leave or holiday changes",
+          "steps": "1. Add a leave for a member during a sprint.\n2. Navigate to the sprint detail page.\n3. Click 'Rebuild Capacity'.",
+          "expected": "The capacity table refreshes and reflects the updated leave days and net capacity."
+        },
+        {
+          "id": "TC-SP-1604",
+          "severity": "P1",
+          "scenario": "Sprints belong to a Financial Year and are filtered by it",
+          "steps": "1. Create sprints for two different financial years.\n2. On the Sprints page, filter by one financial year.",
+          "expected": "Only sprints belonging to the selected financial year are displayed."
+        },
+        {
+          "id": "TC-SP-1605",
+          "severity": "P1",
+          "scenario": "The active (in-progress) sprint is reflected in the sprint pill in the application header",
+          "steps": "1. Set a sprint as active (In Progress).\n2. Navigate to different pages of the application.",
+          "expected": "The sprint pill in the application header shows the name and end date of the in-progress sprint across all pages."
+        },
+        {
+          "id": "TC-SP-1606",
+          "severity": "P2",
+          "scenario": "Generating sprints for a financial year creates one sprint per configured duration period",
+          "steps": "1. Open Generate Sprints.\n2. Select a financial year with no existing sprints.\n3. Generate.",
+          "expected": "The correct number of sprints is created to cover the full financial year duration, each with appropriate start and end dates based on the configured sprint length."
+        },
+        {
+          "id": "TC-SP-1607",
+          "severity": "P2",
+          "scenario": "Financial Year filter in the Sprints page shows only active financial years",
+          "steps": "1. Navigate to the Sprints page.\n2. Click the Financial Year filter dropdown.",
+          "expected": "The Financial Year filter lists financial years configured in the system."
+        },
+        {
+          "id": "TC-SP-1608",
+          "severity": "P2",
+          "scenario": "Sprint code is unique and auto-generated from financial year and sprint number",
+          "steps": "1. Create two sprints with different sprint numbers under the same financial year.\n2. Compare their codes.",
+          "expected": "Each sprint has a unique auto-generated code that incorporates the financial year and sprint number."
+        }
+      ]
+    }
+  ]
+}

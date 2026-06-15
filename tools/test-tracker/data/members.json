@@ -1,0 +1,767 @@
+{
+  "module": {
+    "slug": "members",
+    "name": "Members",
+    "sort_order": 10,
+    "parent": {
+      "slug": "people",
+      "name": "People",
+      "sort_order": 7
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-MB-100",
+      "name": "Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-MB-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user is redirected away from the Members page",
+          "steps": "1. Open the Members page URL without being logged in.",
+          "expected": "The browser redirects to the login page. The Members page is not shown."
+        },
+        {
+          "id": "TC-MB-102",
+          "severity": "P1",
+          "scenario": "Authenticated user with view-only access can see the Members list",
+          "steps": "1. Log in as a user with no workforce management permissions.\n2. Navigate to People > Members.",
+          "expected": "The Members list loads and all members are visible. No Edit or Assign Team actions appear on any row."
+        },
+        {
+          "id": "TC-MB-103",
+          "severity": "P1",
+          "scenario": "User without Edit workforce permission does not see the Edit action on member rows",
+          "steps": "1. Log in as a user without the 'can_change_workforce' permission.\n2. Navigate to People > Members.\n3. Hover over or expand a member row's action menu.",
+          "expected": "No Edit option appears in the row actions. Other actions (if permitted) are visible."
+        },
+        {
+          "id": "TC-MB-104",
+          "severity": "P1",
+          "scenario": "User without Assign Team permission does not see the Assign Team action",
+          "steps": "1. Log in as a user without the 'can_assign_team' permission.\n2. Navigate to People > Members.\n3. Hover over or expand a member row's action menu.",
+          "expected": "No Assign Team option appears in the row actions."
+        },
+        {
+          "id": "TC-MB-105",
+          "severity": "P1",
+          "scenario": "View drawer shown without 'Edit member' button for users without edit permission",
+          "steps": "1. Log in as a user without the 'can_change_workforce' permission.\n2. Navigate to People > Members.\n3. Click on any member row to open the view drawer.",
+          "expected": "The view drawer opens showing member details. The footer shows only a 'Close' button — no 'Edit member' button is present."
+        },
+        {
+          "id": "TC-MB-106",
+          "severity": "P1",
+          "scenario": "User with Edit workforce permission sees Edit action and Edit member button in view drawer",
+          "steps": "1. Log in as a user with the 'can_change_workforce' permission.\n2. Navigate to People > Members.\n3. Hover over a member row to reveal row actions.\n4. Also click the row to open the view drawer.",
+          "expected": "An Edit action appears in the row actions. The view drawer footer shows an 'Edit member' button."
+        },
+        {
+          "id": "TC-MB-107",
+          "severity": "P1",
+          "scenario": "User with Assign Team permission sees Assign Team action on rows",
+          "steps": "1. Log in as a user with the 'can_assign_team' permission.\n2. Navigate to People > Members.\n3. Hover over or expand a member row's action menu.",
+          "expected": "An 'Assign Team' option appears in the row actions."
+        },
+        {
+          "id": "TC-MB-108",
+          "severity": "P2",
+          "scenario": "Export button is hidden until the page data loads",
+          "steps": "1. Navigate to People > Members.\n2. Observe the Export button state as the page loads.",
+          "expected": "The Export button is hidden initially and becomes visible once the table data has loaded."
+        }
+      ]
+    },
+    {
+      "id": "TC-MB-200",
+      "name": "Browsing & Filtering",
+      "test_cases": [
+        {
+          "id": "TC-MB-201",
+          "severity": "P0",
+          "scenario": "Members page loads with the correct layout and table",
+          "steps": "1. Navigate to People > Members.",
+          "expected": "The page displays the 'People' eyebrow, 'Members' heading, and subtitle 'View and manage your organisation's workforce details.' The filter panel and members table are visible. The table shows avatar, Name, Email, Location, Employment Type, Role, Status, Team, and Joined columns."
+        },
+        {
+          "id": "TC-MB-202",
+          "severity": "P1",
+          "scenario": "Members list defaults to showing only active members",
+          "steps": "1. Navigate to People > Members.\n2. Check the Is Active filter value.",
+          "expected": "The Is Active filter is set to 'Active' by default. Only active members are shown in the table."
+        },
+        {
+          "id": "TC-MB-203",
+          "severity": "P1",
+          "scenario": "Search by member name filters the list",
+          "steps": "1. Navigate to People > Members.\n2. Type a member's name into the search field.",
+          "expected": "The table updates to show only members whose names match the search text. Non-matching members are hidden."
+        },
+        {
+          "id": "TC-MB-204",
+          "severity": "P1",
+          "scenario": "Search by email address finds matching members",
+          "steps": "1. Navigate to People > Members.\n2. Type a partial or full email address into the search field.",
+          "expected": "Members with matching email addresses appear in the results."
+        },
+        {
+          "id": "TC-MB-205",
+          "severity": "P1",
+          "scenario": "Is Active filter set to 'All' shows both active and inactive members",
+          "steps": "1. Navigate to People > Members.\n2. Change the Is Active filter to 'All'.",
+          "expected": "The table now shows both active and inactive members. Inactive members are distinguishable by their Status column value."
+        },
+        {
+          "id": "TC-MB-206",
+          "severity": "P1",
+          "scenario": "Is Active filter set to 'Inactive' shows only inactive members",
+          "steps": "1. Navigate to People > Members.\n2. Change the Is Active filter to 'Inactive'.",
+          "expected": "Only members with inactive status are listed in the table."
+        },
+        {
+          "id": "TC-MB-207",
+          "severity": "P1",
+          "scenario": "Role filter narrows the list to members with the selected role",
+          "steps": "1. Navigate to People > Members.\n2. Select a role from the Role filter dropdown.",
+          "expected": "The table updates to show only members assigned to the selected role."
+        },
+        {
+          "id": "TC-MB-208",
+          "severity": "P1",
+          "scenario": "Employment Type filter narrows the list to members with the selected employment type",
+          "steps": "1. Navigate to People > Members.\n2. Select an employment type from the Employment Type filter dropdown.",
+          "expected": "Only members with the selected employment type are shown."
+        },
+        {
+          "id": "TC-MB-209",
+          "severity": "P1",
+          "scenario": "Location filter narrows the list to members in the selected location",
+          "steps": "1. Navigate to People > Members.\n2. Select a location from the Location filter dropdown.",
+          "expected": "Only members assigned to the selected location are shown."
+        },
+        {
+          "id": "TC-MB-210",
+          "severity": "P1",
+          "scenario": "Team filter narrows the list to members in the selected team",
+          "steps": "1. Navigate to People > Members.\n2. Select a team from the Team filter dropdown.",
+          "expected": "Only members who belong to the selected team are displayed."
+        },
+        {
+          "id": "TC-MB-211",
+          "severity": "P1",
+          "scenario": "Multiple filters combine to further narrow results",
+          "steps": "1. Navigate to People > Members.\n2. Select a specific Role.\n3. Also select a specific Location.",
+          "expected": "Only members who match both the selected role and the selected location are shown. The result set is smaller than each filter applied alone."
+        },
+        {
+          "id": "TC-MB-212",
+          "severity": "P2",
+          "scenario": "Table can be sorted by the Name column",
+          "steps": "1. Navigate to People > Members.\n2. Click the 'Name' column header once.\n3. Click it again.",
+          "expected": "First click sorts members alphabetically by name (A–Z). Second click reverses the sort (Z–A)."
+        },
+        {
+          "id": "TC-MB-213",
+          "severity": "P2",
+          "scenario": "Table can be sorted by the Email column",
+          "steps": "1. Navigate to People > Members.\n2. Click the 'Email' column header.",
+          "expected": "The table reorders members by their email address alphabetically."
+        },
+        {
+          "id": "TC-MB-214",
+          "severity": "P2",
+          "scenario": "Table can be sorted by the Location column",
+          "steps": "1. Navigate to People > Members.\n2. Click the 'Location' column header.",
+          "expected": "Members are reordered alphabetically by their location name."
+        },
+        {
+          "id": "TC-MB-215",
+          "severity": "P2",
+          "scenario": "Table can be sorted by Employment Type and Role columns",
+          "steps": "1. Navigate to People > Members.\n2. Click the 'Employment Type' column header.\n3. Then click the 'Role' column header.",
+          "expected": "Each click reorders the table by the respective column. Sort direction indicator (arrow) is shown on the active sort column."
+        },
+        {
+          "id": "TC-MB-216",
+          "severity": "P2",
+          "scenario": "Table can be sorted by the Joined date column",
+          "steps": "1. Navigate to People > Members.\n2. Click the 'Joined' column header.",
+          "expected": "The table reorders members by their joined date, oldest first. Clicking again reverses to newest first."
+        },
+        {
+          "id": "TC-MB-217",
+          "severity": "P2",
+          "scenario": "Pagination works correctly when there are more than 25 members",
+          "steps": "1. Navigate to People > Members with the Is Active filter set to 'All'.\n2. If there are more than 25 members, scroll to the bottom of the table.",
+          "expected": "Pagination controls appear. Clicking the next page loads the next set of members. The total count is reflected accurately."
+        },
+        {
+          "id": "TC-MB-218",
+          "severity": "P2",
+          "scenario": "No results message shown when search returns no members",
+          "steps": "1. Navigate to People > Members.\n2. Type a search term that matches no member names or emails.",
+          "expected": "The table shows an empty state message: 'No members found.' No table rows are present."
+        },
+        {
+          "id": "TC-MB-219",
+          "severity": "P3",
+          "scenario": "Pressing '/' keyboard shortcut focuses the search field",
+          "steps": "1. Navigate to People > Members.\n2. Ensure focus is not already in a text input.\n3. Press the '/' key on the keyboard.",
+          "expected": "The search field receives keyboard focus and is ready for text input."
+        },
+        {
+          "id": "TC-MB-220",
+          "severity": "P2",
+          "scenario": "Active filter chips displayed below the filter panel",
+          "steps": "1. Navigate to People > Members.\n2. Apply a Role filter and a Location filter.",
+          "expected": "Active filter tags/chips appear below the filter panel showing the selected Role and Location. Each chip can be removed individually to clear that filter."
+        }
+      ]
+    },
+    {
+      "id": "TC-MB-300",
+      "name": "View Drawer",
+      "test_cases": [
+        {
+          "id": "TC-MB-301",
+          "severity": "P1",
+          "scenario": "Clicking a member row opens the view drawer",
+          "steps": "1. Navigate to People > Members.\n2. Click anywhere on a member's table row (not on an action button).",
+          "expected": "A slide-in view drawer opens from the right showing the selected member's details."
+        },
+        {
+          "id": "TC-MB-302",
+          "severity": "P1",
+          "scenario": "View drawer shows all expected member detail fields",
+          "steps": "1. Navigate to People > Members.\n2. Click a member row to open the view drawer.",
+          "expected": "The view drawer displays: member avatar, Code (monospace), Status, First name, Last name, Display name, Email address, Location, Employment type, Role, Joined date, Leaving date, Default holidays, Skills (as badge tags), Teams (as badge tags), Created (meta), and Created by (meta)."
+        },
+        {
+          "id": "TC-MB-303",
+          "severity": "P1",
+          "scenario": "Close button dismisses the view drawer",
+          "steps": "1. Navigate to People > Members.\n2. Click a member row to open the view drawer.\n3. Click the 'Close' button in the drawer footer.",
+          "expected": "The view drawer slides closed. The member list is still visible and unchanged."
+        },
+        {
+          "id": "TC-MB-304",
+          "severity": "P1",
+          "scenario": "View drawer shows 'Edit member' footer button for users with edit permission",
+          "steps": "1. Log in as a user with the 'can_change_workforce' permission.\n2. Navigate to People > Members.\n3. Click a member row to open the view drawer.",
+          "expected": "The view drawer footer shows an 'Edit member' button alongside the 'Close' button."
+        },
+        {
+          "id": "TC-MB-305",
+          "severity": "P1",
+          "scenario": "View drawer shows only Close button for users without edit permission",
+          "steps": "1. Log in as a user without the 'can_change_workforce' permission.\n2. Navigate to People > Members.\n3. Click a member row to open the view drawer.",
+          "expected": "The view drawer footer shows only the 'Close' button. No 'Edit member' button is present."
+        },
+        {
+          "id": "TC-MB-306",
+          "severity": "P1",
+          "scenario": "Clicking 'Edit member' in view drawer opens the edit drawer for the same member",
+          "steps": "1. Log in as a user with the 'can_change_workforce' permission.\n2. Navigate to People > Members.\n3. Click a member row to open the view drawer.\n4. Click the 'Edit member' button in the view drawer footer.",
+          "expected": "The view drawer closes and the edit drawer opens for the same member, pre-populated with their current details."
+        },
+        {
+          "id": "TC-MB-307",
+          "severity": "P2",
+          "scenario": "Skills appear as badge tags in the view drawer",
+          "steps": "1. Navigate to People > Members.\n2. Click a member row who has skills assigned.",
+          "expected": "The Skills field in the view drawer shows each skill as a soft-styled badge tag."
+        },
+        {
+          "id": "TC-MB-308",
+          "severity": "P2",
+          "scenario": "Teams appear as badge tags in the view drawer",
+          "steps": "1. Navigate to People > Members.\n2. Click a member row who belongs to one or more teams.",
+          "expected": "The Teams field in the view drawer shows each team as a soft-styled badge tag."
+        },
+        {
+          "id": "TC-MB-309",
+          "severity": "P2",
+          "scenario": "Member with no skills shows empty Skills field in view drawer",
+          "steps": "1. Navigate to People > Members.\n2. Click a member row who has no skills assigned.",
+          "expected": "The Skills field in the view drawer is blank or shows a dash — no badge tags appear."
+        },
+        {
+          "id": "TC-MB-310",
+          "severity": "P2",
+          "scenario": "Member with no team shows empty Teams field in view drawer",
+          "steps": "1. Navigate to People > Members.\n2. Click a member row who is not assigned to any team.",
+          "expected": "The Teams field in the view drawer is blank or shows a dash — no badge tags appear."
+        },
+        {
+          "id": "TC-MB-311",
+          "severity": "P2",
+          "scenario": "Leaving date is blank in view drawer if not set for the member",
+          "steps": "1. Navigate to People > Members.\n2. Click a member who does not have a leaving date set.",
+          "expected": "The Leaving date field in the view drawer is empty or displays a dash."
+        },
+        {
+          "id": "TC-MB-312",
+          "severity": "P3",
+          "scenario": "Member code shown in monospace style in the view drawer",
+          "steps": "1. Navigate to People > Members.\n2. Click a member row to open the view drawer.",
+          "expected": "The Code field displays in a monospace font style, distinguishable from other text fields."
+        }
+      ]
+    },
+    {
+      "id": "TC-MB-400",
+      "name": "Editing Members",
+      "test_cases": [
+        {
+          "id": "TC-MB-401",
+          "severity": "P0",
+          "scenario": "Edit action opens the edit drawer pre-populated with the member's current details",
+          "steps": "1. Log in as a user with the 'can_change_workforce' permission.\n2. Navigate to People > Members.\n3. Click the Edit action on a member row.",
+          "expected": "The edit drawer slides open. The member's avatar and name appear in the drawer header. The Location, Employment type, Role, Joined date, Leaving date, and Default holidays fields are pre-populated with the member's current values."
+        },
+        {
+          "id": "TC-MB-402",
+          "severity": "P1",
+          "scenario": "Edit drawer shows the informational banner about personal details",
+          "steps": "1. Log in as a user with the 'can_change_workforce' permission.\n2. Open the edit drawer for any member.",
+          "expected": "An information banner is displayed at the top of the edit drawer with the message: 'Personal details (name, display name, skills, etc.) can only be updated by the member themselves via their profile page.'"
+        },
+        {
+          "id": "TC-MB-403",
+          "severity": "P1",
+          "scenario": "Name, email, and skills fields are NOT editable in the edit drawer",
+          "steps": "1. Log in as a user with the 'can_change_workforce' permission.\n2. Open the edit drawer for a member.\n3. Look for Name, Email, and Skills fields.",
+          "expected": "There are no editable Name, Email, or Skills fields in the edit drawer. These details are only manageable by the member via their own profile."
+        },
+        {
+          "id": "TC-MB-404",
+          "severity": "P1",
+          "scenario": "User can change the member's Location",
+          "steps": "1. Open the edit drawer for a member.\n2. Change the Location dropdown to a different location.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes, a success toast appears, and the member's row in the table now shows the updated location."
+        },
+        {
+          "id": "TC-MB-405",
+          "severity": "P1",
+          "scenario": "User can change the member's Employment Type",
+          "steps": "1. Open the edit drawer for a member.\n2. Change the Employment type dropdown to a different type.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes, a success toast appears, and the member's employment type is updated in the table."
+        },
+        {
+          "id": "TC-MB-406",
+          "severity": "P1",
+          "scenario": "User can change the member's Role",
+          "steps": "1. Open the edit drawer for a member.\n2. Change the Role dropdown to a different role.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes, a success toast appears, and the member's role is updated in the table."
+        },
+        {
+          "id": "TC-MB-407",
+          "severity": "P1",
+          "scenario": "User can set or update the member's Joined date",
+          "steps": "1. Open the edit drawer for a member.\n2. Change or set the Joined date field to a new date.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes, a success toast appears, and the Joined date is updated."
+        },
+        {
+          "id": "TC-MB-408",
+          "severity": "P1",
+          "scenario": "User can set a Leaving date for the member",
+          "steps": "1. Open the edit drawer for a member with no leaving date.\n2. Enter a date in the Leaving date field.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes, a success toast appears, and the member's leaving date is stored. The view drawer reflects the new leaving date."
+        },
+        {
+          "id": "TC-MB-409",
+          "severity": "P1",
+          "scenario": "User can clear the Leaving date from a member",
+          "steps": "1. Open the edit drawer for a member who has a leaving date.\n2. Clear the Leaving date field.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes, a success toast appears, and the member's leaving date is removed. The view drawer shows the Leaving date field as empty."
+        },
+        {
+          "id": "TC-MB-410",
+          "severity": "P2",
+          "scenario": "Default holidays field accepts blank (uses organisation default)",
+          "steps": "1. Open the edit drawer for a member.\n2. Clear the Default holidays field entirely.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes successfully. The member will now use the organisation's default holiday allocation. The hint text 'Leave blank to use the organisation default.' indicates this is valid."
+        },
+        {
+          "id": "TC-MB-411",
+          "severity": "P2",
+          "scenario": "Default holidays accepts 0 as a valid value",
+          "steps": "1. Open the edit drawer for a member.\n2. Set the Default holidays field to 0.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes with a success toast. A value of 0 holiday days is stored for the member."
+        },
+        {
+          "id": "TC-MB-412",
+          "severity": "P1",
+          "scenario": "Default holidays does not accept negative numbers",
+          "steps": "1. Open the edit drawer for a member.\n2. Enter a negative number (e.g., -5) in the Default holidays field.\n3. Click 'Save changes'.",
+          "expected": "The field shows a validation error. The drawer does not close. The member's data is not changed."
+        },
+        {
+          "id": "TC-MB-413",
+          "severity": "P1",
+          "scenario": "Cancel button closes the edit drawer without saving changes",
+          "steps": "1. Open the edit drawer for a member.\n2. Change the Location to a different value.\n3. Click the 'Cancel' button.",
+          "expected": "The drawer closes without saving. The member's location in the table remains unchanged."
+        },
+        {
+          "id": "TC-MB-414",
+          "severity": "P1",
+          "scenario": "Save changes button shows a busy/loading state during submission",
+          "steps": "1. Open the edit drawer for a member.\n2. Make any change.\n3. Click 'Save changes' and observe the button state.",
+          "expected": "The button enters a loading/busy state (disabled with loading indicator) while the save is in progress. It reverts or shows success once the operation completes."
+        },
+        {
+          "id": "TC-MB-415",
+          "severity": "P1",
+          "scenario": "Error during save shows a toast and keeps the drawer open",
+          "steps": "1. Open the edit drawer for a member.\n2. Make a change.\n3. Simulate or encounter a network or server error during save.\n4. Observe the result.",
+          "expected": "An error toast appears with a helpful message. The edit drawer remains open with the user's changes still visible so they can retry."
+        },
+        {
+          "id": "TC-MB-416",
+          "severity": "P2",
+          "scenario": "Optional fields (Location, Employment Type, Role) can be cleared",
+          "steps": "1. Open the edit drawer for a member who has Location, Employment Type, and Role set.\n2. Clear all three fields.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes with a success toast. The member's Location, Employment Type, and Role are now empty in the table and view drawer."
+        }
+      ]
+    },
+    {
+      "id": "TC-MB-500",
+      "name": "Assigning Teams",
+      "test_cases": [
+        {
+          "id": "TC-MB-501",
+          "severity": "P0",
+          "scenario": "Assign Team action opens the assign team drawer",
+          "steps": "1. Log in as a user with the 'can_assign_team' permission.\n2. Navigate to People > Members.\n3. Click the 'Assign Team' action on a member row.",
+          "expected": "The assign team drawer slides open. The member's avatar and name appear in the drawer header."
+        },
+        {
+          "id": "TC-MB-502",
+          "severity": "P1",
+          "scenario": "Assign team drawer shows the informational banner about team limits",
+          "steps": "1. Open the Assign Team drawer for any member.",
+          "expected": "An information banner is displayed: 'Leadership members can be assigned to multiple teams. Other members can only be in one team at a time.'"
+        },
+        {
+          "id": "TC-MB-503",
+          "severity": "P1",
+          "scenario": "Team dropdown shows available teams",
+          "steps": "1. Open the Assign Team drawer for a member.\n2. Click the Team dropdown.",
+          "expected": "A list of available teams is shown in the dropdown for selection."
+        },
+        {
+          "id": "TC-MB-504",
+          "severity": "P1",
+          "scenario": "Team field is required — cannot save without selecting a team",
+          "steps": "1. Open the Assign Team drawer for a member.\n2. Leave the Team field empty.\n3. Click 'Save changes'.",
+          "expected": "A validation error appears on the Team field. The drawer does not close and no changes are saved."
+        },
+        {
+          "id": "TC-MB-505",
+          "severity": "P2",
+          "scenario": "Note field is optional — drawer can be saved without a note",
+          "steps": "1. Open the Assign Team drawer for a member.\n2. Select a team but leave the Note field blank.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes with a success toast. The team is assigned without requiring a note."
+        },
+        {
+          "id": "TC-MB-506",
+          "severity": "P1",
+          "scenario": "Assigning a team to a member updates the Teams column in the table",
+          "steps": "1. Open the Assign Team drawer for a member who has no team.\n2. Select a team.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes, a success toast appears, and the member's row in the table now shows the assigned team in the Team column."
+        },
+        {
+          "id": "TC-MB-507",
+          "severity": "P1",
+          "scenario": "Non-leadership member can only be in one team at a time",
+          "steps": "1. Open the Assign Team drawer for a non-leadership member who is already in a team.\n2. Select a different team.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes, a success toast appears, and the member is now assigned to the new team. Their previous team assignment is replaced."
+        },
+        {
+          "id": "TC-MB-508",
+          "severity": "P1",
+          "scenario": "Leadership member can be assigned to multiple teams",
+          "steps": "1. Open the Assign Team drawer for a member with a leadership role who is already in a team.\n2. Select an additional team.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes with a success toast. The member now belongs to multiple teams, shown as multiple badge tags in the Team column and view drawer."
+        },
+        {
+          "id": "TC-MB-509",
+          "severity": "P2",
+          "scenario": "Note is saved and visible in team assignment details",
+          "steps": "1. Open the Assign Team drawer for a member.\n2. Select a team.\n3. Enter a note such as 'Joining during Q3 restructure'.\n4. Click 'Save changes'.",
+          "expected": "The drawer closes with a success toast. The note is stored with the team assignment."
+        },
+        {
+          "id": "TC-MB-510",
+          "severity": "P1",
+          "scenario": "Cancel button closes the assign team drawer without saving",
+          "steps": "1. Open the Assign Team drawer for a member.\n2. Select a team.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes without assigning the team. The member's Team column in the table remains unchanged."
+        },
+        {
+          "id": "TC-MB-511",
+          "severity": "P1",
+          "scenario": "Error during team assignment shows a toast and keeps the drawer open",
+          "steps": "1. Open the Assign Team drawer for a member.\n2. Select a team.\n3. Simulate or encounter a network or server error during save.",
+          "expected": "An error toast appears with a helpful message. The assign team drawer stays open so the user can retry."
+        }
+      ]
+    },
+    {
+      "id": "TC-MB-600",
+      "name": "Exporting",
+      "test_cases": [
+        {
+          "id": "TC-MB-601",
+          "severity": "P1",
+          "scenario": "Export button is visible in the page header after data loads",
+          "steps": "1. Navigate to People > Members.\n2. Wait for the table to load.",
+          "expected": "An Export button with a download icon is visible in the top-right page actions area."
+        },
+        {
+          "id": "TC-MB-602",
+          "severity": "P1",
+          "scenario": "Clicking Export opens the export panel",
+          "steps": "1. Navigate to People > Members.\n2. Click the 'Export' button.",
+          "expected": "An export configuration panel or drawer opens, allowing the user to choose export options."
+        },
+        {
+          "id": "TC-MB-603",
+          "severity": "P1",
+          "scenario": "Export respects the active filters",
+          "steps": "1. Navigate to People > Members.\n2. Apply a Location filter to show only members in one location.\n3. Click 'Export' and download the file.",
+          "expected": "The exported file contains only the members matching the current filter — not all members in the system."
+        },
+        {
+          "id": "TC-MB-604",
+          "severity": "P1",
+          "scenario": "Export file downloads successfully",
+          "steps": "1. Navigate to People > Members.\n2. Click 'Export'.\n3. Confirm the export in the export panel.",
+          "expected": "A file is downloaded to the user's device. The file contains the expected member data in the expected format."
+        },
+        {
+          "id": "TC-MB-605",
+          "severity": "P2",
+          "scenario": "Export with no matching members after filtering handles gracefully",
+          "steps": "1. Navigate to People > Members.\n2. Apply filters that result in 0 members being shown.\n3. Click 'Export'.",
+          "expected": "The export either produces an empty file with headers only, or displays a message that there is no data to export. No error or crash occurs."
+        }
+      ]
+    },
+    {
+      "id": "TC-MB-700",
+      "name": "Non-Functional",
+      "test_cases": [
+        {
+          "id": "TC-MB-701",
+          "severity": "P1",
+          "scenario": "Members page loads within an acceptable time with a large workforce",
+          "steps": "1. In an environment with 200+ members, navigate to People > Members.",
+          "expected": "The page loads and the table populates within 3 seconds. Pagination is available for large datasets."
+        },
+        {
+          "id": "TC-MB-702",
+          "severity": "P2",
+          "scenario": "Member avatars display correct initials when no profile photo is set",
+          "steps": "1. Navigate to People > Members.\n2. Look at members who have not uploaded a profile photo.",
+          "expected": "The avatar column shows styled initials (e.g., 'JD' for John Doe) as a placeholder instead of a broken image."
+        },
+        {
+          "id": "TC-MB-703",
+          "severity": "P2",
+          "scenario": "Consistent terminology used throughout the Members page",
+          "steps": "1. Navigate to People > Members.\n2. Review all labels, headings, and messages on the page.",
+          "expected": "The term 'member' (not 'user', 'employee', or 'person') is used consistently throughout the page, drawers, and filter labels."
+        },
+        {
+          "id": "TC-MB-704",
+          "severity": "P1",
+          "scenario": "Session expiry during an edit redirects to login",
+          "steps": "1. Open the edit drawer for a member.\n2. Allow the session to expire (or clear auth tokens).\n3. Click 'Save changes'.",
+          "expected": "The browser redirects to the login page. No partial or corrupted data is saved."
+        },
+        {
+          "id": "TC-MB-705",
+          "severity": "P2",
+          "scenario": "Network failure during page load shows a helpful error state",
+          "steps": "1. Navigate to People > Members with a simulated or real network error.",
+          "expected": "The table shows an error message or retry option rather than an empty or broken state."
+        },
+        {
+          "id": "TC-MB-706",
+          "severity": "P2",
+          "scenario": "Drawers close and table refreshes after a successful edit",
+          "steps": "1. Open the edit drawer for a member.\n2. Change a field and click 'Save changes'.",
+          "expected": "The drawer closes automatically after saving. The table refreshes to reflect the updated values without a full page reload."
+        },
+        {
+          "id": "TC-MB-707",
+          "severity": "P2",
+          "scenario": "Filter state is preserved when closing and reopening a view drawer",
+          "steps": "1. Navigate to People > Members.\n2. Apply a Role filter.\n3. Open a member's view drawer and then close it.",
+          "expected": "The filter remains applied after closing the view drawer. The filtered member list is still shown."
+        }
+      ]
+    },
+    {
+      "id": "TC-MB-800",
+      "name": "Desktop",
+      "test_cases": [
+        {
+          "id": "TC-MB-801",
+          "severity": "P1",
+          "scenario": "All table columns are visible on desktop",
+          "steps": "1. Open People > Members on a desktop browser (1280px+ wide).",
+          "expected": "All columns are visible: Name, Email, Location, Employment Type, Role, Status, Team, and Joined. No columns are hidden."
+        },
+        {
+          "id": "TC-MB-802",
+          "severity": "P1",
+          "scenario": "All six filter fields are visible in the filter panel on desktop",
+          "steps": "1. Open People > Members on a desktop browser.",
+          "expected": "The filter panel shows: Search, Is Active, Role, Employment Type, Location, and Team — all visible without scrolling."
+        },
+        {
+          "id": "TC-MB-803",
+          "severity": "P2",
+          "scenario": "Edit and Assign Team row actions both visible on desktop",
+          "steps": "1. Open People > Members on a desktop browser with appropriate permissions.\n2. Hover over a member row to reveal actions.",
+          "expected": "Both Edit and Assign Team actions are directly accessible in the row actions without needing an overflow menu."
+        },
+        {
+          "id": "TC-MB-804",
+          "severity": "P2",
+          "scenario": "Edit drawer renders correctly at 900px width on desktop",
+          "steps": "1. Open the edit drawer for a member on a desktop browser.\n2. Inspect the drawer layout.",
+          "expected": "The edit drawer renders at 900px wide. Location and Employment type appear side by side (col-md-6). Joined date and Leaving date appear side by side. Role and Default holidays each occupy a full row. No overflow or layout issues."
+        },
+        {
+          "id": "TC-MB-805",
+          "severity": "P2",
+          "scenario": "View drawer renders all fields without scrolling on a large desktop screen",
+          "steps": "1. Open the view drawer for a member with many skills and teams on a desktop browser.",
+          "expected": "The view drawer is scrollable when content is tall. All fields are accessible by scrolling. No fields are clipped or hidden."
+        }
+      ]
+    },
+    {
+      "id": "TC-MB-900",
+      "name": "Mobile",
+      "test_cases": [
+        {
+          "id": "TC-MB-901",
+          "severity": "P1",
+          "scenario": "Only the Name column (with avatar) is visible in the table on mobile",
+          "steps": "1. Open People > Members on a mobile device or narrow viewport (< 768px).",
+          "expected": "The table shows only the member avatar and Name column. Email, Location, Employment Type, Role, Status, Team, and Joined columns are hidden to fit the smaller screen."
+        },
+        {
+          "id": "TC-MB-902",
+          "severity": "P1",
+          "scenario": "Filter panel is accessible on mobile",
+          "steps": "1. Open People > Members on a mobile device.\n2. Locate and open the filter controls.",
+          "expected": "The filter panel is accessible on mobile (via a filter button or collapsed panel). All six filter fields can be accessed when expanded."
+        },
+        {
+          "id": "TC-MB-903",
+          "severity": "P1",
+          "scenario": "Row actions accessible via overflow menu on mobile",
+          "steps": "1. Open People > Members on a mobile device.\n2. Tap on a member row's action area.",
+          "expected": "A '...' or overflow menu appears containing the Edit and/or Assign Team actions. Tapping each action opens the corresponding drawer."
+        },
+        {
+          "id": "TC-MB-904",
+          "severity": "P1",
+          "scenario": "View drawer renders correctly on mobile",
+          "steps": "1. Open People > Members on a mobile device.\n2. Tap a member row to open the view drawer.",
+          "expected": "The view drawer opens full-screen or as a full-width panel on mobile. All member detail fields are readable and accessible. The Close button is easy to tap."
+        },
+        {
+          "id": "TC-MB-905",
+          "severity": "P2",
+          "scenario": "Edit drawer renders correctly on mobile",
+          "steps": "1. Open the Edit action for a member on a mobile device.",
+          "expected": "The edit drawer opens in a mobile-friendly full-screen layout. All fields (Location, Employment type, Role, Joined date, Leaving date, Default holidays) stack vertically and are easy to interact with. Save and Cancel buttons are clearly accessible."
+        },
+        {
+          "id": "TC-MB-906",
+          "severity": "P2",
+          "scenario": "Assign Team drawer renders correctly on mobile",
+          "steps": "1. Open the Assign Team action for a member on a mobile device.",
+          "expected": "The assign team drawer opens in a mobile-friendly layout. The Team dropdown and Note field are easy to interact with. Save and Cancel buttons are accessible."
+        }
+      ]
+    },
+    {
+      "id": "TC-MB-1000",
+      "name": "Integration",
+      "test_cases": [
+        {
+          "id": "TC-MB-1001",
+          "severity": "P1",
+          "scenario": "Member location change is reflected in sprint capacity calculations",
+          "steps": "1. Open the edit drawer for a member and change their Location to a location with different holidays.\n2. Navigate to a sprint's detail page and view the Capacity section.",
+          "expected": "The member's Holiday days in the capacity table reflect the holidays associated with their new location."
+        },
+        {
+          "id": "TC-MB-1002",
+          "severity": "P1",
+          "scenario": "Team assignment made here is reflected in the Teams module",
+          "steps": "1. Assign a member to a team using the Assign Team drawer.\n2. Navigate to the Teams module and view that team's member list.",
+          "expected": "The assigned member appears in the team's member list."
+        },
+        {
+          "id": "TC-MB-1003",
+          "severity": "P1",
+          "scenario": "Member assigned to a team appears in the sprint capacity table for that team",
+          "steps": "1. Assign a member to a team using the Assign Team drawer.\n2. Navigate to a sprint detail page.\n3. Filter the capacity section by the team.",
+          "expected": "The newly assigned member appears in the sprint capacity table when the team filter is applied."
+        },
+        {
+          "id": "TC-MB-1004",
+          "severity": "P1",
+          "scenario": "Default holidays set on the member affects their sprint capacity",
+          "steps": "1. Open the edit drawer for a member and set their Default holidays to a specific value (e.g., 25).\n2. Navigate to a sprint detail page and view that member's capacity.",
+          "expected": "The member's capacity calculation uses the custom holiday value (25) instead of the organisation default."
+        },
+        {
+          "id": "TC-MB-1005",
+          "severity": "P1",
+          "scenario": "Clearing default holidays reverts the member to using the organisation default",
+          "steps": "1. Edit a member who has a custom default holidays value and clear the field.\n2. Navigate to a sprint detail page and view that member's capacity.",
+          "expected": "The member's capacity now uses the organisation's default holiday count."
+        },
+        {
+          "id": "TC-MB-1006",
+          "severity": "P2",
+          "scenario": "Member leaving date affects their availability in planning modules",
+          "steps": "1. Set a leaving date on a member for a date in the past.\n2. Check the member's status in the Members list.",
+          "expected": "The member's Status reflects that they have left or are inactive after the leaving date, and they are excluded from active resource planning accordingly."
+        },
+        {
+          "id": "TC-MB-1007",
+          "severity": "P2",
+          "scenario": "Leaves recorded for a member reduce their net capacity in sprints",
+          "steps": "1. Ensure a leave is recorded for a member for dates within an upcoming sprint.\n2. Navigate to the sprint detail page and view the Capacity section.",
+          "expected": "The member's Leaves column in the sprint capacity table shows the leave days, and their Net Capacity is reduced accordingly."
+        },
+        {
+          "id": "TC-MB-1008",
+          "severity": "P2",
+          "scenario": "Role change is reflected in modules that filter or display by role",
+          "steps": "1. Change a member's role using the Edit drawer.\n2. Navigate to People > Members and filter by the new role.",
+          "expected": "The member now appears when filtering by their new role and no longer appears when filtering by their previous role."
+        },
+        {
+          "id": "TC-MB-1009",
+          "severity": "P2",
+          "scenario": "Employment type change is reflected in the Members list immediately",
+          "steps": "1. Open the edit drawer for a member and change their Employment type.\n2. Click 'Save changes'.\n3. Observe the table row after the drawer closes.",
+          "expected": "The Employment Type column for that member row updates to the new employment type without requiring a page refresh."
+        }
+      ]
+    }
+  ]
+}

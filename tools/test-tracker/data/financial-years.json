@@ -1,0 +1,917 @@
+{
+  "module": {
+    "slug": "financial-years",
+    "name": "Financial Years",
+    "sort_order": 10,
+    "parent": {
+      "slug": "planning",
+      "name": "Planning",
+      "sort_order": 6
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-FY-100",
+      "name": "Page Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-FY-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user cannot access the Financial Years page",
+          "steps": "1. Open a browser with no active session.\n2. Navigate directly to the Financial Years page URL.",
+          "expected": "The user is redirected to the login page. No financial year data is visible."
+        },
+        {
+          "id": "TC-FY-102",
+          "severity": "P0",
+          "scenario": "Authenticated user with view permission can access the Financial Years page",
+          "steps": "1. Log in with a valid account.\n2. Navigate to Planning > Financial Years from the main menu.",
+          "expected": "The Financial Years page loads. The eyebrow reads 'Planning', the title reads 'Financial Years', and the subtitle reads 'Manage financial year periods and their lifecycle status.'"
+        },
+        {
+          "id": "TC-FY-103",
+          "severity": "P1",
+          "scenario": "Add Financial Year button is visible for users with create permission",
+          "steps": "1. Log in as a user with financial year create permission.\n2. Navigate to the Financial Years page.",
+          "expected": "The 'Add Financial Year' button is visible in the page header actions area."
+        },
+        {
+          "id": "TC-FY-104",
+          "severity": "P1",
+          "scenario": "Add Financial Year button is not visible for read-only users",
+          "steps": "1. Log in as a user with read-only access.\n2. Navigate to the Financial Years page.",
+          "expected": "The 'Add Financial Year' button is not present."
+        },
+        {
+          "id": "TC-FY-105",
+          "severity": "P1",
+          "scenario": "Edit, Toggle Active, Set Active, and Delete actions are hidden for read-only users",
+          "steps": "1. Log in as a read-only user.\n2. Navigate to the Financial Years page.\n3. Observe the row actions.",
+          "expected": "No Edit, Toggle Active, Set Active, or Delete action buttons appear on any financial year row."
+        },
+        {
+          "id": "TC-FY-106",
+          "severity": "P1",
+          "scenario": "Users with change permission see Edit, Toggle Active, and Set Active actions",
+          "steps": "1. Log in as a user with change permission.\n2. Navigate to the Financial Years page.",
+          "expected": "Edit, Toggle Active, and Set Active action buttons are visible on applicable rows."
+        },
+        {
+          "id": "TC-FY-107",
+          "severity": "P1",
+          "scenario": "Users with delete permission see the Delete action",
+          "steps": "1. Log in as a user with delete permission.\n2. Navigate to the Financial Years page.",
+          "expected": "The Delete action button is visible on financial year rows."
+        },
+        {
+          "id": "TC-FY-108",
+          "severity": "P1",
+          "scenario": "View drawer Edit button is hidden for read-only users",
+          "steps": "1. Log in as a read-only user.\n2. Click a financial year row to open the view drawer.",
+          "expected": "The view drawer opens showing the financial year details. The 'Edit Financial Year' button is not shown in the footer — only 'Close' is visible."
+        },
+        {
+          "id": "TC-FY-109",
+          "severity": "P2",
+          "scenario": "Breadcrumb reflects Planning > Financial Years hierarchy",
+          "steps": "1. Navigate to the Financial Years page.",
+          "expected": "The breadcrumb trail correctly shows the path to Financial Years under the Planning section."
+        }
+      ]
+    },
+    {
+      "id": "TC-FY-200",
+      "name": "Browsing, Search & Filtering",
+      "test_cases": [
+        {
+          "id": "TC-FY-201",
+          "severity": "P0",
+          "scenario": "Financial year records load and display in the table on page open",
+          "steps": "1. Navigate to the Financial Years page.",
+          "expected": "All existing financial year records are displayed in the table without errors."
+        },
+        {
+          "id": "TC-FY-202",
+          "severity": "P1",
+          "scenario": "Table displays the correct columns on desktop",
+          "steps": "1. Navigate to the Financial Years page on a desktop viewport.\n2. Observe the column headers.",
+          "expected": "Columns appear in order: Financial Year, Short, Code, Start Date, End Date, Span (Days), Status, Active, Created."
+        },
+        {
+          "id": "TC-FY-203",
+          "severity": "P1",
+          "scenario": "Search field filters records by financial year name",
+          "steps": "1. Navigate to the Financial Years page.\n2. Type part of a financial year name or code into the search field.",
+          "expected": "The table updates to show only financial year records matching the search term."
+        },
+        {
+          "id": "TC-FY-204",
+          "severity": "P2",
+          "scenario": "Search with no matching results shows an empty state",
+          "steps": "1. Type a search term that does not match any financial year.",
+          "expected": "The table shows 'No financial years found.' with no data rows."
+        },
+        {
+          "id": "TC-FY-205",
+          "severity": "P2",
+          "scenario": "Clearing the search field restores the full list",
+          "steps": "1. Apply a search term that filters results.\n2. Clear the search field.",
+          "expected": "The full list of financial years is restored with no search filter active."
+        },
+        {
+          "id": "TC-FY-206",
+          "severity": "P1",
+          "scenario": "FY Status filter shows only financial years with the selected status",
+          "steps": "1. Click the Status filter dropdown.\n2. Select a specific FY status (e.g. 'In Progress').",
+          "expected": "The table updates to show only financial years with that status. Records with other statuses are hidden."
+        },
+        {
+          "id": "TC-FY-207",
+          "severity": "P1",
+          "scenario": "Is Active filter set to Active shows only active financial years",
+          "steps": "1. Click the Active filter and select 'Active'.",
+          "expected": "The table shows only financial year records where is_active is true."
+        },
+        {
+          "id": "TC-FY-208",
+          "severity": "P1",
+          "scenario": "Is Active filter set to Inactive shows only inactive financial years",
+          "steps": "1. Click the Active filter and select 'Inactive'.",
+          "expected": "The table shows only financial year records where is_active is false."
+        },
+        {
+          "id": "TC-FY-209",
+          "severity": "P2",
+          "scenario": "Is Active filter set to All shows all financial years regardless of active state",
+          "steps": "1. Set the Active filter to 'All'.",
+          "expected": "Both active and inactive financial years are displayed."
+        },
+        {
+          "id": "TC-FY-210",
+          "severity": "P1",
+          "scenario": "Multiple filters can be combined",
+          "steps": "1. Type a search term.\n2. Select a FY Status.\n3. Set Is Active to 'Active'.",
+          "expected": "The table shows only records that match all three criteria simultaneously."
+        },
+        {
+          "id": "TC-FY-211",
+          "severity": "P2",
+          "scenario": "Active filter chips appear when filters are applied",
+          "steps": "1. Apply the FY Status filter.\n2. Apply the Is Active filter.",
+          "expected": "Active filter chips or tags are shown for each applied filter. Clicking a chip removes that filter."
+        },
+        {
+          "id": "TC-FY-212",
+          "severity": "P1",
+          "scenario": "Table can be sorted by Financial Year column",
+          "steps": "1. Click the Financial Year column header.\n2. Click it again.",
+          "expected": "First click sorts alphabetically ascending. Second click reverses to descending."
+        },
+        {
+          "id": "TC-FY-213",
+          "severity": "P1",
+          "scenario": "Table can be sorted by Start Date ascending and descending",
+          "steps": "1. Click the Start Date column header once.\n2. Click it again.",
+          "expected": "Records sort from earliest to latest start date, then reverse."
+        },
+        {
+          "id": "TC-FY-214",
+          "severity": "P1",
+          "scenario": "Table can be sorted by End Date ascending and descending",
+          "steps": "1. Click the End Date column header once.\n2. Click it again.",
+          "expected": "Records sort from earliest to latest end date, then reverse."
+        },
+        {
+          "id": "TC-FY-215",
+          "severity": "P2",
+          "scenario": "Table can be sorted by Span (Days)",
+          "steps": "1. Click the Span (Days) column header once.\n2. Click it again.",
+          "expected": "Records sort from shortest to longest span in days, then reverse."
+        },
+        {
+          "id": "TC-FY-216",
+          "severity": "P2",
+          "scenario": "Table can be sorted by Created date",
+          "steps": "1. Click the Created column header once.\n2. Click it again.",
+          "expected": "Records sort by creation date ascending, then descending."
+        },
+        {
+          "id": "TC-FY-217",
+          "severity": "P1",
+          "scenario": "Clicking a financial year row opens the view drawer",
+          "steps": "1. Click anywhere on a financial year row, not on an action button.",
+          "expected": "The view drawer slides open showing the full details of the selected financial year."
+        },
+        {
+          "id": "TC-FY-218",
+          "severity": "P1",
+          "scenario": "Pagination controls navigate between pages when many records exist",
+          "steps": "1. Ensure more than 25 financial year records exist.\n2. Use the next and previous page controls.",
+          "expected": "Page navigation works correctly. The correct subset of records is shown on each page."
+        }
+      ]
+    },
+    {
+      "id": "TC-FY-300",
+      "name": "Creating a Financial Year",
+      "test_cases": [
+        {
+          "id": "TC-FY-301",
+          "severity": "P0",
+          "scenario": "Clicking Add Financial Year opens the create drawer",
+          "steps": "1. Navigate to the Financial Years page.\n2. Click the 'Add Financial Year' button.",
+          "expected": "The create drawer slides open with a blank form. The drawer title reads 'Create Financial Year'."
+        },
+        {
+          "id": "TC-FY-302",
+          "severity": "P1",
+          "scenario": "Create drawer contains the expected form fields",
+          "steps": "1. Open the Add Financial Year drawer.\n2. Observe the form fields.",
+          "expected": "The form contains: Start Date (required), End Date (required), and Note (optional)."
+        },
+        {
+          "id": "TC-FY-303",
+          "severity": "P0",
+          "scenario": "A financial year is created successfully with Start Date and End Date",
+          "steps": "1. Open the Add Financial Year drawer.\n2. Set a Start Date.\n3. Set an End Date after the Start Date.\n4. Click 'Create Financial Year'.",
+          "expected": "The drawer closes. A success toast appears. The new financial year appears in the table with auto-generated Financial Year name, Short form, Code, and Span (Days) values."
+        },
+        {
+          "id": "TC-FY-304",
+          "severity": "P1",
+          "scenario": "Financial Year name, Short form, Code, and Span are auto-generated from the dates",
+          "steps": "1. Create a financial year with a Start Date of 1 April 2025 and End Date of 31 March 2026.\n2. View the created record in the table.",
+          "expected": "The Financial Year, Short, Code, and Span (Days) columns are populated automatically based on the dates entered. The user does not need to enter these manually."
+        },
+        {
+          "id": "TC-FY-305",
+          "severity": "P1",
+          "scenario": "Start Date is required — validation error shown when empty",
+          "steps": "1. Open the Add Financial Year drawer.\n2. Set an End Date but leave Start Date empty.\n3. Click 'Create Financial Year'.",
+          "expected": "The form does not submit. A validation error appears under Start Date indicating it is required."
+        },
+        {
+          "id": "TC-FY-306",
+          "severity": "P1",
+          "scenario": "End Date is required — validation error shown when empty",
+          "steps": "1. Open the Add Financial Year drawer.\n2. Set a Start Date but leave End Date empty.\n3. Click 'Create Financial Year'.",
+          "expected": "The form does not submit. A validation error appears under End Date indicating it is required."
+        },
+        {
+          "id": "TC-FY-307",
+          "severity": "P1",
+          "scenario": "End Date set before Start Date shows a validation error",
+          "steps": "1. Open the Add Financial Year drawer.\n2. Set Start Date to 1 April 2025.\n3. Set End Date to 1 January 2025 (before Start Date).\n4. Click 'Create Financial Year'.",
+          "expected": "A validation error is shown indicating the End Date must be after the Start Date. The financial year is not created."
+        },
+        {
+          "id": "TC-FY-308",
+          "severity": "P2",
+          "scenario": "Note field is optional — form submits successfully without a note",
+          "steps": "1. Open the Add Financial Year drawer.\n2. Set Start Date and End Date.\n3. Leave the Note field empty.\n4. Click 'Create Financial Year'.",
+          "expected": "The financial year is created successfully without a note."
+        },
+        {
+          "id": "TC-FY-309",
+          "severity": "P2",
+          "scenario": "Note can be added during financial year creation",
+          "steps": "1. Open the Add Financial Year drawer.\n2. Set Start Date and End Date.\n3. Enter a note.\n4. Click 'Create Financial Year'.",
+          "expected": "The financial year is created. The note is saved and visible in the view drawer."
+        },
+        {
+          "id": "TC-FY-310",
+          "severity": "P2",
+          "scenario": "Closing the create drawer without submitting discards all entered data",
+          "steps": "1. Open the Add Financial Year drawer.\n2. Enter Start Date and End Date.\n3. Click Cancel without submitting.",
+          "expected": "The drawer closes. No financial year is created. The form is blank when reopened."
+        },
+        {
+          "id": "TC-FY-311",
+          "severity": "P1",
+          "scenario": "Submit button shows a busy/loading state during creation",
+          "steps": "1. Open the Add Financial Year drawer.\n2. Fill in required fields.\n3. Click 'Create Financial Year' and observe the button immediately.",
+          "expected": "The button shows a loading indicator and becomes non-clickable while the request processes."
+        },
+        {
+          "id": "TC-FY-312",
+          "severity": "P1",
+          "scenario": "Success toast appears and drawer closes after creating a financial year",
+          "steps": "1. Create a financial year with valid dates and submit.",
+          "expected": "The drawer closes automatically. A success toast notification appears confirming the financial year was created."
+        },
+        {
+          "id": "TC-FY-313",
+          "severity": "P2",
+          "scenario": "Start Date and End Date fields are shown side by side in the create drawer",
+          "steps": "1. Open the Add Financial Year drawer on a desktop viewport.\n2. Observe the layout of the date fields.",
+          "expected": "Start Date and End Date appear side by side (two columns) in the create drawer."
+        }
+      ]
+    },
+    {
+      "id": "TC-FY-400",
+      "name": "View Drawer",
+      "test_cases": [
+        {
+          "id": "TC-FY-401",
+          "severity": "P0",
+          "scenario": "Clicking a financial year row opens the view drawer",
+          "steps": "1. Navigate to the Financial Years page.\n2. Click anywhere on a financial year row (not on an action button).",
+          "expected": "The view drawer slides open showing the full details of the selected financial year."
+        },
+        {
+          "id": "TC-FY-402",
+          "severity": "P1",
+          "scenario": "View drawer displays all expected detail fields",
+          "steps": "1. Click on a financial year row.\n2. Observe all fields shown in the view drawer.",
+          "expected": "The view drawer shows: Financial Year (Long), Financial Year (Short), Code (code style), Start Date, End Date, Span (Days), Status, Note (description style), Created (meta), Created by (meta)."
+        },
+        {
+          "id": "TC-FY-403",
+          "severity": "P2",
+          "scenario": "Code field is rendered in monospace/code style",
+          "steps": "1. Open the view drawer for any financial year.\n2. Observe the Code field.",
+          "expected": "The Code is displayed in a monospace or code-styled format, visually distinct from regular text."
+        },
+        {
+          "id": "TC-FY-404",
+          "severity": "P2",
+          "scenario": "Status field shows the correct FY lifecycle status",
+          "steps": "1. Open the view drawer for a financial year.\n2. Observe the Status field.",
+          "expected": "The Status field shows the correct lifecycle status (e.g. Planned, In Progress, or Closed) for the selected financial year."
+        },
+        {
+          "id": "TC-FY-405",
+          "severity": "P2",
+          "scenario": "Note field is blank or empty for financial years created without a note",
+          "steps": "1. Create a financial year without a note.\n2. Open the view drawer for that record.",
+          "expected": "The Note field is empty or shows a placeholder. No error is displayed."
+        },
+        {
+          "id": "TC-FY-406",
+          "severity": "P2",
+          "scenario": "Span (Days) shows the correct number of days between Start and End Date",
+          "steps": "1. Open the view drawer for a financial year with known start and end dates.\n2. Check the Span (Days) field.",
+          "expected": "The Span (Days) value accurately represents the total number of days in the financial year period."
+        },
+        {
+          "id": "TC-FY-407",
+          "severity": "P2",
+          "scenario": "Created and Created by metadata fields show accurate values",
+          "steps": "1. Create a new financial year.\n2. Open the view drawer for it.\n3. Check the Created and Created by fields.",
+          "expected": "Created shows the date and time the record was created. Created by shows the username of the creator."
+        },
+        {
+          "id": "TC-FY-408",
+          "severity": "P1",
+          "scenario": "Edit Financial Year button in the view drawer footer opens the edit drawer",
+          "steps": "1. Open the view drawer (as a user with change permission).\n2. Click 'Edit Financial Year' in the footer.",
+          "expected": "The view drawer closes and the edit drawer opens, pre-populated with the financial year's current data."
+        },
+        {
+          "id": "TC-FY-409",
+          "severity": "P2",
+          "scenario": "Close button in the view drawer footer closes it without changes",
+          "steps": "1. Open the view drawer for a financial year.\n2. Click 'Close'.",
+          "expected": "The view drawer closes. No changes are made and the user is returned to the financial years list."
+        }
+      ]
+    },
+    {
+      "id": "TC-FY-500",
+      "name": "Editing a Financial Year",
+      "test_cases": [
+        {
+          "id": "TC-FY-501",
+          "severity": "P0",
+          "scenario": "Clicking the Edit action opens the edit drawer pre-populated",
+          "steps": "1. Click the Edit action button on a financial year row.",
+          "expected": "The edit drawer opens. The Financial Year (Long) and Short Form fields are shown as read-only. Start Date, End Date, and Note are pre-filled with current values."
+        },
+        {
+          "id": "TC-FY-502",
+          "severity": "P1",
+          "scenario": "Financial Year (Long) and Short Form fields are read-only in the edit drawer",
+          "steps": "1. Open the edit drawer for any financial year.\n2. Observe the Financial Year and Short Form fields at the top of the form.",
+          "expected": "Both the Financial Year (Long) and Short Form fields are displayed as non-editable view fields. They cannot be changed manually — they are auto-generated from the dates."
+        },
+        {
+          "id": "TC-FY-503",
+          "severity": "P0",
+          "scenario": "Start Date can be updated and saved successfully",
+          "steps": "1. Open the edit drawer for a financial year.\n2. Change the Start Date to a different valid date.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes. A success toast appears. The updated Start Date is reflected in the table. The auto-generated Financial Year name, Short form, and Span also update to reflect the new dates."
+        },
+        {
+          "id": "TC-FY-504",
+          "severity": "P0",
+          "scenario": "End Date can be updated and saved successfully",
+          "steps": "1. Open the edit drawer for a financial year.\n2. Change the End Date.\n3. Click 'Save changes'.",
+          "expected": "The drawer closes. A success toast appears. The End Date and auto-derived fields (Span) update in the table."
+        },
+        {
+          "id": "TC-FY-505",
+          "severity": "P1",
+          "scenario": "Clearing Start Date shows a validation error and prevents saving",
+          "steps": "1. Open the edit drawer.\n2. Clear the Start Date field.\n3. Click 'Save changes'.",
+          "expected": "An inline error appears under Start Date. The drawer does not close and the change is not saved."
+        },
+        {
+          "id": "TC-FY-506",
+          "severity": "P1",
+          "scenario": "Clearing End Date shows a validation error and prevents saving",
+          "steps": "1. Open the edit drawer.\n2. Clear the End Date field.\n3. Click 'Save changes'.",
+          "expected": "An inline error appears under End Date. The change is not saved."
+        },
+        {
+          "id": "TC-FY-507",
+          "severity": "P1",
+          "scenario": "Setting End Date before Start Date in edit mode shows a validation error",
+          "steps": "1. Open the edit drawer.\n2. Set End Date to a date before the Start Date.\n3. Click 'Save changes'.",
+          "expected": "A validation error is shown indicating the date range is invalid. The change is not saved."
+        },
+        {
+          "id": "TC-FY-508",
+          "severity": "P2",
+          "scenario": "Note can be added to a financial year that had no note",
+          "steps": "1. Open the edit drawer for a financial year with no note.\n2. Enter a note.\n3. Click 'Save changes'.",
+          "expected": "The note is saved. The view drawer for that financial year now shows the note."
+        },
+        {
+          "id": "TC-FY-509",
+          "severity": "P2",
+          "scenario": "Note can be cleared from an existing financial year",
+          "steps": "1. Open the edit drawer for a financial year that has a note.\n2. Delete all text from the Note field.\n3. Click 'Save changes'.",
+          "expected": "The note is removed. The view drawer shows no note for that record."
+        },
+        {
+          "id": "TC-FY-510",
+          "severity": "P2",
+          "scenario": "Closing the edit drawer without saving discards all changes",
+          "steps": "1. Open the edit drawer.\n2. Change the Start Date.\n3. Click Cancel.",
+          "expected": "The drawer closes. The financial year in the table shows its original unchanged values."
+        },
+        {
+          "id": "TC-FY-511",
+          "severity": "P1",
+          "scenario": "Success toast appears after successfully saving edits",
+          "steps": "1. Open the edit drawer, make a valid change, and click 'Save changes'.",
+          "expected": "A success toast notification appears confirming the financial year was updated."
+        }
+      ]
+    },
+    {
+      "id": "TC-FY-600",
+      "name": "Activate & Deactivate (Toggle Active)",
+      "test_cases": [
+        {
+          "id": "TC-FY-601",
+          "severity": "P1",
+          "scenario": "Toggle Active action on an active financial year shows a deactivate confirmation modal",
+          "steps": "1. Find an active financial year (Active column shows active/true).\n2. Click the Toggle Active action.",
+          "expected": "A deactivation confirmation modal appears asking the user to confirm deactivating the financial year."
+        },
+        {
+          "id": "TC-FY-602",
+          "severity": "P1",
+          "scenario": "Toggle Active action on an inactive financial year shows an activate confirmation modal",
+          "steps": "1. Find an inactive financial year.\n2. Click the Toggle Active action.",
+          "expected": "An activation confirmation modal appears asking the user to confirm activating the financial year."
+        },
+        {
+          "id": "TC-FY-603",
+          "severity": "P0",
+          "scenario": "Confirming deactivation marks the financial year as inactive",
+          "steps": "1. Click Toggle Active on an active financial year.\n2. Confirm deactivation in the modal.",
+          "expected": "The modal closes. The financial year's Active column updates to show inactive. A success toast confirms the change."
+        },
+        {
+          "id": "TC-FY-604",
+          "severity": "P0",
+          "scenario": "Confirming activation marks the financial year as active",
+          "steps": "1. Click Toggle Active on an inactive financial year.\n2. Confirm activation in the modal.",
+          "expected": "The modal closes. The financial year's Active column updates to show active. A success toast confirms the change."
+        },
+        {
+          "id": "TC-FY-605",
+          "severity": "P1",
+          "scenario": "Cancelling the activate/deactivate modal leaves the state unchanged",
+          "steps": "1. Click Toggle Active on any financial year.\n2. Click Cancel in the confirmation modal.",
+          "expected": "The modal closes. The financial year's active state is unchanged."
+        },
+        {
+          "id": "TC-FY-606",
+          "severity": "P2",
+          "scenario": "Inactive financial years can be filtered out using the Is Active filter",
+          "steps": "1. Deactivate a financial year.\n2. Set the Is Active filter to 'Active'.",
+          "expected": "The deactivated financial year does not appear in the filtered results."
+        }
+      ]
+    },
+    {
+      "id": "TC-FY-700",
+      "name": "Set Active (Mark as In Progress)",
+      "test_cases": [
+        {
+          "id": "TC-FY-701",
+          "severity": "P1",
+          "scenario": "Set Active action is visible for financial years not currently in progress",
+          "steps": "1. Navigate to the Financial Years page.\n2. Find a financial year that is NOT marked as in progress.\n3. Observe the available row actions.",
+          "expected": "The 'Set Active' action button is visible for that financial year row."
+        },
+        {
+          "id": "TC-FY-702",
+          "severity": "P1",
+          "scenario": "Set Active action is hidden for financial years already in progress",
+          "steps": "1. Navigate to the Financial Years page.\n2. Find a financial year that is already marked as in progress.\n3. Observe the available row actions.",
+          "expected": "The 'Set Active' action is not visible for the in-progress financial year."
+        },
+        {
+          "id": "TC-FY-703",
+          "severity": "P0",
+          "scenario": "Clicking Set Active on a financial year marks it as the current/in-progress period",
+          "steps": "1. Click the 'Set Active' action on a financial year that is not currently in progress.\n2. Confirm the action if prompted.",
+          "expected": "The financial year's Status updates to 'In Progress' (or equivalent). A success toast confirms the change. The Set Active action is no longer visible for this record."
+        },
+        {
+          "id": "TC-FY-704",
+          "severity": "P1",
+          "scenario": "Only one financial year can be in progress at a time",
+          "steps": "1. Note which financial year is currently in progress.\n2. Click Set Active on a different financial year.\n3. Confirm the change.",
+          "expected": "The new financial year becomes 'In Progress'. The previously in-progress financial year's status updates accordingly (e.g. Closed or Planned). Only one financial year is in progress at any time."
+        },
+        {
+          "id": "TC-FY-705",
+          "severity": "P2",
+          "scenario": "Financial year set as active is visible in relevant planning views",
+          "steps": "1. Set a specific financial year as active.\n2. Navigate to planning pages that display the current financial year.",
+          "expected": "The newly activated financial year is reflected as the current period in relevant planning and capacity views."
+        },
+        {
+          "id": "TC-FY-706",
+          "severity": "P2",
+          "scenario": "FY Status filter shows In Progress financial years correctly",
+          "steps": "1. Set a financial year as active (In Progress).\n2. Apply the FY Status filter and select 'In Progress'.",
+          "expected": "The table shows only the financial year(s) currently marked as in progress."
+        }
+      ]
+    },
+    {
+      "id": "TC-FY-800",
+      "name": "Deleting a Financial Year",
+      "test_cases": [
+        {
+          "id": "TC-FY-801",
+          "severity": "P0",
+          "scenario": "Clicking Delete shows a confirmation modal",
+          "steps": "1. Navigate to the Financial Years page.\n2. Click the Delete action button on a financial year row.",
+          "expected": "A delete confirmation modal appears referencing the selected financial year."
+        },
+        {
+          "id": "TC-FY-802",
+          "severity": "P0",
+          "scenario": "Confirming deletion permanently removes the financial year",
+          "steps": "1. Click Delete on a financial year.\n2. Type the required confirmation text.\n3. Click the confirm delete button.",
+          "expected": "The modal closes. The financial year is removed from the table. A success toast confirms the deletion."
+        },
+        {
+          "id": "TC-FY-803",
+          "severity": "P1",
+          "scenario": "Delete confirm button is disabled until correct confirmation text is typed",
+          "steps": "1. Click Delete on a financial year.\n2. Leave the confirmation field empty or type incorrect text.",
+          "expected": "The confirm delete button is disabled and cannot be clicked until the exact required text is entered."
+        },
+        {
+          "id": "TC-FY-804",
+          "severity": "P1",
+          "scenario": "Cancelling the delete modal keeps the financial year intact",
+          "steps": "1. Click Delete on a financial year.\n2. Click Cancel in the confirmation modal.",
+          "expected": "The modal closes. The financial year remains in the table unchanged."
+        },
+        {
+          "id": "TC-FY-805",
+          "severity": "P3",
+          "scenario": "Delete confirmation modal warns that the action is permanent",
+          "steps": "1. Click Delete on any financial year.\n2. Read the modal body text.",
+          "expected": "The modal clearly warns that deletion is permanent and cannot be undone."
+        }
+      ]
+    },
+    {
+      "id": "TC-FY-900",
+      "name": "Importing Financial Years",
+      "test_cases": [
+        {
+          "id": "TC-FY-901",
+          "severity": "P1",
+          "scenario": "Import button is visible on the Financial Years page",
+          "steps": "1. Navigate to the Financial Years page with manage permissions.",
+          "expected": "An Import button is visible in the page header actions area."
+        },
+        {
+          "id": "TC-FY-902",
+          "severity": "P1",
+          "scenario": "Clicking Import opens the import view",
+          "steps": "1. Click the Import button.",
+          "expected": "The import view opens with options to download a sample file and upload a file."
+        },
+        {
+          "id": "TC-FY-903",
+          "severity": "P2",
+          "scenario": "Sample import file can be downloaded",
+          "steps": "1. Open the import view.\n2. Click the sample file download link.",
+          "expected": "A sample CSV file is downloaded with the expected import columns (start_date, end_date, note)."
+        },
+        {
+          "id": "TC-FY-904",
+          "severity": "P0",
+          "scenario": "A valid CSV of financial year records imports successfully",
+          "steps": "1. Prepare a valid CSV with start_date and end_date columns.\n2. Upload it in the import view and confirm.",
+          "expected": "The import completes. A success message shows the number of records imported. The table refreshes and shows the new financial years."
+        },
+        {
+          "id": "TC-FY-905",
+          "severity": "P1",
+          "scenario": "Uploading an invalid file format is rejected",
+          "steps": "1. Open the import view.\n2. Attempt to upload a .xlsx, .pdf, or image file.",
+          "expected": "The import view rejects the file and shows an error message."
+        },
+        {
+          "id": "TC-FY-906",
+          "severity": "P1",
+          "scenario": "Importing a row where End Date is before Start Date shows a row-level error",
+          "steps": "1. Prepare a CSV with a row where end_date is before start_date.\n2. Import it.",
+          "expected": "The import reports a validation error for that row. The row is not imported."
+        },
+        {
+          "id": "TC-FY-907",
+          "severity": "P1",
+          "scenario": "Table refreshes automatically after a successful import",
+          "steps": "1. Import a valid CSV with new financial year records.",
+          "expected": "The table refreshes and shows the newly imported financial years without requiring a manual page reload."
+        }
+      ]
+    },
+    {
+      "id": "TC-FY-1000",
+      "name": "Exporting Financial Years",
+      "test_cases": [
+        {
+          "id": "TC-FY-1001",
+          "severity": "P1",
+          "scenario": "Export button is visible on the Financial Years page",
+          "steps": "1. Navigate to the Financial Years page with manage permissions.",
+          "expected": "An Export button is visible in the page header actions area."
+        },
+        {
+          "id": "TC-FY-1002",
+          "severity": "P1",
+          "scenario": "Clicking Export opens the export view",
+          "steps": "1. Click the Export button.",
+          "expected": "The export configuration panel opens."
+        },
+        {
+          "id": "TC-FY-1003",
+          "severity": "P0",
+          "scenario": "Financial years can be exported and a file is downloaded",
+          "steps": "1. Open the export view.\n2. Configure and initiate the export.",
+          "expected": "A file is downloaded to the user's device containing financial year data."
+        },
+        {
+          "id": "TC-FY-1004",
+          "severity": "P1",
+          "scenario": "Exported file contains expected columns",
+          "steps": "1. Export all financial years.\n2. Open the downloaded file.",
+          "expected": "The exported file contains at minimum: Financial Year, Short, Code, Start Date, End Date, Span (Days), Status, Active."
+        },
+        {
+          "id": "TC-FY-1005",
+          "severity": "P1",
+          "scenario": "Export respects active filters",
+          "steps": "1. Apply the FY Status filter to show only 'In Progress' records.\n2. Export.",
+          "expected": "The exported file contains only financial years with the filtered status, not all records."
+        },
+        {
+          "id": "TC-FY-1006",
+          "severity": "P2",
+          "scenario": "Export view can be closed without exporting",
+          "steps": "1. Open the export view.\n2. Close it without initiating a download.",
+          "expected": "The export view closes. No file is downloaded and no data changes."
+        }
+      ]
+    },
+    {
+      "id": "TC-FY-1100",
+      "name": "Non-Functional & Accessibility",
+      "test_cases": [
+        {
+          "id": "TC-FY-1101",
+          "severity": "P1",
+          "scenario": "All interactive elements on the Financial Years page are keyboard accessible",
+          "steps": "1. Navigate to the Financial Years page.\n2. Use only Tab and Enter/Space to reach and activate all controls.",
+          "expected": "All buttons, filters, table rows, and row actions are reachable and operable by keyboard."
+        },
+        {
+          "id": "TC-FY-1102",
+          "severity": "P1",
+          "scenario": "Full financial year creation can be completed via keyboard only",
+          "steps": "1. Use keyboard to open the Add Financial Year drawer.\n2. Tab through Start Date, End Date, and Note.\n3. Submit via keyboard.",
+          "expected": "The financial year is created successfully without using the mouse."
+        },
+        {
+          "id": "TC-FY-1103",
+          "severity": "P2",
+          "scenario": "Focus is trapped within open drawers",
+          "steps": "1. Open the Add Financial Year drawer.\n2. Press Tab repeatedly.",
+          "expected": "Focus cycles within the drawer and does not escape to the main page behind."
+        },
+        {
+          "id": "TC-FY-1104",
+          "severity": "P2",
+          "scenario": "Validation error messages are clear and descriptive",
+          "steps": "1. Submit the create form with both date fields empty.\n2. Read the error messages.",
+          "expected": "Each validation message is human-readable and clearly states what the user must provide."
+        },
+        {
+          "id": "TC-FY-1105",
+          "severity": "P1",
+          "scenario": "No internal error details or stack traces are shown to the user",
+          "steps": "1. Trigger error conditions on the Financial Years page.\n2. Observe all error messages.",
+          "expected": "All error messages are user-friendly and do not expose stack traces, database errors, or internal server details."
+        },
+        {
+          "id": "TC-FY-1106",
+          "severity": "P0",
+          "scenario": "Session expiry prevents creating or editing financial years",
+          "steps": "1. Allow the session to expire.\n2. Attempt to create or edit a financial year.",
+          "expected": "The user is redirected to the login page. No data changes are made."
+        },
+        {
+          "id": "TC-FY-1107",
+          "severity": "P2",
+          "scenario": "Page renders correctly in dark theme",
+          "steps": "1. Navigate to the Financial Years page.\n2. Toggle to dark theme.",
+          "expected": "All elements — table, filters, drawers, modals, and toasts — render correctly in dark mode without visual breakage."
+        },
+        {
+          "id": "TC-FY-1108",
+          "severity": "P3",
+          "scenario": "Financial Years page loads within an acceptable time",
+          "steps": "1. Navigate to the Financial Years page on a standard connection.",
+          "expected": "The page and data load within a reasonable time (typically under 3 seconds)."
+        }
+      ]
+    },
+    {
+      "id": "TC-FY-1200",
+      "name": "Desktop Layout",
+      "test_cases": [
+        {
+          "id": "TC-FY-1201",
+          "severity": "P1",
+          "scenario": "All table columns are visible on desktop viewports",
+          "steps": "1. Open the Financial Years page on a desktop browser (viewport ≥ 1024px).",
+          "expected": "All columns are visible: Financial Year, Short, Code, Start Date, End Date, Span (Days), Status, Active, Created."
+        },
+        {
+          "id": "TC-FY-1202",
+          "severity": "P2",
+          "scenario": "Search, FY Status, and Is Active filters are displayed in the filter bar on desktop",
+          "steps": "1. View the Financial Years page on a desktop viewport.",
+          "expected": "All three filters (Search, Status, Active) are displayed inline in a horizontal filter bar above the table."
+        },
+        {
+          "id": "TC-FY-1203",
+          "severity": "P2",
+          "scenario": "Start Date and End Date fields appear side by side in the create drawer on desktop",
+          "steps": "1. Open the Add Financial Year drawer on a desktop viewport.",
+          "expected": "Start Date and End Date are displayed side by side (two columns) in the drawer."
+        },
+        {
+          "id": "TC-FY-1204",
+          "severity": "P2",
+          "scenario": "Drawers open as a side panel on desktop",
+          "steps": "1. Open any drawer (create, edit, or view) on desktop.",
+          "expected": "The drawer slides in from the right as a wide panel. The main page is still partially visible."
+        },
+        {
+          "id": "TC-FY-1205",
+          "severity": "P2",
+          "scenario": "Import, Export, and Add Financial Year buttons are aligned correctly on desktop",
+          "steps": "1. View the Financial Years page on a desktop browser.",
+          "expected": "Import, Export, and Add Financial Year buttons are aligned horizontally in the top-right area without overflow."
+        }
+      ]
+    },
+    {
+      "id": "TC-FY-1300",
+      "name": "Mobile & Responsive",
+      "test_cases": [
+        {
+          "id": "TC-FY-1301",
+          "severity": "P1",
+          "scenario": "Secondary columns are hidden on mobile viewports",
+          "steps": "1. Open the Financial Years page on a mobile viewport (≤ 767px).",
+          "expected": "Short, Code, Start Date, End Date, Span (Days), Active, and Created columns are hidden. Financial Year and Status remain visible."
+        },
+        {
+          "id": "TC-FY-1302",
+          "severity": "P1",
+          "scenario": "Add Financial Year drawer is usable on mobile",
+          "steps": "1. Open the Add Financial Year drawer on a mobile device.\n2. Fill in Start Date and End Date.\n3. Submit.",
+          "expected": "The drawer opens correctly on mobile. All fields are accessible and the financial year is created without layout issues."
+        },
+        {
+          "id": "TC-FY-1303",
+          "severity": "P2",
+          "scenario": "Start Date and End Date stack vertically in the create drawer on mobile",
+          "steps": "1. Open the Add Financial Year drawer on a mobile viewport.",
+          "expected": "Start Date and End Date are stacked vertically (full width each) making them easier to tap on small screens."
+        },
+        {
+          "id": "TC-FY-1304",
+          "severity": "P2",
+          "scenario": "View drawer is fully readable on mobile",
+          "steps": "1. Tap a financial year row on a mobile device to open the view drawer.",
+          "expected": "All fields — Financial Year, Short, Code, Start Date, End Date, Span, Status, Note — are readable without horizontal scrolling."
+        },
+        {
+          "id": "TC-FY-1305",
+          "severity": "P2",
+          "scenario": "FY Status and Is Active filters are accessible on mobile",
+          "steps": "1. Open the Financial Years page on a mobile viewport.\n2. Tap the Status and Active filters.",
+          "expected": "Both filter dropdowns open and function correctly on mobile."
+        },
+        {
+          "id": "TC-FY-1306",
+          "severity": "P2",
+          "scenario": "Delete confirmation modal is usable on mobile",
+          "steps": "1. On a mobile device, tap Delete for a financial year.\n2. Interact with the modal.",
+          "expected": "The confirmation modal displays correctly on mobile. Buttons are tappable and function correctly."
+        },
+        {
+          "id": "TC-FY-1307",
+          "severity": "P3",
+          "scenario": "Page header does not overflow on small mobile viewports",
+          "steps": "1. Open the Financial Years page on a 375px-wide viewport.",
+          "expected": "The title and action buttons do not overflow or overlap."
+        }
+      ]
+    },
+    {
+      "id": "TC-FY-1400",
+      "name": "Integration with Other Modules",
+      "test_cases": [
+        {
+          "id": "TC-FY-1401",
+          "severity": "P1",
+          "scenario": "Financial year set to In Progress is used as the current period in planning views",
+          "steps": "1. Set a financial year as active (In Progress).\n2. Navigate to planning or sprint pages that reference the current financial year.",
+          "expected": "The in-progress financial year is shown as the current period in planning-related views and banners."
+        },
+        {
+          "id": "TC-FY-1402",
+          "severity": "P1",
+          "scenario": "Sprints or milestones created within a financial year period are associated correctly",
+          "steps": "1. Note a financial year's start and end dates.\n2. Navigate to the Sprints module and create a sprint that falls within those dates.",
+          "expected": "The sprint is associated with or visible in the context of the relevant financial year."
+        },
+        {
+          "id": "TC-FY-1403",
+          "severity": "P1",
+          "scenario": "Financial year code is unique across all records",
+          "steps": "1. Create two financial year records with overlapping or identical date ranges.\n2. Observe the generated codes.",
+          "expected": "Each financial year is assigned a unique auto-generated code. No two financial years share the same code."
+        },
+        {
+          "id": "TC-FY-1404",
+          "severity": "P2",
+          "scenario": "FY banner reflects the in-progress financial year",
+          "steps": "1. Set a financial year as active.\n2. View the page header/banner area across different pages of the application.",
+          "expected": "The FY banner or indicator in the application header reflects the currently active (in-progress) financial year."
+        },
+        {
+          "id": "TC-FY-1405",
+          "severity": "P2",
+          "scenario": "Financial years are accessible from the Planning section of the navigation",
+          "steps": "1. Open the main navigation.\n2. Navigate to the Planning section.",
+          "expected": "A 'Financial Years' link is present in the Planning section and navigates to the Financial Years page."
+        },
+        {
+          "id": "TC-FY-1406",
+          "severity": "P2",
+          "scenario": "Deactivated financial years do not interfere with active planning views",
+          "steps": "1. Deactivate a financial year that is not in progress.\n2. Navigate to planning pages.",
+          "expected": "The deactivated financial year is not shown as the current period. Active planning continues with the in-progress financial year."
+        },
+        {
+          "id": "TC-FY-1407",
+          "severity": "P3",
+          "scenario": "Deleting a financial year does not affect existing sprint or project associations",
+          "steps": "1. Identify a financial year associated with existing sprints or projects.\n2. Delete it.\n3. Navigate to the Sprints or Projects module.",
+          "expected": "Existing sprint or project records are either unaffected or show a clear indication that their associated financial year has been removed."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,210 @@
+{
+  "module": {
+    "slug": "project-codes",
+    "name": "Project Codes",
+    "sort_order": 4,
+    "parent": {
+      "slug": "projects",
+      "name": "Projects",
+      "sort_order": 2
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-PCD-100",
+      "name": "Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-PCD-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user cannot view project codes",
+          "steps": "1. Open a project detail page URL without being logged in.",
+          "expected": "The browser redirects to the login page. The project code is not visible."
+        },
+        {
+          "id": "TC-PCD-102",
+          "severity": "P1",
+          "scenario": "Authenticated user can view the project code on the Operational tab",
+          "steps": "1. Log in as any user.\n2. Open a project detail page.\n3. Click the Operational tab.",
+          "expected": "The Project Code panel is visible showing the project's assigned code in read-only mode."
+        },
+        {
+          "id": "TC-PCD-103",
+          "severity": "P1",
+          "scenario": "Project Code accordion in the edit drawer is only accessible with 'can_change_project'",
+          "steps": "1. Log in as a user with 'can_change_project'.\n2. Open the edit drawer.\n3. Expand the Project Code accordion.",
+          "expected": "The Project Code accordion is accessible with an editable text field."
+        },
+        {
+          "id": "TC-PCD-104",
+          "severity": "P1",
+          "scenario": "User without 'can_change_project' cannot edit the project code",
+          "steps": "1. Log in as a user without 'can_change_project'.\n2. Open a project detail page.",
+          "expected": "The 'Edit Project' button is not available. The project code is displayed as read-only."
+        }
+      ]
+    },
+    {
+      "id": "TC-PCD-200",
+      "name": "Viewing Project Code",
+      "test_cases": [
+        {
+          "id": "TC-PCD-201",
+          "severity": "P0",
+          "scenario": "Project Code panel is shown on the Operational tab",
+          "steps": "1. Open a project detail page.\n2. Click the Operational tab.",
+          "expected": "A 'Project Code' panel is visible in the left column. The panel shows the project code field with a 'code' styling (monospace)."
+        },
+        {
+          "id": "TC-PCD-202",
+          "severity": "P1",
+          "scenario": "Project code is displayed in code/monospace style",
+          "steps": "1. Open a project with a project code assigned.\n2. View the Project Code panel on the Operational tab.",
+          "expected": "The project code value is displayed in a monospace/code typographic style, visually distinct from regular text."
+        },
+        {
+          "id": "TC-PCD-203",
+          "severity": "P2",
+          "scenario": "Project Code panel shows a blank/empty state when no code has been assigned",
+          "steps": "1. Open a project that has no project code set.\n2. Click the Operational tab.",
+          "expected": "The Project Code panel shows an empty or dash value indicating no code has been assigned."
+        }
+      ]
+    },
+    {
+      "id": "TC-PCD-300",
+      "name": "Setting a Project Code",
+      "test_cases": [
+        {
+          "id": "TC-PCD-301",
+          "severity": "P0",
+          "scenario": "Project Code accordion in the edit drawer contains a text field",
+          "steps": "1. Open the edit drawer for any project.\n2. Expand the 'Project Code' accordion.",
+          "expected": "A text field labelled 'Project Code' is shown with placeholder text 'e.g. DP-2025-001'."
+        },
+        {
+          "id": "TC-PCD-302",
+          "severity": "P0",
+          "scenario": "Entering a project code and saving persists the value",
+          "steps": "1. Open the edit drawer.\n2. Expand the Project Code accordion.\n3. Enter 'DP-2025-001' in the Project Code field.\n4. Click 'Save changes'.",
+          "expected": "The drawer closes. The Operational tab now shows 'DP-2025-001' in the Project Code panel."
+        },
+        {
+          "id": "TC-PCD-303",
+          "severity": "P1",
+          "scenario": "Existing project code is pre-filled when the edit drawer opens",
+          "steps": "1. Open the edit drawer for a project that already has a code assigned.",
+          "expected": "The Project Code field in the accordion is pre-filled with the current code value."
+        },
+        {
+          "id": "TC-PCD-304",
+          "severity": "P1",
+          "scenario": "Clearing the project code field and saving removes the code",
+          "steps": "1. Open the edit drawer for a project with a code.\n2. Expand the Project Code accordion.\n3. Clear the code field.\n4. Save changes.",
+          "expected": "The project code is removed. The Operational tab shows the Project Code field as empty."
+        },
+        {
+          "id": "TC-PCD-305",
+          "severity": "P1",
+          "scenario": "Project code can be updated to a new value",
+          "steps": "1. Open the edit drawer for a project with code 'DP-2025-001'.\n2. Change it to 'PRJ-2025-042'.\n3. Save changes.",
+          "expected": "The new code 'PRJ-2025-042' is shown in the Project Code panel. The old value is no longer shown."
+        },
+        {
+          "id": "TC-PCD-306",
+          "severity": "P2",
+          "scenario": "Cancelling after entering a new project code discards the change",
+          "steps": "1. Open the edit drawer.\n2. Enter a new project code.\n3. Click 'Cancel'.",
+          "expected": "The drawer closes. The project code remains unchanged from before the edit."
+        }
+      ]
+    },
+    {
+      "id": "TC-PCD-400",
+      "name": "Validation",
+      "test_cases": [
+        {
+          "id": "TC-PCD-401",
+          "severity": "P1",
+          "scenario": "Project code field enforces a maximum of 255 characters",
+          "steps": "1. Open the edit drawer.\n2. Expand the Project Code accordion.\n3. Enter a value longer than 255 characters.",
+          "expected": "The input is capped at 255 characters or a validation error is shown when attempting to save."
+        },
+        {
+          "id": "TC-PCD-402",
+          "severity": "P1",
+          "scenario": "Project code is optional — saving without one does not cause an error",
+          "steps": "1. Open the edit drawer for a project with no code.\n2. Leave the Project Code field empty.\n3. Save changes.",
+          "expected": "The project saves successfully. No validation error for the empty code field."
+        },
+        {
+          "id": "TC-PCD-403",
+          "severity": "P2",
+          "scenario": "Project code field accepts alphanumeric values and common separators",
+          "steps": "1. Open the edit drawer.\n2. Enter values like 'DP-2025-001', 'PRJ.001', or 'PROJECT_A1' in the code field.\n3. Save changes.",
+          "expected": "All such values are accepted without validation errors."
+        }
+      ]
+    },
+    {
+      "id": "TC-PCD-500",
+      "name": "Non-Functional",
+      "test_cases": [
+        {
+          "id": "TC-PCD-501",
+          "severity": "P2",
+          "scenario": "Project code is not exposed as a publicly searchable identifier",
+          "steps": "1. Enter a unique project code.\n2. Navigate to the Projects list and search for that code value.",
+          "expected": "The search is by project name. The project code is not used as a search key in the main list view unless the system documents otherwise."
+        },
+        {
+          "id": "TC-PCD-502",
+          "severity": "P2",
+          "scenario": "Project code change is reflected immediately after saving without a hard reload",
+          "steps": "1. Open the edit drawer.\n2. Change the project code and save.\n3. Look at the Operational tab immediately after the drawer closes.",
+          "expected": "The updated code is shown on the Operational tab without requiring a full page refresh."
+        }
+      ]
+    },
+    {
+      "id": "TC-PCD-600",
+      "name": "Desktop",
+      "test_cases": [
+        {
+          "id": "TC-PCD-601",
+          "severity": "P1",
+          "scenario": "Project Code panel is clearly visible in the Operational tab on desktop",
+          "steps": "1. Open a project detail page on a desktop browser.\n2. Click the Operational tab.",
+          "expected": "The Project Code panel is in the left column, below the Operational panel. The code is displayed in a monospace style and is fully readable."
+        },
+        {
+          "id": "TC-PCD-602",
+          "severity": "P2",
+          "scenario": "Project Code accordion in the edit drawer is accessible on desktop",
+          "steps": "1. Open the edit drawer on a desktop browser.\n2. Scroll to and expand the Project Code accordion.",
+          "expected": "The accordion is accessible and the text field is easy to edit on a desktop viewport."
+        }
+      ]
+    },
+    {
+      "id": "TC-PCD-700",
+      "name": "Mobile",
+      "test_cases": [
+        {
+          "id": "TC-PCD-701",
+          "severity": "P1",
+          "scenario": "Project Code panel is readable on mobile",
+          "steps": "1. Open a project detail page on a mobile device.\n2. Tap the Operational tab.",
+          "expected": "The Project Code panel is visible in the single-column layout. The code value is readable without truncation."
+        },
+        {
+          "id": "TC-PCD-702",
+          "severity": "P2",
+          "scenario": "Project Code field in the edit drawer is editable on mobile",
+          "steps": "1. Open the edit drawer on a mobile device.\n2. Scroll to the Project Code accordion and expand it.\n3. Tap the code field.",
+          "expected": "The mobile keyboard appears. The code field is tappable and text can be entered."
+        }
+      ]
+    }
+  ]
+}
