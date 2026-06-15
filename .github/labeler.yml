@@ -1,0 +1,41 @@
+backend:
+  - changed-files:
+      - any-glob-to-any-file: "apps/web/apps/**"
+
+frontend:
+  - changed-files:
+      - any-glob-to-any-file: "apps/web/static/**"
+      - any-glob-to-any-file: "apps/web/templates/**"
+
+database:
+  - changed-files:
+      - any-glob-to-any-file: "**/migrations/**"
+
+packages:
+  - changed-files:
+      - any-glob-to-any-file: "packages/**"
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file: ".github/**"
+
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file: "requirements/**"
+      - any-glob-to-any-file: "package*.json"
+
+scripts:
+  - changed-files:
+      - any-glob-to-any-file: "scripts/**"
+
+docs:
+  - changed-files:
+      - any-glob-to-any-file: "docs/**"
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file: "**/tests/**"
+
+test-tracker:
+  - changed-files:
+      - any-glob-to-any-file: "tools/test-tracker/**"
