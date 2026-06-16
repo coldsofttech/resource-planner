@@ -143,21 +143,15 @@
               </section-panel>
             </div>
             <div class="col-12 col-md-4">
-              <section-panel class="mt-2">
-                <panel-title>Version History</panel-title>
-                <panel-body>
-                  <div class="mb-3">
-                    <dropdown-field id="rp-estimate-version-picker" label="Version" show-label>
-                      <values-list>
-                        <value label="— Select a version —" value=""></value>
-                      </values-list>
-                    </dropdown-field>
-                  </div>
-                  <div id="rp-estimate-history-list">
-                    <p class="text-muted rp-fs-13 mb-0">Select a version to view its history.</p>
-                  </div>
-                </panel-body>
-              </section-panel>
+              <history-panel title="Version History" icon="bi-clock-history" class="mt-2">
+                <dropdown-field id="rp-estimate-version-picker" label="Version" show-label class="mb-3">
+                  <values-list>
+                    <value label="— Select a version —" value=""></value>
+                  </values-list>
+                </dropdown-field>
+                <history-items id="rp-estimate-history-list" placeholder="Select a version to view its history.">
+                </history-items>
+              </history-panel>
             </div>
           </div>
         </tab-content>
