@@ -13,8 +13,8 @@ class AssignDefaultGroupTest(SimpleTestCase):
     def setUp(self):
         self.svc = BaseUserService()
 
-    @patch("apps.users.services.get_administrators_group")
-    @patch("apps.users.services.get_guests_group")
+    @patch("apps.users.services.user.get_administrators_group")
+    @patch("apps.users.services.user.get_guests_group")
     def test_uses_administrators_group_when_is_admin_true(
         self, mock_guests, mock_admins
     ):
@@ -28,8 +28,8 @@ class AssignDefaultGroupTest(SimpleTestCase):
         mock_guests.assert_not_called()
         mock_user.groups.add.assert_called_once_with(mock_group)
 
-    @patch("apps.users.services.get_administrators_group")
-    @patch("apps.users.services.get_guests_group")
+    @patch("apps.users.services.user.get_administrators_group")
+    @patch("apps.users.services.user.get_guests_group")
     def test_uses_guests_group_when_is_admin_false(self, mock_guests, mock_admins):
         mock_group = MagicMock()
         mock_guests.return_value = mock_group
@@ -41,7 +41,7 @@ class AssignDefaultGroupTest(SimpleTestCase):
         mock_admins.assert_not_called()
         mock_user.groups.add.assert_called_once_with(mock_group)
 
-    @patch("apps.users.services.get_guests_group")
+    @patch("apps.users.services.user.get_guests_group")
     def test_uses_guests_group_by_default_when_is_admin_not_passed(self, mock_guests):
         mock_group = MagicMock()
         mock_guests.return_value = mock_group
@@ -52,7 +52,7 @@ class AssignDefaultGroupTest(SimpleTestCase):
         mock_guests.assert_called_once()
         mock_user.groups.add.assert_called_once_with(mock_group)
 
-    @patch("apps.users.services.get_guests_group")
+    @patch("apps.users.services.user.get_guests_group")
     def test_skips_group_add_when_guests_group_is_none(self, mock_guests):
         mock_guests.return_value = None
         mock_user = MagicMock()
@@ -61,7 +61,7 @@ class AssignDefaultGroupTest(SimpleTestCase):
 
         mock_user.groups.add.assert_not_called()
 
-    @patch("apps.users.services.get_administrators_group")
+    @patch("apps.users.services.user.get_administrators_group")
     def test_skips_group_add_when_administrators_group_is_none(self, mock_admins):
         mock_admins.return_value = None
         mock_user = MagicMock()
@@ -70,7 +70,7 @@ class AssignDefaultGroupTest(SimpleTestCase):
 
         mock_user.groups.add.assert_not_called()
 
-    @patch("apps.users.services.get_guests_group")
+    @patch("apps.users.services.user.get_guests_group")
     def test_passes_group_object_to_groups_add(self, mock_guests):
         sentinel = MagicMock(name="guests_group")
         mock_guests.return_value = sentinel
@@ -80,7 +80,7 @@ class AssignDefaultGroupTest(SimpleTestCase):
 
         mock_user.groups.add.assert_called_once_with(sentinel)
 
-    @patch("apps.users.services.get_administrators_group")
+    @patch("apps.users.services.user.get_administrators_group")
     def test_passes_admin_group_object_to_groups_add(self, mock_admins):
         sentinel = MagicMock(name="admins_group")
         mock_admins.return_value = sentinel

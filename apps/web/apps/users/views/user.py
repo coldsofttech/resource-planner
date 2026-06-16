@@ -12,19 +12,6 @@ class ProfileView(ProtectedView):
         return ctx
 
 
-class MembersView(ProtectedView):
-    template_name = "users/members.html"
-
-    def get_context_data(self, **kwargs: object) -> dict[str, object]:
-        ctx = super().get_context_data(**kwargs)
-        perms = get_user_permissions(self.request.user)
-        ctx["can_view_members"] = "auth.view_user" in perms
-        ctx["can_change_workforce"] = "users.change_user_workforce" in perms
-        ctx["can_export_members"] = "users.export_member" in perms
-        ctx["can_assign_team"] = "teams.assign_team" in perms
-        return ctx
-
-
 class UsersAdminView(ProtectedView):
     template_name = "users/users.html"
 
@@ -52,28 +39,6 @@ class UsersAdminView(ProtectedView):
             "permissions.add_userpermissioncategory" in perms
         )
         ctx["is_classic_auth"] = is_classic_auth
-        return ctx
-
-
-class GroupsAdminView(ProtectedView):
-    template_name = "users/groups.html"
-
-    def get_context_data(self, **kwargs: object) -> dict[str, object]:
-        ctx = super().get_context_data(**kwargs)
-        perms = get_user_permissions(self.request.user)
-        ctx["can_change_group"] = "users.change_group" in perms
-        ctx["can_delete_group"] = "users.delete_group" in perms
-        return ctx
-
-
-class GroupDetailView(ProtectedView):
-    template_name = "users/group_detail.html"
-
-    def get_context_data(self, **kwargs: object) -> dict[str, object]:
-        ctx = super().get_context_data(**kwargs)
-        perms = get_user_permissions(self.request.user)
-        ctx["can_change_group"] = "users.change_group" in perms
-        ctx["group_code"] = self.kwargs.get("code", "")
         return ctx
 
 
