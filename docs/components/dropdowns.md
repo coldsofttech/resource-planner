@@ -63,3 +63,196 @@ Business-specific status filter dropdown. Options: **All Statuses** (empty value
 ```html
 <is-active-field name="is_active" label="Status" col="col-md-3"></is-active-field>
 ```
+
+---
+
+### Static Dropdown Fields
+
+These fields extend `DropdownField` with hardcoded options — no API fetch and no `<values-list>` child needed.
+
+#### `<auth-type-field>`
+
+Authentication type filter. Options: All Auth Types / Classic / OAuth / SAML.
+
+| Attribute    | Type    | Description                                            |
+| ------------ | ------- | ------------------------------------------------------ |
+| `value`      | string  | `"classic"` \| `"oauth"` \| `"saml"` \| `""` (default) |
+| `show-label` | boolean | Renders "Auth Type" as the visible field label         |
+
+```html
+<auth-type-field name="auth_type" show-label></auth-type-field>
+```
+
+---
+
+#### `<fy-status-field>`
+
+Financial year status filter. Options: Future / In Progress / Completed / Expired.
+
+| Attribute    | Type    | Description                                                              |
+| ------------ | ------- | ------------------------------------------------------------------------ |
+| `value`      | string  | `"future"` \| `"in_progress"` \| `"completed"` \| `"expired"` \| `""`    |
+| `allow-all`  | boolean | Prepends an "All Statuses" option (default when used in filter contexts) |
+| `show-label` | boolean | Renders "Status" as the visible field label                              |
+
+```html
+<fy-status-field name="fy_status" allow-all show-label></fy-status-field>
+```
+
+---
+
+#### `<project-estimate-status-field>`
+
+Project estimate status filter. Options: Draft / Reviewed / Shared / Approved (+ optional Superseded).
+
+| Attribute          | Type    | Description                                                                       |
+| ------------------ | ------- | --------------------------------------------------------------------------------- |
+| `value`            | string  | `"DRAFT"` \| `"REVIEWED"` \| `"SHARED"` \| `"APPROVED"` \| `"SUPERSEDED"` \| `""` |
+| `allow-all`        | boolean | Prepends an "All Statuses" option                                                 |
+| `allow-superseded` | boolean | Appends "Superseded" as the last option                                           |
+| `show-label`       | boolean | Renders "Status" as the visible field label                                       |
+
+---
+
+#### `<sprint-status-field>`
+
+Sprint status filter. Options: Future / In Progress / Completed / Expired.
+
+| Attribute    | Type    | Description                                                           |
+| ------------ | ------- | --------------------------------------------------------------------- |
+| `value`      | string  | `"future"` \| `"in_progress"` \| `"completed"` \| `"expired"` \| `""` |
+| `allow-all`  | boolean | Prepends an "All Statuses" option                                     |
+| `show-label` | boolean | Renders "Status" as the visible field label                           |
+
+---
+
+### API-Fetching Dropdown Fields
+
+These fields fetch their options from the API on first connect and cache them for the element's lifetime. All inherit the full `DropdownField` / `BaseField` API.
+
+**Common attributes (all fields below unless noted):**
+
+| Attribute    | Type    | Description                                                                                              |
+| ------------ | ------- | -------------------------------------------------------------------------------------------------------- |
+| `value`      | string  | Pre-selected option code; takes priority over `is_default` from the API                                  |
+| `allow-all`  | boolean | Prepends an "All …" option with `value=""`, selected by default; use in filter contexts                  |
+| `show-label` | boolean | Renders the field label as visible text; without this attribute the label is hidden (label-less variant) |
+
+| Element                     | Default label      | API endpoint                                      | Notes                                                           |
+| --------------------------- | ------------------ | ------------------------------------------------- | --------------------------------------------------------------- |
+| `<role-field>`              | Role               | `GET /api/v1/roles/options/`                      | Pre-selects `is_default` role when `value` is absent            |
+| `<timezone-field>`          | Timezone           | `GET /api/v1/users/options/`                      | No `allow-all`                                                  |
+| `<employment-type-field>`   | Employment Type    | `GET /api/v1/emp-types/options/`                  | Pre-selects `is_default` employment type when `value` is absent |
+| `<location-field>`          | Location           | `GET /api/v1/locations/options/`                  | Options render as "City, Country"; pre-selects `is_default`     |
+| `<confidence-field>`        | Confidence         | `GET /api/v1/projects/options/?fields=confidence` |                                                                 |
+| `<priority-field>`          | Priority           | `GET /api/v1/projects/options/?fields=priority`   |                                                                 |
+| `<programme-field>`         | Programme          | `GET /api/v1/programmes/options/`                 |                                                                 |
+| `<project-field>`           | Project            | `GET /api/v1/projects/options/`                   | See `programme-id` below                                        |
+| `<project-status-field>`    | Project Status     | `GET /api/v1/projects/statuses/options/`          |                                                                 |
+| `<project-substatus-field>` | Project Sub-Status | `GET /api/v1/projects/sub-statuses/options/`      | See `status-id` below                                           |
+| `<project-type-field>`      | Project Type       | `GET /api/v1/projects/types/options/`             |                                                                 |
+| `<sprint-field>`            | Sprint             | `GET /api/v1/sprints/options/`                    | See `fy-code` below                                             |
+
+**Additional attributes for specific fields:**
+
+`<financial-year-field>` → `GET /api/v1/fy/options/`:
+
+| Attribute    | Type    | Description                                                   |
+| ------------ | ------- | ------------------------------------------------------------- |
+| `show-long`  | boolean | Labels show `FY2024-2025` format                              |
+| `show-short` | boolean | Labels show short FY format (takes priority over `show-long`) |
+
+```html
+<financial-year-field id="plan-fy" required col="col-md-6" show-label></financial-year-field>
+<financial-year-field
+  id="filter-fy"
+  name="fy"
+  allow-all
+  show-label
+  show-short
+></financial-year-field>
+```
+
+`<project-field>`:
+
+| Attribute      | Type   | Description                                                                                                         |
+| -------------- | ------ | ------------------------------------------------------------------------------------------------------------------- |
+| `programme-id` | string | `id` of a `<programme-field>` whose value scopes the project list; shows all projects when no programme is selected |
+
+```html
+<programme-field id="prog-field" required col="col-md-6" show-label></programme-field>
+<project-field
+  id="proj-field"
+  programme-id="prog-field"
+  required
+  col="col-md-6"
+  show-label
+></project-field>
+```
+
+`<project-substatus-field>`:
+
+| Attribute   | Type   | Description                                                                                                         |
+| ----------- | ------ | ------------------------------------------------------------------------------------------------------------------- |
+| `status-id` | string | `id` of a `<project-status-field>` whose value scopes the sub-status list; disabled when no main status is selected |
+
+`<sprint-field>`:
+
+| Attribute | Type   | Description                                                        |
+| --------- | ------ | ------------------------------------------------------------------ |
+| `fy-code` | string | Financial year code to filter sprint options; re-fetches on change |
+
+---
+
+### Hybrid Single / Multi-Select Dropdown Fields
+
+These fields extend `DropdownField` and support a `multi-select` attribute that switches them to chip-based multi-value selection (same visual as `<multi-select-field>`).
+
+| Attribute      | Type    | Description                                                                                                              |
+| -------------- | ------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `multi-select` | boolean | Renders as a chip-based multi-select; `value` returns JSON array string; setter accepts JSON array, CSV string, or Array |
+
+| Element                 | Default label | API endpoint                         | Extra attributes                                             |
+| ----------------------- | ------------- | ------------------------------------ | ------------------------------------------------------------ |
+| `<team-field>`          | Team          | `GET /api/v1/teams/options/`         | `unassign` — prepends "Unassign" option (single-select only) |
+| `<business-unit-field>` | Business Unit | `GET /api/v1/bu/options/`            |                                                              |
+| `<member-field>`        | Member        | `GET /api/v1/members/?page_size=200` | Options render as display name / email / code fallback       |
+
+```html
+<!-- Single-select with allow-all for filters -->
+<team-field name="team" allow-all show-label></team-field>
+
+<!-- Multi-select mode -->
+<team-field id="project-teams" multi-select required col="col-12" show-label></team-field>
+```
+
+```js
+// Read multi-select value
+JSON.parse(document.getElementById("project-teams").value); // → ["TEAM-1", "TEAM-2"]
+document.getElementById("project-teams").values; // → [{ id, label, value }, …]
+```
+
+---
+
+### API-Fetching Multi-Select Fields
+
+These fields extend `MultiSelectField` directly — they do not have a single-select mode. See `fields.md` for the full `MultiSelectField` attribute and API reference.
+
+| Element                | Default label | API endpoint                  | Notes                                               |
+| ---------------------- | ------------- | ----------------------------- | --------------------------------------------------- |
+| `<skills-field>`       | Skills        | `GET /api/v1/skills/options/` |                                                     |
+| `<project-tags-field>` | Tags          | `GET /api/v1/tags/`           | Value is JSON array of tag codes e.g. `["TAG-001"]` |
+
+| Attribute    | Type    | Description                                                          |
+| ------------ | ------- | -------------------------------------------------------------------- |
+| `show-label` | boolean | Renders the field label as visible text                              |
+| `max`        | number  | Maximum number of chips selectable (inherited from MultiSelectField) |
+
+```html
+<skills-field id="member-skills" required col="col-md-12" show-label></skills-field>
+<project-tags-field id="project-tags" col="col-12" show-label></project-tags-field>
+```
+
+```js
+JSON.parse(document.getElementById("member-skills").value); // → ["SKILL-001", "SKILL-002"]
+```

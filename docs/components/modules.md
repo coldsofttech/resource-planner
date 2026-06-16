@@ -143,3 +143,128 @@ Pre-configured `<text-field>`. Defaults: label "First name", required, maxlength
 ### `<last-name-field>`
 
 Pre-configured `<text-field>`. Defaults: label "Last name", required, maxlength 100, placeholder "Doe", autocomplete "family-name".
+
+---
+
+## Account Components
+
+Components from `apps/web/static/js/components/modules/account/` and `apps/web/static/js/components/modules/users/` for user profile and avatar rendering.
+
+### `<user-avatar>`
+
+Circular avatar display for user or member rows, drawers, and any other context that needs to show a user photo with an initials fallback. Applies the `rp-avatar` class (and a size modifier) directly to itself.
+
+| Attribute    | Type   | Default | Description                                               |
+| ------------ | ------ | ------- | --------------------------------------------------------- |
+| `avatar-url` | string | —       | Photo URL; absent or empty triggers the initials fallback |
+| `name`       | string | —       | Display name used for alt text and initials derivation    |
+| `size`       | string | `"md"`  | `"sm"` \| `"md"` (32 px) \| `"lg"` \| `"xl"`              |
+
+```html
+<user-avatar name="Mira Aslan" size="sm"></user-avatar>
+<user-avatar avatar-url="/media/avatars/1.jpg" name="Mira Aslan" size="lg"></user-avatar>
+```
+
+```js
+// Set from row data after API response
+const el = document.querySelector("user-avatar");
+el.setAttribute("avatar-url", row.avatar_url || "");
+el.setAttribute("name", row.full_name);
+```
+
+---
+
+### `<user-avatar-profile>`
+
+Avatar upload component for the account profile page. Renders the current avatar (or an initials fallback) with a camera button to pick and upload a new photo. SSO accounts disable the camera button.
+
+| Attribute    | Type    | Default | Description                                                                                              |
+| ------------ | ------- | ------- | -------------------------------------------------------------------------------------------------------- |
+| `avatar-url` | string  | —       | Current photo URL; absent or empty renders the initials identicon                                        |
+| `seed`       | string  | —       | Seed string used to derive initials for the fallback avatar (typically the user's display name or email) |
+| `is-sso`     | boolean | —       | When present, disables the camera button with a tooltip explaining SSO accounts cannot change avatars    |
+| `sso-name`   | string  | —       | Name of the SSO provider shown in the disabled tooltip (e.g. `"Google"`)                                 |
+
+**Accepted file formats:** JPEG, PNG, GIF, WEBP. Maximum size: 5 MB.
+
+**Public API:**
+
+| Method                     | Description                                   |
+| -------------------------- | --------------------------------------------- |
+| `component.setAvatar(url)` | Updates the displayed avatar to the given URL |
+
+**Events:**
+
+| Event               | Detail                  | Description                            |
+| ------------------- | ----------------------- | -------------------------------------- |
+| `rp:avatar:changed` | `{ avatarUrl: string }` | Fired after the new avatar is uploaded |
+
+```html
+<user-avatar-profile avatar-url="/media/avatars/user-1.jpg" seed="Jane Smith"></user-avatar-profile>
+```
+
+```html
+<!-- SSO user — camera disabled -->
+<user-avatar-profile seed="jane.smith@company.com" is-sso sso-name="Google"></user-avatar-profile>
+```
+
+```js
+const profile = document.querySelector("user-avatar-profile");
+profile.addEventListener("rp:avatar:changed", (e) => {
+  console.log("New avatar URL:", e.detail.avatarUrl);
+});
+```
+
+---
+
+### `<user-profile>`
+
+Top-bar account dropdown. Renders an avatar trigger button and a dropdown panel populated from `GET /api/v1/auth/me/` on first open. Pre-mounted in `templates/base.html` — do not add additional instances.
+
+**Responsibilities:**
+
+- Displays user avatar (or initials fallback) in the trigger button and panel header
+- Shows user name and email in the panel
+- Syncs the server-stored theme preference to `localStorage` on first load
+- Persists theme changes via `PATCH /api/v1/users/me/preferences/` when `<theme-toggle>` fires
+- Handles `Ctrl+,` / `⌘+,` shortcut to navigate to `/profile/`
+- Handles sign-out via `POST /api/v1/auth/logout/`
+
+---
+
+## Permissions
+
+### `<permissions-panel>`
+
+Self-contained component for displaying and editing permission category assignments. Handles both group and user subjects in edit or view modes.
+
+| Attribute      | Type   | Description           |
+| -------------- | ------ | --------------------- |
+| `subject-type` | string | `"group"` \| `"user"` |
+
+**Public API:**
+
+| Method                            | Description                                                                          |
+| --------------------------------- | ------------------------------------------------------------------------------------ |
+| `panel.load(subjectCode)`         | Loads categories and current assignments for editing                                 |
+| `panel.save()`                    | Diffs and persists changes; returns a `Promise`                                      |
+| `panel.loadAssigned(subjectCode)` | Loads current assignments as a read-only list                                        |
+| `panel.loadEffective(userCode)`   | Loads effective (group + direct) permissions as a read-only list (user subject only) |
+
+**Events:**
+
+| Event                  | Detail     | Description                       |
+| ---------------------- | ---------- | --------------------------------- |
+| `rp:permissions:saved` | `{ code }` | Fired after a successful `save()` |
+
+```html
+<permissions-panel subject-type="group"></permissions-panel>
+```
+
+```js
+const panel = document.querySelector("permissions-panel");
+await panel.load("GRP-0001");
+
+// Later, on save button click:
+await panel.save();
+```

@@ -289,6 +289,66 @@ Search input with a prefix icon and optional Ctrl+K / ⌘K keyboard shortcut.
 
 ---
 
+## `<multi-select-field>`
+
+Chip-based multi-value select input. Extends `BaseField` — inherits all common attributes. Options are declared as `<values-list><value>` children (same pattern as `<dropdown-field>`) or populated programmatically.
+
+| Attribute     | Type    | Default | Description                                                            |
+| ------------- | ------- | ------- | ---------------------------------------------------------------------- |
+| `placeholder` | string  | —       | Hint text shown when no chips are selected                             |
+| `max`         | number  | —       | Maximum number of chips that can be selected                           |
+| `free-form`   | boolean | —       | Allows typing custom values not in the options list (Enter key to add) |
+
+**Declarative children (same pattern as `<dropdown-field>`):**
+
+```html
+<multi-select-field id="tags" name="tags" label="Tags" required>
+  <values-list>
+    <value id="TAG-001" value="TAG-001" label="Backend"></value>
+    <value id="TAG-002" value="TAG-002" label="Frontend"></value>
+    <value id="TAG-003" value="TAG-003" label="Infrastructure"></value>
+  </values-list>
+</multi-select-field>
+```
+
+**Public API:**
+
+| Member            | Description                                                                     |
+| ----------------- | ------------------------------------------------------------------------------- |
+| `field.value`     | Getter: JSON array string of selected values (e.g. `'["TAG-001","TAG-003"]'`)   |
+| `field.value = v` | Setter: accepts JSON array string, CSV string, or Array; sets chips accordingly |
+| `field.values`    | Getter: array of `{ id, label, value }` objects for selected chips              |
+
+**Validation:** `required` → at least one chip must be selected.
+
+**Keyboard navigation:**
+
+- `ArrowUp` / `ArrowDown` — navigate the dropdown suggestion list
+- `Enter` — select the highlighted option (or add a free-form chip)
+- `Backspace` on empty input — removes the last chip
+- `Escape` — closes the dropdown
+
+```html
+<!-- Fixed options list -->
+<multi-select-field id="skills" name="skills" label="Skills" col="col-12" max="5">
+  <values-list>
+    <value id="python" value="python" label="Python"></value>
+    <value id="django" value="django" label="Django"></value>
+  </values-list>
+</multi-select-field>
+```
+
+```js
+// Set value programmatically
+document.getElementById("skills").value = '["python","django"]';
+
+// Read selected values as objects
+const selected = document.getElementById("skills").values;
+// → [{ id: "python", label: "Python", value: "python" }, ...]
+```
+
+---
+
 ## `<file-import-field>`
 
 Drag-and-drop / click-to-browse file import field. Renders a drop zone, a hidden file input, and removable file tags for each selected file. Extends `BaseField` and participates in the wizard `rp:validate` lifecycle.
