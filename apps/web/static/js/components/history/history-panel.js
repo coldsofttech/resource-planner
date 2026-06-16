@@ -46,7 +46,8 @@ class HistoryPanel extends HTMLElement {
 
   _render() {
     const extras = Array.from(this.classList).filter((c) => !c.startsWith("col-"));
-    this.className = [this._col, ...extras].join(" ").trim();
+    const margins = extras.some((c) => c.startsWith("mt-")) ? [] : ["mt-3"];
+    this.className = [this._col, ...margins, ...extras].join(" ").trim();
     const iconHTML = this._icon ? `<i class="bi ${esc(this._icon)} rp-card-head-icon"></i>` : "";
     this.innerHTML = `
       <div class="rp-card rp-card-sunken">

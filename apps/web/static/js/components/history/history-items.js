@@ -22,6 +22,9 @@ class HistoryItems extends HTMLElement {
   }
 
   connectedCallback() {
+    if (!this.classList.contains("mt-2") && !this.classList.contains("mt-3")) {
+      this.classList.add("mt-2");
+    }
     if (!this.children.length) this._showMessage(this._placeholder);
   }
 
