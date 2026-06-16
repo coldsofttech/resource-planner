@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Setup Guide — Resource Planner</title>
+    <script src="{% static 'js/dist/theme-init.min.js' %}"></script>
+    <script type="module" src="{% static 'js/dist/components.min.js' %}"></script>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+          crossorigin="anonymous" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="{% static 'css/dist/styles.min.css' %}" />
+    <style>
+      .rp-docs-layout {
+        display: flex;
+        min-height: 100vh;
+      }
+      .rp-docs-sidebar {
+        width: 260px;
+        flex-shrink: 0;
+        border-right: 1px solid var(--rp-border);
+        padding: 1.5rem 0;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+        background: var(--rp-surface);
+      }
+      .rp-docs-content {
+        flex: 1;
+        min-width: 0;
+        padding: 2rem 2.5rem;
+        max-width: 860px;
+      }
+      .rp-docs-topbar {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0 1.25rem 1.25rem;
+        border-bottom: 1px solid var(--rp-border);
+        margin-bottom: 1rem;
+      }
+      .rp-docs-nav-section {
+        padding: 0.5rem 1.25rem 0.25rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--rp-subtle);
+        margin-top: 0.5rem;
+      }
+      .rp-docs-nav-link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 1.25rem;
+        font-size: 0.85rem;
+        color: var(--rp-text);
+        text-decoration: none;
+        border-radius: 0;
+        transition: background 0.1s;
+      }
+      .rp-docs-nav-link:hover,
+      .rp-docs-nav-link.active {
+        background: var(--rp-hover);
+        color: var(--rp-accent);
+      }
+      .rp-docs-nav-link .bi {
+        font-size: 0.8rem;
+        opacity: 0.6;
+      }
+      .rp-step-card {
+        border: 1px solid var(--rp-border);
+        border-radius: var(--rp-radius);
+        margin-bottom: 2.5rem;
+        overflow: hidden;
+      }
+      .rp-step-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 1.25rem;
+        background: var(--rp-surface-alt);
+        border-bottom: 1px solid var(--rp-border);
+      }
+      .rp-step-num {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        background: var(--rp-accent);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+      }
+      .rp-step-body {
+        padding: 1.25rem;
+      }
+      .rp-field-table {
+        width: 100%;
+        font-size: 0.83rem;
+        border-collapse: collapse;
+        margin: 0.75rem 0;
+      }
+      .rp-field-table th {
+        text-align: left;
+        padding: 0.4rem 0.6rem;
+        background: var(--rp-surface-alt);
+        font-weight: 600;
+        border: 1px solid var(--rp-border);
+        white-space: nowrap;
+      }
+      .rp-field-table td {
+        padding: 0.4rem 0.6rem;
+        border: 1px solid var(--rp-border);
+        vertical-align: top;
+      }
+      .rp-field-table tr:hover td {
+        background: var(--rp-hover);
+      }
+      .rp-error-block {
+        background: color-mix(in srgb, var(--rp-danger) 8%, transparent);
+        border: 1px solid color-mix(in srgb, var(--rp-danger) 25%, transparent);
+        border-radius: var(--rp-radius);
+        padding: 0.75rem 1rem;
+        margin: 0.75rem 0;
+        font-size: 0.85rem;
+      }
+      .rp-error-label {
+        font-weight: 700;
+        color: var(--rp-danger);
+        margin-bottom: 0.25rem;
+      }
+      .rp-tip-block {
+        background: color-mix(in srgb, var(--rp-accent) 8%, transparent);
+        border: 1px solid color-mix(in srgb, var(--rp-accent) 25%, transparent);
+        border-radius: var(--rp-radius);
+        padding: 0.75rem 1rem;
+        margin: 0.75rem 0;
+        font-size: 0.85rem;
+      }
+      .rp-warn-block {
+        background: color-mix(in srgb, var(--rp-warning) 10%, transparent);
+        border: 1px solid color-mix(in srgb, var(--rp-warning) 30%, transparent);
+        border-radius: var(--rp-radius);
+        padding: 0.75rem 1rem;
+        margin: 0.75rem 0;
+        font-size: 0.85rem;
+      }
+      .rp-code {
+        font-family: var(--rp-mono-font, monospace);
+        background: var(--rp-surface-alt);
+        border: 1px solid var(--rp-border);
+        border-radius: 3px;
+        padding: 0.1em 0.35em;
+        font-size: 0.8em;
+      }
+      .rp-prereq-list li {
+        margin-bottom: 0.35rem;
+        font-size: 0.9rem;
+      }
+      .rp-phase-badge {
+        display: inline-block;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        padding: 0.15em 0.55em;
+        border-radius: 2rem;
+        background: var(--rp-surface-alt);
+        border: 1px solid var(--rp-border);
+        color: var(--rp-subtle);
+        margin-left: 0.5rem;
+        vertical-align: middle;
+      }
+      @media (max-width: 768px) {
+        .rp-docs-sidebar { display: none; }
+        .rp-docs-content { padding: 1.25rem; }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Top bar -->
+    <div class="rp-auth-bar" style="position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--rp-border); background: var(--rp-surface); padding: 0.6rem 1.25rem;">
+      <div class="rp-logo" data-app-logo>RP</div>
+      <div>
+        <span class="rp-auth-bar-name" id="rp-app-name">Resource Planner</span>
+        <span class="rp-subtle" style="font-size:0.8rem; margin-left:0.5rem;">/ <a href="/docs/" style="color:inherit;text-decoration:none;">Docs</a> / Setup Guide</span>
+      </div>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <theme-toggle></theme-toggle>
+        <a href="/setup/" class="rp-btn rp-btn-sm rp-btn-primary" style="font-size:0.8rem; padding: 0.3rem 0.75rem; border-radius: 2rem; text-decoration: none; background: var(--rp-accent); color:#fff;">Open Setup</a>
+      </div>
+    </div>
+
+    <div class="rp-docs-layout">
+      <!-- Sidebar -->
+      <nav class="rp-docs-sidebar" aria-label="Setup guide navigation">
+        <div class="rp-docs-topbar">
+          <icon-field icon="bi-gear-wide-connected" color="accent"></icon-field>
+          <span style="font-weight:600; font-size:0.9rem;">Setup Guide</span>
+        </div>
+
+        <div class="rp-docs-nav-section">Overview</div>
+        <a class="rp-docs-nav-link" href="#overview"><i class="bi bi-info-circle"></i> What setup does</a>
+        <a class="rp-docs-nav-link" href="#before-you-begin"><i class="bi bi-check2-all"></i> Before you begin</a>
+
+        <div class="rp-docs-nav-section">Steps</div>
+        <a class="rp-docs-nav-link" href="#step-admin"><i class="bi bi-person-badge"></i> 1. Admin account</a>
+        <a class="rp-docs-nav-link" href="#step-app"><i class="bi bi-app"></i> 2. App settings</a>
+        <a class="rp-docs-nav-link" href="#step-infra"><i class="bi bi-server"></i> 3. Infrastructure</a>
+        <a class="rp-docs-nav-link" href="#step-database"><i class="bi bi-database"></i> 4. Database</a>
+        <a class="rp-docs-nav-link" href="#step-auth"><i class="bi bi-shield-lock"></i> 5. Authentication</a>
+        <a class="rp-docs-nav-link" href="#step-storage"><i class="bi bi-hdd"></i> 6. Storage</a>
+        <a class="rp-docs-nav-link" href="#step-email"><i class="bi bi-envelope"></i> 7. Email</a>
+        <a class="rp-docs-nav-link" href="#step-logging"><i class="bi bi-journal-text"></i> 8. Logging</a>
+
+        <div class="rp-docs-nav-section">Reference</div>
+        <a class="rp-docs-nav-link" href="#troubleshooting"><i class="bi bi-bug"></i> Troubleshooting</a>
+        <a class="rp-docs-nav-link" href="#env-reference"><i class="bi bi-file-text"></i> .env reference</a>
+      </nav>
+
+      <!-- Main content -->
+      <main class="rp-docs-content">
+
+        <!-- ── Overview ── -->
+        <section id="overview" class="mb-5">
+          <h1 class="rp-h1 mb-2">Setup Guide</h1>
+          <p class="rp-muted mb-4">
+            The setup wizard runs once when Resource Planner is first deployed. It writes
+            your infrastructure configuration to a <code class="rp-code">.env</code> file,
+            creates your admin account, switches the database, and stores secrets. Once
+            complete it cannot be re-run from the UI — changes are made through the admin
+            settings pages.
+          </p>
+
+          <div class="rp-warn-block">
+            <strong><i class="bi bi-exclamation-triangle-fill text-warning"></i> One-time process.</strong>
+            Setup runs exactly once. Refreshing or navigating away mid-wizard is safe —
+            the wizard resumes where it left off — but submitting the final step locks the
+            wizard permanently. Make sure all values are correct before you click
+            <strong>Finish</strong>.
+          </div>
+
+          <h2 class="rp-h2 mt-4 mb-2">Two phases</h2>
+          <p class="small rp-muted mb-3">
+            The wizard processes your input in two ordered phases. Understanding the
+            boundary helps you predict what rolls back if something fails.
+          </p>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="rp-card p-3">
+                <div class="fw-bold mb-1"><span class="rp-phase-badge">Phase 1</span> Environment</div>
+                <p class="small rp-muted mb-0">
+                  Writes infrastructure, database engine, and logging settings to
+                  <code class="rp-code">.env</code>. Switches the live database connection.
+                  <strong>Not rolled back</strong> on later failure.
+                </p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="rp-card p-3">
+                <div class="fw-bold mb-1"><span class="rp-phase-badge">Phase 2</span> Database (atomic)</div>
+                <p class="small rp-muted mb-0">
+                  Creates the admin user, saves app config, auth providers, storage and email
+                  settings in a single database transaction. All-or-nothing: if any step fails,
+                  the whole phase rolls back.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Before you begin ── -->
+        <section id="before-you-begin" class="mb-5">
+          <h2 class="rp-h2 mb-3">Before you begin</h2>
+          <ul class="rp-prereq-list ps-3">
+            <li>Resource Planner is running and reachable in a browser (<code class="rp-code">/setup/</code> should load).</li>
+            <li>For <strong>PostgreSQL</strong>: the target database and a user with <code class="rp-code">CREATEDB</code> privileges already exist.</li>
+            <li>For <strong>AWS deployment</strong>: an IAM role or access key pair with <code class="rp-code">secretsmanager:CreateSecret</code> / <code class="rp-code">PutSecretValue</code> permissions is available.</li>
+            <li>For <strong>SAML</strong>: your IdP metadata (entity ID, SSO URL, X.509 certificate) is ready. The IdP must be reachable from the server running Resource Planner.</li>
+            <li>For <strong>OAuth</strong>: your provider's client ID, client secret, authorization, token, and userinfo endpoints are ready.</li>
+            <li>For <strong>SMTP email</strong>: server hostname, port, encryption type, and credentials (if required) are available. A test email will be sent during setup.</li>
+            <li>A Fernet encryption key is required for local deployments. Generate one now via <code class="rp-code">GET /api/v1/setup/gen-key/</code> or the wizard's built-in generator.</li>
+          </ul>
+        </section>
+
+        <!-- ── Step 1: Admin ── -->
+        <section id="step-admin" class="mb-2">
+          <div class="rp-step-card">
+            <div class="rp-step-header">
+              <div class="rp-step-num">1</div>
+              <div>
+                <div class="fw-bold">Admin Account</div>
+                <div class="small rp-muted">Creates the first superuser — your primary management account.</div>
+              </div>
+              <span class="rp-phase-badge ms-auto">Phase 2</span>
+            </div>
+            <div class="rp-step-body">
+              <p class="small rp-muted">This account has full access to every feature and all admin settings. Use a strong, unique password that is not shared with any other service.</p>
+
+              <table class="rp-field-table">
+                <thead>
+                  <tr><th>Field</th><th>Type</th><th>Required</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><code class="rp-code">first_name</code></td><td>Text</td><td>Yes</td><td>Max 100 characters.</td></tr>
+                  <tr><td><code class="rp-code">last_name</code></td><td>Text</td><td>Yes</td><td>Max 100 characters.</td></tr>
+                  <tr><td><code class="rp-code">email</code></td><td>Email</td><td>Yes</td><td>Must be a valid email address. Used to sign in.</td></tr>
+                  <tr><td><code class="rp-code">password</code></td><td>Password</td><td>Yes</td><td>Minimum 12 characters, see rules below.</td></tr>
+                </tbody>
+              </table>
+
+              <p class="small fw-bold mt-3 mb-1">Password rules (all must pass):</p>
+              <ul class="small rp-muted ps-3 mb-3">
+                <li>At least 12 characters.</li>
+                <li>At least one uppercase letter (A–Z).</li>
+                <li>At least one lowercase letter (a–z).</li>
+                <li>At least one digit (0–9).</li>
+                <li>At least one symbol (any non-alphanumeric character).</li>
+              </ul>
+
+              <div class="rp-error-block">
+                <div class="rp-error-label"><i class="bi bi-x-circle-fill"></i> Common errors</div>
+                <p class="mb-1"><strong>"Password must be at least 12 characters."</strong> — Use a longer password.</p>
+                <p class="mb-1"><strong>"Password must contain at least one uppercase letter."</strong> — Add an uppercase letter.</p>
+                <p class="mb-1"><strong>"Password must contain at least one symbol."</strong> — Add a symbol such as <code class="rp-code">!</code>, <code class="rp-code">@</code>, <code class="rp-code">#</code>, or <code class="rp-code">$</code>.</p>
+                <p class="mb-0"><strong>Email already exists</strong> — This should not occur during first setup. If you see it, the database already contains user records; the wizard may have been partially run before. Inspect the database directly.</p>
+              </div>
+
+              <div class="rp-tip-block">
+                <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Save these credentials in a password manager immediately. There is no in-app account recovery unless email has been configured — and email is configured later in the wizard.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Step 2: App Settings ── -->
+        <section id="step-app" class="mb-2">
+          <div class="rp-step-card">
+            <div class="rp-step-header">
+              <div class="rp-step-num">2</div>
+              <div>
+                <div class="fw-bold">App Settings</div>
+                <div class="small rp-muted">Sets the public-facing application name and canonical URL.</div>
+              </div>
+              <span class="rp-phase-badge ms-auto">Phase 2</span>
+            </div>
+            <div class="rp-step-body">
+              <table class="rp-field-table">
+                <thead>
+                  <tr><th>Field</th><th>Type</th><th>Required</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><code class="rp-code">app_name</code></td><td>Text</td><td>Yes</td><td>Max 50 characters. Shown in the browser tab, emails, and the top bar. Supports limited HTML: <code class="rp-code">&lt;b&gt;</code>, <code class="rp-code">&lt;strong&gt;</code>, <code class="rp-code">&lt;i&gt;</code>, <code class="rp-code">&lt;em&gt;</code>, <code class="rp-code">&lt;u&gt;</code>.</td></tr>
+                  <tr><td><code class="rp-code">app_url</code></td><td>URL</td><td>Yes</td><td>Max 100 characters. The canonical public URL (e.g. <code class="rp-code">https://rp.example.com</code>). Used in password-reset and notification emails. Must be a valid URL with a scheme.</td></tr>
+                </tbody>
+              </table>
+
+              <div class="rp-error-block">
+                <div class="rp-error-label"><i class="bi bi-x-circle-fill"></i> Common errors</div>
+                <p class="mb-1"><strong>"Enter a valid URL."</strong> — <code class="rp-code">app_url</code> must include the scheme: <code class="rp-code">https://rp.example.com</code>, not <code class="rp-code">rp.example.com</code>.</p>
+                <p class="mb-0"><strong>Name appears truncated in emails</strong> — Keep <code class="rp-code">app_name</code> under 30 characters for best email client compatibility.</p>
+              </div>
+
+              <div class="rp-tip-block">
+                <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> The <code class="rp-code">app_url</code> value is added to Django's <code class="rp-code">ALLOWED_HOSTS</code> automatically. If you later change the domain, update this setting in the admin configuration page and restart the server.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Step 3: Infrastructure ── -->
+        <section id="step-infra" class="mb-2">
+          <div class="rp-step-card">
+            <div class="rp-step-header">
+              <div class="rp-step-num">3</div>
+              <div>
+                <div class="fw-bold">Infrastructure</div>
+                <div class="small rp-muted">Chooses how secrets are encrypted and where they are stored.</div>
+              </div>
+              <span class="rp-phase-badge ms-auto">Phase 1</span>
+            </div>
+            <div class="rp-step-body">
+              <p class="small rp-muted">
+                Choose <strong>Local</strong> if you are running on a single server or in a containerised environment without AWS. Choose <strong>AWS</strong> if you want credentials stored in AWS Secrets Manager.
+              </p>
+
+              <h4 class="mt-3 mb-2" style="font-size:0.95rem;">Option A — Local deployment</h4>
+              <table class="rp-field-table">
+                <thead>
+                  <tr><th>Field</th><th>Type</th><th>Required</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><code class="rp-code">deployment_type</code></td><td>Choice</td><td>Yes</td><td>Set to <code class="rp-code">local</code>.</td></tr>
+                  <tr><td><code class="rp-code">fernet_key</code></td><td>Text (secret)</td><td>Yes</td><td>44-character URL-safe base64 key ending in <code class="rp-code">=</code>. Generate one with the wizard's "Generate key" button or <code class="rp-code">GET /api/v1/setup/gen-key/</code>.</td></tr>
+                </tbody>
+              </table>
+
+              <h4 class="mt-3 mb-2" style="font-size:0.95rem;">Option B — AWS deployment</h4>
+              <table class="rp-field-table">
+                <thead>
+                  <tr><th>Field</th><th>Type</th><th>Required</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><code class="rp-code">deployment_type</code></td><td>Choice</td><td>Yes</td><td>Set to <code class="rp-code">aws</code>.</td></tr>
+                  <tr><td><code class="rp-code">aws_region</code></td><td>Text</td><td>Yes</td><td>AWS region code, e.g. <code class="rp-code">eu-west-1</code>, <code class="rp-code">us-east-1</code>, <code class="rp-code">ap-southeast-2</code>.</td></tr>
+                  <tr><td><code class="rp-code">secrets_prefix</code></td><td>Text</td><td>Yes</td><td>Path prefix for all secrets, e.g. <code class="rp-code">/resourceplanner/prod</code>. Trailing slashes are stripped automatically.</td></tr>
+                  <tr><td><code class="rp-code">aws_auth_mode</code></td><td>Choice</td><td>Yes</td><td><code class="rp-code">role</code> — uses the EC2/ECS IAM role attached to the instance. <code class="rp-code">user</code> — uses an explicit access key pair.</td></tr>
+                  <tr><td><code class="rp-code">aws_access_key_id</code></td><td>Text (secret)</td><td>If <code class="rp-code">aws_auth_mode=user</code></td><td>Exactly 20 uppercase alphanumeric characters, e.g. <code class="rp-code">AKIAIOSFODNN7EXAMPLE</code>.</td></tr>
+                  <tr><td><code class="rp-code">aws_secret_access_key</code></td><td>Text (secret)</td><td>If <code class="rp-code">aws_auth_mode=user</code></td><td>Exactly 40 characters — letters, digits, <code class="rp-code">/</code>, <code class="rp-code">+</code>, <code class="rp-code">=</code>.</td></tr>
+                </tbody>
+              </table>
+
+              <p class="small rp-muted mt-2">
+                With AWS deployment, the database password is stored as a secret under
+                <code class="rp-code">{secrets_prefix}/db</code>. OAuth and SAML credentials are stored
+                under <code class="rp-code">{secrets_prefix}/oauth/{name}/…</code> and
+                <code class="rp-code">{secrets_prefix}/saml/{name}/…</code> respectively.
+              </p>
+
+              <div class="rp-error-block">
+                <div class="rp-error-label"><i class="bi bi-x-circle-fill"></i> Common errors</div>
+                <p class="mb-1"><strong>"Enter a valid AWS region (e.g. eu-west-1, us-east-1, ap-southeast-2)."</strong> — The region must match the pattern <code class="rp-code">xx-xxxx-n</code>. Common mistake: <code class="rp-code">eu-west1</code> (missing hyphen before digit).</p>
+                <p class="mb-1"><strong>"Enter a valid AWS Access Key ID (20 uppercase alphanumeric characters)."</strong> — The key is case-sensitive; it must be all uppercase and exactly 20 characters.</p>
+                <p class="mb-1"><strong>"Enter a valid AWS Secret Access Key (40 characters)."</strong> — Verify you copied the full key. AWS secret keys are exactly 40 characters.</p>
+                <p class="mb-1"><strong>Invalid Fernet key</strong> — The key must be generated by <code class="rp-code">cryptography.fernet.Fernet.generate_key()</code> or the wizard's generator. Do not use a self-typed passphrase.</p>
+                <p class="mb-0"><strong>Phase 1 writes succeed but Phase 2 fails</strong> — The <code class="rp-code">.env</code> file already has the Fernet key / AWS credentials written. You do not need to re-run Phase 1 — but if you re-submit the wizard, the Phase 1 values will be overwritten with whatever you enter again. Make sure to enter the same Fernet key if you retry.</p>
+              </div>
+
+              <div class="rp-warn-block">
+                <strong><i class="bi bi-exclamation-triangle-fill"></i> Secret key safety.</strong>
+                Back up the Fernet key immediately after setup. If it is lost and you used local
+                deployment, all encrypted data (OAuth client secrets, SAML certificates) becomes
+                unrecoverable.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Step 4: Database ── -->
+        <section id="step-database" class="mb-2">
+          <div class="rp-step-card">
+            <div class="rp-step-header">
+              <div class="rp-step-num">4</div>
+              <div>
+                <div class="fw-bold">Database</div>
+                <div class="small rp-muted">Connects to your database, runs migrations, and switches the live connection.</div>
+              </div>
+              <span class="rp-phase-badge ms-auto">Phase 1</span>
+            </div>
+            <div class="rp-step-body">
+              <p class="small rp-muted">
+                The wizard tests the connection before writing anything. On success it
+                writes credentials to <code class="rp-code">.env</code>, rebuilds the Django database
+                connection, and runs <code class="rp-code">manage.py migrate</code> automatically.
+              </p>
+
+              <h4 class="mt-3 mb-2" style="font-size:0.95rem;">Option A — SQLite (development only)</h4>
+              <table class="rp-field-table">
+                <thead><tr><th>Field</th><th>Value</th></tr></thead>
+                <tbody>
+                  <tr><td><code class="rp-code">engine</code></td><td><code class="rp-code">sqlite</code></td></tr>
+                </tbody>
+              </table>
+              <p class="small rp-muted">No further fields required. Uses the default <code class="rp-code">db.sqlite3</code> file in the project root. <strong>Not suitable for production.</strong></p>
+
+              <h4 class="mt-3 mb-2" style="font-size:0.95rem;">Option B — PostgreSQL (production)</h4>
+              <table class="rp-field-table">
+                <thead>
+                  <tr><th>Field</th><th>Type</th><th>Required</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><code class="rp-code">engine</code></td><td>Choice</td><td>Yes</td><td>Set to <code class="rp-code">postgresql</code>.</td></tr>
+                  <tr><td><code class="rp-code">host</code></td><td>Text</td><td>Yes</td><td>Hostname or IP of the PostgreSQL server.</td></tr>
+                  <tr><td><code class="rp-code">port</code></td><td>Text</td><td>Yes</td><td>Default: <code class="rp-code">5432</code>.</td></tr>
+                  <tr><td><code class="rp-code">db_name</code></td><td>Text</td><td>Yes</td><td>Name of the target database. Must already exist.</td></tr>
+                  <tr><td><code class="rp-code">user_name</code></td><td>Text</td><td>Yes</td><td>Database user. Must have permission to create tables and run migrations.</td></tr>
+                  <tr><td><code class="rp-code">password</code></td><td>Text (secret)</td><td>Yes</td><td>Database user's password. Stored in <code class="rp-code">.env</code> (local) or Secrets Manager (AWS).</td></tr>
+                </tbody>
+              </table>
+
+              <div class="rp-tip-block">
+                <strong><i class="bi bi-lightbulb-fill"></i> Test connection first.</strong>
+                Use the "Test connection" button in the wizard (calls <code class="rp-code">POST /api/v1/setup/test/db/</code>) before submitting. This verifies connectivity with a 5-second timeout and gives you a clear success or failure message before any changes are written.
+              </div>
+
+              <div class="rp-error-block">
+                <div class="rp-error-label"><i class="bi bi-x-circle-fill"></i> Common errors</div>
+                <p class="mb-1"><strong>"could not connect to server: Connection refused"</strong> — The PostgreSQL server is not running or <code class="rp-code">host</code>/<code class="rp-code">port</code> is wrong. Verify with <code class="rp-code">psql -h &lt;host&gt; -p &lt;port&gt; -U &lt;user&gt;</code> from the server running Resource Planner.</p>
+                <p class="mb-1"><strong>"FATAL: password authentication failed"</strong> — Wrong username or password. Check the credentials against your database server's <code class="rp-code">pg_hba.conf</code>.</p>
+                <p class="mb-1"><strong>"FATAL: database does not exist"</strong> — Create the database first: <code class="rp-code">createdb -U postgres &lt;db_name&gt;</code>.</p>
+                <p class="mb-1"><strong>"could not connect to server: Connection timed out"</strong> — A firewall is blocking the connection. Check security group rules if using AWS RDS, or <code class="rp-code">pg_hba.conf</code> if self-hosted.</p>
+                <p class="mb-1"><strong>"psycopg2 not installed"</strong> — Install the PostgreSQL driver: <code class="rp-code">pip install psycopg2-binary</code>.</p>
+                <p class="mb-0"><strong>Migrations fail mid-wizard</strong> — This is a Phase 1 failure. The <code class="rp-code">.env</code> was updated and the DB engine switched but migrations did not complete. Connect to the database and run <code class="rp-code">python manage.py migrate</code> manually, then re-submit the wizard.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Step 5: Authentication ── -->
+        <section id="step-auth" class="mb-2">
+          <div class="rp-step-card">
+            <div class="rp-step-header">
+              <div class="rp-step-num">5</div>
+              <div>
+                <div class="fw-bold">Authentication</div>
+                <div class="small rp-muted">Configures how users sign in — Classic, OAuth, or SAML.</div>
+              </div>
+              <span class="rp-phase-badge ms-auto">Phase 2</span>
+            </div>
+            <div class="rp-step-body">
+              <p class="small rp-muted">
+                Choose the authentication mode that matches your organisation's identity strategy.
+                Only one mode is active at a time. Connection tests run automatically before
+                credentials are saved.
+              </p>
+
+              <!-- Classic -->
+              <h4 class="mt-3 mb-2" style="font-size:0.95rem;">Option A — Classic (username &amp; password)</h4>
+              <table class="rp-field-table">
+                <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Notes</th></tr></thead>
+                <tbody>
+                  <tr><td><code class="rp-code">auth_type</code></td><td>Choice</td><td>Yes</td><td>Set to <code class="rp-code">classic</code>.</td></tr>
+                  <tr><td><code class="rp-code">self_register</code></td><td>Boolean</td><td>Yes</td><td>If <code class="rp-code">true</code>, anyone can create their own account at <code class="rp-code">/register/</code>. If <code class="rp-code">false</code>, only admins can create accounts.</td></tr>
+                </tbody>
+              </table>
+              <p class="small rp-muted">No external connection test is performed for Classic auth.</p>
+
+              <!-- OAuth -->
+              <h4 class="mt-3 mb-2" style="font-size:0.95rem;">Option B — OAuth 2.0</h4>
+              <table class="rp-field-table">
+                <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Notes</th></tr></thead>
+                <tbody>
+                  <tr><td><code class="rp-code">auth_type</code></td><td>Choice</td><td>Yes</td><td>Set to <code class="rp-code">oauth</code>.</td></tr>
+                  <tr><td><code class="rp-code">provider_name</code></td><td>Text</td><td>Yes</td><td>Display name, e.g. <code class="rp-code">Google</code>, <code class="rp-code">Okta</code>, <code class="rp-code">Azure AD</code>. Max 100 characters. Must be unique.</td></tr>
+                  <tr><td><code class="rp-code">client_id</code></td><td>Text (secret)</td><td>Yes</td><td>OAuth application client ID. Stored encrypted.</td></tr>
+                  <tr><td><code class="rp-code">client_secret</code></td><td>Text (secret)</td><td>Yes</td><td>OAuth application client secret. Stored encrypted.</td></tr>
+                  <tr><td><code class="rp-code">auth_endpoint</code></td><td>URL</td><td>Yes</td><td>Authorization endpoint, e.g. <code class="rp-code">https://accounts.google.com/o/oauth2/v2/auth</code>.</td></tr>
+                  <tr><td><code class="rp-code">token_endpoint</code></td><td>URL</td><td>Yes</td><td>Token endpoint, e.g. <code class="rp-code">https://oauth2.googleapis.com/token</code>.</td></tr>
+                  <tr><td><code class="rp-code">userinfo_endpoint</code></td><td>URL</td><td>Yes</td><td>Userinfo endpoint, e.g. <code class="rp-code">https://openidconnect.googleapis.com/v1/userinfo</code>.</td></tr>
+                  <tr><td><code class="rp-code">scope</code></td><td>Text</td><td>Yes</td><td>Space-separated scopes, e.g. <code class="rp-code">openid email profile</code>.</td></tr>
+                  <tr><td><code class="rp-code">icon</code></td><td>Bootstrap Icon class</td><td>No</td><td>Optional icon shown on the SSO button, e.g. <code class="rp-code">bi-google</code>.</td></tr>
+                </tbody>
+              </table>
+
+              <p class="small rp-muted mt-2">
+                <strong>How the OAuth connection test works:</strong> The wizard posts a request
+                to your <code class="rp-code">token_endpoint</code> with a dummy authorization code
+                (<code class="rp-code">rp_test_probe</code>). A valid configuration returns
+                <code class="rp-code">error: invalid_grant</code> (wrong code — expected). If the
+                server returns <code class="rp-code">error: invalid_client</code>, the client ID or
+                secret is wrong. Then the wizard separately checks that the
+                <code class="rp-code">auth_endpoint</code> is reachable.
+              </p>
+
+              <!-- SAML -->
+              <h4 class="mt-3 mb-2" style="font-size:0.95rem;">Option C — SAML 2.0</h4>
+              <table class="rp-field-table">
+                <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Notes</th></tr></thead>
+                <tbody>
+                  <tr><td><code class="rp-code">auth_type</code></td><td>Choice</td><td>Yes</td><td>Set to <code class="rp-code">saml</code>.</td></tr>
+                  <tr><td><code class="rp-code">provider_name</code></td><td>Text</td><td>Yes</td><td>Display name, e.g. <code class="rp-code">Okta</code>. Max 100 characters. Must be unique.</td></tr>
+                  <tr><td><code class="rp-code">idp_entity_id</code></td><td>URL</td><td>Yes</td><td>IdP entity ID from your IdP's metadata, e.g. <code class="rp-code">https://your-idp.okta.com</code>.</td></tr>
+                  <tr><td><code class="rp-code">idp_sso_url</code></td><td>URL</td><td>Yes</td><td>IdP single sign-on URL, e.g. <code class="rp-code">https://your-idp.okta.com/sso/saml</code>.</td></tr>
+                  <tr><td><code class="rp-code">idp_x509_cert</code></td><td>Text (secret)</td><td>Yes</td><td>Base64 certificate body only — <strong>no</strong> <code class="rp-code">-----BEGIN CERTIFICATE-----</code> headers. Min 50 characters. Stored encrypted.</td></tr>
+                  <tr><td><code class="rp-code">sp_entity_id</code></td><td>URL</td><td>No</td><td>Service provider entity ID. Defaults to <code class="rp-code">app_url</code> if left blank.</td></tr>
+                  <tr><td><code class="rp-code">sp_assertion_url</code></td><td>URL</td><td>Yes</td><td>The ACS (Assertion Consumer Service) URL the IdP will POST the SAML response to, e.g. <code class="rp-code">https://rp.example.com/saml/acs/</code>.</td></tr>
+                  <tr><td><code class="rp-code">icon</code></td><td>Bootstrap Icon class</td><td>No</td><td>Optional icon shown on the SSO button.</td></tr>
+                </tbody>
+              </table>
+
+              <div class="rp-error-block">
+                <div class="rp-error-label"><i class="bi bi-x-circle-fill"></i> Common errors — OAuth</div>
+                <p class="mb-1"><strong>"Token endpoint is reachable but the client credentials were rejected."</strong> — Check your Client ID and Client Secret against your OAuth application. They must match exactly — no extra spaces.</p>
+                <p class="mb-1"><strong>"Cannot reach token endpoint: &lt;reason&gt;"</strong> — The server running Resource Planner cannot reach <code class="rp-code">token_endpoint</code>. Check DNS resolution and firewall rules from the server.</p>
+                <p class="mb-0"><strong>"Cannot reach authorisation endpoint: &lt;reason&gt;"</strong> — Same as above for <code class="rp-code">auth_endpoint</code>.</p>
+              </div>
+
+              <div class="rp-error-block mt-2">
+                <div class="rp-error-label"><i class="bi bi-x-circle-fill"></i> Common errors — SAML</div>
+                <p class="mb-1"><strong>"Do not include the -----BEGIN CERTIFICATE----- header or footer"</strong> — Strip the PEM wrapper lines. Copy only the lines between them.</p>
+                <p class="mb-1"><strong>"Enter a valid base64-encoded X.509 certificate body."</strong> — The certificate body may contain line breaks from copy-paste. Remove all whitespace and newlines, leaving a continuous base64 string.</p>
+                <p class="mb-1"><strong>"IdP X.509 certificate expired on &lt;date&gt;."</strong> — Obtain an updated certificate from your IdP and re-enter it.</p>
+                <p class="mb-0"><strong>"Cannot reach IdP SSO URL: &lt;reason&gt;"</strong> — The server running Resource Planner cannot make outbound HTTP requests to your IdP. Ensure the IdP URL is accessible from the server's network.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Step 6: Storage ── -->
+        <section id="step-storage" class="mb-2">
+          <div class="rp-step-card">
+            <div class="rp-step-header">
+              <div class="rp-step-num">6</div>
+              <div>
+                <div class="fw-bold">Storage</div>
+                <div class="small rp-muted">Configures where uploaded files (avatars, attachments) are stored.</div>
+              </div>
+              <span class="rp-phase-badge ms-auto">Phase 2</span>
+            </div>
+            <div class="rp-step-body">
+              <table class="rp-field-table">
+                <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Notes</th></tr></thead>
+                <tbody>
+                  <tr><td><code class="rp-code">storage_type</code></td><td>Choice</td><td>Yes</td><td><code class="rp-code">database</code> — store files as BLOBs in the database (simple, not recommended for large deployments). <code class="rp-code">filesystem</code> — store files in a local directory. <code class="rp-code">s3</code> — store files in an S3 bucket.</td></tr>
+                  <tr><td><code class="rp-code">storage_path</code></td><td>Text</td><td>If <code class="rp-code">filesystem</code> or <code class="rp-code">s3</code></td><td>Filesystem: absolute path, e.g. <code class="rp-code">/var/resourceplanner/media</code>. The directory is created automatically. S3: full ARN, e.g. <code class="rp-code">arn:aws:s3:::my-rp-bucket</code>.</td></tr>
+                </tbody>
+              </table>
+
+              <div class="rp-error-block">
+                <div class="rp-error-label"><i class="bi bi-x-circle-fill"></i> Common errors</div>
+                <p class="mb-1"><strong>"Enter a valid S3 bucket ARN (e.g. arn:aws:s3:::my-bucket)."</strong> — The ARN must start with <code class="rp-code">arn:aws:s3:::</code> followed by a valid bucket name (lowercase letters, digits, hyphens, dots, 3–63 characters).</p>
+                <p class="mb-0"><strong>Directory creation fails</strong> — If the filesystem path cannot be created (e.g. permission denied), the setup transaction rolls back. Ensure the process running Resource Planner has write access to the parent directory, or create the directory manually before setup.</p>
+              </div>
+
+              <div class="rp-tip-block">
+                <strong><i class="bi bi-lightbulb-fill"></i> S3 permissions required:</strong>
+                The IAM role or user needs <code class="rp-code">s3:PutObject</code>, <code class="rp-code">s3:GetObject</code>, and <code class="rp-code">s3:DeleteObject</code> on the bucket. If using pre-signed URLs, also grant <code class="rp-code">s3:GeneratePresignedUrl</code>.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Step 7: Email ── -->
+        <section id="step-email" class="mb-2">
+          <div class="rp-step-card">
+            <div class="rp-step-header">
+              <div class="rp-step-num">7</div>
+              <div>
+                <div class="fw-bold">Email</div>
+                <div class="small rp-muted">Configures how Resource Planner sends password-reset and notification emails.</div>
+              </div>
+              <span class="rp-phase-badge ms-auto">Phase 2</span>
+            </div>
+            <div class="rp-step-body">
+              <h4 class="mt-1 mb-2" style="font-size:0.95rem;">Common fields (all email types)</h4>
+              <table class="rp-field-table">
+                <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Notes</th></tr></thead>
+                <tbody>
+                  <tr><td><code class="rp-code">email_type</code></td><td>Choice</td><td>Yes</td><td><code class="rp-code">console</code> — prints emails to server logs (development). <code class="rp-code">smtp</code> — sends real emails.</td></tr>
+                  <tr><td><code class="rp-code">from_address</code></td><td>Email</td><td>Yes</td><td>The <em>From</em> address on all outgoing emails, e.g. <code class="rp-code">noreply@example.com</code>.</td></tr>
+                  <tr><td><code class="rp-code">from_name</code></td><td>Text</td><td>Yes</td><td>The <em>From</em> display name, e.g. <code class="rp-code">Resource Planner</code>.</td></tr>
+                </tbody>
+              </table>
+
+              <h4 class="mt-3 mb-2" style="font-size:0.95rem;">SMTP-specific fields</h4>
+              <table class="rp-field-table">
+                <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Notes</th></tr></thead>
+                <tbody>
+                  <tr><td><code class="rp-code">smtp_host</code></td><td>Text</td><td>Yes</td><td>SMTP server hostname, e.g. <code class="rp-code">smtp.sendgrid.net</code>.</td></tr>
+                  <tr><td><code class="rp-code">smtp_port</code></td><td>Integer</td><td>Yes</td><td>Port number 1–65535. Common: <code class="rp-code">587</code> (STARTTLS), <code class="rp-code">465</code> (SSL), <code class="rp-code">25</code> (none).</td></tr>
+                  <tr><td><code class="rp-code">smtp_enc_type</code></td><td>Choice</td><td>Yes</td><td><code class="rp-code">none</code>, <code class="rp-code">starttls</code>, or <code class="rp-code">ssl</code>. Use <code class="rp-code">starttls</code> with port 587 or <code class="rp-code">ssl</code> with port 465.</td></tr>
+                  <tr><td><code class="rp-code">smtp_auth_enabled</code></td><td>Boolean</td><td>No</td><td>Enable SMTP authentication. Default: <code class="rp-code">false</code>.</td></tr>
+                  <tr><td><code class="rp-code">smtp_username</code></td><td>Text</td><td>If <code class="rp-code">smtp_auth_enabled</code></td><td>SMTP login username.</td></tr>
+                  <tr><td><code class="rp-code">smtp_password</code></td><td>Text (secret)</td><td>If <code class="rp-code">smtp_auth_enabled</code></td><td>SMTP login password.</td></tr>
+                </tbody>
+              </table>
+
+              <p class="small rp-muted mt-2">
+                A test email is sent to <code class="rp-code">from_address</code> during setup with the
+                subject <em>"Resource Planner — Email Test"</em>. If it does not arrive, check your
+                spam folder before concluding the configuration is wrong.
+              </p>
+
+              <div class="rp-error-block">
+                <div class="rp-error-label"><i class="bi bi-x-circle-fill"></i> Common errors</div>
+                <p class="mb-1"><strong>"Connection refused" / "Network unreachable"</strong> — The SMTP host or port is wrong, or a firewall is blocking outbound connections on that port. Some cloud providers (AWS EC2, Google Cloud) block port 25 by default — use port 587 with STARTTLS.</p>
+                <p class="mb-1"><strong>"(535, 'Authentication credentials invalid')"</strong> — Wrong username or password. For Gmail, you need an App Password (not your regular password) and must enable "Less secure apps" or use OAuth SMTP.</p>
+                <p class="mb-1"><strong>"SSL: WRONG_VERSION_NUMBER"</strong> — Mismatch between <code class="rp-code">smtp_enc_type</code> and the actual port. Port 587 uses STARTTLS, port 465 uses SSL. Swapping them causes this error.</p>
+                <p class="mb-1"><strong>"STARTTLS extension not supported by server"</strong> — The server does not support STARTTLS. Switch to <code class="rp-code">ssl</code> on port 465, or <code class="rp-code">none</code> on port 25 (not recommended).</p>
+                <p class="mb-0"><strong>Test email not received</strong> — Check spam/junk folder. If using <code class="rp-code">from_address</code> that does not match your sending domain, SPF/DKIM alignment may cause the message to be silently dropped.</p>
+              </div>
+
+              <div class="rp-tip-block">
+                <strong><i class="bi bi-lightbulb-fill"></i> Common SMTP presets:</strong>
+                <table class="rp-field-table mt-2">
+                  <thead><tr><th>Provider</th><th>Host</th><th>Port</th><th>Encryption</th><th>Auth</th></tr></thead>
+                  <tbody>
+                    <tr><td>SendGrid</td><td><code class="rp-code">smtp.sendgrid.net</code></td><td>587</td><td>starttls</td><td>Username: <code class="rp-code">apikey</code>, Password: API key</td></tr>
+                    <tr><td>Mailgun</td><td><code class="rp-code">smtp.mailgun.org</code></td><td>587</td><td>starttls</td><td>Mailgun SMTP credentials</td></tr>
+                    <tr><td>AWS SES</td><td><code class="rp-code">email-smtp.&lt;region&gt;.amazonaws.com</code></td><td>587</td><td>starttls</td><td>SES SMTP credentials (not IAM)</td></tr>
+                    <tr><td>Gmail (app password)</td><td><code class="rp-code">smtp.gmail.com</code></td><td>587</td><td>starttls</td><td>Your Gmail address + App Password</td></tr>
+                    <tr><td>Microsoft 365</td><td><code class="rp-code">smtp.office365.com</code></td><td>587</td><td>starttls</td><td>Your O365 email + password</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Step 8: Logging ── -->
+        <section id="step-logging" class="mb-2">
+          <div class="rp-step-card">
+            <div class="rp-step-header">
+              <div class="rp-step-num">8</div>
+              <div>
+                <div class="fw-bold">Logging</div>
+                <div class="small rp-muted">Configures where application logs are written and how they are rotated.</div>
+              </div>
+              <span class="rp-phase-badge ms-auto">Phase 1</span>
+            </div>
+            <div class="rp-step-body">
+              <table class="rp-field-table">
+                <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Notes</th></tr></thead>
+                <tbody>
+                  <tr><td><code class="rp-code">log_destination</code></td><td>Choice</td><td>Yes</td><td><code class="rp-code">local</code> — write to a file. <code class="rp-code">s3</code> — write to an S3 bucket. <code class="rp-code">cloudwatch</code> — send to AWS CloudWatch Logs.</td></tr>
+                  <tr><td><code class="rp-code">log_name</code></td><td>Text</td><td>Yes</td><td>Logger name / log file base name, e.g. <code class="rp-code">resourceplanner</code>.</td></tr>
+                  <tr><td><code class="rp-code">log_path</code></td><td>Text</td><td>If <code class="rp-code">local</code></td><td>Absolute directory path for log files, e.g. <code class="rp-code">/var/log/resourceplanner</code>.</td></tr>
+                  <tr><td><code class="rp-code">log_rotation</code></td><td>Choice</td><td>No</td><td><code class="rp-code">none</code>, <code class="rp-code">daily</code>, <code class="rp-code">weekly</code>, <code class="rp-code">monthly</code>, or <code class="rp-code">size</code>. Default: <code class="rp-code">none</code>.</td></tr>
+                  <tr><td><code class="rp-code">log_rotation_size_mb</code></td><td>Integer</td><td>If <code class="rp-code">rotation=size</code></td><td>Rotate when log file exceeds this many MB. Minimum: 1.</td></tr>
+                  <tr><td><code class="rp-code">log_cleanup_keep_files</code></td><td>Integer</td><td>No</td><td>Number of rotated files to retain. Default: 5.</td></tr>
+                  <tr><td><code class="rp-code">log_cleanup_keep_days</code></td><td>Integer</td><td>No</td><td>Delete rotated files older than this many days. Default: 0 (disabled).</td></tr>
+                  <tr><td><code class="rp-code">log_s3_bucket</code></td><td>Text</td><td>If <code class="rp-code">s3</code></td><td>S3 bucket ARN, e.g. <code class="rp-code">arn:aws:s3:::my-rp-logs</code>.</td></tr>
+                </tbody>
+              </table>
+
+              <div class="rp-error-block">
+                <div class="rp-error-label"><i class="bi bi-x-circle-fill"></i> Common errors</div>
+                <p class="mb-1"><strong>"Enter a valid S3 bucket ARN"</strong> — See Storage step above for ARN format rules.</p>
+                <p class="mb-0"><strong>Log path inaccessible</strong> — Unlike storage, the log directory is <em>not</em> created automatically. Create it and set the correct permissions before setup, or the application will fail to write logs at runtime.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Troubleshooting ── -->
+        <section id="troubleshooting" class="mb-5">
+          <h2 class="rp-h2 mb-3">General troubleshooting</h2>
+
+          <div class="rp-step-card mb-3">
+            <div class="rp-step-header" style="background:color-mix(in srgb, var(--rp-danger) 6%, transparent);">
+              <icon-field icon="bi-exclamation-circle-fill" color="danger"></icon-field>
+              <div class="fw-bold">Setup loops back to the wizard after completion</div>
+            </div>
+            <div class="rp-step-body small">
+              <p class="mb-1">The setup middleware redirects all traffic to <code class="rp-code">/setup/</code> until <code class="rp-code">SETUP_COMPLETE</code> is <code class="rp-code">True</code> in the database.</p>
+              <p class="mb-0"><strong>Fix:</strong> If the Phase 2 transaction rolled back, the config key was never written. Check the server logs for the exception that caused the rollback, fix the underlying issue, and re-submit the wizard.</p>
+            </div>
+          </div>
+
+          <div class="rp-step-card mb-3">
+            <div class="rp-step-header" style="background:color-mix(in srgb, var(--rp-danger) 6%, transparent);">
+              <icon-field icon="bi-exclamation-circle-fill" color="danger"></icon-field>
+              <div class="fw-bold">Phase 2 rolled back but Phase 1 already wrote .env</div>
+            </div>
+            <div class="rp-step-body small">
+              <p class="mb-1">Phase 1 (infra, database, logging) is not transactional — if Phase 2 fails and you re-run, Phase 1 values will be overwritten with whatever you enter on the next attempt.</p>
+              <p class="mb-0"><strong>Fix:</strong> Keep a copy of all Phase 1 values (especially the Fernet key) and enter the same values on retry. If you used a different Fernet key on retry, all secrets encrypted with the old key will be unreadable.</p>
+            </div>
+          </div>
+
+          <div class="rp-step-card mb-3">
+            <div class="rp-step-header" style="background:color-mix(in srgb, var(--rp-danger) 6%, transparent);">
+              <icon-field icon="bi-exclamation-circle-fill" color="danger"></icon-field>
+              <div class="fw-bold">AppRegistryNotReady / ImproperlyConfigured on startup</div>
+            </div>
+            <div class="rp-step-body small">
+              <p class="mb-1">The <code class="rp-code">DJANGO_SETTINGS_MODULE</code> environment variable is not set, or the application is imported before Django is fully initialised.</p>
+              <p class="mb-0"><strong>Fix:</strong> Ensure <code class="rp-code">DJANGO_SETTINGS_MODULE=config.settings</code> is set before starting the server. With Docker, add it to the container's environment. Check <code class="rp-code">pyproject.toml</code> / <code class="rp-code">manage.py</code> for the correct module path.</p>
+            </div>
+          </div>
+
+          <div class="rp-step-card mb-3">
+            <div class="rp-step-header" style="background:color-mix(in srgb, var(--rp-danger) 6%, transparent);">
+              <icon-field icon="bi-exclamation-circle-fill" color="danger"></icon-field>
+              <div class="fw-bold">AWS Secrets Manager: AccessDeniedException</div>
+            </div>
+            <div class="rp-step-body small">
+              <p class="mb-1">The IAM user or role does not have permission to create or update secrets.</p>
+              <p class="mb-0"><strong>Fix:</strong> Attach a policy with at minimum: <code class="rp-code">secretsmanager:CreateSecret</code>, <code class="rp-code">secretsmanager:PutSecretValue</code>, <code class="rp-code">secretsmanager:GetSecretValue</code>, and <code class="rp-code">secretsmanager:DescribeSecret</code> for the resource ARN <code class="rp-code">arn:aws:secretsmanager:&lt;region&gt;:&lt;account&gt;:secret:&lt;prefix&gt;/*</code>.</p>
+            </div>
+          </div>
+
+          <div class="rp-step-card mb-3">
+            <div class="rp-step-header" style="background:color-mix(in srgb, var(--rp-danger) 6%, transparent);">
+              <icon-field icon="bi-exclamation-circle-fill" color="danger"></icon-field>
+              <div class="fw-bold">Setup status stuck at "running"</div>
+            </div>
+            <div class="rp-step-body small">
+              <p class="mb-1">The wizard polls <code class="rp-code">GET /api/v1/setup/status/</code> every few seconds. If setup is killed mid-run the status never transitions to "complete" or "error".</p>
+              <p class="mb-0"><strong>Fix:</strong> Restart the application server. The in-memory status tracker resets on restart. Re-submit the wizard — it will re-run setup from scratch (Phase 1 values in <code class="rp-code">.env</code> persist, but the database transaction was rolled back by the crash).</p>
+            </div>
+          </div>
+
+          <div class="rp-step-card mb-3">
+            <div class="rp-step-header" style="background:color-mix(in srgb, var(--rp-danger) 6%, transparent);">
+              <icon-field icon="bi-exclamation-circle-fill" color="danger"></icon-field>
+              <div class="fw-bold">Cannot bypass the setup redirect to reach /admin/ or /api/</div>
+            </div>
+            <div class="rp-step-body small">
+              <p class="mb-1">The <code class="rp-code">SetupMiddleware</code> intercepts all traffic and redirects to <code class="rp-code">/setup/</code> until setup is complete.</p>
+              <p class="mb-0"><strong>Exempt paths:</strong> <code class="rp-code">/setup/</code>, <code class="rp-code">/login/</code>, <code class="rp-code">/api/v1/setup/</code>, <code class="rp-code">/api/v1/auth/</code>, <code class="rp-code">/static/</code>, <code class="rp-code">/media/</code>. If you need emergency access to the Django admin, temporarily set <code class="rp-code">SETUP_COMPLETE=True</code> directly in the database and restart.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── .env Reference ── -->
+        <section id="env-reference" class="mb-5">
+          <h2 class="rp-h2 mb-3">.env reference</h2>
+          <p class="small rp-muted mb-3">
+            Setup writes the following variables to the <code class="rp-code">.env</code> file in the
+            project root. These take effect immediately at runtime — no restart is needed for
+            most values, but database connection changes require a server restart or Gunicorn
+            reload.
+          </p>
+
+          <table class="rp-field-table">
+            <thead>
+              <tr><th>Variable</th><th>Example value</th><th>Written by</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code class="rp-code">FERNET_KEY</code></td><td><em>&lt;44-char base64&gt;</em></td><td>Infrastructure (local)</td></tr>
+              <tr><td><code class="rp-code">SECRETS_PREFIX</code></td><td><code class="rp-code">/rp/prod</code> or <code class="rp-code">""</code></td><td>Infrastructure</td></tr>
+              <tr><td><code class="rp-code">DB_PASSWORD_SOURCE</code></td><td><code class="rp-code">env</code> or <code class="rp-code">aws</code></td><td>Infrastructure</td></tr>
+              <tr><td><code class="rp-code">AWS_REGION</code></td><td><code class="rp-code">eu-west-1</code></td><td>Infrastructure (AWS)</td></tr>
+              <tr><td><code class="rp-code">AWS_DEFAULT_REGION</code></td><td><code class="rp-code">eu-west-1</code></td><td>Infrastructure (AWS)</td></tr>
+              <tr><td><code class="rp-code">AWS_ACCESS_KEY_ID</code></td><td><em>&lt;20 chars&gt;</em></td><td>Infrastructure (AWS user mode)</td></tr>
+              <tr><td><code class="rp-code">AWS_SECRET_ACCESS_KEY</code></td><td><em>&lt;40 chars&gt;</em></td><td>Infrastructure (AWS user mode)</td></tr>
+              <tr><td><code class="rp-code">DB_ENGINE</code></td><td><code class="rp-code">sqlite</code> or <code class="rp-code">postgresql</code></td><td>Database</td></tr>
+              <tr><td><code class="rp-code">DB_HOST</code></td><td><code class="rp-code">db.example.com</code></td><td>Database (PostgreSQL)</td></tr>
+              <tr><td><code class="rp-code">DB_PORT</code></td><td><code class="rp-code">5432</code></td><td>Database (PostgreSQL)</td></tr>
+              <tr><td><code class="rp-code">DB_NAME</code></td><td><code class="rp-code">resourceplanner</code></td><td>Database (PostgreSQL)</td></tr>
+              <tr><td><code class="rp-code">DB_USER</code></td><td><code class="rp-code">rp_user</code></td><td>Database (PostgreSQL)</td></tr>
+              <tr><td><code class="rp-code">DB_PASSWORD</code></td><td><em>&lt;password&gt;</em></td><td>Database (PostgreSQL + local deploy)</td></tr>
+              <tr><td><code class="rp-code">DB_SECRET_NAME</code></td><td><code class="rp-code">/rp/prod/db</code></td><td>Database (PostgreSQL + AWS deploy)</td></tr>
+              <tr><td><code class="rp-code">LOG_DESTINATION</code></td><td><code class="rp-code">local</code></td><td>Logging</td></tr>
+              <tr><td><code class="rp-code">LOG_NAME</code></td><td><code class="rp-code">resourceplanner</code></td><td>Logging</td></tr>
+              <tr><td><code class="rp-code">LOG_PATH</code></td><td><code class="rp-code">/var/log/rp</code></td><td>Logging (local)</td></tr>
+              <tr><td><code class="rp-code">LOG_ROTATION</code></td><td><code class="rp-code">daily</code></td><td>Logging</td></tr>
+              <tr><td><code class="rp-code">LOG_ROTATION_SIZE_MB</code></td><td><code class="rp-code">10</code></td><td>Logging</td></tr>
+              <tr><td><code class="rp-code">LOG_CLEANUP_KEEP_FILES</code></td><td><code class="rp-code">5</code></td><td>Logging</td></tr>
+              <tr><td><code class="rp-code">LOG_CLEANUP_KEEP_DAYS</code></td><td><code class="rp-code">0</code></td><td>Logging</td></tr>
+              <tr><td><code class="rp-code">LOG_S3_BUCKET</code></td><td><code class="rp-code">arn:aws:s3:::my-logs</code></td><td>Logging (S3)</td></tr>
+            </tbody>
+          </table>
+
+          <div class="rp-warn-block mt-3">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Never commit <code class="rp-code">.env</code> to source control.</strong>
+            It contains your Fernet key, database password, and (if AWS user mode) IAM credentials.
+            The repository's <code class="rp-code">.gitignore</code> already excludes <code class="rp-code">.env</code>.
+          </div>
+        </section>
+
+        <!-- Footer nav -->
+        <div class="d-flex gap-3 mt-4 pt-3" style="border-top: 1px solid var(--rp-border);">
+          <a href="/docs/" class="rp-btn rp-btn-sm" style="font-size:0.85rem; text-decoration:none; color: var(--rp-text);">
+            <i class="bi bi-arrow-left"></i> Back to Docs
+          </a>
+          <a href="/setup/" class="rp-btn rp-btn-sm" style="font-size:0.85rem; text-decoration:none; background: var(--rp-accent); color:#fff; padding: 0.3rem 0.75rem; border-radius: 2rem;">
+            Open Setup Wizard <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+
+      </main>
+    </div>
+
+    <script>
+      // Highlight active nav link on scroll
+      const links = document.querySelectorAll('.rp-docs-nav-link[href^="#"]');
+      const sections = [...links].map(l => document.querySelector(l.getAttribute('href'))).filter(Boolean);
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const active = [...links].find(l => l.getAttribute('href') === '#' + entry.target.id);
+            if (active) active.classList.add('active');
+          }
+        });
+      }, { rootMargin: '-10% 0px -80% 0px' });
+      sections.forEach(s => observer.observe(s));
+    </script>
+  </body>
+</html>

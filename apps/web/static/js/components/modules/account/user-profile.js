@@ -88,6 +88,10 @@ class UserProfile extends HTMLElement {
           <i class="bi bi-bell"></i>
           Notification preferences
         </a>
+        <a href="/docs/">
+          <i class="bi bi-book"></i>
+          Docs
+        </a>
         <hr />
         <button type="button" class="rp-dd-link rp-dd-danger" data-signout>
           <i class="bi bi-box-arrow-right"></i>
