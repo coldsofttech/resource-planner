@@ -24,7 +24,7 @@ runs:
       run: |
         mkdir -p .pytest-reports
         set +e
-        pytest --override-ini=addopts= -m unit ${{ inputs.extra-args }} \
+        pytest --override-ini=addopts= -m unit -n auto ${{ inputs.extra-args }} \
           --junit-xml=.pytest-reports/junit-unit-${{ inputs.name }}.xml \
           --html=.pytest-reports/test-report-unit-${{ inputs.name }}.html \
           --self-contained-html \
