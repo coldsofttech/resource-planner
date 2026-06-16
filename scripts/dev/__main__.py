@@ -32,6 +32,9 @@ def main() -> None:
     )
     args = parser.parse_args()
     if args.options:
+        from .core import shell as _shell
+
+        _shell.non_interactive = True
         _run_options(args.options)
     else:
         from .menu import main_menu

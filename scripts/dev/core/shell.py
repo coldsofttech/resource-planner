@@ -2,6 +2,9 @@ import subprocess  # nosec B404
 
 from ..constants import RED, RESET, ROOT, YELLOW
 
+# Set to True by __main__ when running via --options to suppress interactive pauses.
+non_interactive: bool = False
+
 
 def run(cmd, cwd=ROOT):
     """Run shell command safely."""
@@ -31,4 +34,5 @@ def _run_pytest(cmd: str) -> int:
 
 
 def pause():
-    input("\nPlease enter to continue...")
+    if not non_interactive:
+        input("\nPlease enter to continue...")
