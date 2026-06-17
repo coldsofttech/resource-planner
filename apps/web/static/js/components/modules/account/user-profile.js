@@ -88,7 +88,7 @@ class UserProfile extends HTMLElement {
           <i class="bi bi-bell"></i>
           Notification preferences
         </a>
-        <a href="/docs/">
+        <a href="/docs/" target="_blank">
           <i class="bi bi-book"></i>
           Docs
         </a>

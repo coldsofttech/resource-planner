@@ -26,7 +26,7 @@
           </div>
           <div class="ms-auto d-flex align-items-center gap-2">
             <theme-toggle></theme-toggle>
-            <link-field href="/login/" class="rp-auth-register-link">Sign in</link-field>
+            <link-field href="{{ cta_url }}" class="rp-auth-register-link">{{ cta_label }}</link-field>
           </div>
         </div>
 
@@ -119,21 +119,21 @@
             <h2 class="rp-h2 mb-3">Where to go next</h2>
             <div class="row g-3">
               <div class="col-12 col-md-4">
-                <a href="/docs/guide/" class="rp-card p-3 d-flex flex-column align-items-start text-decoration-none h-100">
-                  <icon-field icon="bi-book" color="accent" size="lg" class="mb-2"></icon-field>
-                  <strong class="mb-1">User Guide</strong>
-                  <p class="rp-muted mb-0 small">
-                    Step-by-step guides for everyday tasks — no sign-in required.
-                  </p>
-                </a>
-              </div>
-              <div class="col-12 col-md-4">
                 <a href="/docs/setup/" class="rp-card p-3 d-flex flex-column align-items-start text-decoration-none h-100">
                   <icon-field icon="bi-gear" color="accent" size="lg" class="mb-2"></icon-field>
                   <strong class="mb-1">Setup</strong>
                   <p class="rp-muted mb-0 small">
                     Configure your Resource Planner instance — database, auth, and
                     integrations.
+                  </p>
+                </a>
+              </div>
+              <div class="col-12 col-md-4">
+                <a href="/docs/guide/" class="rp-card p-3 d-flex flex-column align-items-start text-decoration-none h-100">
+                  <icon-field icon="bi-book" color="accent" size="lg" class="mb-2"></icon-field>
+                  <strong class="mb-1">User Guide</strong>
+                  <p class="rp-muted mb-0 small">
+                    Step-by-step guides for everyday tasks — no sign-in required.
                   </p>
                 </a>
               </div>

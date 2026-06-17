@@ -31,8 +31,8 @@
         </div>
         <div class="ms-auto d-flex align-items-center gap-2">
           <theme-toggle></theme-toggle>
-          <a href="/setup/" class="rp-docs-bar-btn">
-            Open Setup <i class="bi bi-arrow-right"></i>
+          <a href="{{ cta_url }}" class="rp-docs-bar-btn">
+            {{ cta_label }}{% if cta_icon %} <i class="bi {{ cta_icon }}"></i>{% endif %}
           </a>
         </div>
       </div>
