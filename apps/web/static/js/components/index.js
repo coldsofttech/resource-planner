@@ -7,6 +7,7 @@ import "./drawers/index.js";
 import "./dropdowns/index.js";
 import "./fields/index.js";
 import "./filters/index.js";
+import "./history/index.js";
 import "./icons/index.js";
 import "./menus/index.js";
 import "./modals/index.js";

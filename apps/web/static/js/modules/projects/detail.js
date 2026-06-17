@@ -877,12 +877,24 @@ async function loadEstimateHistory(estimateCode) {
   if (!container) return;
 
   if (!estimateCode) {
-    container.innerHTML =
-      '<p class="text-muted rp-fs-13 mb-0">Select a version to view its history.</p>';
+    container.empty("Select a version to view its history.");
     return;
   }
 
-  container.innerHTML = '<p class="text-muted rp-fs-13 mb-0">Loading history…</p>';
+  container.loading();
+
+  const actionIcons = {
+    CREATED: "bi-plus-circle-fill",
+    UPDATED: "bi-pencil-fill",
+    APPROVED: "bi-check-circle-fill",
+    SUPERSEDED: "bi-arrow-counterclockwise",
+  };
+  const actionIconColors = {
+    CREATED: "accent",
+    UPDATED: "muted",
+    APPROVED: "success",
+    SUPERSEDED: "muted",
+  };
 
   try {
     const { href, method } = API_URLS.projectEstimates.history(projectCode, estimateCode);
@@ -890,88 +902,32 @@ async function loadEstimateHistory(estimateCode) {
     const rows = resp?.data ?? [];
 
     if (!rows.length) {
-      container.innerHTML = '<p class="text-muted rp-fs-13 mb-0">No history available.</p>';
+      container.empty("No history available.");
       return;
     }
 
-    const actionIcons = {
-      CREATED: "bi-plus-circle-fill",
-      UPDATED: "bi-pencil-fill",
-      APPROVED: "bi-check-circle-fill",
-      SUPERSEDED: "bi-arrow-counterclockwise",
-    };
-    const actionColors = {
-      CREATED: "var(--rp-accent)",
-      UPDATED: "var(--rp-text-muted)",
-      APPROVED: "var(--rp-success-soft-text, #198754)",
-      SUPERSEDED: "var(--rp-text-muted)",
-    };
-
-    const frag = document.createDocumentFragment();
-    rows.forEach((row, idx) => {
+    const items = rows.map((row, idx) => {
       const isLast = idx === rows.length - 1;
-      const icon = actionIcons[row.action] ?? "bi-circle-fill";
-      const color = actionColors[row.action] ?? "var(--rp-text-muted)";
       const statusChange = row.previous_status
         ? `${estimateStatusLabel(row.previous_status)} → ${estimateStatusLabel(row.new_status)}`
         : estimateStatusLabel(row.new_status);
       const dateStr = row.changed_on ? formatDate(row.changed_on) : "";
       const byStr = row.changed_by?.email ? ` · ${row.changed_by.email}` : "";
 
-      const wrapper = document.createElement("div");
-      wrapper.className = `d-flex gap-2 align-items-start${isLast ? "" : " pb-3"}`;
-      wrapper.style.position = "relative";
-
-      const iconCol = document.createElement("div");
-      iconCol.className = "d-flex flex-column align-items-center flex-shrink-0";
-      iconCol.style.width = "20px";
-
-      const iconEl = document.createElement("i");
-      iconEl.className = `bi ${icon}`;
-      iconEl.style.cssText = `color:${color};font-size:14px;`;
-      iconCol.appendChild(iconEl);
-
-      if (!isLast) {
-        const line = document.createElement("div");
-        line.style.cssText =
-          "width:1px;flex:1;min-height:20px;background:var(--rp-border);margin-top:4px;";
-        iconCol.appendChild(line);
-      }
-
-      const body = document.createElement("div");
-      body.className = "flex-grow-1";
-
-      const actionLabel = document.createElement("div");
-      actionLabel.className = "rp-fs-13 fw-medium";
-      actionLabel.textContent = row.action.charAt(0) + row.action.slice(1).toLowerCase();
-
-      const statusLine = document.createElement("div");
-      statusLine.className = "rp-fs-12 text-muted";
-      statusLine.textContent = statusChange;
-
-      const metaLine = document.createElement("div");
-      metaLine.className = "rp-fs-11 text-muted mt-1";
-      metaLine.textContent = dateStr + byStr;
-
-      body.appendChild(actionLabel);
-      body.appendChild(statusLine);
-
-      if (row.note) {
-        const noteLine = document.createElement("div");
-        noteLine.className = "rp-fs-12 text-muted fst-italic mt-1";
-        noteLine.textContent = row.note;
-        body.appendChild(noteLine);
-      }
-
-      body.appendChild(metaLine);
-      wrapper.appendChild(iconCol);
-      wrapper.appendChild(body);
-      frag.appendChild(wrapper);
+      const item = document.createElement("history-item");
+      item.setAttribute("label", row.action.charAt(0) + row.action.slice(1).toLowerCase());
+      item.setAttribute("icon", actionIcons[row.action] ?? "bi-circle-fill");
+      item.setAttribute("icon-color", actionIconColors[row.action] ?? "muted");
+      item.setAttribute("status", statusChange);
+      if (row.note) item.setAttribute("note", row.note);
+      item.setAttribute("meta", dateStr + byStr);
+      if (!isLast) item.setAttribute("connector", "");
+      return item;
     });
 
-    container.replaceChildren(frag);
+    container.setItems(items);
   } catch {
-    container.innerHTML = '<p class="text-muted rp-fs-13 mb-0">Failed to load history.</p>';
+    container.error();
   }
 }
 
@@ -1209,10 +1165,7 @@ function initEstimatesTab() {
         await apiFetch(href, { method });
         deleteModal.hide();
         const historyContainer = document.getElementById("rp-estimate-history-list");
-        if (historyContainer) {
-          historyContainer.innerHTML =
-            '<p class="text-muted rp-fs-13 mb-0">Select a version to view its history.</p>';
-        }
+        if (historyContainer) historyContainer.empty("Select a version to view its history.");
         if (picker) picker.value = "";
         pendingEstimateRow = null;
         table?.refresh();

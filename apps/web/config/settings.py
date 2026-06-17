@@ -80,6 +80,8 @@ INSTALLED_APPS = [
     "apps.dashboard.apps.DashboardConfig",
     "apps.business_units.apps.BusinessUnitConfig",
     "apps.tags.apps.TagConfig",
+    "apps.how_to.apps.HowToConfig",
+    "apps.notifications.apps.NotificationsConfig",
 ]
 
 MIDDLEWARE = [

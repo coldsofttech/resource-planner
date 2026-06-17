@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>User Guide — Resource Planner</title>
+    <script src="{% static 'js/dist/theme-init.min.js' %}"></script>
+    <script type="module" src="{% static 'js/dist/components.min.js' %}"></script>
+    <script type="module" src="{% static 'js/modules/how-to/guide.js' %}"></script>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+          crossorigin="anonymous" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="{% static 'css/dist/styles.min.css' %}" />
+  </head>
+  <body>
+    <div class="rp-docs-page">
+
+      <!-- Top bar -->
+      <div class="rp-docs-bar">
+        <div class="rp-logo" data-app-logo>RP</div>
+        <div>
+          <span class="rp-auth-bar-name" id="rp-app-name">Resource Planner</span>
+          <span class="rp-docs-bar-crumb">
+            / <a href="/docs/">Docs</a> / User Guide
+          </span>
+        </div>
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <theme-toggle></theme-toggle>
+          <a href="{{ cta_url }}" class="rp-docs-bar-btn">
+            <i class="bi bi-box-arrow-in-right"></i> {{ cta_label }}
+          </a>
+        </div>
+      </div>
+
+      <div class="rp-docs-layout">
+
+        <!-- Sidebar -->
+        <nav class="rp-docs-sidebar" aria-label="User guide navigation">
+          <div class="rp-docs-sidebar-header">
+            <icon-field icon="bi-book-half" color="accent"></icon-field>
+            <span style="font-weight:600;font-size:0.9rem;">User Guide</span>
+          </div>
+
+          <div class="rp-docs-nav-section">Getting Started</div>
+          <a class="rp-docs-nav-link" href="#overview"><i class="bi bi-grid"></i> Overview</a>
+          <a class="rp-docs-nav-link" href="#concepts"><i class="bi bi-diagram-3"></i> Key Concepts</a>
+
+          <div class="rp-docs-nav-section">Planning</div>
+          <a class="rp-docs-nav-link" href="#financial-years"><i class="bi bi-calendar3"></i> Financial Years</a>
+          <a class="rp-docs-nav-link" href="#sprints"><i class="bi bi-lightning"></i> Sprints</a>
+          <a class="rp-docs-nav-link" href="#projects"><i class="bi bi-kanban"></i> Projects</a>
+          <a class="rp-docs-nav-link" href="#programmes"><i class="bi bi-collection"></i> Programmes</a>
+
+          <div class="rp-docs-nav-section">Workforce</div>
+          <a class="rp-docs-nav-link" href="#teams"><i class="bi bi-people"></i> Teams</a>
+          <a class="rp-docs-nav-link" href="#members"><i class="bi bi-person-badge"></i> Members</a>
+          <a class="rp-docs-nav-link" href="#leaves"><i class="bi bi-calendar-x"></i> Leaves</a>
+
+          <div class="rp-docs-nav-section">Configuration</div>
+          <a class="rp-docs-nav-link" href="#business-units"><i class="bi bi-building"></i> Business Units</a>
+          <a class="rp-docs-nav-link" href="#roles"><i class="bi bi-award"></i> Roles</a>
+          <a class="rp-docs-nav-link" href="#skills"><i class="bi bi-stars"></i> Skills</a>
+          <a class="rp-docs-nav-link" href="#employment-types"><i class="bi bi-briefcase"></i> Employment Types</a>
+          <a class="rp-docs-nav-link" href="#locations"><i class="bi bi-geo-alt"></i> Locations</a>
+          <a class="rp-docs-nav-link" href="#holidays"><i class="bi bi-calendar-heart"></i> Holidays</a>
+          <a class="rp-docs-nav-link" href="#tags"><i class="bi bi-tag"></i> Tags</a>
+        </nav>
+
+        <!-- Main content -->
+        <main class="rp-docs-main">
+
+          <!-- ── Overview ── -->
+          <section id="overview" class="rp-module">
+            <h1 class="rp-h1 mb-2">User Guide</h1>
+            <p class="rp-muted mb-4">
+              Step-by-step instructions for every module in Resource Planner.
+              Start with <a href="#concepts">Key Concepts</a> to understand the building blocks,
+              then jump to the module you need.
+            </p>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <div class="rp-card p-3 h-100">
+                  <div class="fw-bold mb-1"><i class="bi bi-calendar3"></i> Plan</div>
+                  <p class="small rp-muted mb-0">Set up financial years and sprints to frame delivery capacity over time.</p>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="rp-card p-3 h-100">
+                  <div class="fw-bold mb-1"><i class="bi bi-kanban"></i> Deliver</div>
+                  <p class="small rp-muted mb-0">Create and manage projects, estimates, budgets, and programmes.</p>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="rp-card p-3 h-100">
+                  <div class="fw-bold mb-1"><i class="bi bi-people"></i> Manage</div>
+                  <p class="small rp-muted mb-0">Organise teams, track capacity, and manage workforce skills and leaves.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ── Key Concepts ── -->
+          <section id="concepts" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-diagram-3" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Key Concepts</h2>
+                <p class="small rp-muted mb-0">Understand these ideas once and everything else will make sense.</p>
+              </div>
+            </div>
+
+            <h3 class="rp-docs-subheading">Codes</h3>
+            <p class="small rp-muted">Every record gets an auto-generated code when it is created — for example <strong>TEAM-0001</strong> or <strong>PRJ-0042</strong>. Codes are permanent: they never change even if you rename the record. You will see them in search results, exports, history logs, and URLs.</p>
+
+            <h3 class="rp-docs-subheading">Active and Inactive</h3>
+            <p class="small rp-muted">Most records can be set to <strong>Active</strong> or <strong>Inactive</strong>. Inactive records disappear from dropdown menus and filters so they do not clutter your day-to-day view — but they are not deleted. You can reactivate them at any time. Use inactive to archive records you no longer need without losing their history.</p>
+
+            <h3 class="rp-docs-subheading">Audit trail</h3>
+            <p class="small rp-muted">Every record shows who created it and when it was last changed. Key modules (Teams, Projects, Estimates) also keep a full <strong>change history</strong> — a timestamped log of every edit, who made it, and what the previous value was. History logs are read-only and cannot be altered.</p>
+
+            <h3 class="rp-docs-subheading">Defaults</h3>
+            <p class="small rp-muted">Roles, Locations, and Employment Types each support a single <strong>default</strong> record. When you create a new team member, the default values are pre-filled for you. Only one record per type can be the default at any time — setting a new default automatically clears the previous one.</p>
+
+            <h3 class="rp-docs-subheading">Filters</h3>
+            <p class="small rp-muted">Every list page has a filter bar. Use it to narrow down what you are looking at before taking an action. Filters also affect exports — if you apply a filter and then export, only the filtered records are downloaded. Remove all filters first if you want the full list.</p>
+
+            <h3 class="rp-docs-subheading">Importing records</h3>
+            <p class="small rp-muted">Most list pages have an <strong>Import</strong> button. Use it to create many records at once from a spreadsheet.</p>
+            <ol class="rp-step-list">
+              <li>Click <strong>Import</strong> on the list page.</li>
+              <li>Download the <strong>sample template</strong> — it shows the exact columns and format required.</li>
+              <li>Fill in your data and save the file as CSV or XLSX.</li>
+              <li>Upload the file. The system validates every row and shows a preview with any errors before saving anything.</li>
+              <li>Fix any highlighted errors and re-upload. When there are no errors, click <strong>Confirm Import</strong> to commit.</li>
+            </ol>
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Always download a fresh sample template for each import — it reflects the current column requirements exactly. Using an old template from a previous session may cause format errors.
+            </div>
+
+            <h3 class="rp-docs-subheading">Exporting records</h3>
+            <p class="small rp-muted">Click <strong>Export</strong> on any list page to download the visible records. Choose from <strong>CSV</strong>, <strong>Excel (XLSX)</strong>, <strong>PDF</strong>, or <strong>JSON</strong>. The export respects your current filters — only matching records are included.</p>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Supported export formats</strong><br>
+              <strong>CSV</strong> — plain text, opens in any spreadsheet app.<br>
+              <strong>XLSX</strong> — formatted Excel workbook with column headers.<br>
+              <strong>PDF</strong> — ready-to-print document.<br>
+              <strong>JSON</strong> — structured data for integrations or backups.
+            </div>
+          </section>
+
+          <!-- ── Financial Years ── -->
+          <section id="financial-years" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-calendar3" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Financial Years</h2>
+                <p class="small rp-muted mb-0">The top-level planning container for sprints, budgets, and all reporting.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">A Financial Year (FY) is the foundation of everything in Resource Planner. Sprints sit inside FYs, project budgets are allocated per FY, and all reports are anchored to a financial year. Set these up first, before creating sprints or allocating budgets.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Financial Year</strong></td><td>Opens a panel on the right. Enter the start date, end date, initial status, and an optional note. Labels and duration are calculated for you.</td></tr>
+                <tr><td><strong>View</strong> <i class="bi bi-eye"></i></td><td>Opens a read-only summary of the financial year, including all sprints within it.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the dates, status, or note.</td></tr>
+                <tr><td><strong>Deactivate / Activate</strong></td><td>Hides or shows the FY in planning dropdowns. Does not affect existing sprints or budget data.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Status explained</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Status</th><th>When to use it</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Future</strong></td><td>The year has not started. Use when creating an upcoming FY in advance.</td></tr>
+                <tr><td><strong>In Progress</strong></td><td>The currently active year. Only one FY can be In Progress at a time.</td></tr>
+                <tr><td><strong>Completed</strong></td><td>The year ended normally. Sprints and budgets are preserved for historical reporting.</td></tr>
+                <tr><td><strong>Expired</strong></td><td>The end date passed without the year being marked Completed.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Setting up a financial year</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Financial Years</strong> in the navigation.</li>
+              <li>Click <strong>Add Financial Year</strong>.</li>
+              <li>Enter the start date (e.g. 1 July) and end date (e.g. 30 June the following year).</li>
+              <li>Set the status to <strong>Future</strong> if it has not started yet, or <strong>In Progress</strong> for the current year.</li>
+              <li>Click <strong>Save</strong>. The year label (e.g. FY2025-26) and total days are calculated automatically.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Transitioning to a new year</h3>
+            <ol class="rp-step-list">
+              <li>Create the new FY with status <strong>Future</strong> a few weeks before the current year ends.</li>
+              <li>On the first day of the new year, open it and change the status to <strong>In Progress</strong>.</li>
+              <li>The current FY is automatically moved to <strong>Completed</strong> — you do not need to update it manually.</li>
+            </ol>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Only one year can be In Progress at a time.</strong>
+              Setting a second FY to In Progress will be blocked if another one is already active. Transition or complete the current year first.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Date ranges overlap with an existing financial year"</strong> — your new FY's start or end date falls inside an existing one. Ensure the years sit end-to-end with no overlap. A common mistake: if the current year ends on 30 June, the new one should start on 1 July, not 30 June.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Create the next FY in <strong>Future</strong> status a few weeks early. This lets you set up sprints and start planning for the upcoming year before the current one closes.
+            </div>
+          </section>
+
+          <!-- ── Sprints ── -->
+          <section id="sprints" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-lightning" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Sprints</h2>
+                <p class="small rp-muted mb-0">Time-boxed delivery windows within a Financial Year, with automatic capacity tracking per member.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Sprints divide a Financial Year into delivery windows — typically fortnightly or monthly. Each sprint automatically calculates how many days each team member is available, subtracting public holidays and approved leave from the calendar days in the window.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Sprint</strong></td><td>Opens a panel. Select a financial year, enter a sprint number, name, date range, and status.</td></tr>
+                <tr><td><strong>View</strong> <i class="bi bi-eye"></i></td><td>Opens the sprint detail — shows the capacity breakdown for every team member: working days, holidays, leave, and net available days.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update dates, status, or notes. Capacity is recalculated on save.</td></tr>
+                <tr><td><strong>Close Sprint</strong></td><td>Locks the sprint permanently. Capacity figures cannot change after closing. Use once the sprint period has ended and all leaves for that period are recorded.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">How capacity is calculated</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Figure</th><th>How it is worked out</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Working days</strong></td><td>Total calendar days in the sprint window (weekends included — the system uses a full calendar day count).</td></tr>
+                <tr><td><strong>Holidays</strong></td><td>Public holidays in the member's location that fall within the sprint dates.</td></tr>
+                <tr><td><strong>Leave days</strong></td><td>Approved leave records for this member that overlap the sprint.</td></tr>
+                <tr><td><strong>Net capacity</strong></td><td>Working days minus holidays minus leave — the actual days available for project allocation.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Creating a sprint</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Sprints</strong> and click <strong>Add Sprint</strong>.</li>
+              <li>Select the Financial Year this sprint belongs to.</li>
+              <li>Enter a sprint number (unique across all years), a display name, and the start and end dates.</li>
+              <li>Set the status to <strong>Future</strong> or <strong>In Progress</strong>.</li>
+              <li>Click <strong>Save</strong>. Capacity is calculated automatically for all members.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Closing a sprint</h3>
+            <ol class="rp-step-list">
+              <li>Make sure all leaves for the sprint period are recorded.</li>
+              <li>Open the sprint and click <strong>Close Sprint</strong>.</li>
+              <li>Confirm the action. The sprint is now locked — capacity and status are frozen for historical reporting.</li>
+            </ol>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-lock-fill"></i> Record all leaves before closing.</strong>
+              Once a sprint is closed, its capacity figures are frozen. Leaves added after closing only update open and future sprints — not the closed one.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Sprint dates must fall within the selected financial year"</strong> — the start or end date falls outside the FY window. Adjust the sprint dates or select the correct financial year.<br><br>
+              <strong>"Sprint number already exists"</strong> — sprint numbers are unique across all financial years. Use the next available number in the sequence.<br><br>
+              <strong>"Capacity shows zero holidays even though holidays are recorded"</strong> — the member likely has no <strong>location</strong> set on their profile. Go to the member's Workforce tab and set their location.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Open a sprint's detail view to see the full capacity table — including which members are at zero capacity (fully on leave) or have reduced capacity due to holidays. Use this before assigning work in a resource plan.
+            </div>
+          </section>
+
+          <!-- ── Projects ── -->
+          <section id="projects" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-kanban" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Projects</h2>
+                <p class="small rp-muted mb-0">The core delivery entity — status, estimates, budgets, collaborators, and history in one place.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">A Project captures everything about a funded body of work — what it is, who owns it, where it is in delivery, how much it costs, and who is involved. Every project belongs to a Programme, is owned by a Team, and can carry multiple estimate versions and a per-FY budget.</p>
+
+            <h3 class="rp-docs-subheading">Actions on the projects list</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Project</strong></td><td>Opens the creation panel. Fill in the name, programme, type, status, team, dates, and priority.</td></tr>
+                <tr><td><strong>View</strong> <i class="bi bi-eye"></i></td><td>Opens the full project detail page — overview, estimates, budget, collaborators, history, and followers tabs.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the project's core fields (name, status, dates, team, priority, tags, etc.).</td></tr>
+                <tr><td><strong>Export</strong></td><td>Download the project list in your chosen format. Current filters are respected.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Creating a project</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Projects</strong> and click <strong>Add Project</strong>.</li>
+              <li>Enter the full name and a short display name (used in dashboards and reports).</li>
+              <li>Select a <strong>Programme</strong> — every project must belong to one.</li>
+              <li>Choose the project type, current status, and the team responsible for delivery.</li>
+              <li>Enter the planned start and end dates, a commitment date if known, and the business priority.</li>
+              <li>Add any <strong>Tags</strong> to help with cross-programme filtering.</li>
+              <li>Click <strong>Save</strong>. A unique project code is generated automatically.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Project statuses</h3>
+            <p class="small rp-muted">Statuses represent your organisation's delivery lifecycle (for example: Scoping → In Progress → Completed). Sub-statuses sit underneath a main status for finer-grained tracking. Your administrator configures which statuses are available — contact them if you need a new one added.</p>
+
+            <h3 class="rp-docs-subheading">Estimates</h3>
+            <p class="small rp-muted">An estimate records how much effort and cost a project requires. You can hold multiple estimate versions as scope evolves — the most recent approved one is used in budget and financial views.</p>
+
+            <h3 class="rp-docs-subheading">Adding and progressing an estimate</h3>
+            <ol class="rp-step-list">
+              <li>Open the project and click the <strong>Estimates</strong> tab.</li>
+              <li>Click <strong>Add Estimate</strong>. Enter the number of effort days, a day rate, and an optional contingency percentage. The total cost is calculated automatically.</li>
+              <li>Add a link to your detailed estimate document if you have one, and save.</li>
+              <li>The estimate starts in <strong>Draft</strong>. Move it forward through the workflow as it is reviewed and approved.</li>
+              <li>When a new estimate version replaces an old one, the previous version is automatically marked <strong>Superseded</strong> and kept for reference.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Estimate workflow</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Status</th><th>What it means</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Draft</strong></td><td>Being prepared — not yet shared externally.</td></tr>
+                <tr><td><strong>Reviewed</strong></td><td>Reviewed internally by the team.</td></tr>
+                <tr><td><strong>Shared</strong></td><td>Sent to the business or stakeholders for sign-off.</td></tr>
+                <tr><td><strong>Approved</strong></td><td>Formally agreed. This version is used when creating a budget.</td></tr>
+                <tr><td><strong>Superseded</strong></td><td>Replaced by a newer version. Kept for historical reference.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Budgets</h3>
+            <p class="small rp-muted">A budget allocates funding to a project for a specific Financial Year. It links to an estimate version and tracks three figures:</p>
+            <ul class="rp-rule-list">
+              <li><strong>Allocated budget</strong> — the initial approved funding amount.</li>
+              <li><strong>Refined budget</strong> — an updated figure that overrides the allocated amount once a more accurate number is known.</li>
+              <li><strong>Remaining budget</strong> — current budget minus the linked estimate total, giving instant over/under-spend visibility.</li>
+            </ul>
+            <p class="small rp-muted">To add a budget: open the project, click the <strong>Budget</strong> tab, then <strong>Add Budget</strong>. Select the Financial Year and the estimate to link it to.</p>
+
+            <h3 class="rp-docs-subheading">Collaborators</h3>
+            <p class="small rp-muted">A project has one <strong>primary team</strong> that leads delivery. Other teams contributing can be added as <strong>Collaborators</strong>. Collaborating teams appear alongside the primary team in resource planning and capacity views.</p>
+            <p class="small rp-muted">To add a collaborator: open the project, go to the <strong>Collaborators</strong> tab, and click <strong>Add Collaborator</strong>. Select the team and their role on the project.</p>
+
+            <h3 class="rp-docs-subheading">Project codes</h3>
+            <p class="small rp-muted">A project code is an external reference — a Jira ID, portfolio number, or finance code. Only one code is active per project at a time. Every code change is stored in the <strong>Code History</strong> log with a timestamp and who made the change.</p>
+
+            <h3 class="rp-docs-subheading">Labels</h3>
+            <p class="small rp-muted">Labels are short project-specific identifiers (up to 50 characters) you define directly on the project — useful for internal reference numbers unique to that project. One label per project can be marked as the default. Labels are different from Tags: tags come from a shared library and work across all projects; labels belong only to this project.</p>
+
+            <h3 class="rp-docs-subheading">Followers</h3>
+            <p class="small rp-muted">Team members can follow a project to receive notifications when its status or estimate changes. Open the project and click <strong>Follow</strong> to subscribe yourself. Administrators can add followers on behalf of others from the <strong>Followers</strong> tab.</p>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Programme is required"</strong> — every project must belong to a programme. Create the programme first if it does not exist yet (see <a href="#programmes">Programmes</a>).<br><br>
+              <strong>"Project name already exists"</strong> — names must be unique across the system. Add a year, team abbreviation, or qualifier to differentiate it.<br><br>
+              <strong>"Commitment date cannot be before the start date"</strong> — check both dates and ensure the commitment date is on or after the project start date.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Keep project statuses up to date. Stale statuses make portfolio views unreliable and erode leadership confidence in the data. If a status is genuinely unknown, use the closest available sub-status and add a note rather than leaving it out of date.
+            </div>
+          </section>
+
+          <!-- ── Programmes ── -->
+          <section id="programmes" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-collection" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Programmes</h2>
+                <p class="small rp-muted mb-0">Group related projects under a strategic initiative for portfolio-level reporting.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">A Programme is a named container for related projects. Portfolio views and reports can roll up budget totals and delivery status across every project in a programme. Every project must belong to a programme — create programmes before creating projects.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Programme</strong></td><td>Creates a new programme. Enter a name and optional description.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the programme name or description.</td></tr>
+                <tr><td><strong>Deactivate / Activate</strong></td><td>Hides or shows the programme in the project creation dropdown. Does not affect existing projects.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Permanently removes the programme. Only possible when no projects are linked to it.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">How to use</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Projects → Programmes</strong>.</li>
+              <li>Click <strong>Add Programme</strong>, enter a name and optional description, and save.</li>
+              <li>When creating a project, select this programme from the dropdown.</li>
+            </ol>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Protected programmes cannot be deleted.</strong>
+              Some programmes are marked as <strong>protected</strong> by an administrator. They can only be deactivated, not deleted, to preserve historical project data.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Cannot delete a programme with linked projects"</strong> — reassign or delete all projects in this programme before deleting it. Consider deactivating instead of deleting if you want to keep the history.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Set up your programme structure before inviting other users. A project cannot be saved without a programme, so having them ready prevents blockages when the team starts adding projects.
+            </div>
+          </section>
+
+          <!-- ── Teams ── -->
+          <section id="teams" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-people" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Teams</h2>
+                <p class="small rp-muted mb-0">Organise your workforce into delivery teams. Every membership change is recorded in history.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Teams are the central organising unit for resource allocation. Members belong to teams, and projects are owned and collaborated on by teams. Every team change — who joined, who left, when — is recorded in an immutable history log.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Team</strong></td><td>Creates a new team. Enter a name and optional description.</td></tr>
+                <tr><td><strong>View</strong> <i class="bi bi-eye"></i></td><td>Opens the team detail page — current members, assignment history, and projects this team owns or collaborates on.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the team name or description.</td></tr>
+                <tr><td><strong>Deactivate / Activate</strong></td><td>Hides or shows the team in assignment dropdowns. Existing member assignments and project links are not removed.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Permanently removes the team. Only possible when no members are assigned and no projects reference the team.</td></tr>
+                <tr><td><strong>Import</strong></td><td>Create multiple teams at once from a CSV or Excel file.</td></tr>
+                <tr><td><strong>Export</strong></td><td>Download the full team list.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Creating a team</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Teams</strong> and click <strong>Add Team</strong>.</li>
+              <li>Enter a clear, unique team name and an optional description of the team's purpose.</li>
+              <li>Click <strong>Save</strong>.</li>
+              <li>Add members by opening each member's profile and updating their team assignment — or use the team's assignment panel inside the team detail page.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Team assignment rules</h3>
+            <ul class="rp-rule-list">
+              <li><strong>Regular members</strong> can only be on <strong>one team</strong> at a time. Moving someone to a new team automatically removes them from their current team and records the transfer in history.</li>
+              <li><strong>Leadership members</strong> (those with a role marked as Leadership) can belong to <strong>multiple teams simultaneously</strong>. Assigning them to a second team does not remove them from the first.</li>
+            </ul>
+
+            <h3 class="rp-docs-subheading">Viewing team history</h3>
+            <p class="small rp-muted">Open the team's detail page and click the <strong>History</strong> tab. You will see the complete log of who joined the team, when, who they replaced, and who made each change. This log is read-only — it cannot be edited or deleted.</p>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Cannot delete a team with active members"</strong> — reassign all current members to other teams before deleting. To stop using the team without losing history, deactivate it instead of deleting.<br><br>
+              <strong>"Cannot delete a team linked to projects"</strong> — remove the team from all projects (as primary team or collaborator) before attempting to delete it.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Use the team History tab for retrospectives and capacity reviews. It shows exactly who was on the team during any past sprint period — invaluable when revisiting what capacity was actually available.
+            </div>
+          </section>
+
+          <!-- ── Members ── -->
+          <section id="members" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-person-badge" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Members</h2>
+                <p class="small rp-muted mb-0">Manage workforce profiles — role, skills, location, employment type, and personal preferences.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Every user has a profile combining their account settings with workforce data. Some fields are controlled by administrators; others are managed by the members themselves from their own Profile menu.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>View</strong> <i class="bi bi-eye"></i></td><td>Opens the full profile — personal details, Workforce tab (role, skills, location, team), Permissions tab, and account settings.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the member's workforce fields. Requires the workforce management permission.</td></tr>
+                <tr><td><strong>Import</strong></td><td>Bulk-update workforce fields (role, location, team, employment type) for many members at once from a CSV or Excel file.</td></tr>
+                <tr><td><strong>Export</strong></td><td>Download the member list with workforce data included.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Who can change what</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Field</th><th>Who can update it</th></tr></thead>
+              <tbody>
+                <tr><td>Display name, theme (light/dark), timezone</td><td>The member themselves — from the <strong>Profile</strong> menu in the top-right corner</td></tr>
+                <tr><td>Role, skills, location, employment type, join date, leaving date, team</td><td>Administrators with the workforce management permission</td></tr>
+                <tr><td>Permission groups</td><td>Administrators with the user management permission</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Updating a member's workforce details</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Members</strong> and click the member's name to open their profile.</li>
+              <li>Click the <strong>Workforce</strong> tab.</li>
+              <li>Click <strong>Edit</strong> and update the role, skills, location, employment type, and dates as needed.</li>
+              <li>Click <strong>Save</strong>.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Inviting a new member</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Users</strong> in the admin area.</li>
+              <li>Click <strong>Invite User</strong> and enter their email address.</li>
+              <li>Assign them to the appropriate permission group.</li>
+              <li>Once they accept the invitation and sign in, open their profile and fill in the Workforce details — role, location, team, and employment type.</li>
+            </ol>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Always set the location before recording leaves.</strong>
+              The leave day calculator uses the member's location to find public holidays. A missing or incorrect location means sprint capacity figures will be inaccurate for that member.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"You do not have permission to edit workforce fields"</strong> — you need the workforce management permission. Contact your administrator to request access.<br><br>
+              <strong>"Leaving date cannot be before joining date"</strong> — check both fields and ensure the leaving date is on or after the joining date.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Encourage members to set their own <strong>display name</strong> from the Profile menu. The display name appears throughout the platform and is more recognisable than a raw email address or first/last name combination.
+            </div>
+          </section>
+
+          <!-- ── Leaves ── -->
+          <section id="leaves" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-calendar-x" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Leaves</h2>
+                <p class="small rp-muted mb-0">Record approved absences — sprint capacity is automatically adjusted.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Leave records represent approved absence periods. When you save a leave record, Resource Planner calculates the exact working days lost — excluding public holidays at the member's location — and immediately updates sprint capacity for any sprints that overlap the leave period.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Leave</strong></td><td>Opens a panel. Select the member, enter the dates, and choose whether it is a full day, half day AM, or half day PM.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the leave dates or notes. Sprint capacity is recalculated on save.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Removes the leave record and restores the capacity days to all open sprints that overlapped it.</td></tr>
+                <tr><td><strong>Import</strong></td><td>Bulk-load leave records for multiple members at once from a CSV or Excel file — the fastest way to enter planned leave for a whole team.</td></tr>
+                <tr><td><strong>Export</strong></td><td>Download the leave list with your current filters applied.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Recording a leave</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Leaves</strong> and click <strong>Add Leave</strong>.</li>
+              <li>Select the team member who is taking leave.</li>
+              <li>Enter the start and end dates.</li>
+              <li>If it is a half-day, enable the <strong>Half Day</strong> toggle and select <strong>AM</strong> or <strong>PM</strong>. For a half-day, start and end must be the same date.</li>
+              <li>Click <strong>Save</strong>. Working days are calculated automatically. Any open sprint that overlaps these dates is updated immediately.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">How days are counted</h3>
+            <p class="small rp-muted">The system counts working days in the leave range and subtracts any public holidays at the member's location. A full day counts as 1; a half-day counts as 0.5. Weekends are counted as part of the calendar range but will not increase the day count beyond what the system considers working days based on your location's holiday data.</p>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Record leaves before closing sprints.</strong>
+              Closing a sprint locks its capacity figures. Leave records added after a sprint is closed will not update the closed sprint — only open sprints are recalculated.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Leave dates overlap with an existing leave record for this member"</strong> — this member already has leave covering some of these dates. Edit the existing record rather than creating a new one, or adjust the date range.<br><br>
+              <strong>"Half-day start and end dates must be the same date"</strong> — for a half-day, both the start and end date must be identical.<br><br>
+              <strong>"Capacity has not changed after adding leave"</strong> — the sprint may already be closed, or the member does not have a location set. Check both — a closed sprint's capacity is frozen; a member without a location will not have holidays correctly applied either.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> At the start of each financial year, use <strong>Import</strong> to load the full year's planned leave for all team members in one go. This gets accurate capacity figures into every sprint before planning begins, and is far faster than entering leave one record at a time.
+            </div>
+          </section>
+
+          <!-- ── Business Units ── -->
+          <section id="business-units" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-building" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Business Units</h2>
+                <p class="small rp-muted mb-0">Represent your organisation's divisions for portfolio reporting and budget tracking.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Business Units are top-level organisational groupings — divisions, departments, or cost centres. Teams and budget allocations can be linked to a business unit, enabling portfolio views and reports to roll up by division.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Business Unit</strong></td><td>Create a new division. Enter a full name and a short abbreviation (max 10 characters) for badges and dashboards.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the name or abbreviation.</td></tr>
+                <tr><td><strong>Deactivate / Activate</strong></td><td>Hides or shows the unit in reporting dropdowns. Existing team associations are preserved.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Permanently removes the unit if no teams or allocations reference it.</td></tr>
+                <tr><td><strong>Import / Export</strong></td><td>Bulk-create units from a spreadsheet, or download the current list.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">How to use</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Business Units</strong> and click <strong>Add Business Unit</strong>.</li>
+              <li>Enter the full name (e.g. <em>Finance &amp; Operations</em>) and a short abbreviation (e.g. <em>FIN</em>).</li>
+              <li>Click <strong>Save</strong>. The unit now appears in team and reporting dropdowns.</li>
+            </ol>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Keep abbreviations to 3–6 characters so they fit neatly in dashboard badges and report table columns without truncating.
+            </div>
+          </section>
+
+          <!-- ── Roles ── -->
+          <section id="roles" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-award" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Roles</h2>
+                <p class="small rp-muted mb-0">Define job roles that control multi-team assignment eligibility and resource plan visibility.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Roles classify what a team member does. Two flags on a role have real functional effects on how the platform behaves — not just how the member is labelled.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Role</strong></td><td>Create a new role with a name and configure the Leadership and Assignable flags.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the name or flags. Changes apply immediately to all members who hold this role.</td></tr>
+                <tr><td><strong>Set as Default</strong></td><td>Pre-selects this role when creating new members. Only one role can be the default — setting a new default clears the previous one.</td></tr>
+                <tr><td><strong>Deactivate / Activate</strong></td><td>Hides or shows the role in member profile dropdowns. Members who already hold the role are unaffected.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Removes the role permanently if no members currently hold it.</td></tr>
+                <tr><td><strong>Import / Export</strong></td><td>Bulk-create roles from a spreadsheet, or download the list.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">The two functional flags</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Flag</th><th>What it controls</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Leadership</strong></td>
+                  <td>Members with this flag can be assigned to <strong>multiple teams at the same time</strong>. Regular (non-leadership) members can only be on one team. Use this for managers, heads of practice, or anyone who spans multiple teams.</td>
+                </tr>
+                <tr>
+                  <td><strong>Assignable</strong></td>
+                  <td>Members with this flag appear in the <strong>resource planning allocation panel</strong>. Non-assignable members (e.g. administrative staff) are excluded. Tick this for any role that does project delivery work.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">How to use</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Roles</strong> and click <strong>Add Role</strong>.</li>
+              <li>Enter the role name (e.g. <em>Senior Engineer</em>, <em>Delivery Manager</em>).</li>
+              <li>Enable <strong>Leadership</strong> if members with this role should be able to span multiple teams.</li>
+              <li>Enable <strong>Assignable</strong> if members with this role should appear in resource planning.</li>
+              <li>Mark one role as the <strong>default</strong> — it is pre-selected when creating new members.</li>
+              <li>Click <strong>Save</strong>.</li>
+            </ol>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Changing Leadership affects existing team assignments.</strong>
+              If you change a member's role from non-leadership to leadership (or vice versa), their team assignments are not automatically adjusted. Review the member's team memberships manually after changing this flag.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Cannot delete a role assigned to active members"</strong> — use the <strong>Export</strong> button to see which members hold this role, then reassign them before attempting to delete.
+            </div>
+          </section>
+
+          <!-- ── Skills ── -->
+          <section id="skills" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-stars" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Skills</h2>
+                <p class="small rp-muted mb-0">A shared library of competencies assigned to team members for resource matching.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Skills define the competencies in your workforce. Members can hold multiple skills. Skill data powers workforce search and resource planning filters — helping you find people with the right expertise for a given project.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Skill</strong></td><td>Create a new skill with a short name (max 20 characters) and optional description.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the name or description. Changes appear immediately on all member profiles that hold this skill.</td></tr>
+                <tr><td><strong>Deactivate / Activate</strong></td><td>Hides the skill from the member profile dropdown. Members who already have it keep it on their profile.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Removes the skill from the library permanently. Only possible when no members currently hold it.</td></tr>
+                <tr><td><strong>Import / Export</strong></td><td>Bulk-create skills from a spreadsheet, or download the skill library.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">How to use</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Skills</strong> and click <strong>Add Skill</strong>.</li>
+              <li>Enter a short, precise name — 20 characters maximum. Use the simplest recognisable form (e.g. <em>Python</em>, not <em>Python programming language</em>).</li>
+              <li>Add an optional description if the name needs clarification and click <strong>Save</strong>.</li>
+              <li>Assign skills to members via their <strong>Profile → Workforce</strong> tab.</li>
+            </ol>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Cannot delete a skill assigned to members"</strong> — deactivate the skill instead. It will be hidden from the dropdown but will remain visible on existing member profiles. To fully delete it, first remove it from all affected profiles.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Agree on a fixed skill vocabulary before building the library. Having <em>AWS</em>, <em>Amazon Web Services</em>, and <em>aws-cloud</em> as three separate entries makes skill-based filtering useless. One canonical name per skill, consistently applied.
+            </div>
+          </section>
+
+          <!-- ── Employment Types ── -->
+          <section id="employment-types" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-briefcase" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Employment Types</h2>
+                <p class="small rp-muted mb-0">Classify how team members are engaged — permanent, contractor, part-time, and so on.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Employment Types label the nature of each member's contract. They appear in workforce reports and filters, and can be used to segment capacity assumptions across different categories of worker.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Employment Type</strong></td><td>Create a new type with a clear, descriptive name.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the name. Changes apply immediately to all members who hold this type.</td></tr>
+                <tr><td><strong>Set as Default</strong></td><td>Pre-selects this type when creating new members. Only one can be the default at a time.</td></tr>
+                <tr><td><strong>Deactivate / Activate</strong></td><td>Hides or shows the type in member profile dropdowns.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Removes the type if no members currently use it.</td></tr>
+                <tr><td><strong>Import / Export</strong></td><td>Bulk-create types from a spreadsheet, or download the list.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">How to use</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Employment Types</strong> and click <strong>Add Employment Type</strong>.</li>
+              <li>Enter a clear, self-explanatory name (e.g. <em>Full-time Permanent</em>, <em>Fixed-Term Contractor</em>, <em>Part-time</em>).</li>
+              <li>Mark one as the <strong>default</strong> — typically your most common employment type.</li>
+              <li>Click <strong>Save</strong>. The type now appears in member profile dropdowns.</li>
+            </ol>
+          </section>
+
+          <!-- ── Locations ── -->
+          <section id="locations" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-geo-alt" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Locations</h2>
+                <p class="small rp-muted mb-0">Office locations that control which public holidays apply to each team member.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">A member's location determines which public holidays are excluded from their leave day count and sprint capacity. Getting this right matters: an incorrect or missing location produces inaccurate capacity figures across all sprints and resource plans for that member.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Location</strong></td><td>Create a city/country pair. After saving, go to Holidays to add the public holidays for this location.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the city or country name.</td></tr>
+                <tr><td><strong>Set as Default</strong></td><td>Pre-selects this location when creating new members.</td></tr>
+                <tr><td><strong>Deactivate / Activate</strong></td><td>Hides or shows the location in member profile dropdowns. Existing member assignments are preserved.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Removes the location if no members are assigned to it.</td></tr>
+                <tr><td><strong>Import / Export</strong></td><td>Bulk-create locations from a spreadsheet, or download the list.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">How to use</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Locations</strong> and click <strong>Add Location</strong>.</li>
+              <li>Enter the city and country. Mark one location as the default.</li>
+              <li>Click <strong>Save</strong>.</li>
+              <li>Go to <strong>Holidays</strong> and add the public holidays for this location before any leaves or sprints use it.</li>
+              <li>Assign the location to team members via their <strong>Profile → Workforce</strong> tab.</li>
+            </ol>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Each city + country combination must be unique.</strong>
+              You cannot create two locations with the same city and country. If you have multiple offices in the same city, differentiate them — for example <em>London East</em> and <em>London West</em> — or group them under one location.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"A location with this city and country already exists"</strong> — check the list before creating a new entry. Small spelling differences (e.g. <em>United Kingdom</em> vs <em>UK</em>) can create unintended duplicates that split your holiday data across two locations.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Set up locations and their holidays <em>before</em> inviting members or recording any leaves. Members without a location will have no public holidays deducted, which inflates their apparent capacity in every sprint.
+            </div>
+          </section>
+
+          <!-- ── Holidays ── -->
+          <section id="holidays" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-calendar-heart" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Holidays</h2>
+                <p class="small rp-muted mb-0">Public holidays per location — automatically excluded from leave day counts and sprint capacity.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Holiday records tell Resource Planner which dates are non-working days for each location. They are factored out of leave calculations and sprint capacity automatically. Without them, capacity is overstated for every member in a location that observes public holidays.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Holiday</strong></td><td>Record a single public holiday for a specific location and date. All open sprints and leaves that cover this date are recalculated immediately.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the holiday name or date. Capacity is recalculated on save.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Removes the holiday. Open sprints and leaves that covered this date are recalculated — the day is restored to capacity.</td></tr>
+                <tr><td><strong>Import</strong></td><td>Bulk-load a full year's public holidays for one or more locations from a CSV or Excel file — by far the fastest way to set up holiday data.</td></tr>
+                <tr><td><strong>Export</strong></td><td>Download the holiday list for your currently filtered location and date range.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Recording a single holiday</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Holidays</strong> and click <strong>Add Holiday</strong>.</li>
+              <li>Select the location this holiday applies to.</li>
+              <li>Enter the date and the holiday name (e.g. <em>Christmas Day</em>).</li>
+              <li>Click <strong>Save</strong>. All open sprints and leave records covering this date are updated immediately.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Bulk importing a full year's holidays</h3>
+            <ol class="rp-step-list">
+              <li>Click <strong>Import</strong> on the Holidays page.</li>
+              <li>Download the <strong>sample template</strong>. It shows three columns: location, date, and holiday name.</li>
+              <li>Fill in every public holiday for each location. If the same bank holiday applies to multiple locations, add a row for each one.</li>
+              <li>Upload the file. Review the preview and fix any errors.</li>
+              <li>Click <strong>Confirm Import</strong>. Capacity figures across all affected sprints and leaves are recalculated immediately.</li>
+            </ol>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> One record per location per date.</strong>
+              Each location/date combination is unique. If the same bank holiday applies across multiple city locations, add it separately for each — one row per location in your import file.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"A holiday already exists for this location on this date"</strong> — check whether the holiday is already recorded before adding it again. Use the location filter to narrow the list to the specific location.<br><br>
+              <strong>"Sprint capacity does not change after adding a holiday"</strong> — the sprint is likely already closed. Closed sprints have frozen capacity. Only open sprints are recalculated when a holiday is added or removed.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> At the start of each financial year, use <strong>Import</strong> to load the full year's public holidays for every location in one go. This takes a few minutes and ensures accurate capacity from the first sprint onwards.
+            </div>
+          </section>
+
+          <!-- ── Tags ── -->
+          <section id="tags" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-tag" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Tags</h2>
+                <p class="small rp-muted mb-0">Shared labels that group projects across programme boundaries for portfolio filtering.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Tags are simple, reusable labels from a shared library that can be applied to any project. They let you slice the portfolio in ways that cut across programmes — for example, tagging all cloud-related projects with <em>cloud-migration</em> regardless of which programme owns them.</p>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Tags vs. Labels — what is the difference?</strong><br>
+              <strong>Tags</strong> come from a shared library and can be applied to any project. Use them for cross-portfolio categorisation (e.g. <em>regulatory</em>, <em>high-risk</em>, <em>cloud-migration</em>).<br>
+              <strong>Labels</strong> are project-specific short identifiers defined directly on a project. Use them for internal reference codes unique to that one project. They do not appear in a shared library.
+            </div>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Tag</strong></td><td>Create a new tag with a short, unique name (max 50 characters).</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the tag name. The change is reflected immediately on all projects that use it.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Removes the tag from the library and unlinks it from every project that used it. This cannot be undone.</td></tr>
+                <tr><td><strong>Import / Export</strong></td><td>Bulk-create tags from a spreadsheet, or download the tag library.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">How to use</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Tags</strong> and click <strong>Add Tag</strong>. Enter a concise, lowercase name and click <strong>Save</strong>.</li>
+              <li>Open a project and go to the <strong>Tags</strong> field. Search for and select one or more tags.</li>
+              <li>On the Projects list, use the <strong>Tags</strong> filter to find all projects with a given tag across all programmes.</li>
+            </ol>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Deleting a tag removes it from all projects.</strong>
+              When you delete a tag from the library, it is immediately unlinked from every project that used it — with no confirmation step beyond the initial delete prompt. If in doubt, check which projects use the tag before deleting.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Agree on a tag vocabulary with your team before creating the library. Having <em>cloud</em>, <em>cloud-migration</em>, and <em>Cloud Migration</em> as three separate tags fragments your portfolio view. Pick one name per concept and stick to it.
+            </div>
+          </section>
+
+          <!-- Footer -->
+          <div class="rp-docs-footer-nav">
+            <a href="/docs/" class="rp-docs-footer-link">
+              <i class="bi bi-arrow-left"></i> Back to Docs
+            </a>
+            <a href="/docs/setup/" class="rp-docs-footer-link">
+              Setup Guide <i class="bi bi-arrow-right"></i>
+            </a>
+            <a href="{{ cta_url }}" class="rp-docs-footer-link rp-docs-footer-link--primary">
+              {{ cta_footer_label }} <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

@@ -49,6 +49,8 @@
   color: var(--rp-text-subtle);
   flex-shrink: 0;
 }
-section-panel {
+section-panel,
+history-panel,
+history-items {
   display: block;
 }

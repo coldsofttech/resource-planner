@@ -32,6 +32,7 @@
 @import "./components/website.css";
 @import "./components/wizard.css";
 
+@import "./features/docs.css";
 @import "./features/home.css";
 @import "./features/login.css";
 @import "./features/project.css";

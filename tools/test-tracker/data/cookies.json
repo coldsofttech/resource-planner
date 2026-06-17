@@ -1,0 +1,496 @@
+{
+  "module": {
+    "slug": "cookies",
+    "name": "Cookie Consent",
+    "sort_order": 10,
+    "parent": { "slug": "platform", "name": "Platform", "sort_order": 90 }
+  },
+  "suites": [
+    {
+      "id": "TC-CK-100",
+      "name": "Banner Visibility",
+      "test_cases": [
+        {
+          "id": "TC-CK-101",
+          "severity": "P0",
+          "scenario": "Cookie banner appears on first visit when no consent cookie exists",
+          "steps": "Clear all cookies for the site. Navigate to any page (e.g. /login/). Observe the bottom of the screen.",
+          "expected": "A cookie consent banner is visible at the bottom of the page. It shows a title, body text, and at minimum Accept and Reject buttons."
+        },
+        {
+          "id": "TC-CK-102",
+          "severity": "P0",
+          "scenario": "Cookie banner is hidden after accepting",
+          "steps": "Clear cookies. Navigate to any page. Click Accept all. Observe the banner.",
+          "expected": "The banner immediately disappears without a page reload."
+        },
+        {
+          "id": "TC-CK-103",
+          "severity": "P0",
+          "scenario": "Cookie banner is hidden after rejecting",
+          "steps": "Clear cookies. Navigate to any page. Click Reject. Observe the banner.",
+          "expected": "The banner immediately disappears without a page reload."
+        },
+        {
+          "id": "TC-CK-104",
+          "severity": "P0",
+          "scenario": "Banner does not appear on subsequent page load after accepting",
+          "steps": "Clear cookies. Navigate to any page. Click Accept all. Navigate to another page (e.g. /dashboard/).",
+          "expected": "Cookie banner is NOT visible on the new page. Consent was persisted."
+        },
+        {
+          "id": "TC-CK-105",
+          "severity": "P0",
+          "scenario": "Banner does not appear on subsequent page load after rejecting",
+          "steps": "Clear cookies. Navigate to any page. Click Reject. Navigate to another page.",
+          "expected": "Cookie banner is NOT visible. Rejection was persisted."
+        },
+        {
+          "id": "TC-CK-106",
+          "severity": "P1",
+          "scenario": "Banner does not appear when rp-cookie-consent cookie already has value 'accepted'",
+          "steps": "Manually set the cookie rp-cookie-consent=accepted in DevTools > Application > Cookies. Navigate to any page.",
+          "expected": "Banner is not shown on page load."
+        },
+        {
+          "id": "TC-CK-107",
+          "severity": "P1",
+          "scenario": "Banner does not appear when rp-cookie-consent cookie already has value 'declined'",
+          "steps": "Manually set the cookie rp-cookie-consent=declined in DevTools > Application > Cookies. Navigate to any page.",
+          "expected": "Banner is not shown on page load."
+        },
+        {
+          "id": "TC-CK-108",
+          "severity": "P2",
+          "scenario": "Banner appears when rp-cookie-consent cookie exists but has an unexpected/unrecognised value",
+          "steps": "Manually set rp-cookie-consent=unknown in DevTools. Navigate to any page.",
+          "expected": "Banner appears (consent is not considered given for non-standard values)."
+        }
+      ]
+    },
+    {
+      "id": "TC-CK-200",
+      "name": "Accept Flow",
+      "test_cases": [
+        {
+          "id": "TC-CK-201",
+          "severity": "P0",
+          "scenario": "Clicking Accept sets rp-cookie-consent=accepted in the browser",
+          "steps": "Clear cookies. Navigate to any page. Click Accept all. Open DevTools > Application > Cookies.",
+          "expected": "The cookie rp-cookie-consent is present with value 'accepted'."
+        },
+        {
+          "id": "TC-CK-202",
+          "severity": "P1",
+          "scenario": "Accept cookie has correct path=/",
+          "steps": "Clear cookies. Accept consent. Inspect rp-cookie-consent in DevTools.",
+          "expected": "Cookie path is /. The cookie is sent on all pages of the application."
+        },
+        {
+          "id": "TC-CK-203",
+          "severity": "P1",
+          "scenario": "Accept cookie expires approximately 365 days from now",
+          "steps": "Clear cookies. Accept consent. Inspect rp-cookie-consent expiry date in DevTools.",
+          "expected": "Expiry is approximately 365 days from the current date (within ±1 day tolerance)."
+        },
+        {
+          "id": "TC-CK-204",
+          "severity": "P1",
+          "scenario": "Accept cookie has SameSite=Lax attribute",
+          "steps": "Clear cookies. Accept consent. Inspect rp-cookie-consent attributes in DevTools.",
+          "expected": "Cookie has SameSite=Lax attribute. It is not SameSite=None or SameSite=Strict."
+        },
+        {
+          "id": "TC-CK-205",
+          "severity": "P2",
+          "scenario": "Accept button label is customisable",
+          "steps": "Inspect the <cookie-banner> element in the DOM. Check the accept-label attribute if set.",
+          "expected": "The accept button shows the configured label. Falls back to 'Accept all' if not set."
+        }
+      ]
+    },
+    {
+      "id": "TC-CK-300",
+      "name": "Reject Flow",
+      "test_cases": [
+        {
+          "id": "TC-CK-301",
+          "severity": "P0",
+          "scenario": "Clicking Reject sets rp-cookie-consent=declined in the browser",
+          "steps": "Clear cookies. Navigate to any page. Click Reject. Open DevTools > Application > Cookies.",
+          "expected": "The cookie rp-cookie-consent is present with value 'declined'."
+        },
+        {
+          "id": "TC-CK-302",
+          "severity": "P1",
+          "scenario": "Reject cookie has correct path=/",
+          "steps": "Clear cookies. Click Reject. Inspect rp-cookie-consent in DevTools.",
+          "expected": "Cookie path is /."
+        },
+        {
+          "id": "TC-CK-303",
+          "severity": "P1",
+          "scenario": "Reject cookie expires approximately 365 days from now",
+          "steps": "Clear cookies. Click Reject. Inspect rp-cookie-consent expiry in DevTools.",
+          "expected": "Expiry is approximately 365 days from the current date."
+        },
+        {
+          "id": "TC-CK-304",
+          "severity": "P2",
+          "scenario": "Reject button label is customisable",
+          "steps": "Inspect the <cookie-banner> element. Check the reject-label attribute if set.",
+          "expected": "The reject button shows the configured label. Falls back to 'Reject' if not set."
+        }
+      ]
+    },
+    {
+      "id": "TC-CK-400",
+      "name": "More Info Button",
+      "test_cases": [
+        {
+          "id": "TC-CK-401",
+          "severity": "P2",
+          "scenario": "More Info button is not shown when more-info-label attribute is not set",
+          "steps": "View the cookie banner without a more-info-label attribute configured.",
+          "expected": "Only Accept and Reject buttons are visible. No third button is present."
+        },
+        {
+          "id": "TC-CK-402",
+          "severity": "P2",
+          "scenario": "More Info button appears and shows correct label when configured",
+          "steps": "Set more-info-label to a custom label. View the cookie banner.",
+          "expected": "A third button appears with the configured label, to the left of Reject and Accept."
+        },
+        {
+          "id": "TC-CK-403",
+          "severity": "P2",
+          "scenario": "Clicking More Info opens the configured URL in a new tab",
+          "steps": "Set more-info-href to a URL (e.g. /privacy/). Click the More Info button.",
+          "expected": "A new browser tab opens to the configured URL. The banner dismisses."
+        },
+        {
+          "id": "TC-CK-404",
+          "severity": "P2",
+          "scenario": "More Info link opens with noopener security attribute",
+          "steps": "Click More Info. Inspect the newly opened tab.",
+          "expected": "The tab is opened with rel=noopener (window.open is called with 'noopener'). No opener reference is available."
+        },
+        {
+          "id": "TC-CK-405",
+          "severity": "P3",
+          "scenario": "Clicking More Info dismisses the banner without setting consent",
+          "steps": "Click More Info. Close the new tab and return to the original page. Check DevTools cookies.",
+          "expected": "The banner is dismissed. The rp-cookie-consent cookie is NOT set (More Info does not imply acceptance or rejection)."
+        }
+      ]
+    },
+    {
+      "id": "TC-CK-500",
+      "name": "Content & Rendering",
+      "test_cases": [
+        {
+          "id": "TC-CK-501",
+          "severity": "P1",
+          "scenario": "Banner title renders correctly",
+          "steps": "View the cookie banner. Observe the heading.",
+          "expected": "The configured title is displayed. Falls back to 'Cookies' if title attribute is not set."
+        },
+        {
+          "id": "TC-CK-502",
+          "severity": "P1",
+          "scenario": "Banner body text renders correctly",
+          "steps": "View the cookie banner. Observe the description text below the title.",
+          "expected": "Body text is displayed as configured. If no body attribute is set, no description line is shown."
+        },
+        {
+          "id": "TC-CK-503",
+          "severity": "P2",
+          "scenario": "Default cookie icon renders when icon attribute is not set",
+          "steps": "View the cookie banner without an explicit icon attribute.",
+          "expected": "A cookie icon (bi-cookie) is displayed to the left of the title."
+        },
+        {
+          "id": "TC-CK-504",
+          "severity": "P2",
+          "scenario": "Custom icon renders when icon attribute is provided",
+          "steps": "Set a custom Bootstrap Icon class as the icon attribute. View the banner.",
+          "expected": "The specified icon is shown instead of the default cookie icon."
+        },
+        {
+          "id": "TC-CK-505",
+          "severity": "P2",
+          "scenario": "Banner is positioned fixed at the bottom of the viewport",
+          "steps": "View the cookie banner. Scroll down a long page.",
+          "expected": "The banner remains fixed at the bottom of the screen as the user scrolls."
+        },
+        {
+          "id": "TC-CK-506",
+          "severity": "P2",
+          "scenario": "Banner renders with elevated background and border matching app theme",
+          "steps": "View the cookie banner in both light and dark mode.",
+          "expected": "Banner uses the app's elevated background colour and strong border colour — visually consistent with the app theme in both modes."
+        }
+      ]
+    },
+    {
+      "id": "TC-CK-600",
+      "name": "Accessibility",
+      "test_cases": [
+        {
+          "id": "TC-CK-601",
+          "severity": "P1",
+          "scenario": "Banner buttons are reachable via keyboard Tab navigation",
+          "steps": "When the cookie banner is visible, use Tab to cycle through focusable elements on the page.",
+          "expected": "The Accept and Reject buttons (and More Info if present) receive keyboard focus and are highlighted with a visible focus ring."
+        },
+        {
+          "id": "TC-CK-602",
+          "severity": "P1",
+          "scenario": "Pressing Enter on the Accept button accepts consent",
+          "steps": "Tab to the Accept button. Press Enter.",
+          "expected": "Consent is accepted. Banner disappears. rp-cookie-consent=accepted is set."
+        },
+        {
+          "id": "TC-CK-603",
+          "severity": "P1",
+          "scenario": "Pressing Enter on the Reject button rejects consent",
+          "steps": "Tab to the Reject button. Press Enter.",
+          "expected": "Consent is declined. Banner disappears. rp-cookie-consent=declined is set."
+        },
+        {
+          "id": "TC-CK-604",
+          "severity": "P2",
+          "scenario": "Banner buttons have meaningful accessible labels",
+          "steps": "Open the banner. Inspect each button in an accessibility tree tool (e.g. browser a11y panel) or with a screen reader.",
+          "expected": "Buttons have clear accessible names ('Accept all', 'Reject', and the configured more-info label). No unlabelled buttons."
+        },
+        {
+          "id": "TC-CK-605",
+          "severity": "P2",
+          "scenario": "Banner is visible in high-contrast mode",
+          "steps": "Enable Windows High Contrast or forced-colors mode in the browser. View the cookie banner.",
+          "expected": "Banner remains visible and legible. Buttons are distinguishable."
+        }
+      ]
+    },
+    {
+      "id": "TC-CK-700",
+      "name": "Responsive Layout",
+      "test_cases": [
+        {
+          "id": "TC-CK-701",
+          "severity": "P1",
+          "scenario": "Banner layout on desktop (viewport ≥ 900px)",
+          "steps": "Set browser viewport width to ≥ 900px. View the cookie banner.",
+          "expected": "Banner is displayed as a horizontal strip fixed to the bottom-right. Width is approximately 520px. Icon, text, and buttons are in a single row."
+        },
+        {
+          "id": "TC-CK-702",
+          "severity": "P1",
+          "scenario": "Banner layout on mobile (viewport < 900px)",
+          "steps": "Set browser viewport width to < 900px (e.g. 375px). View the cookie banner.",
+          "expected": "Banner spans the full width of the viewport (minus margins). Content stacks vertically: icon and title on top, buttons full-width below."
+        },
+        {
+          "id": "TC-CK-703",
+          "severity": "P2",
+          "scenario": "Banner layout on tablet (viewport ≈ 768px)",
+          "steps": "Set browser viewport to 768px. View the cookie banner.",
+          "expected": "Banner is still in the stacked mobile layout (< 900px breakpoint). Buttons are full width."
+        },
+        {
+          "id": "TC-CK-704",
+          "severity": "P2",
+          "scenario": "Banner buttons are comfortably tappable on a touch screen",
+          "steps": "Open the banner on a mobile device or emulated touch screen. Attempt to tap each button.",
+          "expected": "Accept, Reject, and More Info buttons are large enough to tap easily without accidentally hitting adjacent buttons. No mis-taps at normal finger precision."
+        },
+        {
+          "id": "TC-CK-705",
+          "severity": "P2",
+          "scenario": "Banner does not obscure critical page content on mobile",
+          "steps": "On a 375px viewport, open a page with a form at the bottom (e.g. /login/). View with banner visible.",
+          "expected": "While the banner overlaps some content at the bottom, the primary CTA of the page (e.g. Sign In button) remains reachable by scrolling or the form is not fully hidden by the fixed banner."
+        },
+        {
+          "id": "TC-CK-706",
+          "severity": "P3",
+          "scenario": "Banner position is correct in landscape orientation on mobile",
+          "steps": "Open the banner on a mobile device in landscape orientation (e.g. 667px wide, 375px tall).",
+          "expected": "Banner is still fixed at the bottom. Layout fits within the viewport without overflow."
+        }
+      ]
+    },
+    {
+      "id": "TC-CK-800",
+      "name": "Non-Functional & Performance",
+      "test_cases": [
+        {
+          "id": "TC-CK-801",
+          "severity": "P1",
+          "scenario": "Cookie banner does not cause layout shift on page load",
+          "steps": "Clear cookies. Open any page with DevTools Performance or Lighthouse. Record a page load. Inspect Cumulative Layout Shift (CLS).",
+          "expected": "The banner appearing at the bottom does not shift existing page content (it is position:fixed). CLS contribution from the banner is zero or negligible."
+        },
+        {
+          "id": "TC-CK-802",
+          "severity": "P2",
+          "scenario": "Banner appears promptly on first-visit page load",
+          "steps": "Clear cookies. Navigate to any page. Observe how quickly the banner appears.",
+          "expected": "The banner is visible within the same render cycle as the page content. No noticeable delay."
+        },
+        {
+          "id": "TC-CK-803",
+          "severity": "P2",
+          "scenario": "Dismissing the banner (accept or reject) has no perceptible delay",
+          "steps": "Click Accept or Reject. Observe the time until the banner disappears.",
+          "expected": "The banner disappears immediately on click (no animation delay blocking the dismiss)."
+        },
+        {
+          "id": "TC-CK-804",
+          "severity": "P3",
+          "scenario": "Cookie consent logic does not block page interactivity",
+          "steps": "Clear cookies. Load a page. Immediately interact with page elements (e.g. click a link) while the banner is visible.",
+          "expected": "Page elements behind the banner (not covered by it) respond immediately. The banner does not cause JavaScript blocking that delays interactivity."
+        }
+      ]
+    },
+    {
+      "id": "TC-CK-900",
+      "name": "Security",
+      "test_cases": [
+        {
+          "id": "TC-CK-901",
+          "severity": "P1",
+          "scenario": "Cookie consent value is URL-encoded to prevent injection",
+          "steps": "Inspect the raw cookie header (DevTools > Network > any request > Request Headers > Cookie). Observe the rp-cookie-consent value.",
+          "expected": "Value is 'accepted' or 'declined' (URL-encoded if necessary). No arbitrary script or HTML characters are stored in the cookie."
+        },
+        {
+          "id": "TC-CK-902",
+          "severity": "P1",
+          "scenario": "Cookie does not carry the HttpOnly flag (it must be readable by JS)",
+          "steps": "Inspect rp-cookie-consent in DevTools > Application > Cookies.",
+          "expected": "HttpOnly is NOT set. The cookie must be readable by client-side JavaScript to determine banner visibility."
+        },
+        {
+          "id": "TC-CK-903",
+          "severity": "P1",
+          "scenario": "Cookie SameSite attribute is Lax (CSRF protection)",
+          "steps": "Inspect rp-cookie-consent attributes in DevTools.",
+          "expected": "SameSite attribute is 'Lax'. The cookie is not sent on cross-site requests that could be used for CSRF."
+        },
+        {
+          "id": "TC-CK-904",
+          "severity": "P2",
+          "scenario": "Consent cookie does not contain sensitive user data",
+          "steps": "Accept or reject consent. Inspect the rp-cookie-consent cookie value.",
+          "expected": "Value is exactly 'accepted' or 'declined'. No user identifier, session token, or PII is stored in this cookie."
+        },
+        {
+          "id": "TC-CK-905",
+          "severity": "P2",
+          "scenario": "CSRF token cookie (csrftoken) is unaffected by consent cookie operations",
+          "steps": "Clear cookies. Load any page. Accept consent. Inspect all cookies in DevTools.",
+          "expected": "The csrftoken cookie is present and unchanged. Accepting/rejecting consent does not overwrite or delete other application cookies."
+        },
+        {
+          "id": "TC-CK-906",
+          "severity": "P3",
+          "scenario": "Banner body text with HTML characters is safely rendered",
+          "steps": "If the body attribute can be set dynamically, attempt to set it to a value containing HTML characters (e.g. '<b>bold</b>'). View the banner.",
+          "expected": "HTML is rendered as escaped text, not as live markup. No script execution occurs."
+        }
+      ]
+    },
+    {
+      "id": "TC-CK-1000",
+      "name": "Integration & Cross-Page Behaviour",
+      "test_cases": [
+        {
+          "id": "TC-CK-1001",
+          "severity": "P1",
+          "scenario": "Consent decision persists across multiple pages without requiring a server round-trip",
+          "steps": "Clear cookies. Accept consent on /login/. Navigate to /dashboard/, then /projects/. Check banner visibility on each page.",
+          "expected": "Banner is not shown on any subsequent page. Consent is read from the cookie on each page load without any server call."
+        },
+        {
+          "id": "TC-CK-1002",
+          "severity": "P1",
+          "scenario": "Consent decision persists across a browser restart (cookie is not session-only)",
+          "steps": "Clear cookies. Accept consent. Close the browser completely. Reopen the browser and navigate to the app.",
+          "expected": "Cookie banner is not shown. The rp-cookie-consent cookie survived the browser restart because it has an explicit expiry date."
+        },
+        {
+          "id": "TC-CK-1003",
+          "severity": "P2",
+          "scenario": "Consent decision persists when the user logs in and out",
+          "steps": "Clear cookies. Accept consent without logging in. Log in. Log out. Navigate to the app again.",
+          "expected": "Banner is not shown after logout/re-login. The consent cookie is independent of the authentication session."
+        },
+        {
+          "id": "TC-CK-1004",
+          "severity": "P2",
+          "scenario": "Banner appears on the Setup Wizard page if no consent is given",
+          "steps": "Clear cookies and reset setup. Navigate to /setup/.",
+          "expected": "Cookie banner appears at the bottom of the setup wizard page."
+        },
+        {
+          "id": "TC-CK-1005",
+          "severity": "P2",
+          "scenario": "Banner appears on the login page if no consent is given",
+          "steps": "Clear cookies. Navigate to /login/.",
+          "expected": "Cookie banner appears at the bottom of the login page."
+        },
+        {
+          "id": "TC-CK-1006",
+          "severity": "P2",
+          "scenario": "Deleting the consent cookie manually causes the banner to reappear on the next page load",
+          "steps": "Accept consent. Delete rp-cookie-consent from DevTools > Application > Cookies. Reload the page.",
+          "expected": "Cookie banner appears again — the app treats the missing cookie as a first visit."
+        },
+        {
+          "id": "TC-CK-1007",
+          "severity": "P3",
+          "scenario": "Banner behaves correctly in a private/incognito browser window",
+          "steps": "Open a new private/incognito window. Navigate to any page.",
+          "expected": "Banner appears (no prior consent in a fresh private session). Accept/Reject works. Decision is remembered within the same private session but not beyond it."
+        },
+        {
+          "id": "TC-CK-1008",
+          "severity": "P3",
+          "scenario": "Consent in one browser tab is not immediately reflected in another tab without reload",
+          "steps": "Open the app in two tabs side by side. Accept consent in tab 1 without reloading tab 2.",
+          "expected": "Tab 2 still shows the banner (it already rendered). After reloading tab 2 the banner is gone."
+        }
+      ]
+    },
+    {
+      "id": "TC-CK-1100",
+      "name": "Dark Mode",
+      "test_cases": [
+        {
+          "id": "TC-CK-1101",
+          "severity": "P2",
+          "scenario": "Cookie banner renders correctly in dark mode",
+          "steps": "Toggle the app to dark mode using the theme toggle. Clear cookies and view any page.",
+          "expected": "Banner background, text, and buttons use dark-mode-appropriate colours from the app theme. No white-on-white or black-on-black text."
+        },
+        {
+          "id": "TC-CK-1102",
+          "severity": "P2",
+          "scenario": "Cookie banner renders correctly in light mode",
+          "steps": "Toggle the app to light mode. Clear cookies and view any page.",
+          "expected": "Banner renders cleanly in light mode. Background and border contrast is sufficient."
+        },
+        {
+          "id": "TC-CK-1103",
+          "severity": "P3",
+          "scenario": "Switching theme while banner is visible updates banner appearance",
+          "steps": "Clear cookies. View any page so banner appears. Toggle theme from light to dark (or vice versa) while banner is still open.",
+          "expected": "Banner appearance updates to reflect the new theme. No visual glitch or stale colours remain."
+        }
+      ]
+    }
+  ]
+}

@@ -65,9 +65,9 @@ Group of toggle switch inputs rendered from declarative `<option-field>` childre
 
 ## `<theme-toggle>`
 
-Dark / light mode toggle. No public attributes. Persists the user's preference in `localStorage` under the `rp-theme` key and applies a `dark` class to `<html>`.
+Three-way theme toggle (light → dark → system). No public attributes. Persists the user's preference via `setTheme()` in `localStorage` and applies `data-theme="light|dark"` to `<html>`. The **system** mode follows the OS `prefers-color-scheme` media query and responds to OS changes dynamically.
 
-Fires a `rp-theme-changed` event on `window` (not `CustomEvent` — plain `Event`) when the theme changes, so other components can sync.
+Multiple instances on the same page stay in sync via the `rp-theme-changed` window event.
 
 Pre-mounted in `templates/base.html` as `<rp-theme-toggle>`. Do not add it to individual page templates.
 
@@ -76,11 +76,17 @@ Pre-mounted in `templates/base.html` as `<rp-theme-toggle>`. Do not add it to in
 <rp-theme-toggle></rp-theme-toggle>
 ```
 
+**Events (dispatched on `window`):**
+
+| Event              | Detail                         | Description                  |
+| ------------------ | ------------------------------ | ---------------------------- |
+| `rp-theme-changed` | `{ theme: "light" \| "dark" }` | Fired when the theme changes |
+
 **Listen for theme changes:**
 
 ```js
-window.addEventListener("rp-theme-changed", () => {
-  const isDark = document.documentElement.classList.contains("dark");
+window.addEventListener("rp-theme-changed", (e) => {
+  const isDark = e.detail.theme === "dark";
   // respond to theme change
 });
 ```

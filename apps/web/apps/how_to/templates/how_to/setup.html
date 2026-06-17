@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Setup Guide — Resource Planner</title>
+    <script src="{% static 'js/dist/theme-init.min.js' %}"></script>
+    <script type="module" src="{% static 'js/dist/components.min.js' %}"></script>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+          crossorigin="anonymous" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="{% static 'css/dist/styles.min.css' %}" />
+    <script type="module" src="{% static 'js/modules/how-to/setup.js' %}"></script>
+  </head>
+  <body>
+    <div class="rp-docs-page">
+
+      <!-- Top bar -->
+      <div class="rp-docs-bar">
+        <div class="rp-logo" data-app-logo>RP</div>
+        <div>
+          <span class="rp-auth-bar-name" id="rp-app-name">Resource Planner</span>
+          <span class="rp-docs-bar-crumb">
+            / <a href="/docs/">Docs</a> / Setup Guide
+          </span>
+        </div>
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <theme-toggle></theme-toggle>
+          <a href="{{ cta_url }}" class="rp-docs-bar-btn">
+            {{ cta_label }}{% if cta_icon %} <i class="bi {{ cta_icon }}"></i>{% endif %}
+          </a>
+        </div>
+      </div>
+
+      <div class="rp-docs-layout">
+
+        <!-- Sidebar -->
+        <nav class="rp-docs-sidebar" aria-label="Setup guide navigation">
+          <div class="rp-docs-sidebar-header">
+            <icon-field icon="bi-gear-wide-connected" color="accent"></icon-field>
+            <span class="fw-semibold" style="font-size:0.9rem;">Setup Guide</span>
+          </div>
+
+          <div class="rp-docs-nav-section">Overview</div>
+          <a class="rp-docs-nav-link" href="#overview">
+            <i class="bi bi-info-circle"></i> What setup does
+          </a>
+          <a class="rp-docs-nav-link" href="#before-you-begin">
+            <i class="bi bi-check2-all"></i> Before you begin
+          </a>
+
+          <div class="rp-docs-nav-section">Steps</div>
+          <a class="rp-docs-nav-link" href="#step-admin">
+            <i class="bi bi-person-badge"></i> 1. Admin account
+          </a>
+          <a class="rp-docs-nav-link" href="#step-app">
+            <i class="bi bi-app"></i> 2. App name &amp; URL
+          </a>
+          <a class="rp-docs-nav-link" href="#step-infra">
+            <i class="bi bi-server"></i> 3. Secret storage
+          </a>
+          <a class="rp-docs-nav-link" href="#step-database">
+            <i class="bi bi-database"></i> 4. Database
+          </a>
+          <a class="rp-docs-nav-link" href="#step-auth">
+            <i class="bi bi-shield-lock"></i> 5. Sign-in method
+          </a>
+          <a class="rp-docs-nav-link" href="#step-storage">
+            <i class="bi bi-hdd"></i> 6. File storage
+          </a>
+          <a class="rp-docs-nav-link" href="#step-email">
+            <i class="bi bi-envelope"></i> 7. Email
+          </a>
+          <a class="rp-docs-nav-link" href="#step-logging">
+            <i class="bi bi-journal-text"></i> 8. Logging
+          </a>
+
+          <div class="rp-docs-nav-section">Help</div>
+          <a class="rp-docs-nav-link" href="#troubleshooting">
+            <i class="bi bi-bug"></i> Troubleshooting
+          </a>
+        </nav>
+
+        <!-- Main content -->
+        <main class="rp-docs-main">
+
+          <!-- ── Overview ── -->
+          <section id="overview" class="mb-5">
+            <h1 class="rp-h1 mb-2">Setting Up Resource Planner</h1>
+            <p class="rp-muted mb-4">
+              The setup wizard runs once when you first deploy Resource Planner. It walks
+              you through eight steps — creating your admin account, naming the app,
+              choosing how secrets are stored, connecting your database, configuring
+              sign-in, setting up file storage, connecting email, and enabling logging.
+              Once complete, the wizard is locked and all further changes are made through
+              the Settings pages inside the app.
+            </p>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill text-warning"></i> One-time process.</strong>
+              The wizard can only be completed once. Navigating away mid-wizard is safe —
+              it resumes where you left off — but once you click <strong>Finish</strong> the
+              wizard is permanently locked. Double-check all values before submitting.
+            </div>
+
+            <h2 class="rp-h2 mt-4 mb-2">How setup works</h2>
+            <p class="small rp-muted mb-3">
+              Setup runs in two phases. Understanding the difference matters if something
+              goes wrong and you need to retry.
+            </p>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="rp-card p-3">
+                  <div class="fw-bold mb-1">
+                    <span class="rp-phase-badge" style="margin-left:0; margin-right:0.5rem;">Phase 1</span>
+                    Environment
+                  </div>
+                  <p class="small rp-muted mb-0">
+                    Writes your infrastructure, database, and logging choices to a
+                    configuration file on the server. These changes take effect
+                    immediately and are <strong>not rolled back</strong> if a later step
+                    fails.
+                  </p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="rp-card p-3">
+                  <div class="fw-bold mb-1">
+                    <span class="rp-phase-badge" style="margin-left:0; margin-right:0.5rem;">Phase 2</span>
+                    Database
+                  </div>
+                  <p class="small rp-muted mb-0">
+                    Creates your admin account and saves all other settings in a single
+                    database transaction. If any step in Phase 2 fails, everything from
+                    Phase 2 is rolled back automatically — you can fix the issue and retry.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ── Before you begin ── -->
+          <section id="before-you-begin" class="mb-5">
+            <h2 class="rp-h2 mb-3">Before you begin</h2>
+            <ul class="rp-prereq-list ps-3">
+              <li>
+                Resource Planner is running and reachable in your browser —
+                you should be able to open the setup wizard.
+              </li>
+              <li>
+                For <strong>PostgreSQL</strong>: the target database already exists and
+                you have a database username and password with permission to create
+                tables.
+              </li>
+              <li>
+                For <strong>AWS</strong>: an IAM role or access key with permission to
+                create and update secrets in AWS Secrets Manager is available.
+              </li>
+              <li>
+                For <strong>OAuth sign-in</strong> (Google, Okta, Azure AD, etc.): your
+                identity provider's client ID, client secret, and endpoint URLs are ready.
+              </li>
+              <li>
+                For <strong>SAML sign-in</strong>: your IdP's entity ID, SSO URL, and
+                X.509 certificate are ready, and the IdP can reach your server's network.
+              </li>
+              <li>
+                For <strong>SMTP email</strong>: your mail server hostname, port, encryption
+                type, and login credentials (if required) are available.
+              </li>
+            </ul>
+          </section>
+
+          <!-- ── Step 1: Admin account ── -->
+          <section id="step-admin" class="mb-2">
+            <div class="rp-step-card">
+              <div class="rp-step-header">
+                <div class="rp-step-num">1</div>
+                <div>
+                  <div class="fw-bold">Create your admin account</div>
+                  <div class="small rp-muted">
+                    The primary management account with full access to all features and settings.
+                  </div>
+                </div>
+                <span class="rp-phase-badge ms-auto">Phase 2</span>
+              </div>
+              <div class="rp-step-body">
+                <p class="small rp-muted">
+                  Enter your first name, last name, email address, and a strong password.
+                  Your email address is used to sign in and must be valid. This account
+                  cannot be deleted and is the only account until you invite other users.
+                </p>
+
+                <p class="small fw-bold mb-1">Your password must:</p>
+                <ul class="small rp-muted ps-3 mb-3">
+                  <li>Be at least 12 characters long.</li>
+                  <li>Include at least one uppercase letter (A–Z).</li>
+                  <li>Include at least one lowercase letter (a–z).</li>
+                  <li>Include at least one number (0–9).</li>
+                  <li>Include at least one symbol — for example <code class="rp-code">!</code>, <code class="rp-code">@</code>, <code class="rp-code">#</code>, or <code class="rp-code">$</code>.</li>
+                </ul>
+
+                <div class="rp-tip-block">
+                  <strong><i class="bi bi-lightbulb-fill"></i> Save your credentials now.</strong>
+                  Store this email and password in a password manager before clicking
+                  Next. Password resets by email are only available after email is
+                  configured in Step 7 — there is no recovery option before then.
+                </div>
+
+                <div class="rp-error-block">
+                  <div class="rp-error-label"><i class="bi bi-x-circle-fill"></i> Common issues</div>
+                  <p class="mb-1"><strong>"Password must be at least 12 characters"</strong> — Your password is too short. Try a passphrase with symbols.</p>
+                  <p class="mb-1"><strong>"Password must contain at least one symbol"</strong> — Add a character such as <code class="rp-code">!</code>, <code class="rp-code">@</code>, or <code class="rp-code">#</code>.</p>
+                  <p class="mb-0"><strong>"Email address already exists"</strong> — The database already has a user record. A previous setup attempt may have partially run. Check whether an admin account was created before retrying.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ── Step 2: App name & URL ── -->
+          <section id="step-app" class="mb-2">
+            <div class="rp-step-card">
+              <div class="rp-step-header">
+                <div class="rp-step-num">2</div>
+                <div>
+                  <div class="fw-bold">Name your instance</div>
+                  <div class="small rp-muted">
+                    The public-facing name and URL for your Resource Planner deployment.
+                  </div>
+                </div>
+                <span class="rp-phase-badge ms-auto">Phase 2</span>
+              </div>
+              <div class="rp-step-body">
+                <p class="small rp-muted mb-3">
+                  Give your instance a name and the web address where users will access it.
+                </p>
+
+                <table class="rp-field-table">
+                  <thead>
+                    <tr><th>What to enter</th><th>Details</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>App name</strong></td>
+                      <td>
+                        Shown in the browser tab, notification emails, and the top navigation
+                        bar. Examples: <code class="rp-code">Resource Planner</code> or
+                        <code class="rp-code">Acme Delivery Hub</code>.
+                        Keep it short for best email compatibility.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>App URL</strong></td>
+                      <td>
+                        The full web address users navigate to — must start with
+                        <code class="rp-code">https://</code> or <code class="rp-code">http://</code>.
+                        Example: <code class="rp-code">https://rp.acme.com</code>.
+                        Used in password-reset links and system notifications.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="rp-tip-block">
+                  <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong>
+                  The app URL is added to the server's allowed-host list automatically.
+                  If you move to a different domain later, update this in Settings and
+                  restart the server.
+                </div>
+
+                <div class="rp-error-block">
+                  <div class="rp-error-label"><i class="bi bi-x-circle-fill"></i> Common issues</div>
+                  <p class="mb-1"><strong>"Enter a valid URL"</strong> — Make sure the address starts with <code class="rp-code">https://</code>. Writing <code class="rp-code">rp.acme.com</code> without the scheme will be rejected.</p>
+                  <p class="mb-0"><strong>Name appears cut off in emails</strong> — Keep the app name under 30 characters for best compatibility with email clients.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ── Step 3: Infrastructure ── -->
+          <section id="step-infra" class="mb-2">
+            <div class="rp-step-card">
+              <div class="rp-step-header">
+                <div class="rp-step-num">3</div>
+                <div>
+                  <div class="fw-bold">Choose where secrets are stored</div>
+                  <div class="small rp-muted">
+                    Controls how Resource Planner encrypts and stores sensitive credentials.
+                  </div>
+                </div>
+                <span class="rp-phase-badge ms-auto">Phase 1</span>
+              </div>
+              <div class="rp-step-body">
+                <p class="small rp-muted">
+                  Resource Planner encrypts sensitive values — database passwords, OAuth
+                  credentials, and certificates. Choose where those encrypted secrets live.
+                </p>
+
+                <h4 class="rp-docs-subheading">Local deployment</h4>
+                <p class="small rp-muted mb-2">
+                  Best for single-server and Docker deployments. Secrets are encrypted
+                  using a key stored on your server.
+                </p>
+                <ul class="small rp-muted ps-3 mb-3">
+                  <li>
+                    The wizard generates a secret encryption key for you — click
+                    <strong>Generate key</strong> to create one, or paste your own.
+                  </li>
+                  <li>
+                    <strong>Copy this key immediately</strong> and save it somewhere
+                    secure (a secrets vault, password manager, or printed copy in a
+                    safe location). If it is lost, all encrypted data becomes
+                    unrecoverable.
+                  </li>
+                </ul>
+
+                <h4 class="rp-docs-subheading">AWS deployment</h4>
+                <p class="small rp-muted mb-2">
+                  Choose this if you are running on AWS and want secrets managed centrally
+                  in AWS Secrets Manager.
+                </p>
+                <table class="rp-field-table">
+                  <thead>
+                    <tr><th>What to enter</th><th>Details</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>AWS region</strong></td>
+                      <td>The region your Secrets Manager is in, e.g. <code class="rp-code">eu-west-1</code> or <code class="rp-code">us-east-1</code>.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Secrets path prefix</strong></td>
+                      <td>A path prefix for all secrets created by Resource Planner, e.g. <code class="rp-code">/resourceplanner/prod</code>.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Authentication</strong></td>
+                      <td>
+                        <strong>IAM role</strong> — uses the role attached to your EC2 or ECS instance automatically.
+                        <strong>Access key</strong> — enter an AWS access key ID and secret access key manually.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="rp-warn-block">
+                  <strong><i class="bi bi-exclamation-triangle-fill"></i> Back up your encryption key.</strong>
+                  For local deployments: once setup completes, copy the encryption key
+                  from your server's configuration file and store it somewhere safe
+                  outside the server. If the server is lost without a backup of this key,
+                  all encrypted credentials are permanently unrecoverable.
+                </div>
+
+                <div class="rp-error-block">
+                  <div class="rp-error-label"><i class="bi bi-x-circle-fill"></i> Common issues</div>
+                  <p class="mb-1"><strong>"Invalid AWS region"</strong> — The region must follow the format <code class="rp-code">xx-xxxx-n</code>, e.g. <code class="rp-code">eu-west-1</code>. A common mistake is <code class="rp-code">eu-west1</code> (missing hyphen before the digit).</p>
+                  <p class="mb-1"><strong>"Invalid AWS Access Key ID"</strong> — The key must be exactly 20 uppercase characters. Check that you have not accidentally trimmed or lowercased it.</p>
+                  <p class="mb-0"><strong>Phase 2 fails after Phase 1 succeeded</strong> — Phase 1 settings (including the encryption key) have already been written. If you retry, enter the <em>same</em> encryption key again — entering a different key will make previously encrypted data unreadable.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ── Step 4: Database ── -->
+          <section id="step-database" class="mb-2">
+            <div class="rp-step-card">
+              <div class="rp-step-header">
+                <div class="rp-step-num">4</div>
+                <div>
+                  <div class="fw-bold">Connect your database</div>
+                  <div class="small rp-muted">
+                    Choose your database engine and enter connection details.
+                  </div>
+                </div>
+                <span class="rp-phase-badge ms-auto">Phase 1</span>
+              </div>
+              <div class="rp-step-body">
+                <p class="small rp-muted">
+                  The wizard tests the connection before writing anything. If the test
+                  passes, it saves the credentials, switches the live connection, and
+                  runs the database migrations automatically.
+                </p>
+
+                <h4 class="rp-docs-subheading">SQLite — for testing only</h4>
+                <p class="small rp-muted mb-3">
+                  No connection details needed. Resource Planner uses a file on the server.
+                  <strong>Do not use SQLite in production</strong> — it does not support
+                  concurrent access or proper backups.
+                </p>
+
+                <h4 class="rp-docs-subheading">PostgreSQL — recommended for production</h4>
+                <table class="rp-field-table">
+                  <thead>
+                    <tr><th>What to enter</th><th>Details</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Host</strong></td>
+                      <td>The hostname or IP address of your PostgreSQL server, e.g. <code class="rp-code">db.acme.com</code> or <code class="rp-code">10.0.0.5</code>.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Port</strong></td>
+                      <td>Default is <code class="rp-code">5432</code>. Change only if your database runs on a non-standard port.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Database name</strong></td>
+                      <td>The name of the database to use. It must already exist on the server.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Username</strong></td>
+                      <td>A database user with permission to create tables and run migrations.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Password</strong></td>
+                      <td>The database user's password.</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="rp-tip-block">
+                  <strong><i class="bi bi-lightbulb-fill"></i> Test the connection first.</strong>
+                  Click <strong>Test connection</strong> before proceeding. This checks your
+                  details with a short timeout and confirms connectivity before any changes
+                  are written.
+                </div>
+
+                <div class="rp-error-block">
+                  <div class="rp-error-label"><i class="bi bi-x-circle-fill"></i> Common issues</div>
+                  <p class="mb-1"><strong>"Connection refused"</strong> — The database server is not running, or the host or port is incorrect. Verify the server is accessible from the machine running Resource Planner.</p>
+                  <p class="mb-1"><strong>"Authentication failed"</strong> — The username or password is wrong. Double-check against your database server's user list.</p>
+                  <p class="mb-1"><strong>"Database does not exist"</strong> — Create the target database on your PostgreSQL server first, then retry.</p>
+                  <p class="mb-1"><strong>"Connection timed out"</strong> — A firewall or security group rule is blocking the connection. Check your network rules between the app server and the database server.</p>
+                  <p class="mb-0"><strong>Migrations fail part-way through</strong> — Phase 1 settings were saved but migrations did not complete. Connect to your database directly and run migrations manually, then re-submit the wizard.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ── Step 5: Authentication ── -->
+          <section id="step-auth" class="mb-2">
+            <div class="rp-step-card">
+              <div class="rp-step-header">
+                <div class="rp-step-num">5</div>
+                <div>
+                  <div class="fw-bold">Choose how users sign in</div>
+                  <div class="small rp-muted">
+                    Configure the sign-in method for your organisation — Classic, OAuth, or SAML.
+                  </div>
+                </div>
+                <span class="rp-phase-badge ms-auto">Phase 2</span>
+              </div>
+              <div class="rp-step-body">
+                <p class="small rp-muted">
+                  Only one sign-in method is active at a time. You can change this later in
+                  Settings. The wizard runs a connection test for OAuth and SAML to confirm
+                  the provider is reachable before saving anything.
+                </p>
+
+                <!-- Classic -->
+                <h4 class="rp-docs-subheading">Classic — email and password</h4>
+                <p class="small rp-muted mb-2">
+                  Users sign in with their email address and password. No external provider
+                  is needed.
+                </p>
+                <ul class="small rp-muted ps-3 mb-3">
+                  <li>
+                    <strong>Allow self-registration</strong> — if enabled, anyone can
+                    create their own account at the sign-up page. If disabled, only
+                    admins can create accounts.
+                  </li>
+                </ul>
+
+                <!-- OAuth -->
+                <h4 class="rp-docs-subheading">OAuth — sign in with Google, Okta, Azure AD, or similar</h4>
+                <p class="small rp-muted mb-2">
+                  Users sign in via an external identity provider. You will need the
+                  following from your provider's developer console.
+                </p>
+                <table class="rp-field-table">
+                  <thead>
+                    <tr><th>What to enter</th><th>Where to find it</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Provider name</strong></td>
+                      <td>A label shown on the sign-in button, e.g. <code class="rp-code">Google</code> or <code class="rp-code">Okta</code>.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Client ID</strong></td>
+                      <td>The application's client identifier from your OAuth provider.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Client secret</strong></td>
+                      <td>The secret key paired with the client ID. Keep this confidential.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Authorisation endpoint</strong></td>
+                      <td>The provider's URL that starts the sign-in flow. Found in the provider's documentation or OIDC discovery document.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Token endpoint</strong></td>
+                      <td>The provider's URL for exchanging authorisation codes for tokens.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>User info endpoint</strong></td>
+                      <td>The URL Resource Planner calls to fetch the signed-in user's profile.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Scopes</strong></td>
+                      <td>Permissions requested from the provider. At minimum: <code class="rp-code">openid email profile</code>.</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="rp-info-block small">
+                  <strong><i class="bi bi-info-circle-fill"></i> How the connection test works:</strong>
+                  The wizard pings your token endpoint with a dummy request. A valid
+                  configuration returns an "invalid code" error — that is expected and
+                  means the provider is reachable and your credentials are accepted.
+                  An "invalid client" error means the client ID or secret is wrong.
+                </div>
+
+                <!-- SAML -->
+                <h4 class="rp-docs-subheading">SAML — enterprise single sign-on</h4>
+                <p class="small rp-muted mb-2">
+                  Users sign in via your enterprise identity provider (e.g. Okta, Azure AD,
+                  ADFS). Collect the following from your IdP's admin console or metadata file.
+                </p>
+                <table class="rp-field-table">
+                  <thead>
+                    <tr><th>What to enter</th><th>Where to find it</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Provider name</strong></td>
+                      <td>A label shown on the sign-in button, e.g. <code class="rp-code">Okta</code>.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>IdP Entity ID</strong></td>
+                      <td>Your identity provider's unique identifier, found in its SAML metadata. Usually a URL.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>IdP SSO URL</strong></td>
+                      <td>The URL Resource Planner redirects users to when they click Sign In.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>IdP Certificate</strong></td>
+                      <td>
+                        The X.509 certificate used to verify the IdP's SAML responses.
+                        Paste only the certificate body — remove the
+                        <code class="rp-code">-----BEGIN CERTIFICATE-----</code> and
+                        <code class="rp-code">-----END CERTIFICATE-----</code> lines, and
+                        remove any line breaks so it is one continuous string.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>Assertion Consumer Service URL</strong></td>
+                      <td>
+                        The URL your IdP will POST the SAML response to after a successful
+                        sign-in. Set this to your app URL followed by
+                        <code class="rp-code">/saml/acs/</code>, e.g.
+                        <code class="rp-code">https://rp.acme.com/saml/acs/</code>.
+                        Register this URL in your IdP application settings.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="rp-error-block">
+                  <div class="rp-error-label"><i class="bi bi-x-circle-fill"></i> Common issues — OAuth</div>
+                  <p class="mb-1"><strong>"Client credentials rejected"</strong> — The client ID or secret does not match what your provider has. Check for extra spaces or truncation when copying.</p>
+                  <p class="mb-0"><strong>"Cannot reach endpoint"</strong> — The server running Resource Planner cannot make outbound HTTPS requests to your provider. Check firewall rules and DNS resolution.</p>
+                </div>
+
+                <div class="rp-error-block mt-2">
+                  <div class="rp-error-label"><i class="bi bi-x-circle-fill"></i> Common issues — SAML</div>
+                  <p class="mb-1"><strong>"Do not include the BEGIN CERTIFICATE header"</strong> — Strip the PEM header and footer lines, and remove all line breaks from the certificate body.</p>
+                  <p class="mb-1"><strong>"Certificate body contains invalid characters"</strong> — The certificate may have picked up whitespace or newlines when copied. Paste it into a plain text editor, remove all whitespace, then re-paste.</p>
+                  <p class="mb-0"><strong>"Certificate expired"</strong> — Obtain an updated certificate from your IdP and re-enter it.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ── Step 6: Storage ── -->
+          <section id="step-storage" class="mb-2">
+            <div class="rp-step-card">
+              <div class="rp-step-header">
+                <div class="rp-step-num">6</div>
+                <div>
+                  <div class="fw-bold">Configure file storage</div>
+                  <div class="small rp-muted">
+                    Choose where uploaded files — profile pictures and attachments — are stored.
+                  </div>
+                </div>
+                <span class="rp-phase-badge ms-auto">Phase 2</span>
+              </div>
+              <div class="rp-step-body">
+                <table class="rp-field-table">
+                  <thead>
+                    <tr><th>Option</th><th>When to use</th><th>What to enter</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Database</strong></td>
+                      <td>Simple deployments with few file uploads. Not recommended at scale.</td>
+                      <td>Nothing — files are stored directly in the database.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Filesystem</strong></td>
+                      <td>Single-server deployments with a dedicated media folder.</td>
+                      <td>An absolute folder path on your server, e.g. <code class="rp-code">/var/resourceplanner/media</code>. The folder will be created if it does not exist.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Amazon S3</strong></td>
+                      <td>AWS deployments or any setup requiring scalable object storage.</td>
+                      <td>Your S3 bucket ARN, e.g. <code class="rp-code">arn:aws:s3:::my-rp-files</code>.</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="rp-tip-block">
+                  <strong><i class="bi bi-lightbulb-fill"></i> S3 permissions needed:</strong>
+                  The IAM role or user must have read, write, and delete permission on the bucket
+                  (<code class="rp-code">s3:GetObject</code>, <code class="rp-code">s3:PutObject</code>,
+                  <code class="rp-code">s3:DeleteObject</code>).
+                </div>
+
+                <div class="rp-error-block">
+                  <div class="rp-error-label"><i class="bi bi-x-circle-fill"></i> Common issues</div>
+                  <p class="mb-1"><strong>"Enter a valid S3 bucket ARN"</strong> — The ARN must start with <code class="rp-code">arn:aws:s3:::</code> followed by a valid bucket name (letters, digits, hyphens, dots).</p>
+                  <p class="mb-0"><strong>Filesystem path error</strong> — If the parent directory is not writable by the process running Resource Planner, the setup transaction will roll back. Create the directory and set the correct permissions, then retry.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ── Step 7: Email ── -->
+          <section id="step-email" class="mb-2">
+            <div class="rp-step-card">
+              <div class="rp-step-header">
+                <div class="rp-step-num">7</div>
+                <div>
+                  <div class="fw-bold">Connect email</div>
+                  <div class="small rp-muted">
+                    Configure how Resource Planner sends password-reset and notification emails.
+                  </div>
+                </div>
+                <span class="rp-phase-badge ms-auto">Phase 2</span>
+              </div>
+              <div class="rp-step-body">
+                <h4 class="rp-docs-subheading">Console — for development and testing</h4>
+                <p class="small rp-muted mb-3">
+                  Emails are printed to the server log instead of delivered. Use this when
+                  setting up a development or staging environment. Enter a From address and
+                  display name — they appear in the log output.
+                </p>
+
+                <h4 class="rp-docs-subheading">SMTP — for production</h4>
+                <p class="small rp-muted mb-2">
+                  Real email delivery. Enter the From address users will see in their inbox,
+                  then your SMTP server details.
+                </p>
+
+                <table class="rp-field-table">
+                  <thead>
+                    <tr><th>What to enter</th><th>Details</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>From name</strong></td>
+                      <td>Appears as the sender name in email clients, e.g. <code class="rp-code">Resource Planner</code>.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>From address</strong></td>
+                      <td>The email address outgoing emails are sent from, e.g. <code class="rp-code">noreply@acme.com</code>.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>SMTP server</strong></td>
+                      <td>Your mail server's hostname, e.g. <code class="rp-code">smtp.sendgrid.net</code>.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Port</strong></td>
+                      <td><code class="rp-code">587</code> with STARTTLS (recommended), <code class="rp-code">465</code> with SSL, or <code class="rp-code">25</code> without encryption.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Encryption</strong></td>
+                      <td>Match this to your port: STARTTLS for 587, SSL for 465, None for 25.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Authentication</strong></td>
+                      <td>Enable if your server requires a username and password to send mail.</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <p class="small rp-muted mt-2">
+                  A test email is sent to your From address during setup. If it does not
+                  arrive within a few minutes, check your spam folder before assuming the
+                  configuration is wrong.
+                </p>
+
+                <div class="rp-tip-block">
+                  <strong><i class="bi bi-lightbulb-fill"></i> Common SMTP providers:</strong>
+                  <table class="rp-field-table mt-2">
+                    <thead>
+                      <tr><th>Provider</th><th>Host</th><th>Port</th><th>Encryption</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>SendGrid</td><td><code class="rp-code">smtp.sendgrid.net</code></td><td>587</td><td>STARTTLS</td></tr>
+                      <tr><td>Mailgun</td><td><code class="rp-code">smtp.mailgun.org</code></td><td>587</td><td>STARTTLS</td></tr>
+                      <tr><td>AWS SES</td><td><code class="rp-code">email-smtp.&lt;region&gt;.amazonaws.com</code></td><td>587</td><td>STARTTLS</td></tr>
+                      <tr><td>Gmail</td><td><code class="rp-code">smtp.gmail.com</code></td><td>587</td><td>STARTTLS — requires an App Password</td></tr>
+                      <tr><td>Microsoft 365</td><td><code class="rp-code">smtp.office365.com</code></td><td>587</td><td>STARTTLS</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="rp-error-block">
+                  <div class="rp-error-label"><i class="bi bi-x-circle-fill"></i> Common issues</div>
+                  <p class="mb-1"><strong>"Connection refused" or "Network unreachable"</strong> — The SMTP server or port is wrong, or a firewall is blocking outbound connections on that port. Some cloud providers block port 25 by default — use port 587.</p>
+                  <p class="mb-1"><strong>"Authentication credentials invalid"</strong> — Wrong username or password. For Gmail, use an App Password — your regular Gmail password will not work.</p>
+                  <p class="mb-1"><strong>"SSL: WRONG_VERSION_NUMBER"</strong> — Encryption type and port are mismatched. Port 587 needs STARTTLS; port 465 needs SSL.</p>
+                  <p class="mb-0"><strong>Test email not received</strong> — Check your spam or junk folder. If the From address domain does not match your sending domain, SPF or DKIM failures may cause silent delivery failures.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ── Step 8: Logging ── -->
+          <section id="step-logging" class="mb-2">
+            <div class="rp-step-card">
+              <div class="rp-step-header">
+                <div class="rp-step-num">8</div>
+                <div>
+                  <div class="fw-bold">Configure logging</div>
+                  <div class="small rp-muted">
+                    Choose where the application writes its activity and error logs.
+                  </div>
+                </div>
+                <span class="rp-phase-badge ms-auto">Phase 1</span>
+              </div>
+              <div class="rp-step-body">
+                <table class="rp-field-table">
+                  <thead>
+                    <tr><th>Option</th><th>What to enter</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Local file</strong></td>
+                      <td>
+                        A folder path on the server where log files are written, e.g.
+                        <code class="rp-code">/var/log/resourceplanner</code>.
+                        You can also configure rotation: daily, weekly, monthly, or when a
+                        file reaches a size limit.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>Amazon S3</strong></td>
+                      <td>Your S3 bucket ARN where log files will be uploaded.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>AWS CloudWatch</strong></td>
+                      <td>Logs are streamed directly to CloudWatch Logs. No path is needed — the IAM role must have permission to create and write log streams.</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="rp-warn-block">
+                  <strong><i class="bi bi-exclamation-triangle-fill"></i> Create the log folder before setup.</strong>
+                  Unlike the file storage folder, the log directory is <strong>not</strong>
+                  created automatically. Create the folder on your server and ensure the
+                  process running Resource Planner can write to it — otherwise the
+                  application will fail to start.
+                </div>
+
+                <div class="rp-tip-block">
+                  <strong><i class="bi bi-lightbulb-fill"></i> Rotation settings:</strong>
+                  For local logs, set rotation to <strong>Daily</strong> and keep 30 files
+                  as a reasonable starting point. Adjust based on how busy your instance is
+                  and how much disk space is available.
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ── Troubleshooting ── -->
+          <section id="troubleshooting" class="mb-5">
+            <h2 class="rp-h2 mb-3">If something goes wrong</h2>
+
+            <div class="rp-step-card mb-3">
+              <div class="rp-step-header rp-step-header--danger">
+                <icon-field icon="bi-exclamation-circle-fill" color="danger"></icon-field>
+                <div class="fw-bold">The app keeps redirecting me to the setup wizard</div>
+              </div>
+              <div class="rp-step-body small">
+                <p class="mb-1">
+                  Resource Planner redirects all traffic to the setup wizard until setup is
+                  confirmed as complete in the database.
+                </p>
+                <p class="mb-0">
+                  <strong>What to do:</strong> Check the server logs for an error that
+                  occurred during setup. The most common cause is a Phase 2 transaction
+                  rollback — fix the underlying issue (such as an unreachable SMTP server
+                  or a SAML certificate error) and re-submit the wizard.
+                </p>
+              </div>
+            </div>
+
+            <div class="rp-step-card mb-3">
+              <div class="rp-step-header rp-step-header--danger">
+                <icon-field icon="bi-exclamation-circle-fill" color="danger"></icon-field>
+                <div class="fw-bold">I failed midway through and need to retry — will my settings be lost?</div>
+              </div>
+              <div class="rp-step-body small">
+                <p class="mb-1">
+                  Phase 1 settings (infrastructure, database, logging) are written to the
+                  server immediately and are <strong>not</strong> rolled back. Phase 2
+                  settings (admin account, auth, storage, email) roll back automatically if
+                  any step fails.
+                </p>
+                <p class="mb-0">
+                  <strong>What to do:</strong> When retrying, enter the <em>same</em>
+                  encryption key you used the first time. Entering a different key will
+                  make any previously encrypted data unreadable. All Phase 2 steps can be
+                  re-submitted freely.
+                </p>
+              </div>
+            </div>
+
+            <div class="rp-step-card mb-3">
+              <div class="rp-step-header rp-step-header--danger">
+                <icon-field icon="bi-exclamation-circle-fill" color="danger"></icon-field>
+                <div class="fw-bold">AWS: "Access Denied" when saving secrets</div>
+              </div>
+              <div class="rp-step-body small">
+                <p class="mb-1">
+                  The IAM user or role does not have permission to create or update secrets
+                  in Secrets Manager.
+                </p>
+                <p class="mb-0">
+                  <strong>What to do:</strong> Attach a policy granting at minimum
+                  <code class="rp-code">secretsmanager:CreateSecret</code>,
+                  <code class="rp-code">secretsmanager:PutSecretValue</code>,
+                  <code class="rp-code">secretsmanager:GetSecretValue</code>, and
+                  <code class="rp-code">secretsmanager:DescribeSecret</code> for the ARN
+                  pattern <code class="rp-code">arn:aws:secretsmanager:&lt;region&gt;:&lt;account&gt;:secret:&lt;prefix&gt;/*</code>.
+                </p>
+              </div>
+            </div>
+
+            <div class="rp-step-card mb-3">
+              <div class="rp-step-header rp-step-header--danger">
+                <icon-field icon="bi-exclamation-circle-fill" color="danger"></icon-field>
+                <div class="fw-bold">Setup appears stuck at "running" and never finishes</div>
+              </div>
+              <div class="rp-step-body small">
+                <p class="mb-1">
+                  The wizard polls for status every few seconds. If the server process was
+                  killed mid-run, the status never transitions to complete or error.
+                </p>
+                <p class="mb-0">
+                  <strong>What to do:</strong> Restart the application server. The in-memory
+                  status resets on restart. Re-submit the wizard — Phase 1 settings already
+                  written to the server persist, but the database transaction was rolled back.
+                </p>
+              </div>
+            </div>
+
+            <div class="rp-step-card mb-3">
+              <div class="rp-step-header rp-step-header--danger">
+                <icon-field icon="bi-exclamation-circle-fill" color="danger"></icon-field>
+                <div class="fw-bold">I cannot reach the login page or admin area</div>
+              </div>
+              <div class="rp-step-body small">
+                <p class="mb-1">
+                  While setup is incomplete, all traffic is redirected to the wizard.
+                  A small number of paths are exempt: the wizard itself, the login page,
+                  setup API endpoints, and static files.
+                </p>
+                <p class="mb-0">
+                  <strong>What to do:</strong> Complete setup or contact your server
+                  administrator to manually mark setup as complete in the database if a
+                  previous run finished but the confirmation was not saved.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Footer nav -->
+          <div class="rp-docs-footer-nav">
+            <a href="/docs/" class="rp-docs-footer-link">
+              <i class="bi bi-arrow-left"></i> Back to Docs
+            </a>
+            <a href="/setup/" class="rp-docs-footer-link rp-docs-footer-link--primary">
+              Open Setup Wizard <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+
+        </main>
+      </div>
+    </div>
+  </body>
+</html>
