@@ -59,14 +59,14 @@ jobs:
 
       - uses: ./.github/actions/openapi-validation
 
-  unit-tests:
-    name: Unit Tests (${{ matrix.app }})
+  tests:
+    name: Tests (${{ matrix.app }})
     needs: [lint]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        app: &apps
+        app:
           - audit
           - auth
           - business_units
@@ -96,29 +96,7 @@ jobs:
 
       - uses: ./.github/actions/install-python-deps
 
-      - uses: ./.github/actions/unit-test
-        with:
-          path: apps/web/apps/${{ matrix.app }}/tests/
-          name: ${{ matrix.app }}
-          artifact-name: unit-test-report-${{ matrix.app }}
-
-  integration-tests:
-    name: Integration Tests (${{ matrix.app }})
-    needs: [unit-tests]
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        app: *apps
-
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: ./.github/actions/setup-python
-
-      - uses: ./.github/actions/install-python-deps
-
-      - uses: ./.github/actions/integration-test
+      - uses: ./.github/actions/pytest
         with:
           path: apps/web/apps/${{ matrix.app }}/tests/
           name: ${{ matrix.app }}

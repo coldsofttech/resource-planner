@@ -1,5 +1,5 @@
-name: Integration Test
-description: Run pytest integration tests and upload the report
+name: Pytest
+description: Run pytest (unit + integration) and upload the report
 
 inputs:
   path:
@@ -9,7 +9,7 @@ inputs:
     description: Display name used in report filenames
     required: true
   extra-args:
-    description: Additional pytest arguments (e.g. -n auto --dist=loadfile)
+    description: Additional pytest arguments (e.g. -p no:django --import-mode=importlib)
     required: false
     default: ""
   artifact-name:
@@ -19,22 +19,25 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: pytest (integration — ${{ inputs.name }})
+    - name: pytest (${{ inputs.name }})
       shell: bash
       run: |
         mkdir -p .pytest-reports
         set +e
-        pytest --override-ini=addopts= -m integration -n auto --dist=loadfile ${{ inputs.extra-args }} \
+        pytest --override-ini=addopts= -n auto --dist=loadfile ${{ inputs.extra-args }} \
           --junit-xml=.pytest-reports/junit-${{ inputs.name }}.xml \
           --html=.pytest-reports/test-report-${{ inputs.name }}.html \
           --self-contained-html \
           ${{ inputs.path }}
         EXIT_CODE=$?
         set -e
-        if [ $EXIT_CODE -eq 5 ]; then
+        if [ ! -f .pytest-reports/junit-${{ inputs.name }}.xml ]; then
           printf '<?xml version="1.0" encoding="utf-8"?>\n<testsuites/>\n' > .pytest-reports/junit-${{ inputs.name }}.xml
-          printf '<!DOCTYPE html><html><body><p>No integration tests collected for ${{ inputs.name }}.</p></body></html>\n' > .pytest-reports/test-report-${{ inputs.name }}.html
-        elif [ $EXIT_CODE -ne 0 ]; then
+        fi
+        if [ ! -f .pytest-reports/test-report-${{ inputs.name }}.html ]; then
+          printf '<!DOCTYPE html><html><body><p>No test report generated for ${{ inputs.name }}.</p></body></html>\n' > .pytest-reports/test-report-${{ inputs.name }}.html
+        fi
+        if [ $EXIT_CODE -ne 0 ] && [ $EXIT_CODE -ne 5 ]; then
           exit $EXIT_CODE
         fi
 
