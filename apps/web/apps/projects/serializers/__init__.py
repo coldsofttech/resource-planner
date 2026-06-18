@@ -36,6 +36,7 @@ from apps.projects.serializers.project import (
     ProjectListSerializer,
     ProjectUpdateSerializer,
 )
+from apps.projects.serializers.project_size_config import ProjectSizeConfigSerializer
 from apps.projects.serializers.project_status import (
     ProjectStatusDetailSerializer,
     ProjectStatusListSerializer,
@@ -58,6 +59,7 @@ from apps.projects.serializers.tag import (
 )
 
 __all__ = [
+    "ProjectSizeConfigSerializer",
     "ProgrammeCreateSerializer",
     "ProgrammeDetailSerializer",
     "ProgrammeListSerializer",

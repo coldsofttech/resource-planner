@@ -21,6 +21,7 @@ let pendingLabelDeletions = [];
 let currentEstimates = [];
 let estimatesLoaded = false;
 let pendingEstimateRow = null;
+let _pendingEditApprovePayload = null;
 
 function setView(id, val) {
   const el = document.getElementById(id);
@@ -813,6 +814,23 @@ function initTagsSaveButton() {
   });
 }
 
+function estimateSizeClass(size) {
+  switch (size) {
+    case "XS":
+      return "rp-badge rp-badge-soft";
+    case "S":
+      return "rp-badge rp-badge-soft rp-badge-info";
+    case "M":
+      return "rp-badge rp-badge-soft rp-badge-success";
+    case "L":
+      return "rp-badge rp-badge-soft rp-badge-warning";
+    case "XL":
+      return "rp-badge rp-badge-soft rp-badge-danger";
+    default:
+      return "rp-badge rp-badge-soft";
+  }
+}
+
 function estimateStatusClass(status) {
   switch (status) {
     case "APPROVED":
@@ -843,6 +861,7 @@ window.renderProjectEstimateRow = function renderProjectEstimateRow(row) {
     `<td class="text-end">${esc(String(row.estimate_days ?? ""))}d</td>` +
     `<td class="text-end">${esc(String(row.contingency_percentage ?? ""))}%</td>` +
     `<td>${esc(formatCurrency(row.total_cost ?? 0))}</td>` +
+    `<td><span class="${estimateSizeClass(row.size)}">${esc(row.size ?? "")}</span></td>` +
     `<td><span class="${estimateStatusClass(row.status)}">${esc(estimateStatusLabel(row.status))}</span></td>`
   );
 };
@@ -970,27 +989,237 @@ function openCreateEstimateDrawer() {
   drawer.show();
 }
 
-function openEditEstimateDrawer(est) {
+async function openEditEstimateDrawer(est) {
   const drawer = document.getElementById("rp-estimate-edit-drawer");
   if (!drawer) return;
   pendingEstimateRow = est;
   drawer.setTitle(est.version_display ?? "Estimate");
+
+  let detail = null;
+  try {
+    const { href, method } = API_URLS.projectEstimates.detail(projectCode, est.code);
+    const resp = await apiFetch(href, { method });
+    detail = resp?.data ?? null;
+  } catch {
+    // fall back to row data only
+  }
+
   const daysField = document.getElementById("rp-edit-estimate-days");
   const contingencyField = document.getElementById("rp-edit-estimate-contingency");
-  const dayRateField = document.getElementById("rp-edit-estimate-day-rate");
   const statusField = document.getElementById("rp-edit-estimate-status");
+  const sharedByField = document.getElementById("rp-edit-estimate-shared-by");
+  const reviewedByField = document.getElementById("rp-edit-estimate-reviewed-by");
   const linkField = document.getElementById("rp-edit-estimate-link");
   const noteField = document.getElementById("rp-edit-estimate-note");
+
   if (daysField) daysField.value = String(est.estimate_days ?? "");
   if (contingencyField) contingencyField.value = String(est.contingency_percentage ?? "");
-  if (dayRateField) dayRateField.value = String(est.day_rate ?? "");
   if (statusField) statusField.value = est.status ?? "DRAFT";
   if (linkField) linkField.value = est.estimate_link ?? "";
   if (noteField) noteField.value = "";
+
+  if (sharedByField) {
+    const sharedBy = detail?.shared_by ?? [];
+    sharedByField._selectedValues = sharedBy.map((u) => ({
+      id: u.id,
+      label: u.name || u.email,
+      value: u.id,
+    }));
+    sharedByField._refreshChipsAndInput?.();
+  }
+  if (reviewedByField) {
+    const reviewedBy = detail?.reviewed_by ?? [];
+    reviewedByField._selectedValues = reviewedBy.map((u) => ({
+      id: u.id,
+      label: u.name || u.email,
+      value: u.id,
+    }));
+    reviewedByField._refreshChipsAndInput?.();
+  }
+
   drawer.querySelectorAll("[data-rp-error]:not([hidden])").forEach((el) => {
     el.hidden = true;
   });
   drawer.show();
+}
+
+async function advanceEstimateStatus(row, newStatus, extra = {}) {
+  const { href, method } = API_URLS.projectEstimates.update(projectCode, row.code);
+  await apiFetch(href, { method, body: JSON.stringify({ status: newStatus, ...extra }) });
+  document.getElementById("rp-estimates-table")?.refresh();
+  loadEstimateVersions();
+  const picker = document.getElementById("rp-estimate-version-picker");
+  if (picker?.value === row.code) await loadEstimateHistory(row.code);
+  toast({
+    type: "success",
+    title: "Status updated",
+    message: `Estimate moved to ${estimateStatusLabel(newStatus)}.`,
+  });
+}
+
+function openAdvanceEstimateFlow(row) {
+  pendingEstimateRow = row;
+  if (row.status === "DRAFT") {
+    const modal = document.getElementById("rp-estimate-reviewed-modal");
+    if (!modal) return;
+    const field = document.getElementById("rp-estimate-reviewed-by-field");
+    if (field) {
+      field._selectedValues = [];
+      field._refreshChipsAndInput?.();
+    }
+    modal.querySelectorAll("[data-rp-error]:not([hidden])").forEach((el) => {
+      el.hidden = true;
+    });
+    modal.show();
+  } else if (row.status === "REVIEWED") {
+    advanceEstimateStatus(row, "SHARED", {})
+      .then(() => {
+        pendingEstimateRow = null;
+      })
+      .catch((err) => {
+        pendingEstimateRow = null;
+        toast({
+          type: "error",
+          title: "Error",
+          message: err?.data?.error?.message ?? "Failed to update estimate.",
+        });
+      });
+  } else if (row.status === "SHARED") {
+    if (currentProject?.project_code_value) {
+      advanceEstimateStatus(row, "APPROVED", {})
+        .then(() => {
+          pendingEstimateRow = null;
+        })
+        .catch((err) => {
+          pendingEstimateRow = null;
+          toast({
+            type: "error",
+            title: "Error",
+            message: err?.data?.error?.message ?? "Failed to approve estimate.",
+          });
+        });
+    } else {
+      const modal = document.getElementById("rp-estimate-approve-modal");
+      if (!modal) return;
+      const codeField = document.getElementById("rp-estimate-approve-code-field");
+      if (codeField) codeField.value = "";
+      modal.querySelectorAll("[data-rp-error]:not([hidden])").forEach((el) => {
+        el.hidden = true;
+      });
+      modal.show();
+    }
+  }
+}
+
+function initAdvanceFlow(table) {
+  if (!table) return;
+
+  table.addEventListener("rp:estimate:advance", (e) => openAdvanceEstimateFlow(e.detail.row));
+
+  const reviewedModal = document.getElementById("rp-estimate-reviewed-modal");
+  if (reviewedModal) {
+    reviewedModal.addEventListener("rp:cancel", () => {
+      pendingEstimateRow = null;
+    });
+
+    reviewedModal.addEventListener("rp:primary", async () => {
+      if (!pendingEstimateRow) return;
+      const field = document.getElementById("rp-estimate-reviewed-by-field");
+      const codes = (field?.values ?? []).map((v) => v.value);
+      if (!codes.length) {
+        field?.dispatchEvent(new Event("rp:validate", { bubbles: false }));
+        toast({
+          type: "warning",
+          title: "Reviewed By required",
+          message: "Please select at least one reviewer.",
+        });
+        return;
+      }
+      const primaryBtn = reviewedModal.querySelector("[data-primary-modal]");
+      const snap = snapshotButton(primaryBtn);
+      setBusyButton(primaryBtn, "Saving…");
+      try {
+        await advanceEstimateStatus(pendingEstimateRow, "REVIEWED", { reviewed_by_codes: codes });
+        reviewedModal.hide();
+        pendingEstimateRow = null;
+        restoreButton(primaryBtn, snap);
+      } catch (err) {
+        restoreButton(primaryBtn, snap);
+        toast({
+          type: "error",
+          title: "Error",
+          message: err?.data?.error?.message ?? "Failed to update estimate.",
+        });
+      }
+    });
+  }
+
+  const approveModal = document.getElementById("rp-estimate-approve-modal");
+  if (approveModal) {
+    approveModal.addEventListener("rp:cancel", () => {
+      if (_pendingEditApprovePayload) {
+        _pendingEditApprovePayload = null;
+        // pendingEstimateRow stays set — edit drawer is still open
+      } else {
+        pendingEstimateRow = null;
+      }
+    });
+
+    approveModal.addEventListener("rp:primary", async () => {
+      if (!pendingEstimateRow && !_pendingEditApprovePayload) return;
+      const codeField = document.getElementById("rp-estimate-approve-code-field");
+      const codeVal = codeField?.value?.trim() ?? "";
+      if (!codeVal) {
+        codeField?.dispatchEvent(new Event("rp:validate", { bubbles: false }));
+        return;
+      }
+      const primaryBtn = approveModal.querySelector("[data-primary-modal]");
+      const snap = snapshotButton(primaryBtn);
+      setBusyButton(primaryBtn, "Approving…");
+      try {
+        const { href: ph, method: pm } = API_URLS.projects.update(projectCode);
+        await apiFetch(ph, { method: pm, body: JSON.stringify({ project_code_value: codeVal }) });
+        if (currentProject) {
+          currentProject.project_code_value = codeVal;
+          setView("rp-project-detail-code-value", codeVal);
+        }
+        if (_pendingEditApprovePayload) {
+          // Opened from the edit drawer — save the estimate update directly
+          const { estimateCode, payload } = _pendingEditApprovePayload;
+          _pendingEditApprovePayload = null;
+          const { href, method } = API_URLS.projectEstimates.update(projectCode, estimateCode);
+          await apiFetch(href, { method, body: JSON.stringify(payload) });
+          approveModal.hide();
+          const editDr = document.getElementById("rp-estimate-edit-drawer");
+          editDr?.hide();
+          pendingEstimateRow = null;
+          restoreButton(primaryBtn, snap);
+          table?.refresh();
+          loadEstimateVersions();
+          const versionPicker = document.getElementById("rp-estimate-version-picker");
+          if (versionPicker?.value === estimateCode) await loadEstimateHistory(estimateCode);
+          toast({
+            type: "success",
+            title: "Estimate updated",
+            message: "The estimate has been saved.",
+          });
+        } else {
+          // Opened from the advance flow
+          await advanceEstimateStatus(pendingEstimateRow, "APPROVED", {});
+          approveModal.hide();
+          pendingEstimateRow = null;
+          restoreButton(primaryBtn, snap);
+        }
+      } catch (err) {
+        restoreButton(primaryBtn, snap);
+        toast({
+          type: "error",
+          title: "Error",
+          message: err?.data?.error?.message ?? "Failed to approve estimate.",
+        });
+      }
+    });
+  }
 }
 
 function initEstimatesTab() {
@@ -1022,8 +1251,30 @@ function initEstimatesTab() {
       const rows = e.detail.rows ?? [];
       table.querySelectorAll("tr[data-rp-row]").forEach((tr, idx) => {
         const row = rows[idx];
+        const locked = !row || ["APPROVED", "SUPERSEDED"].includes(row.status);
+
+        const editBtn = tr.querySelector('[data-rp-action="rp:estimate:edit"]');
+        if (editBtn) editBtn.hidden = locked;
+
+        const deleteBtn = tr.querySelector('[data-rp-action="rp:estimate:delete"]');
+        if (deleteBtn) deleteBtn.hidden = locked;
+
         const emailBtn = tr.querySelector('[data-rp-action="rp:estimate:email"]');
-        if (emailBtn) emailBtn.hidden = !row || row.status !== "DRAFT";
+        if (emailBtn) {
+          emailBtn.hidden = !row || row.status !== "APPROVED";
+          if (!emailBtn.hidden) {
+            const label = row.approval_email_sent ? "Resend Email" : "Email";
+            emailBtn.setAttribute("title", label);
+            emailBtn.setAttribute("aria-label", label);
+            const last = emailBtn.lastChild;
+            if (last?.nodeType === Node.TEXT_NODE) last.textContent = label;
+          }
+        }
+
+        const advanceBtn = tr.querySelector('[data-rp-action="rp:estimate:advance"]');
+        if (advanceBtn) {
+          advanceBtn.hidden = !row || !["DRAFT", "REVIEWED", "SHARED"].includes(row.status);
+        }
       });
     });
 
@@ -1043,6 +1294,16 @@ function initEstimatesTab() {
         modal.setAttribute("confirm-value", pendingEstimateRow.version_display);
         modal.show();
       }
+    });
+
+    table.addEventListener("click", (e) => {
+      if (e.target.closest("[data-rp-action]") || e.target.closest(".rp-table-more-btn")) return;
+      const tr = e.target.closest("tr[data-rp-row]");
+      if (!tr) return;
+      const idx = parseInt(tr.getAttribute("data-rp-row"), 10);
+      const row = table.rows[idx];
+      if (!row?.estimate_link) return;
+      window.open(row.estimate_link, "_blank", "noopener,noreferrer");
     });
   }
 
@@ -1110,6 +1371,23 @@ function initEstimatesTab() {
   if (editDrawer) {
     editDrawer.addEventListener("rp:footer-primary", async () => {
       if (!pendingEstimateRow) return;
+
+      const sharedByField = document.getElementById("rp-edit-estimate-shared-by");
+      const reviewedByField = document.getElementById("rp-edit-estimate-reviewed-by");
+      const newStatus = document.getElementById("rp-edit-estimate-status")?.value || "DRAFT";
+      const reviewedByCodes = (reviewedByField?.values ?? []).map((v) => v.value);
+
+      // Guard: any status at or beyond REVIEWED requires at least one reviewer
+      if (["REVIEWED", "SHARED", "APPROVED"].includes(newStatus) && !reviewedByCodes.length) {
+        reviewedByField?.dispatchEvent(new Event("rp:validate", { bubbles: false }));
+        toast({
+          type: "warning",
+          title: "Reviewed By required",
+          message: "Please select at least one reviewer.",
+        });
+        return;
+      }
+
       const submitBtn = editDrawer.querySelector("[data-footer-primary]");
       const snap = snapshotButton(submitBtn);
       setBusyButton(submitBtn, "Saving…");
@@ -1120,11 +1398,28 @@ function initEstimatesTab() {
         contingency_percentage: parseFloat(
           document.getElementById("rp-edit-estimate-contingency")?.value || "0",
         ),
-        day_rate: parseInt(document.getElementById("rp-edit-estimate-day-rate")?.value || "0", 10),
-        status: document.getElementById("rp-edit-estimate-status")?.value || "DRAFT",
+        status: newStatus,
         estimate_link: document.getElementById("rp-edit-estimate-link")?.value?.trim() || "",
         note: document.getElementById("rp-edit-estimate-note")?.value?.trim() || "",
+        shared_by_codes: (sharedByField?.values ?? []).map((v) => v.value),
+        reviewed_by_codes: reviewedByCodes,
       };
+
+      // Guard: APPROVED requires a project code — collect it via the approve modal
+      if (newStatus === "APPROVED" && !currentProject?.project_code_value) {
+        restoreButton(submitBtn, snap);
+        _pendingEditApprovePayload = { estimateCode: prevCode, payload };
+        const approveModal = document.getElementById("rp-estimate-approve-modal");
+        if (approveModal) {
+          const codeField = document.getElementById("rp-estimate-approve-code-field");
+          if (codeField) codeField.value = "";
+          approveModal.querySelectorAll("[data-rp-error]:not([hidden])").forEach((el) => {
+            el.hidden = true;
+          });
+          approveModal.show();
+        }
+        return;
+      }
 
       try {
         const { href, method } = API_URLS.projectEstimates.update(projectCode, prevCode);
@@ -1182,6 +1477,8 @@ function initEstimatesTab() {
       }
     });
   }
+
+  initAdvanceFlow(table);
 }
 
 document.addEventListener("DOMContentLoaded", () => {

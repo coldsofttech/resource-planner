@@ -110,7 +110,7 @@
         <tab-header title="Estimates" icon="bi-calculator"></tab-header>
         <tab-content>
           <div class="row g-4 align-items-start">
-            <div class="col-12 col-md-8">
+            <div class="col-12 col-md-8 rp-estimate-main-col">
               <section-panel class="mt-2">
                 <panel-title>Estimates</panel-title>
                 <panel-body>
@@ -129,11 +129,13 @@
                       <table-column label="Estimate Days" key="estimate_days" sortable numeric></table-column>
                       <table-column label="Contingency %" key="contingency_percentage" sortable numeric></table-column>
                       <table-column label="Total Cost" key="total_cost" sortable></table-column>
+                      <table-column label="Size" key="size" sortable></table-column>
                       <table-column label="Status" key="status" sortable></table-column>
                     </table-columns>
                     {% if can_change_estimate %}
                     <table-actions>
                       <table-action icon="bi-pencil" label="Edit" event="rp:estimate:edit"></table-action>
+                      <table-action icon="bi-arrow-right-circle" label="Advance" event="rp:estimate:advance"></table-action>
                       <table-action icon="bi-envelope" label="Email" event="rp:estimate:email"></table-action>
                       <table-action icon="bi-trash" label="Delete" event="rp:estimate:delete" danger></table-action>
                     </table-actions>
@@ -142,7 +144,7 @@
                 </panel-body>
               </section-panel>
             </div>
-            <div class="col-12 col-md-4 d-none d-md-block">
+            <div class="col-12 col-md-4 rp-estimate-history-col">
               <history-panel title="Version History" icon="bi-clock-history" class="mt-2">
                 <dropdown-field id="rp-estimate-version-picker" label="Version" show-label class="mb-3">
                   <values-list>
@@ -179,30 +181,41 @@
     <drawer-footer close="Cancel" primary="Create Estimate" primary-icon="bi-check2"></drawer-footer>
   </drawer-modal>
   <!-- Edit Estimate drawer -->
-  <drawer-modal id="rp-estimate-edit-drawer" width="560">
+  <drawer-modal id="rp-estimate-edit-drawer" width="900">
     <drawer-header eyebrow="Project Estimate" title="" no-sizes></drawer-header>
     <drawer-panel>
       <div class="row g-3">
         <decimal-field id="rp-edit-estimate-days" col="col-12 col-md-6" label="Estimate Days" placeholder="0.00"></decimal-field>
-        <decimal-field id="rp-edit-estimate-contingency" col="col-12 col-md-6" label="Contingency %" placeholder="0.00"></decimal-field>
-        <number-field id="rp-edit-estimate-day-rate" col="col-12 col-md-6" label="Day Rate (£)" placeholder="0"></number-field>
-        <dropdown-field id="rp-edit-estimate-status" col="col-12 col-md-6" label="Status" show-label>
-          <values-list>
-            <value label="Draft" value="DRAFT"></value>
-            <value label="Reviewed" value="REVIEWED"></value>
-            <value label="Shared" value="SHARED"></value>
-            <value label="Approved" value="APPROVED"></value>
-            <value label="Superseded" value="SUPERSEDED"></value>
-          </values-list>
-        </dropdown-field>
-        <text-field id="rp-edit-estimate-link" col="col-12" label="Estimate Link (URL)" placeholder="https://…" maxlength="500"></text-field>
-        <text-field id="rp-edit-estimate-note" col="col-12" label="Note (optional)" placeholder="Reason for this change…" maxlength="500"></text-field>
+        <percentage-field id="rp-edit-estimate-contingency" col="col-12 col-md-6" label="Contingency %" placeholder="0" min="0"></percentage-field>
+        <project-estimate-status-field id="rp-edit-estimate-status" col="col-12 col-md-6" show-label></project-estimate-status-field>
+        <member-field id="rp-edit-estimate-shared-by" col="col-12" label="Shared By" show-label multi-select></member-field>
+        <member-field id="rp-edit-estimate-reviewed-by" col="col-12" label="Reviewed By" show-label multi-select></member-field>
+        <website-field id="rp-edit-estimate-link" col="col-12" label="Estimate Link">
+          <scheme-list>
+            <scheme>https://</scheme>
+            <scheme>http://</scheme>
+          </scheme-list>
+        </website-field>
+        <text-field id="rp-edit-estimate-note" col="col-12" label="Note" placeholder="Reason for this change…" maxlength="500" cols="3"></text-field>
       </div>
     </drawer-panel>
     <drawer-footer close="Cancel" primary="Save Changes" primary-icon="bi-check2"></drawer-footer>
   </drawer-modal>
   <!-- Delete Estimate modal -->
   <delete-modal id="rp-estimate-delete-modal"></delete-modal>
+  <!-- Advance to Reviewed modal -->
+  <form-modal id="rp-estimate-reviewed-modal" title="Mark as Reviewed" primary-label="Mark as Reviewed" primary-icon="bi-check2">
+    <div class="row g-3">
+      <member-field id="rp-estimate-reviewed-by-field" col="col-12" label="Reviewed By" show-label multi-select required></member-field>
+    </div>
+  </form-modal>
+  <!-- Advance to Approved modal -->
+  <form-modal id="rp-estimate-approve-modal" title="Approve Estimate" primary-label="Approve Estimate" primary-icon="bi-check2">
+    <p class="text-muted rp-fs-13 mb-3">A project code is required before approving this estimate. Please provide it below.</p>
+    <div class="row g-3">
+      <text-field id="rp-estimate-approve-code-field" col="col-12" label="Project Code" placeholder="e.g. DP-2025-001" maxlength="255" required></text-field>
+    </div>
+  </form-modal>
   {% endif %}
   {% if can_change_project %}
   <!-- Edit Project drawer -->

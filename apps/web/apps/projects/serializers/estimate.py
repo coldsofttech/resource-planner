@@ -46,6 +46,7 @@ class ProjectEstimateListSerializer(ListMixin, CodeSerializer):
     )
     day_rate = serializers.IntegerField(read_only=True)
     total_cost = serializers.FloatField(read_only=True)
+    size = serializers.CharField(read_only=True)
     estimate_link = serializers.URLField(read_only=True, allow_blank=True)
     approval_email_sent = serializers.BooleanField(read_only=True)
     is_active = serializers.BooleanField(read_only=True)
@@ -67,6 +68,7 @@ class ProjectEstimateListSerializer(ListMixin, CodeSerializer):
             "contingency_percentage",
             "day_rate",
             "total_cost",
+            "size",
             "estimate_link",
             "approval_email_sent",
             "is_active",
@@ -92,6 +94,7 @@ class ProjectEstimateDetailSerializer(ReadMixin, AuditableSerializer):
     )
     day_rate = serializers.IntegerField(read_only=True)
     total_cost = serializers.FloatField(read_only=True)
+    size = serializers.CharField(read_only=True)
     estimate_link = serializers.URLField(read_only=True, allow_blank=True)
     shared_by = _UserMiniInlineSerializer(many=True, read_only=True)
     reviewed_by = _UserMiniInlineSerializer(many=True, read_only=True)
@@ -111,6 +114,7 @@ class ProjectEstimateDetailSerializer(ReadMixin, AuditableSerializer):
             "contingency_percentage",
             "day_rate",
             "total_cost",
+            "size",
             "estimate_link",
             "shared_by",
             "reviewed_by",

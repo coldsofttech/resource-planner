@@ -44,21 +44,21 @@ class ProjectEstimateStatusField extends DropdownField {
 
   connectedCallback() {
     if (this._initialOptions === undefined) {
-      this._initialOptions = this._buildOptions();
+      this._initialOptions = this._getOptions();
     }
     super.connectedCallback();
   }
 
   attributeChangedCallback(name, oldVal, newVal) {
     if ((name === "allow-all" || name === "allow-superseded") && this._connected) {
-      this._initialOptions = this._buildOptions();
+      this._initialOptions = this._getOptions();
       this._doRender();
     } else {
       super.attributeChangedCallback(name, oldVal, newVal);
     }
   }
 
-  _buildOptions() {
+  _getOptions() {
     const allOpt = this.hasAttribute("allow-all")
       ? [{ id: "", value: "", label: "All Statuses", selected: true, disabled: false }]
       : [];

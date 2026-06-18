@@ -11,11 +11,10 @@ from apps.core.exceptions import NotFoundException, ValidationException
 from apps.core.services import AuditableService, ExportService, FilterableQueryService
 from apps.core.types import ListParams, PaginatedResult
 from apps.projects import selectors
-from apps.projects.constants import ProjectEstimateStatus
+from apps.projects.constants import ProjectEstimateAction, ProjectEstimateStatus
 from apps.projects.models import (
     Project,
     ProjectEstimate,
-    ProjectEstimateAction,
     ProjectEstimateStatusHistory,
 )
 from apps.users.models import User
@@ -111,7 +110,7 @@ class ProjectEstimateService(AuditableService, FilterableQueryService):
         estimate_link: str = "",
         shared_by_codes: List[str] | None = None,
         reviewed_by_codes: List[str] | None = None,
-        status: str = ProjectEstimateStatus.DRAFT[0],
+        status: str = ProjectEstimateStatus.DRAFT,  # type: ignore[assignment]
         estimate_days: float = 0,
         contingency_percentage: float = 0,
         day_rate: int | None = None,
@@ -145,7 +144,7 @@ class ProjectEstimateService(AuditableService, FilterableQueryService):
 
         _record_history(
             obj,
-            action=ProjectEstimateAction.CREATED[0],
+            action=ProjectEstimateAction.CREATED,  # type: ignore[arg-type]
             previous_status=None,
             new_status=obj.status,
             note=note,
@@ -163,6 +162,16 @@ class ProjectEstimateService(AuditableService, FilterableQueryService):
     @transaction.atomic
     def update(self, code: str, **kwargs) -> ProjectEstimate:
         obj = self.get(code)
+
+        locked_statuses = (
+            ProjectEstimateStatus.APPROVED,
+            ProjectEstimateStatus.SUPERSEDED,
+        )
+        if obj.status in locked_statuses:
+            raise ValidationException(
+                "Approved and superseded estimates cannot be edited."
+            )
+
         before = self._snapshot(obj)
         previous_status = obj.status
         update_fields: list[str] = ["updated_by", "updated_at"]
@@ -189,11 +198,37 @@ class ProjectEstimateService(AuditableService, FilterableQueryService):
             obj.reviewed_by.set(_get_users(kwargs["reviewed_by_codes"] or []))
 
         new_status = obj.status
-        action: str = ProjectEstimateAction.UPDATED[0]
+        action: str = ProjectEstimateAction.UPDATED  # type: ignore[assignment]
         if "status" in kwargs and new_status == ProjectEstimateStatus.APPROVED:
-            action = ProjectEstimateAction.APPROVED[0]
+            action = ProjectEstimateAction.APPROVED  # type: ignore[assignment]
+            # Supersede all other APPROVED estimates for this project
+            previously_approved = ProjectEstimate.objects.filter(
+                project=obj.project,
+                status=ProjectEstimateStatus.APPROVED,
+            ).exclude(pk=obj.pk)
+            for prev in previously_approved:
+                prev_snapshot = self._snapshot(prev)
+                prev.status = ProjectEstimateStatus.SUPERSEDED
+                prev.updated_by = self.user
+                prev.save(update_fields=["status", "updated_by", "updated_at"])
+                _record_history(
+                    prev,
+                    action=ProjectEstimateAction.SUPERSEDED,  # type: ignore[arg-type]
+                    previous_status=ProjectEstimateStatus.APPROVED,  # type: ignore[arg-type]
+                    new_status=ProjectEstimateStatus.SUPERSEDED,  # type: ignore[arg-type]
+                    note="Superseded by a newer approved estimate.",
+                    actor=self.user,
+                )
+                AuditService.log_update(
+                    module=_MODULE,
+                    resource_type=_RESOURCE_TYPE,
+                    resource_code=prev.code,
+                    before=prev_snapshot,
+                    after=self._snapshot(prev),
+                    actor=self.user,
+                )
         elif "status" in kwargs and new_status == ProjectEstimateStatus.SUPERSEDED:
-            action = ProjectEstimateAction.SUPERSEDED[0]
+            action = ProjectEstimateAction.SUPERSEDED  # type: ignore[assignment]
 
         _record_history(
             obj,
@@ -252,6 +287,16 @@ class ProjectEstimateService(AuditableService, FilterableQueryService):
     @transaction.atomic
     def delete(self, code: str) -> None:
         obj = self.get(code)
+
+        locked_statuses = (
+            ProjectEstimateStatus.APPROVED,
+            ProjectEstimateStatus.SUPERSEDED,
+        )
+        if obj.status in locked_statuses:
+            raise ValidationException(
+                "Approved and superseded estimates cannot be deleted."
+            )
+
         obj_code = obj.code
         before = self._snapshot(obj)
         obj.delete()
