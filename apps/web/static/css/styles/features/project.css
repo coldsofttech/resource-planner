@@ -1,3 +1,63 @@
+/* ── Project size tier cards ─────────────────────────────────────────────── */
+
+.rp-size-tier-card {
+  background: var(--rp-bg-card);
+  border: 1px solid var(--rp-border);
+  border-radius: 10px;
+  padding: 16px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rp-size-tier-card.rp-size-tier-xl {
+  border-style: dashed;
+  opacity: 0.75;
+}
+
+.rp-size-tier-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rp-size-tier-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--rp-text);
+}
+
+.rp-size-tier-range {
+  font-size: 0.8125rem;
+  color: var(--rp-text-muted);
+  min-height: 1.2em;
+}
+
+.rp-size-tier-implied {
+  font-size: 0.8125rem;
+  color: var(--rp-text-subtle);
+  font-style: italic;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+/* ── Estimates history panel ─────────────────────────────────────────────── */
+
+.rp-estimate-history-col {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .rp-estimate-history-col {
+    display: none;
+  }
+  .rp-estimate-main-col {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
 /* ── Sub-status table ────────────────────────────────────────────────────── */
 
 .rp-substatus-table {

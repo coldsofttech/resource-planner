@@ -61,8 +61,8 @@ jobs:
 
       - uses: ./.github/actions/pip-audit
 
-  unit-tests:
-    name: Unit Tests (${{ matrix.package }})
+  tests:
+    name: Tests (${{ matrix.package }})
     needs: [lint]
     runs-on: ubuntu-latest
     strategy:
@@ -81,38 +81,11 @@ jobs:
         with:
           package: ${{ matrix.package }}
 
-      - uses: ./.github/actions/unit-test
+      - uses: ./.github/actions/pytest
         with:
           path: packages/${{ matrix.package }}/tests/
           name: ${{ matrix.package }}
-          extra-args: "-n auto --dist=loadfile -p no:django --import-mode=importlib"
-          artifact-name: packages-unit-test-report-${{ matrix.package }}
-
-  test:
-    name: Integration Test (${{ matrix.package }})
-    needs: [unit-tests]
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        package: *packages
-
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: ./.github/actions/setup-python
-
-      - uses: ./.github/actions/install-python-deps
-
-      - uses: ./.github/actions/install-packages
-        with:
-          package: ${{ matrix.package }}
-
-      - uses: ./.github/actions/integration-test
-        with:
-          path: packages/${{ matrix.package }}/tests/
-          name: ${{ matrix.package }}
-          extra-args: "-n auto --dist=loadfile -p no:django --import-mode=importlib"
+          extra-args: "-p no:django --import-mode=importlib"
           artifact-name: packages-test-report-${{ matrix.package }}
 
       - uses: ./.github/actions/build-validate

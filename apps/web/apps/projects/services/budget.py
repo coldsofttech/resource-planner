@@ -13,10 +13,10 @@ from apps.core.services import AuditableService, ExportService, FilterableQueryS
 from apps.core.types import ListParams, PaginatedResult
 from apps.financial_years.models import FinancialYear
 from apps.projects import selectors
+from apps.projects.constants import ProjectBudgetAction
 from apps.projects.models import (
     Project,
     ProjectBudget,
-    ProjectBudgetAction,
     ProjectBudgetStatusHistory,
     ProjectEstimate,
 )
@@ -165,7 +165,7 @@ class ProjectBudgetService(AuditableService, FilterableQueryService):
 
         _record_history(
             obj,
-            action=ProjectBudgetAction.CREATED[0],
+            action=ProjectBudgetAction.CREATED,  # type: ignore[arg-type]
             new_allocated_budget=obj.allocated_budget,
             new_refined_budget=obj.refined_budget,
             new_estimate_version=obj.estimate_version,
@@ -220,7 +220,7 @@ class ProjectBudgetService(AuditableService, FilterableQueryService):
 
         _record_history(
             obj,
-            action=ProjectBudgetAction.UPDATED[0],
+            action=ProjectBudgetAction.UPDATED,  # type: ignore[arg-type]
             previous_allocated_budget=prev_allocated,
             previous_refined_budget=prev_refined,
             previous_estimate_version=prev_estimate,

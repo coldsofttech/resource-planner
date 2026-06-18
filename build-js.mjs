@@ -10,6 +10,7 @@ const esmModules = [
   "locations",
   "main",
   "programmes",
+  "project-sizes",
   "project-statuses",
   "project-types",
   "projects",

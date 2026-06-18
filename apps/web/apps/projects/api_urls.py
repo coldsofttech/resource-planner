@@ -6,6 +6,7 @@ from apps.projects.api_views import (
     ProjectEstimateViewSet,
     ProjectFollowerViewSet,
     ProjectLabelViewSet,
+    ProjectSizeConfigViewSet,
     ProjectStatusViewSet,
     ProjectSubStatusFlatOptionsViewSet,
     ProjectSubStatusGlobalViewSet,
@@ -72,6 +73,13 @@ urlpatterns = [
         "programmes/<str:code>/deactivate/",
         ProgrammeViewSet.as_view({"post": "deactivate"}),
         name="programmes-deactivate",
+    ),
+    path(
+        "projects/sizes/",
+        ProjectSizeConfigViewSet.as_view(
+            {"get": "retrieve", "patch": "partial_update"}
+        ),
+        name="project-sizes-config",
     ),
     path(
         "projects/types/",

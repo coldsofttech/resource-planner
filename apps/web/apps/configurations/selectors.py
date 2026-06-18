@@ -190,6 +190,24 @@ class Sprint:
         return int(get_config_value("SPRINT_POINT_PRICE"))
 
 
+class Project:
+    @staticmethod
+    def get_size_xs_max_amount() -> int:
+        return int(get_config_value("PROJECT_SIZE_XS_MAX_AMOUNT"))
+
+    @staticmethod
+    def get_size_s_max_amount() -> int:
+        return int(get_config_value("PROJECT_SIZE_S_MAX_AMOUNT"))
+
+    @staticmethod
+    def get_size_m_max_amount() -> int:
+        return int(get_config_value("PROJECT_SIZE_M_MAX_AMOUNT"))
+
+    @staticmethod
+    def get_size_l_max_amount() -> int:
+        return int(get_config_value("PROJECT_SIZE_L_MAX_AMOUNT"))
+
+
 class AI:
     @staticmethod
     def is_ai_enabled() -> bool:

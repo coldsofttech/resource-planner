@@ -95,7 +95,7 @@
                                   {% endif %}
                                 </menu-section>
                               </menu-group>
-                              {% if "sprints.view_sprint" in rp_permissions or "projects.view_project" in rp_permissions or "projects.view_programme" in rp_permissions or "projects.view_projecttype" in rp_permissions or "projects.view_projectstatus" in rp_permissions %}
+                              {% if "sprints.view_sprint" in rp_permissions or "projects.view_project" in rp_permissions or "projects.view_programme" in rp_permissions or "projects.view_projecttype" in rp_permissions or "projects.view_projectstatus" in rp_permissions or "configurations.change_configuration" in rp_permissions %}
                                 <menu-group name="Project" icon="bi-kanban">
                                   {% if "projects.view_project" in rp_permissions or "projects.view_programme" in rp_permissions %}
                                     <menu-section label="Projects">
@@ -112,13 +112,16 @@
                                       <menu-item name="Sprints" href="/sprints/" icon="bi-lightning"></menu-item>
                                     </menu-section>
                                   {% endif %}
-                                  {% if "projects.view_projecttype" in rp_permissions or "projects.view_projectstatus" in rp_permissions %}
+                                  {% if "projects.view_projecttype" in rp_permissions or "projects.view_projectstatus" in rp_permissions or "configurations.change_configuration" in rp_permissions %}
                                     <menu-section label="Configurations">
                                       {% if "projects.view_projecttype" in rp_permissions %}
                                         <menu-item name="Project Types" href="/projects/types/" icon="bi-tag"></menu-item>
                                       {% endif %}
                                       {% if "projects.view_projectstatus" in rp_permissions %}
                                         <menu-item name="Project Statuses" href="/projects/statuses/" icon="bi-flag"></menu-item>
+                                      {% endif %}
+                                      {% if "configurations.change_configuration" in rp_permissions %}
+                                        <menu-item name="Project Sizes" href="/projects/sizes/" icon="bi-rulers"></menu-item>
                                       {% endif %}
                                     </menu-section>
                                   {% endif %}

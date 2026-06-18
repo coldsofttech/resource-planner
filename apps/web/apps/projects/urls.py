@@ -3,6 +3,7 @@ from django.urls import path
 from apps.projects.views import (
     ProgrammesListView,
     ProjectDetailView,
+    ProjectSizesConfigView,
     ProjectsListView,
     ProjectStatusesListView,
     ProjectTypesListView,
@@ -10,6 +11,9 @@ from apps.projects.views import (
 
 urlpatterns = [
     path("projects/", ProjectsListView.as_view(), name="projects-list"),
+    path(
+        "projects/sizes/", ProjectSizesConfigView.as_view(), name="project-sizes-config"
+    ),
     path("projects/types/", ProjectTypesListView.as_view(), name="project-types-list"),
     path(
         "projects/statuses/",

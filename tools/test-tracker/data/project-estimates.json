@@ -1,0 +1,966 @@
+{
+  "module": {
+    "slug": "project-estimates",
+    "name": "Project Estimates",
+    "sort_order": 12,
+    "parent": {
+      "slug": "projects",
+      "name": "Projects",
+      "sort_order": 11
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-PE-100",
+      "name": "Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-PE-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user is redirected when accessing project detail page",
+          "steps": "1. Open the project detail URL without being logged in.\n2. Navigate to the Estimates tab.",
+          "expected": "The browser redirects to the login page. The Estimates tab and its data are not accessible."
+        },
+        {
+          "id": "TC-PE-102",
+          "severity": "P1",
+          "scenario": "User with view permission sees the Estimates tab and table",
+          "steps": "1. Log in as a user with 'can_view_project_estimate' permission.\n2. Open a project detail page.\n3. Click the Estimates tab.",
+          "expected": "The Estimates tab is visible. The estimates table loads showing columns: Version, Estimate Days, Contingency %, Total Cost, Size, Status. No Create, Edit, or Delete controls are shown if the user lacks those permissions."
+        },
+        {
+          "id": "TC-PE-103",
+          "severity": "P1",
+          "scenario": "User without view permission does not see the Estimates tab",
+          "steps": "1. Log in as a user without 'can_view_project_estimate' permission.\n2. Open a project detail page.",
+          "expected": "The Estimates tab is not visible in the project tab list."
+        },
+        {
+          "id": "TC-PE-104",
+          "severity": "P1",
+          "scenario": "User with add permission sees the Create Estimate button",
+          "steps": "1. Log in as a user with 'can_add_project_estimate' permission.\n2. Open a project detail page.\n3. Click the Estimates tab.",
+          "expected": "A 'Create Estimate' button is visible in the Estimates tab header."
+        },
+        {
+          "id": "TC-PE-105",
+          "severity": "P1",
+          "scenario": "User without add permission does not see the Create Estimate button",
+          "steps": "1. Log in as a user without 'can_add_project_estimate' permission.\n2. Open a project detail page.\n3. Click the Estimates tab.",
+          "expected": "The 'Create Estimate' button is not visible."
+        },
+        {
+          "id": "TC-PE-106",
+          "severity": "P1",
+          "scenario": "User without change permission sees no Edit or Advance actions on estimates",
+          "steps": "1. Log in as a user without 'can_change_project_estimate' permission.\n2. Navigate to the Estimates tab on a project that has DRAFT estimates.\n3. Expand the action menu on a DRAFT estimate row.",
+          "expected": "No Edit action appears. No Advance action appears."
+        },
+        {
+          "id": "TC-PE-107",
+          "severity": "P1",
+          "scenario": "User without delete permission sees no Delete action on estimates",
+          "steps": "1. Log in as a user without 'can_delete_project_estimate' permission.\n2. Navigate to the Estimates tab on a project that has DRAFT estimates.\n3. Expand the action menu on a DRAFT estimate row.",
+          "expected": "No Delete action appears in the row action menu."
+        },
+        {
+          "id": "TC-PE-108",
+          "severity": "P1",
+          "scenario": "User without export permission does not see the Export button",
+          "steps": "1. Log in as a user without 'can_export_project_estimate' permission.\n2. Navigate to the Estimates tab.",
+          "expected": "No Export button or export action is visible."
+        },
+        {
+          "id": "TC-PE-109",
+          "severity": "P1",
+          "scenario": "User with export permission sees the Export button",
+          "steps": "1. Log in as a user with 'can_export_project_estimate' permission.\n2. Navigate to the Estimates tab.",
+          "expected": "An Export button is visible in the tab header area."
+        }
+      ]
+    },
+    {
+      "id": "TC-PE-200",
+      "name": "Estimates Tab — List & Browse",
+      "test_cases": [
+        {
+          "id": "TC-PE-201",
+          "severity": "P0",
+          "scenario": "Estimates tab renders table with correct column headers",
+          "steps": "1. Log in as a user with view permission.\n2. Open a project detail page.\n3. Click the Estimates tab.",
+          "expected": "The table displays columns: Version, Estimate Days, Contingency %, Total Cost, Size, Status. The table loads without errors."
+        },
+        {
+          "id": "TC-PE-202",
+          "severity": "P1",
+          "scenario": "Estimates are listed in descending version order by default",
+          "steps": "1. Navigate to the Estimates tab on a project that has multiple estimate versions.\n2. Observe the row order.",
+          "expected": "The highest version number (most recent) appears at the top of the table. Older versions appear below in descending order."
+        },
+        {
+          "id": "TC-PE-203",
+          "severity": "P1",
+          "scenario": "Status column displays correct coloured badge for each status",
+          "steps": "1. Navigate to the Estimates tab on a project that has estimates in various statuses (DRAFT, REVIEWED, SHARED, APPROVED, SUPERSEDED).\n2. Observe the Status column badges.",
+          "expected": "DRAFT shows a neutral grey badge. REVIEWED shows a blue badge. SHARED shows an amber/warning badge. APPROVED shows a green success badge. SUPERSEDED shows a grey neutral badge."
+        },
+        {
+          "id": "TC-PE-204",
+          "severity": "P2",
+          "scenario": "Size column displays correct coloured badge based on total cost tier",
+          "steps": "1. Navigate to the Estimates tab.\n2. Observe the Size column for estimates of varying total costs.",
+          "expected": "XS shows a grey badge, S shows a blue badge, M shows a green badge, L shows an amber badge, XL shows a red/danger badge. The tier displayed matches the configured cost thresholds."
+        },
+        {
+          "id": "TC-PE-205",
+          "severity": "P1",
+          "scenario": "Total cost column displays formatted currency value",
+          "steps": "1. Create an estimate with Estimate Days = 10, Contingency % = 20, and a known day rate.\n2. Navigate to the Estimates tab.",
+          "expected": "Total Cost column shows the value formatted as currency (e.g. £12,000.00). The value equals estimate_days × day_rate × (1 + contingency_percentage / 100)."
+        },
+        {
+          "id": "TC-PE-206",
+          "severity": "P2",
+          "scenario": "Clicking a row with an estimate link opens the link in a new tab",
+          "steps": "1. Create an estimate with a valid estimate link URL.\n2. Navigate to the Estimates tab.\n3. Click the estimate row (not on an action button).",
+          "expected": "The estimate link URL opens in a new browser tab. The current project detail page remains open."
+        },
+        {
+          "id": "TC-PE-207",
+          "severity": "P3",
+          "scenario": "Clicking a row without an estimate link does nothing",
+          "steps": "1. Ensure an estimate has no estimate link set.\n2. Navigate to the Estimates tab.\n3. Click the estimate row (not on an action button).",
+          "expected": "No navigation occurs. No error is shown. The page remains unchanged."
+        },
+        {
+          "id": "TC-PE-208",
+          "severity": "P1",
+          "scenario": "Estimates table automatically refreshes after a create, edit, or delete action",
+          "steps": "1. Navigate to the Estimates tab.\n2. Create a new estimate and observe the table.\n3. Edit an existing estimate and observe the table.\n4. Delete an estimate and observe the table.",
+          "expected": "After each action, the table immediately reflects the updated data without requiring a manual page refresh."
+        },
+        {
+          "id": "TC-PE-209",
+          "severity": "P2",
+          "scenario": "Empty state is shown when a project has no estimates",
+          "steps": "1. Open a project that has no estimates.\n2. Navigate to the Estimates tab.",
+          "expected": "An empty state message is displayed in the table area, indicating no estimates exist yet."
+        }
+      ]
+    },
+    {
+      "id": "TC-PE-300",
+      "name": "Create Estimate",
+      "test_cases": [
+        {
+          "id": "TC-PE-301",
+          "severity": "P0",
+          "scenario": "Create Estimate drawer opens when the button is clicked",
+          "steps": "1. Navigate to the Estimates tab on a project detail page.\n2. Click the 'Create Estimate' button.",
+          "expected": "The Create Estimate drawer slides in from the right. All fields are empty. No validation errors are shown."
+        },
+        {
+          "id": "TC-PE-302",
+          "severity": "P0",
+          "scenario": "New estimate is created successfully with all required fields",
+          "steps": "1. Open the Create Estimate drawer.\n2. Enter a valid number in the Estimate Days field (e.g. 10).\n3. Select at least one user in the Shared By field.\n4. Click the submit button.",
+          "expected": "The drawer closes. A success toast appears ('A new estimate version has been added.'). The new estimate appears in the table with status DRAFT and version 1 (or next incremented version for this project)."
+        },
+        {
+          "id": "TC-PE-303",
+          "severity": "P1",
+          "scenario": "Creating a second estimate for the same project auto-increments the version",
+          "steps": "1. Create the first estimate for a project (version 1 is assigned).\n2. Create a second estimate for the same project.\n3. Observe the version number in the table.",
+          "expected": "The second estimate is assigned version 2. Version numbers increment by 1 for each estimate within the same project."
+        },
+        {
+          "id": "TC-PE-304",
+          "severity": "P1",
+          "scenario": "Newly created estimate defaults to DRAFT status",
+          "steps": "1. Create an estimate without specifying a status.\n2. Check the Status column in the estimates table.",
+          "expected": "The estimate appears with 'Draft' status badge."
+        },
+        {
+          "id": "TC-PE-305",
+          "severity": "P1",
+          "scenario": "Day rate is snapshotted from the current sprint configuration at creation time",
+          "steps": "1. Check the current sprint day rate in sprint configuration settings.\n2. Create a new estimate.\n3. After creation, export the estimate or view its details.",
+          "expected": "The day rate stored on the estimate matches the configured sprint day rate at the time of creation. Subsequent changes to the sprint configuration do not alter the estimate's day rate."
+        },
+        {
+          "id": "TC-PE-306",
+          "severity": "P2",
+          "scenario": "Contingency % defaults to 0 when left blank during creation",
+          "steps": "1. Open the Create Estimate drawer.\n2. Enter Estimate Days.\n3. Select Shared By user(s).\n4. Leave Contingency % blank.\n5. Submit.",
+          "expected": "The estimate is created with Contingency % of 0. Total cost is estimate_days × day_rate with no contingency markup."
+        },
+        {
+          "id": "TC-PE-307",
+          "severity": "P1",
+          "scenario": "Create drawer resets and closes on successful submission",
+          "steps": "1. Open the Create Estimate drawer.\n2. Fill in all fields.\n3. Submit successfully.",
+          "expected": "The drawer closes. All form fields are cleared. The next time the drawer is opened, all fields start empty with no residual data from the previous submission."
+        },
+        {
+          "id": "TC-PE-308",
+          "severity": "P1",
+          "scenario": "Submit button shows a loading state during estimate creation",
+          "steps": "1. Open the Create Estimate drawer.\n2. Fill in required fields.\n3. Click the submit button.",
+          "expected": "The submit button shows 'Creating…' and is disabled while the API request is in progress. The button is re-enabled once the response is received (success or error)."
+        },
+        {
+          "id": "TC-PE-309",
+          "severity": "P2",
+          "scenario": "Optional Estimate Link field accepts a valid URL",
+          "steps": "1. Open the Create Estimate drawer.\n2. Enter a valid HTTPS URL in the Estimate Link field (e.g. https://docs.example.com/estimate).\n3. Fill in required fields and submit.",
+          "expected": "The estimate is created. The estimate link is stored and clicking the estimate row in the table later opens the URL in a new tab."
+        },
+        {
+          "id": "TC-PE-310",
+          "severity": "P2",
+          "scenario": "Optional Note field value is recorded in the history entry",
+          "steps": "1. Open the Create Estimate drawer.\n2. Enter a note in the Note field.\n3. Fill in required fields and submit.\n4. Open the Version History panel and select the new version.",
+          "expected": "The history entry for the CREATED action shows the note text entered during creation."
+        }
+      ]
+    },
+    {
+      "id": "TC-PE-400",
+      "name": "Edit Estimate",
+      "test_cases": [
+        {
+          "id": "TC-PE-401",
+          "severity": "P0",
+          "scenario": "Edit drawer opens with pre-populated field values from the selected estimate",
+          "steps": "1. Navigate to the Estimates tab.\n2. Click the Edit action on a DRAFT or REVIEWED estimate row.",
+          "expected": "The Edit Estimate drawer opens. Estimate Days, Contingency %, Estimate Link, Status, Shared By, and Reviewed By fields are populated with the estimate's current values."
+        },
+        {
+          "id": "TC-PE-402",
+          "severity": "P1",
+          "scenario": "Edit drawer title shows the version label of the selected estimate",
+          "steps": "1. Click the Edit action on estimate version 3.",
+          "expected": "The drawer header displays the version identifier (e.g. 'v3') as its title."
+        },
+        {
+          "id": "TC-PE-403",
+          "severity": "P1",
+          "scenario": "Estimate Days can be updated and change is reflected in the table",
+          "steps": "1. Open the Edit drawer for a DRAFT estimate.\n2. Change the Estimate Days value to a new number.\n3. Submit.",
+          "expected": "The drawer closes with a success toast. The Estimate Days column in the table shows the updated value."
+        },
+        {
+          "id": "TC-PE-404",
+          "severity": "P1",
+          "scenario": "Contingency % can be updated and Total Cost recalculates",
+          "steps": "1. Open the Edit drawer for a DRAFT estimate.\n2. Change the Contingency % to a new value.\n3. Submit.\n4. Check the Total Cost column.",
+          "expected": "The Total Cost column reflects the recalculated value using the updated contingency percentage."
+        },
+        {
+          "id": "TC-PE-405",
+          "severity": "P2",
+          "scenario": "Estimate Link can be updated to a new valid URL",
+          "steps": "1. Open the Edit drawer.\n2. Change the Estimate Link to a new valid URL.\n3. Submit.",
+          "expected": "The change is saved. Clicking the estimate row in the table opens the new URL."
+        },
+        {
+          "id": "TC-PE-406",
+          "severity": "P1",
+          "scenario": "Shared By users can be changed in the edit drawer",
+          "steps": "1. Open the Edit drawer for an estimate.\n2. Remove existing shared-by users and add new ones.\n3. Submit.",
+          "expected": "The estimate is saved with the new set of shared-by users."
+        },
+        {
+          "id": "TC-PE-407",
+          "severity": "P1",
+          "scenario": "Reviewed By users can be added during edit",
+          "steps": "1. Open the Edit drawer for a DRAFT estimate.\n2. Add one or more users to the Reviewed By field.\n3. Submit.",
+          "expected": "The estimate is saved with the reviewed-by users recorded."
+        },
+        {
+          "id": "TC-PE-408",
+          "severity": "P0",
+          "scenario": "Approved and Superseded estimates have no Edit action",
+          "steps": "1. Navigate to the Estimates tab.\n2. Find an APPROVED estimate row.\n3. Open the row action menu.",
+          "expected": "No Edit action appears for APPROVED or SUPERSEDED estimates. The action button is hidden."
+        },
+        {
+          "id": "TC-PE-409",
+          "severity": "P1",
+          "scenario": "Edit drawer note field is blank when opened (not pre-filled from previous note)",
+          "steps": "1. Open the Edit drawer for any estimate.",
+          "expected": "The Note field is empty, allowing the user to enter a new note for this specific update."
+        },
+        {
+          "id": "TC-PE-410",
+          "severity": "P1",
+          "scenario": "Success toast is shown after a successful update",
+          "steps": "1. Open the Edit drawer.\n2. Modify any field.\n3. Submit.",
+          "expected": "A success toast appears with the message 'The estimate has been saved.'"
+        }
+      ]
+    },
+    {
+      "id": "TC-PE-500",
+      "name": "Status Lifecycle — Advance Flow",
+      "test_cases": [
+        {
+          "id": "TC-PE-501",
+          "severity": "P0",
+          "scenario": "DRAFT estimate row shows the Advance action",
+          "steps": "1. Navigate to the Estimates tab.\n2. Find a DRAFT estimate row.\n3. Open the row action menu.",
+          "expected": "An 'Advance' action is visible and enabled for DRAFT estimates."
+        },
+        {
+          "id": "TC-PE-502",
+          "severity": "P0",
+          "scenario": "Advancing a DRAFT estimate opens the Mark as Reviewed modal",
+          "steps": "1. Click the Advance action on a DRAFT estimate.",
+          "expected": "A 'Mark as Reviewed' modal dialog opens. The modal contains a 'Reviewed By' multi-select field. The field is empty."
+        },
+        {
+          "id": "TC-PE-503",
+          "severity": "P0",
+          "scenario": "Mark as Reviewed modal requires at least one reviewer before confirming",
+          "steps": "1. Open the Mark as Reviewed modal.\n2. Leave the Reviewed By field empty.\n3. Click the confirm button.",
+          "expected": "A warning toast appears ('Please select at least one reviewer.'). The modal remains open. The estimate status does not change."
+        },
+        {
+          "id": "TC-PE-504",
+          "severity": "P0",
+          "scenario": "Confirming Mark as Reviewed with valid reviewers changes status to REVIEWED",
+          "steps": "1. Open the Mark as Reviewed modal.\n2. Select one or more users in the Reviewed By field.\n3. Click the confirm button.",
+          "expected": "The modal closes. A success toast appears ('Estimate moved to Reviewed.'). The estimate status badge in the table changes to 'Reviewed' (blue badge)."
+        },
+        {
+          "id": "TC-PE-505",
+          "severity": "P0",
+          "scenario": "REVIEWED estimate row shows the Advance action",
+          "steps": "1. Find a REVIEWED estimate row.\n2. Open the row action menu.",
+          "expected": "An 'Advance' action is visible for REVIEWED estimates."
+        },
+        {
+          "id": "TC-PE-506",
+          "severity": "P0",
+          "scenario": "Advancing a REVIEWED estimate immediately moves it to SHARED without a modal",
+          "steps": "1. Click the Advance action on a REVIEWED estimate.",
+          "expected": "No modal is shown. The estimate status changes immediately to 'Shared' (amber badge). A success toast appears ('Estimate moved to Shared.')."
+        },
+        {
+          "id": "TC-PE-507",
+          "severity": "P0",
+          "scenario": "SHARED estimate row shows the Advance action",
+          "steps": "1. Find a SHARED estimate row.\n2. Open the row action menu.",
+          "expected": "An 'Advance' action is visible for SHARED estimates."
+        },
+        {
+          "id": "TC-PE-508",
+          "severity": "P0",
+          "scenario": "Advancing a SHARED estimate when the project already has a project code moves it to APPROVED directly",
+          "steps": "1. Ensure the project has a project code configured.\n2. Click the Advance action on a SHARED estimate.",
+          "expected": "No modal is shown. The estimate status changes immediately to 'Approved' (green badge). A success toast appears ('Estimate moved to Approved.')."
+        },
+        {
+          "id": "TC-PE-509",
+          "severity": "P0",
+          "scenario": "Advancing a SHARED estimate when the project has no project code shows the Approve Estimate modal",
+          "steps": "1. Ensure the project does NOT have a project code configured.\n2. Click the Advance action on a SHARED estimate.",
+          "expected": "An 'Approve Estimate' modal opens, prompting the user to enter a project code."
+        },
+        {
+          "id": "TC-PE-510",
+          "severity": "P0",
+          "scenario": "Approve Estimate modal requires a non-empty project code before confirming",
+          "steps": "1. Open the Approve Estimate modal.\n2. Leave the project code field empty.\n3. Click the confirm button.",
+          "expected": "The validation error is shown on the code field. The modal stays open. The estimate status does not change."
+        },
+        {
+          "id": "TC-PE-511",
+          "severity": "P0",
+          "scenario": "Entering a project code and confirming in the Approve modal sets estimate to APPROVED",
+          "steps": "1. Open the Approve Estimate modal.\n2. Enter a valid project code.\n3. Click the confirm button.",
+          "expected": "The modal closes. The project code is saved on the project. The estimate status changes to 'Approved' (green badge). A success toast is shown."
+        },
+        {
+          "id": "TC-PE-512",
+          "severity": "P1",
+          "scenario": "APPROVED estimate does not show the Advance action",
+          "steps": "1. Find an APPROVED estimate row.\n2. Open the row action menu.",
+          "expected": "No Advance action is visible. The estimate is in a terminal approved state."
+        },
+        {
+          "id": "TC-PE-513",
+          "severity": "P1",
+          "scenario": "SUPERSEDED estimate does not show the Advance action",
+          "steps": "1. Find a SUPERSEDED estimate row.\n2. Open the row action menu.",
+          "expected": "No Advance action is visible. The estimate is locked in the superseded state."
+        },
+        {
+          "id": "TC-PE-514",
+          "severity": "P1",
+          "scenario": "Closing the Mark as Reviewed modal without confirming leaves estimate in DRAFT",
+          "steps": "1. Open the Mark as Reviewed modal.\n2. Click Cancel or close the modal without confirming.",
+          "expected": "The modal closes. The estimate status remains DRAFT. No change is made."
+        }
+      ]
+    },
+    {
+      "id": "TC-PE-600",
+      "name": "Delete Estimate",
+      "test_cases": [
+        {
+          "id": "TC-PE-601",
+          "severity": "P0",
+          "scenario": "Delete modal opens with correct version label when Delete action is triggered",
+          "steps": "1. Navigate to the Estimates tab.\n2. Click the Delete action on a DRAFT estimate row.",
+          "expected": "A delete confirmation modal opens. The modal title includes the version identifier of the estimate (e.g. 'Delete v1?')."
+        },
+        {
+          "id": "TC-PE-602",
+          "severity": "P0",
+          "scenario": "Delete confirmation requires typing the version label exactly",
+          "steps": "1. Open the delete modal for an estimate.\n2. Leave the confirmation input empty.\n3. Attempt to click the delete button.",
+          "expected": "The delete button is disabled until the user types the exact version label in the confirmation input."
+        },
+        {
+          "id": "TC-PE-603",
+          "severity": "P0",
+          "scenario": "Typing the correct version label enables the Delete button",
+          "steps": "1. Open the delete modal for a version labelled 'v2'.\n2. Type 'v2' in the confirmation input.",
+          "expected": "The Delete button becomes enabled."
+        },
+        {
+          "id": "TC-PE-604",
+          "severity": "P0",
+          "scenario": "Confirming deletion of a DRAFT estimate removes it from the table",
+          "steps": "1. Open the delete modal for a DRAFT estimate.\n2. Type the version label.\n3. Click the Delete button.",
+          "expected": "The modal closes. The estimate is removed from the table. A success toast appears ('The estimate has been removed.'). The version history picker no longer includes this version."
+        },
+        {
+          "id": "TC-PE-605",
+          "severity": "P1",
+          "scenario": "Confirming deletion of a REVIEWED estimate removes it successfully",
+          "steps": "1. Open the delete modal for a REVIEWED estimate.\n2. Type the version label.\n3. Click Delete.",
+          "expected": "The REVIEWED estimate is permanently deleted. A success toast is shown."
+        },
+        {
+          "id": "TC-PE-606",
+          "severity": "P0",
+          "scenario": "APPROVED estimate does not show the Delete action",
+          "steps": "1. Find an APPROVED estimate row.\n2. Open the row action menu.",
+          "expected": "No Delete action is visible. The estimate cannot be deleted while in APPROVED status."
+        },
+        {
+          "id": "TC-PE-607",
+          "severity": "P0",
+          "scenario": "SUPERSEDED estimate does not show the Delete action",
+          "steps": "1. Find a SUPERSEDED estimate row.\n2. Open the row action menu.",
+          "expected": "No Delete action is visible. Superseded estimates are locked."
+        },
+        {
+          "id": "TC-PE-608",
+          "severity": "P1",
+          "scenario": "Cancelling the delete modal leaves the estimate intact",
+          "steps": "1. Open the delete modal for an estimate.\n2. Type the version label.\n3. Click Cancel.",
+          "expected": "The modal closes. The estimate remains in the table with its status unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-PE-700",
+      "name": "Approve & Supersede",
+      "test_cases": [
+        {
+          "id": "TC-PE-701",
+          "severity": "P0",
+          "scenario": "Approving a new estimate automatically supersedes the previously approved estimate",
+          "steps": "1. Ensure project has an existing APPROVED estimate (v1).\n2. Create a new estimate (v2) and advance it through DRAFT → REVIEWED → SHARED.\n3. Advance v2 to APPROVED.",
+          "expected": "v2 status changes to 'Approved'. v1 status automatically changes to 'Superseded'. Both changes are reflected immediately in the table."
+        },
+        {
+          "id": "TC-PE-702",
+          "severity": "P0",
+          "scenario": "Superseded estimate shows 'Superseded' badge in the table",
+          "steps": "1. After approving a newer estimate (TC-PE-701 precondition met).\n2. Observe the previously approved estimate row in the table.",
+          "expected": "The formerly APPROVED estimate now shows a 'Superseded' status badge (grey/neutral)."
+        },
+        {
+          "id": "TC-PE-703",
+          "severity": "P0",
+          "scenario": "Approving an estimate only supersedes estimates within the same project",
+          "steps": "1. Project A has an APPROVED estimate (v1).\n2. Project B has an APPROVED estimate (v1).\n3. Create a new estimate on Project A (v2) and approve it.",
+          "expected": "Project A's v1 estimate becomes SUPERSEDED. Project B's APPROVED estimate is unaffected and remains APPROVED."
+        },
+        {
+          "id": "TC-PE-704",
+          "severity": "P0",
+          "scenario": "Approved and superseded estimates are locked for editing",
+          "steps": "1. Attempt to edit an APPROVED estimate via the API or UI.",
+          "expected": "The system returns a validation error ('Approved and superseded estimates cannot be edited.'). No changes are saved. The UI does not show an Edit action for these estimates."
+        },
+        {
+          "id": "TC-PE-705",
+          "severity": "P0",
+          "scenario": "Approved and superseded estimates cannot be deleted",
+          "steps": "1. Attempt to delete an APPROVED estimate via the API or UI.",
+          "expected": "The system returns a validation error ('Approved and superseded estimates cannot be deleted.'). The Delete action is not shown for these estimates in the UI."
+        },
+        {
+          "id": "TC-PE-706",
+          "severity": "P1",
+          "scenario": "Setting status to APPROVED via edit drawer triggers the approve modal if project has no code",
+          "steps": "1. Open the Edit drawer for a SHARED estimate.\n2. Change the Status field to 'Approved'.\n3. Click Submit.\n4. Observe: the approve modal appears asking for a project code.",
+          "expected": "The Approve Estimate modal opens instead of saving immediately. After entering the project code and confirming, the estimate is saved as APPROVED."
+        },
+        {
+          "id": "TC-PE-707",
+          "severity": "P1",
+          "scenario": "Superseded estimate history records the supersede action",
+          "steps": "1. Approve a new estimate, superseding an old one.\n2. Open the Version History panel.\n3. Select the superseded (old) estimate version.",
+          "expected": "The history entries for the old estimate include a 'Superseded' action entry, showing the status change from Approved → Superseded, with the note 'Superseded by a newer approved estimate.'"
+        }
+      ]
+    },
+    {
+      "id": "TC-PE-800",
+      "name": "Email Action",
+      "test_cases": [
+        {
+          "id": "TC-PE-801",
+          "severity": "P0",
+          "scenario": "Email action only appears on APPROVED estimates",
+          "steps": "1. Navigate to the Estimates tab.\n2. Observe the action menus on DRAFT, REVIEWED, SHARED, and APPROVED estimates.",
+          "expected": "The Email action is visible only for APPROVED estimates. It is not shown for any other status."
+        },
+        {
+          "id": "TC-PE-802",
+          "severity": "P1",
+          "scenario": "Email button label shows 'Email' when the approval email has not been sent yet",
+          "steps": "1. Find an APPROVED estimate where the approval email has never been sent.\n2. Observe the Email action button label.",
+          "expected": "The button or action shows the label 'Email'."
+        },
+        {
+          "id": "TC-PE-803",
+          "severity": "P1",
+          "scenario": "Email button label shows 'Resend Email' after the approval email has been sent",
+          "steps": "1. Trigger the Email action on an APPROVED estimate.\n2. After the success toast, observe the Email action button label.",
+          "expected": "The action label changes to 'Resend Email', indicating the email has already been sent."
+        },
+        {
+          "id": "TC-PE-804",
+          "severity": "P1",
+          "scenario": "Clicking the Email action triggers the approval email and shows a success toast",
+          "steps": "1. Click the Email action on an APPROVED estimate.",
+          "expected": "A success toast appears: 'Approval email has been triggered.' The table refreshes. The email action label updates to 'Resend Email'."
+        }
+      ]
+    },
+    {
+      "id": "TC-PE-900",
+      "name": "Version History Panel",
+      "test_cases": [
+        {
+          "id": "TC-PE-901",
+          "severity": "P0",
+          "scenario": "Version picker is populated with all estimate versions for the project",
+          "steps": "1. Navigate to the Estimates tab on a project with multiple estimate versions.\n2. Observe the version picker dropdown in the Version History panel.",
+          "expected": "The dropdown contains an entry for every estimate version on this project (e.g. v1, v2, v3). The default selection is '— Select a version —'."
+        },
+        {
+          "id": "TC-PE-902",
+          "severity": "P0",
+          "scenario": "Selecting a version in the picker loads and displays its history entries",
+          "steps": "1. Click the version picker in the Version History panel.\n2. Select a specific version.",
+          "expected": "The history list below the picker populates with entries for the selected estimate. Each entry shows the action, status change, date, and actor email."
+        },
+        {
+          "id": "TC-PE-903",
+          "severity": "P1",
+          "scenario": "History entries show the action label, status change direction, date, and actor email",
+          "steps": "1. Select a version in the history picker that has been updated multiple times.",
+          "expected": "Each history entry displays: an action icon and label (Created, Updated, Approved, Superseded), the status transition (e.g. 'Draft → Reviewed'), the date of the change, and the email address of the user who made the change."
+        },
+        {
+          "id": "TC-PE-904",
+          "severity": "P2",
+          "scenario": "The Created history entry shows no previous status",
+          "steps": "1. Select a version in the history picker.\n2. Find the 'Created' history entry.",
+          "expected": "The Created entry shows only the new status ('Draft'), not a status transition arrow, as there was no prior status."
+        },
+        {
+          "id": "TC-PE-905",
+          "severity": "P2",
+          "scenario": "Updated history entry shows the status change direction when status changed",
+          "steps": "1. Advance an estimate from DRAFT to REVIEWED.\n2. Select that version in the history picker.",
+          "expected": "The history list includes an entry showing 'Draft → Reviewed' with the UPDATED or APPROVED action."
+        },
+        {
+          "id": "TC-PE-906",
+          "severity": "P1",
+          "scenario": "Superseded action entry appears in the superseded estimate's history",
+          "steps": "1. Ensure a previous estimate was superseded by a newer approval.\n2. Select the superseded estimate version in the history picker.",
+          "expected": "The history list includes a 'Superseded' entry showing the status change from 'Approved → Superseded' with the note 'Superseded by a newer approved estimate.'"
+        },
+        {
+          "id": "TC-PE-907",
+          "severity": "P2",
+          "scenario": "Empty state is shown when the selected version has no history entries",
+          "steps": "1. Select a version in the history picker that has no recorded history entries.",
+          "expected": "The history list shows 'No history available.' message."
+        },
+        {
+          "id": "TC-PE-908",
+          "severity": "P2",
+          "scenario": "Default empty state is shown before any version is selected",
+          "steps": "1. Navigate to the Estimates tab.\n2. Do not select any version in the history picker.",
+          "expected": "The history list area shows 'Select a version to view its history.' message."
+        },
+        {
+          "id": "TC-PE-909",
+          "severity": "P1",
+          "scenario": "Version picker updates immediately after creating a new estimate",
+          "steps": "1. Note the current entries in the version picker.\n2. Create a new estimate.\n3. Check the version picker without refreshing the page.",
+          "expected": "The newly created version (e.g. v3) appears in the version picker dropdown alongside existing versions."
+        },
+        {
+          "id": "TC-PE-910",
+          "severity": "P1",
+          "scenario": "Version picker removes a version after it is deleted",
+          "steps": "1. Note the current entries in the version picker.\n2. Delete an estimate.\n3. Check the version picker.",
+          "expected": "The deleted version is no longer listed in the version picker. The history area resets to 'Select a version to view its history.'"
+        }
+      ]
+    },
+    {
+      "id": "TC-PE-1000",
+      "name": "Export",
+      "test_cases": [
+        {
+          "id": "TC-PE-1001",
+          "severity": "P0",
+          "scenario": "Export specs endpoint returns the list of available fields and default selection",
+          "steps": "1. As an authenticated user with export permission, call the export specs endpoint for a project's estimates.\n2. Inspect the response.",
+          "expected": "The response returns HTTP 200 with a list of available export fields (code, project, version, status, estimate_days, contingency_percentage, day_rate, total_cost, estimate_link, approval_email_sent, is_active, created_at, created_by, updated_at, updated_by) and their human-readable labels. A default field list is included."
+        },
+        {
+          "id": "TC-PE-1002",
+          "severity": "P0",
+          "scenario": "CSV export downloads a file containing estimate data",
+          "steps": "1. With at least one estimate existing, click the Export button in the Estimates tab.\n2. Select CSV format.\n3. Confirm the export.",
+          "expected": "A CSV file is downloaded named 'project_estimates_export*.csv'. The file contains a header row and one data row per estimate. The file is parseable as valid CSV."
+        },
+        {
+          "id": "TC-PE-1003",
+          "severity": "P1",
+          "scenario": "Default CSV export includes the standard set of columns",
+          "steps": "1. Export estimates as CSV with no custom field selection.",
+          "expected": "The CSV header row includes: Code, Project, Version, Status, Estimate Days, Contingency %, Day Rate (£), Total Cost (£), Active, Created On. No additional columns appear unless selected."
+        },
+        {
+          "id": "TC-PE-1004",
+          "severity": "P1",
+          "scenario": "XLSX export downloads a valid spreadsheet",
+          "steps": "1. Click Export and select XLSX format.\n2. Download and open the file.",
+          "expected": "An XLSX file is downloaded. The file opens in a spreadsheet application. The header row has styled formatting. Data rows contain estimate records."
+        },
+        {
+          "id": "TC-PE-1005",
+          "severity": "P1",
+          "scenario": "PDF export downloads a valid PDF document",
+          "steps": "1. Click Export and select PDF format.\n2. Download and open the file.",
+          "expected": "A PDF file is downloaded. The file opens in a PDF viewer. It contains the export title 'Project Estimates' and estimate data rows."
+        },
+        {
+          "id": "TC-PE-1006",
+          "severity": "P2",
+          "scenario": "JSON export downloads valid JSON containing estimate records",
+          "steps": "1. Click Export and select JSON format.\n2. Download and inspect the file.",
+          "expected": "A JSON file is downloaded. The content is valid JSON containing an array of estimate objects with field keys matching the selected export fields."
+        },
+        {
+          "id": "TC-PE-1007",
+          "severity": "P2",
+          "scenario": "Export respects optional status filter",
+          "steps": "1. Export estimates with status filter set to 'APPROVED'.",
+          "expected": "Only APPROVED estimates appear in the exported file. Estimates with other statuses are excluded."
+        },
+        {
+          "id": "TC-PE-1008",
+          "severity": "P1",
+          "scenario": "Unauthenticated user cannot access the export endpoint",
+          "steps": "1. Without logging in, call the export endpoint for a project's estimates directly.",
+          "expected": "The API returns HTTP 401 Unauthorized. No file is returned."
+        },
+        {
+          "id": "TC-PE-1009",
+          "severity": "P1",
+          "scenario": "User without export permission receives 403 when calling the export endpoint",
+          "steps": "1. Log in as a user without 'can_export_project_estimate' permission.\n2. Attempt to call the export or export specs endpoint directly.",
+          "expected": "The API returns HTTP 403 Forbidden. No data is returned."
+        }
+      ]
+    },
+    {
+      "id": "TC-PE-1100",
+      "name": "Validation",
+      "test_cases": [
+        {
+          "id": "TC-PE-1101",
+          "severity": "P0",
+          "scenario": "Submitting the Create form without selecting Shared By shows a warning",
+          "steps": "1. Open the Create Estimate drawer.\n2. Enter Estimate Days.\n3. Leave Shared By empty.\n4. Click Submit.",
+          "expected": "A warning toast appears: 'Please select at least one person in Shared By.' The form is not submitted. The drawer remains open."
+        },
+        {
+          "id": "TC-PE-1102",
+          "severity": "P1",
+          "scenario": "Estimate Days must be a positive numeric value",
+          "steps": "1. Open the Create Estimate drawer.\n2. Enter a negative number or zero in Estimate Days.\n3. Select Shared By.\n4. Submit.",
+          "expected": "A validation error or API error is shown indicating that Estimate Days must be a positive number. The estimate is not created."
+        },
+        {
+          "id": "TC-PE-1103",
+          "severity": "P1",
+          "scenario": "Estimate Link field accepts only valid URLs",
+          "steps": "1. Open the Create Estimate drawer.\n2. Enter a non-URL string (e.g. 'not-a-url') in the Estimate Link field.\n3. Fill in other required fields.\n4. Submit.",
+          "expected": "A validation error is shown on the Estimate Link field indicating the value must be a valid URL. The estimate is not created."
+        },
+        {
+          "id": "TC-PE-1104",
+          "severity": "P1",
+          "scenario": "Providing an invalid user code in Shared By returns a 422 error",
+          "steps": "1. Using the API, submit a POST request to create an estimate with shared_by_codes containing a non-existent user code.\n2. Observe the response.",
+          "expected": "The API returns HTTP 422 Unprocessable Entity with an error message listing the invalid user code(s). No estimate is created."
+        },
+        {
+          "id": "TC-PE-1105",
+          "severity": "P0",
+          "scenario": "Advancing to REVIEWED without providing Reviewed By shows a warning",
+          "steps": "1. Click the Advance action on a DRAFT estimate.\n2. In the Mark as Reviewed modal, leave Reviewed By empty.\n3. Click Confirm.",
+          "expected": "A warning toast appears: 'Please select at least one reviewer.' The modal stays open. The estimate remains DRAFT."
+        },
+        {
+          "id": "TC-PE-1106",
+          "severity": "P1",
+          "scenario": "Editing an estimate to REVIEWED status requires at least one Reviewed By user",
+          "steps": "1. Open the Edit drawer for an estimate.\n2. Change the Status dropdown to 'Reviewed'.\n3. Leave Reviewed By empty.\n4. Click Submit.",
+          "expected": "A warning toast appears indicating at least one reviewer is required. The form is not submitted."
+        },
+        {
+          "id": "TC-PE-1107",
+          "severity": "P1",
+          "scenario": "Editing an estimate to APPROVED status requires at least one Reviewed By user",
+          "steps": "1. Open the Edit drawer for an estimate.\n2. Change Status to 'Approved'.\n3. Leave Reviewed By empty.\n4. Click Submit.",
+          "expected": "A warning is shown requiring at least one reviewer before the form can be submitted."
+        },
+        {
+          "id": "TC-PE-1108",
+          "severity": "P0",
+          "scenario": "Approve Estimate modal requires a non-empty project code",
+          "steps": "1. Open the Approve Estimate modal (project has no code set).\n2. Leave the project code field empty.\n3. Click Confirm.",
+          "expected": "The code field shows a validation error. The modal remains open. The estimate is not approved."
+        },
+        {
+          "id": "TC-PE-1109",
+          "severity": "P2",
+          "scenario": "Contingency % must be numeric — non-numeric input is rejected",
+          "steps": "1. Open the Create or Edit drawer.\n2. Enter a non-numeric string in the Contingency % field.\n3. Submit.",
+          "expected": "A validation error is shown. The estimate is not saved."
+        }
+      ]
+    },
+    {
+      "id": "TC-PE-1200",
+      "name": "Non-Functional — Performance, Accessibility, Responsiveness",
+      "test_cases": [
+        {
+          "id": "TC-PE-1201",
+          "severity": "P2",
+          "scenario": "Estimates tab loads within an acceptable time on a stable connection",
+          "steps": "1. Navigate to the Estimates tab on a project with up to 50 estimate records.\n2. Measure the time from tab click to table data rendered.",
+          "expected": "The table data loads and renders within 2 seconds under normal network conditions."
+        },
+        {
+          "id": "TC-PE-1202",
+          "severity": "P2",
+          "scenario": "Estimates table is usable on mobile screen width (≤767px)",
+          "steps": "1. Open the project detail page on a mobile device or emulated mobile viewport (≤767px).\n2. Click the Estimates tab.",
+          "expected": "The table is scrollable horizontally on mobile. All columns remain accessible by scrolling. No content is clipped or unreadable."
+        },
+        {
+          "id": "TC-PE-1203",
+          "severity": "P2",
+          "scenario": "Create and Edit drawers are fully usable on tablet viewport (768px–1024px)",
+          "steps": "1. Open the project detail page on a tablet viewport.\n2. Open the Create Estimate drawer.\n3. Fill in all fields.",
+          "expected": "All form fields are fully visible and interactive. No fields are cut off. The drawer footer with the submit button is accessible."
+        },
+        {
+          "id": "TC-PE-1204",
+          "severity": "P2",
+          "scenario": "All interactive elements in the Estimates tab are keyboard-navigable",
+          "steps": "1. Navigate to the Estimates tab using only the keyboard (Tab, Enter, Space, Arrow keys).\n2. Try to open the Create Estimate drawer, fill in the form, and submit.",
+          "expected": "All buttons, form fields, dropdowns, and the submit button are reachable and operable using the keyboard alone."
+        },
+        {
+          "id": "TC-PE-1205",
+          "severity": "P2",
+          "scenario": "Create Estimate submit button shows a loading/busy state while the request is in-flight",
+          "steps": "1. Open the Create Estimate drawer.\n2. Fill in required fields.\n3. Click Submit on a slow connection.",
+          "expected": "The submit button is disabled and shows 'Creating…' while the API call is pending. Once complete (success or error), the button state is restored."
+        },
+        {
+          "id": "TC-PE-1206",
+          "severity": "P2",
+          "scenario": "Error messages do not expose internal exception or stack trace details",
+          "steps": "1. Trigger an API error (e.g. by providing invalid data or using a slow network).\n2. Observe the error toast or inline error message.",
+          "expected": "The error message is user-friendly (e.g. 'Failed to create estimate. Please try again.'). No stack trace, internal field names, or system-level details are visible to the user."
+        },
+        {
+          "id": "TC-PE-1207",
+          "severity": "P3",
+          "scenario": "Status badges pass WCAG AA colour contrast requirements",
+          "steps": "1. View the Estimates table with estimates in various statuses.\n2. Check the contrast ratio of badge text against badge background for DRAFT, REVIEWED, SHARED, APPROVED, SUPERSEDED.",
+          "expected": "Each badge's text colour has a contrast ratio of at least 4.5:1 against its background colour, meeting WCAG AA standards."
+        },
+        {
+          "id": "TC-PE-1208",
+          "severity": "P2",
+          "scenario": "Estimates tab is usable in dark mode",
+          "steps": "1. Toggle the application to dark mode using the theme toggle.\n2. Navigate to the Estimates tab.",
+          "expected": "All text, badges, table rows, and drawers render correctly in dark mode. No unreadable text or invisible UI elements."
+        }
+      ]
+    },
+    {
+      "id": "TC-PE-1300",
+      "name": "Security",
+      "test_cases": [
+        {
+          "id": "TC-PE-1301",
+          "severity": "P0",
+          "scenario": "Unauthenticated API call to list estimates returns 401",
+          "steps": "1. Send a GET request to /api/v1/projects/{code}/estimates/ without an Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned. No estimate data is included in the response."
+        },
+        {
+          "id": "TC-PE-1302",
+          "severity": "P0",
+          "scenario": "Unauthenticated API call to create an estimate returns 401",
+          "steps": "1. Send a POST request to /api/v1/projects/{code}/estimates/ without an Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned. No estimate is created."
+        },
+        {
+          "id": "TC-PE-1303",
+          "severity": "P0",
+          "scenario": "Unauthenticated export endpoint call returns 401",
+          "steps": "1. Send a GET request to /api/v1/projects/{code}/estimates/export/ without an Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned. No file is returned."
+        },
+        {
+          "id": "TC-PE-1304",
+          "severity": "P1",
+          "scenario": "User cannot access estimates from a different project by manipulating the project code in the URL",
+          "steps": "1. Log in as a user who has access to Project A but not Project B.\n2. Replace Project A's code with Project B's code in the estimates API URL.\n3. Attempt to list estimates.",
+          "expected": "The API returns an appropriate error (404 or 403). No estimates from Project B are returned."
+        },
+        {
+          "id": "TC-PE-1305",
+          "severity": "P1",
+          "scenario": "CSRF token is required for estimate mutation requests",
+          "steps": "1. Attempt to POST or PATCH an estimate API endpoint without a valid CSRF token in the request headers.\n2. Observe the response.",
+          "expected": "The API rejects the request with a 403 Forbidden or equivalent CSRF error. No mutation is performed."
+        },
+        {
+          "id": "TC-PE-1306",
+          "severity": "P1",
+          "scenario": "Day rate is snapshotted at creation and not exposed as a user-settable field via the API",
+          "steps": "1. Create an estimate.\n2. Change the sprint configuration day rate to a different value.\n3. Observe the existing estimate's day rate.",
+          "expected": "The existing estimate retains the day rate that was active at the time of creation. The day rate is not retroactively updated. Users cannot override the day rate via the create or update API payload without explicit field access."
+        },
+        {
+          "id": "TC-PE-1307",
+          "severity": "P1",
+          "scenario": "User without delete permission receives 403 when calling the delete endpoint directly",
+          "steps": "1. Log in as a user without 'can_delete_project_estimate' permission.\n2. Send a DELETE request to /api/v1/projects/{code}/estimates/{estimate_code}/ directly.",
+          "expected": "HTTP 403 Forbidden is returned. The estimate is not deleted."
+        }
+      ]
+    },
+    {
+      "id": "TC-PE-1400",
+      "name": "Edge Cases & Integration",
+      "test_cases": [
+        {
+          "id": "TC-PE-1401",
+          "severity": "P1",
+          "scenario": "Creating multiple estimates for the same project assigns correct sequential version numbers",
+          "steps": "1. Create estimates v1, v2, and v3 in sequence on the same project.\n2. Verify version numbers in the table.",
+          "expected": "Estimates are numbered v1, v2, v3 in sequence. Version numbers are unique within the project and never reused."
+        },
+        {
+          "id": "TC-PE-1402",
+          "severity": "P2",
+          "scenario": "Deleting an estimate does not change version numbers of remaining estimates",
+          "steps": "1. Create estimates v1, v2, v3.\n2. Delete v2.\n3. Observe the remaining estimates.",
+          "expected": "v1 and v3 retain their original version numbers. The gap (v2) is preserved — version numbers are not renumbered."
+        },
+        {
+          "id": "TC-PE-1403",
+          "severity": "P1",
+          "scenario": "Clicking Delete and then cancelling leaves the estimate unchanged",
+          "steps": "1. Open the delete confirmation modal for an estimate.\n2. Type the version label.\n3. Click Cancel.",
+          "expected": "The modal closes. The estimate remains in the table with its status and data unchanged."
+        },
+        {
+          "id": "TC-PE-1404",
+          "severity": "P1",
+          "scenario": "Closing the advance modal without confirming leaves estimate status unchanged",
+          "steps": "1. Click Advance on a DRAFT estimate.\n2. In the Mark as Reviewed modal, click Cancel.",
+          "expected": "The modal closes. The estimate remains in DRAFT status."
+        },
+        {
+          "id": "TC-PE-1405",
+          "severity": "P2",
+          "scenario": "Estimate with 0% contingency shows total cost equal to estimate_days × day_rate",
+          "steps": "1. Create an estimate with Estimate Days = 5, Contingency % = 0, and a known day rate of £1000/day.\n2. Check the Total Cost column.",
+          "expected": "Total Cost shows £5,000.00. No contingency markup is applied."
+        },
+        {
+          "id": "TC-PE-1406",
+          "severity": "P2",
+          "scenario": "Size badge reflects the correct tier based on configured cost thresholds",
+          "steps": "1. Review the size category thresholds in the system configuration.\n2. Create estimates with total costs that fall into XS, S, M, L, and XL tiers.\n3. Observe the Size badges in the table.",
+          "expected": "Each estimate's Size badge matches the tier corresponding to its total cost as defined in the configuration."
+        },
+        {
+          "id": "TC-PE-1407",
+          "severity": "P3",
+          "scenario": "Very large estimate_days value displays without overflow in the table",
+          "steps": "1. Create an estimate with a very large Estimate Days value (e.g. 10000).\n2. Check the Estimate Days column in the table.",
+          "expected": "The value is displayed correctly without overflowing its cell. The column layout remains intact."
+        },
+        {
+          "id": "TC-PE-1408",
+          "severity": "P1",
+          "scenario": "Status badges and table data remain accurate after a hard browser refresh",
+          "steps": "1. Create, advance, and approve estimates.\n2. Refresh the browser page.\n3. Navigate back to the Estimates tab.",
+          "expected": "All estimates retain their correct statuses after the page refresh. The table reflects the same data as before the refresh."
+        },
+        {
+          "id": "TC-PE-1409",
+          "severity": "P2",
+          "scenario": "Only one estimate can be APPROVED at a time per project",
+          "steps": "1. Approve estimate v1 for a project.\n2. Create v2 and approve it.\n3. Observe both estimates' statuses.",
+          "expected": "v2 is APPROVED. v1 is automatically SUPERSEDED. No project can have more than one estimate in APPROVED status simultaneously."
+        },
+        {
+          "id": "TC-PE-1410",
+          "severity": "P2",
+          "scenario": "Version history panel is synchronized when the version picker is open and a new estimate is created",
+          "steps": "1. Open the Estimates tab.\n2. Select a version in the history picker.\n3. In another browser tab or by clicking away, create a new estimate.\n4. Return to the estimates tab.\n5. Check the version picker.",
+          "expected": "The version picker updates to include the newly created estimate version upon the next load or table refresh. The history selection is not disrupted."
+        }
+      ]
+    }
+  ]
+}

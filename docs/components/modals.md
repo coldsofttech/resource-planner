@@ -146,6 +146,85 @@ Confirmation modal for deactivation actions. Extends `ConfirmModal`.
 
 ---
 
+## `<form-modal>`
+
+A general-purpose modal that hosts arbitrary slotted child content in its body. Child nodes declared inside the element in HTML are captured before the first render and re-inserted each time the modal re-renders, preserving custom-element state (e.g. `<member-field>` selections) across open/close cycles.
+
+The inner panel uses `overflow: visible` so that absolutely-positioned dropdown lists (e.g. `<member-field>`) are never clipped.
+
+Inherits `open` and `closeable` from `Modal`.
+
+| Attribute       | Type   | Default   | Description                                          |
+| --------------- | ------ | --------- | ---------------------------------------------------- |
+| `title`         | string | —         | Heading text shown in the modal header               |
+| `primary-label` | string | `Confirm` | Label for the primary action button                  |
+| `primary-icon`  | string | —         | Bootstrap Icon class for the primary button (prefix) |
+
+**Public API:**
+
+| Method                 | Description                                       |
+| ---------------------- | ------------------------------------------------- |
+| `modal.show()`         | Opens the modal                                   |
+| `modal.hide()`         | Closes the modal                                  |
+| `modal.setTitle(text)` | Updates the header title without a full re-render |
+
+**Events fired (all bubble):**
+
+| Event        | Description                                   |
+| ------------ | --------------------------------------------- |
+| `rp:primary` | Primary action button clicked                 |
+| `rp:cancel`  | Cancel or × button clicked (modal also hides) |
+
+```html
+<!-- Reviewed-by collection modal -->
+<form-modal
+  id="rp-estimate-reviewed-modal"
+  title="Mark as Reviewed"
+  primary-label="Mark as Reviewed"
+  primary-icon="bi-check2"
+>
+  <div class="row g-3">
+    <member-field
+      id="rp-estimate-reviewed-by-field"
+      col="col-12"
+      label="Reviewed By"
+      show-label
+      multi-select
+      required
+    ></member-field>
+  </div>
+</form-modal>
+```
+
+```js
+const modal = document.getElementById("rp-estimate-reviewed-modal");
+
+modal.addEventListener("rp:primary", async () => {
+  const field = document.getElementById("rp-estimate-reviewed-by-field");
+  const codes = (field?.values ?? []).map((v) => v.value);
+  if (!codes.length) {
+    field?.dispatchEvent(new Event("rp:validate", { bubbles: false }));
+    return;
+  }
+  await saveReviewedBy(codes);
+  modal.hide();
+});
+
+modal.addEventListener("rp:cancel", () => {
+  // user dismissed — reset any pending state
+});
+
+modal.show();
+```
+
+**Notes:**
+
+- Slotted child content (the nodes placed inside `<form-modal>` in HTML) is captured once on connect and re-inserted after every render. Do not dynamically append children after the element has connected — set field values via the element's own API instead.
+- The modal does **not** reset field values on hide. Reset fields in your `rp:cancel` handler or before calling `show()`.
+- Use `modal.querySelectorAll("[data-rp-error]:not([hidden])")` to clear field validation state before opening.
+
+---
+
 **Inheritance chain:**
 
 ```
@@ -155,5 +234,6 @@ Modal (base)
         │     ├── ActivateModal   <activate-modal>
         │     └── DeactivateModal <deactivate-modal>
         └── DeleteModal           <delete-modal>
-  └── StatusModal                 <status-modal>
+  ├── StatusModal                 <status-modal>
+  └── FormModal                   <form-modal>
 ```

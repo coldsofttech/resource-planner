@@ -641,7 +641,7 @@ class ExportMixin:
         },
     )
     @action(detail=False, methods=["get"], url_path="export/specs")
-    def export_specs(self, request):
+    def export_specs(self, request, **kwargs):
         """GET /module/export/specs/"""
         return self.response(
             data={"columns": self.export_columns},
@@ -694,7 +694,7 @@ class ExportMixin:
         },
     )
     @action(detail=False, methods=["get"], url_path="export")
-    def export(self, request):
+    def export(self, request, **kwargs):
         """GET /module/export/?type=csv|xlsx|pdf|json&fields=f1,f2"""
         fields = self._parse_fields_param(request)
         export_format = request.query_params.get("type", "csv").lower()

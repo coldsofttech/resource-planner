@@ -21,3 +21,23 @@ class ProjectEstimateStatus(models.TextChoices):
     SHARED = "SHARED", "Shared"
     APPROVED = "APPROVED", "Approved"
     SUPERSEDED = "SUPERSEDED", "Superseded"
+
+
+class ProjectSize(models.TextChoices):
+    XS = "XS", "X-Small"
+    S = "S", "Small"
+    M = "M", "Medium"
+    L = "L", "Large"
+    XL = "XL", "X-Large"
+
+
+class ProjectEstimateAction(models.TextChoices):
+    CREATED = "CREATED", "Created"
+    UPDATED = "UPDATED", "Updated"
+    APPROVED = "APPROVED", "Approved"
+    SUPERSEDED = "SUPERSEDED", "Superseded"
+
+
+class ProjectBudgetAction(models.TextChoices):
+    CREATED = "CREATED", "Created"
+    UPDATED = "UPDATED", "Updated"

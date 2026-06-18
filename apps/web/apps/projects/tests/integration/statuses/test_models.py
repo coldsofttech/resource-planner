@@ -1,8 +1,13 @@
 from django.db import IntegrityError
 from django.test import TestCase
 
-from apps.projects.models import ProjectStatus, ProjectSubStatus
-from apps.projects.tests.factories import make_project_status, make_project_substatus
+from apps.projects.models import ProjectStatus, ProjectStatusHistory, ProjectSubStatus
+from apps.projects.tests.factories import (
+    make_project,
+    make_project_status,
+    make_project_status_history,
+    make_project_substatus,
+)
 from apps.users.tests.factories import make_user
 
 # ── ProjectStatus ─────────────────────────────────────────────────────────────
@@ -203,3 +208,90 @@ class ProjectSubStatusAuditableTest(TestCase):
             updated_by=user,
         )
         self.assertEqual(ss.created_by, user)
+
+
+# ── ProjectStatusHistory ──────────────────────────────────────────────────────
+
+
+class ProjectStatusHistoryFieldTest(TestCase):
+    def test_project_linked(self):
+        project = make_project()
+        status = make_project_status("Linked Status")
+        history = make_project_status_history(project=project, new_status=status)
+        self.assertEqual(history.project, project)
+
+    def test_new_status_linked(self):
+        status = make_project_status("New State")
+        history = make_project_status_history(new_status=status)
+        self.assertEqual(history.new_status, status)
+
+    def test_previous_status_defaults_to_none(self):
+        history = make_project_status_history()
+        self.assertIsNone(history.previous_status)
+
+    def test_previous_status_stores_value(self):
+        prev = make_project_status("Prev Status")
+        new = make_project_status("Next Status")
+        history = make_project_status_history(previous_status=prev, new_status=new)
+        self.assertEqual(history.previous_status, prev)
+
+    def test_previous_sub_status_defaults_to_none(self):
+        history = make_project_status_history()
+        self.assertIsNone(history.previous_sub_status)
+
+    def test_new_sub_status_defaults_to_none(self):
+        history = make_project_status_history()
+        self.assertIsNone(history.new_sub_status)
+
+    def test_note_defaults_to_empty(self):
+        history = make_project_status_history()
+        self.assertEqual(history.note, "")
+
+    def test_note_stores_value(self):
+        history = make_project_status_history(note="Moved to review")
+        self.assertEqual(history.note, "Moved to review")
+
+    def test_changed_on_auto_set(self):
+        history = make_project_status_history()
+        self.assertIsNotNone(history.changed_on)
+
+    def test_changed_by_defaults_to_none(self):
+        history = make_project_status_history()
+        self.assertIsNone(history.changed_by)
+
+    def test_changed_by_stores_user(self):
+        user = make_user()
+        history = make_project_status_history(changed_by=user)
+        self.assertEqual(history.changed_by, user)
+
+
+class ProjectStatusHistoryOrderingTest(TestCase):
+    def test_ordered_by_changed_on_descending(self):
+        project = make_project()
+        s1 = make_project_status("Alpha Hist")
+        s2 = make_project_status("Beta Hist")
+        h1 = make_project_status_history(project=project, new_status=s1)
+        h2 = make_project_status_history(project=project, new_status=s2)
+        pks = list(
+            ProjectStatusHistory.objects.filter(project=project).values_list(
+                "pk", flat=True
+            )
+        )
+        self.assertEqual(pks, [h2.pk, h1.pk])
+
+
+class ProjectStatusHistoryCascadeTest(TestCase):
+    def test_cascade_delete_with_project(self):
+        project = make_project()
+        history = make_project_status_history(project=project)
+        history_pk = history.pk
+        project.delete()
+        self.assertFalse(ProjectStatusHistory.objects.filter(pk=history_pk).exists())
+
+    def test_previous_status_set_null_on_status_delete(self):
+        prev = make_project_status("Prev Cascade")
+        new = make_project_status("New Cascade")
+        history = make_project_status_history(previous_status=prev, new_status=new)
+        prev.delete()
+        history.refresh_from_db()
+        self.assertIsNone(history.previous_status)
