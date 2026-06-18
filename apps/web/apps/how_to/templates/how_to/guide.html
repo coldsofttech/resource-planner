@@ -56,6 +56,7 @@
           <a class="rp-docs-nav-link" href="#projects"><i class="bi bi-kanban"></i> Projects</a>
           <a class="rp-docs-nav-link" href="#estimates"><i class="bi bi-calculator"></i> Project Estimates</a>
           <a class="rp-docs-nav-link" href="#project-sizes"><i class="bi bi-rulers"></i> Project Sizes</a>
+          <a class="rp-docs-nav-link" href="#project-links"><i class="bi bi-link-45deg"></i> Project Links</a>
           <a class="rp-docs-nav-link" href="#programmes"><i class="bi bi-collection"></i> Programmes</a>
 
           <div class="rp-docs-nav-section">Workforce</div>
@@ -627,6 +628,89 @@
 
             <div class="rp-tip-block">
               <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Use round numbers that reflect how your organisation thinks about project scale — for example multiples of £25k or £50k. The range hints on the screen show the exact boundaries in real time, so you can see what you are setting before you save.
+            </div>
+          </section>
+
+          <!-- ── Project Links ── -->
+          <section id="project-links" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-link-45deg" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Project Links</h2>
+                <p class="small rp-muted mb-0">Attach named URLs to a project — Confluence pages, Jira boards, SharePoint sites, or any external reference.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Project Links let you attach named URLs directly to a project record. Use them to surface the resources your team refers to most — a Confluence planning page, a Jira board, a SharePoint folder, a Miro board, or any external URL. Links appear on the project's <strong>Links</strong> tab and open in a new browser tab when clicked.</p>
+
+            <h3 class="rp-docs-subheading">Navigating to Project Links</h3>
+            <ol class="rp-step-list">
+              <li>Open any project from the <strong>Projects</strong> list.</li>
+              <li>Click the <strong>Links</strong> tab inside the project detail page.</li>
+              <li>All links for this project are listed here, ordered alphabetically by title.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Actions on the Links tab</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Link</strong></td><td>Opens a form to create a new link. Enter a title and a URL.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the link's title or URL.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Permanently removes the link. A confirmation prompt appears before deletion.</td></tr>
+                <tr><td><strong>Click a link title</strong></td><td>Opens the URL in a new browser tab.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Adding a link</h3>
+            <ol class="rp-step-list">
+              <li>Open the project and click the <strong>Links</strong> tab.</li>
+              <li>Click <strong>Add Link</strong>.</li>
+              <li>Enter a <strong>Title</strong> — a short, descriptive label (e.g. <em>Confluence Planning Page</em>, <em>Jira Board</em>). Titles must be unique within the project.</li>
+              <li>Enter the full <strong>URL</strong> — must start with <code>http://</code> or <code>https://</code>.</li>
+              <li>Click <strong>Save</strong>. The link appears in the list immediately, sorted alphabetically.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Editing a link</h3>
+            <ol class="rp-step-list">
+              <li>On the <strong>Links</strong> tab, click <strong>Edit</strong> on the link you want to change.</li>
+              <li>Update the <strong>Title</strong> and/or <strong>URL</strong> as needed.</li>
+              <li>Click <strong>Save</strong>. The list updates immediately.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Deleting a link</h3>
+            <ol class="rp-step-list">
+              <li>On the <strong>Links</strong> tab, click <strong>Delete</strong> on the link you want to remove.</li>
+              <li>Confirm the deletion in the prompt that appears.</li>
+              <li>The link is permanently removed. This action cannot be undone.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Link fields</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Field</th><th>Details</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Title</strong></td><td>Required. A short label for the link. Maximum 200 characters. Must be unique within the project — two links on the same project cannot share the same title.</td></tr>
+                <tr><td><strong>URL</strong></td><td>Required. A full URL beginning with <code>http://</code> or <code>https://</code>. Maximum 500 characters.</td></tr>
+              </tbody>
+            </table>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Links open in a new tab.</strong>
+              Clicking a link title always opens the URL in a new browser tab. You do not leave the project page.
+            </div>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Link titles must be unique per project.</strong>
+              Two links on the same project cannot share the same title. If you need to point to two different URLs with similar names, use a distinguishing qualifier — for example <em>Confluence Planning Page (v1)</em> and <em>Confluence Planning Page (v2)</em>.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"A link with this title already exists on this project"</strong> — each link title must be unique within the project. Choose a different title or update the existing link instead.<br><br>
+              <strong>"Enter a valid URL"</strong> — the URL field only accepts full addresses starting with <code>http://</code> or <code>https://</code>. Relative paths, bare domain names (e.g. <em>example.com</em>), or mailto addresses are not accepted.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Use descriptive titles so that anyone opening the project immediately understands what each link points to. "Confluence" tells you nothing; "Confluence — Delivery Planning Page Q3" tells you exactly where to go and why.
             </div>
           </section>
 
