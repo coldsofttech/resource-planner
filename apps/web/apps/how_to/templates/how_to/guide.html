@@ -54,6 +54,8 @@
           <a class="rp-docs-nav-link" href="#financial-years"><i class="bi bi-calendar3"></i> Financial Years</a>
           <a class="rp-docs-nav-link" href="#sprints"><i class="bi bi-lightning"></i> Sprints</a>
           <a class="rp-docs-nav-link" href="#projects"><i class="bi bi-kanban"></i> Projects</a>
+          <a class="rp-docs-nav-link" href="#estimates"><i class="bi bi-calculator"></i> Project Estimates</a>
+          <a class="rp-docs-nav-link" href="#project-sizes"><i class="bi bi-rulers"></i> Project Sizes</a>
           <a class="rp-docs-nav-link" href="#programmes"><i class="bi bi-collection"></i> Programmes</a>
 
           <div class="rp-docs-nav-section">Workforce</div>
@@ -347,6 +349,23 @@
               </tbody>
             </table>
 
+            <h3 class="rp-docs-subheading">Project size</h3>
+            <p class="small rp-muted">Every estimate automatically displays a <strong>T-shirt size</strong> badge — a quick visual signal of the project's cost scale. The size is derived from the estimate's total cost and updates automatically when the cost changes.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Size</th><th>Total cost</th></tr></thead>
+              <tbody>
+                <tr><td><strong>XS — X-Small</strong></td><td>Up to the XS threshold (default: £20,000)</td></tr>
+                <tr><td><strong>S — Small</strong></td><td>Up to the S threshold (default: £60,000)</td></tr>
+                <tr><td><strong>M — Medium</strong></td><td>Up to the M threshold (default: £200,000)</td></tr>
+                <tr><td><strong>L — Large</strong></td><td>Up to the L threshold (default: £500,000)</td></tr>
+                <tr><td><strong>XL — X-Large</strong></td><td>Above the L threshold</td></tr>
+              </tbody>
+            </table>
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Thresholds are configurable.</strong>
+              The cost boundaries for each size band are set by your administrator under <strong>Project → Configurations → <a href="#project-sizes">Project Sizes</a></strong>. The values shown above are the system defaults.
+            </div>
+
             <h3 class="rp-docs-subheading">Budgets</h3>
             <p class="small rp-muted">A budget allocates funding to a project for a specific Financial Year. It links to an estimate version and tracks three figures:</p>
             <ul class="rp-rule-list">
@@ -378,6 +397,236 @@
 
             <div class="rp-tip-block">
               <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Keep project statuses up to date. Stale statuses make portfolio views unreliable and erode leadership confidence in the data. If a status is genuinely unknown, use the closest available sub-status and add a note rather than leaving it out of date.
+            </div>
+          </section>
+
+          <!-- ── Project Estimates ── -->
+          <section id="estimates" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-calculator" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Project Estimates</h2>
+                <p class="small rp-muted mb-0">Versioned effort and cost estimates with a governed approval workflow.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">An estimate records how many effort days a project requires, the day rate, and a contingency allowance. You can hold multiple estimate versions as scope evolves. Each version passes through a defined review and approval workflow. Only one version is <strong>Approved</strong> at any time — approving a newer version automatically supersedes the previous one. The Approved version drives budget and financial views.</p>
+
+            <h3 class="rp-docs-subheading">Estimate fields</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Field</th><th>What it means</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Estimate Days</strong></td><td>The total effort required, in working days.</td></tr>
+                <tr><td><strong>Contingency %</strong></td><td>A percentage buffer added on top of the base cost. Defaults to 0.</td></tr>
+                <tr><td><strong>Day Rate</strong></td><td>Automatically taken from the current sprint configuration at the moment the estimate is created. It is snapshotted and does not change if the sprint day rate changes later.</td></tr>
+                <tr><td><strong>Total Cost</strong></td><td>Calculated automatically: <em>Estimate Days × Day Rate × (1 + Contingency % ÷ 100)</em>.</td></tr>
+                <tr><td><strong>Size</strong></td><td>A T-shirt size badge (XS / S / M / L / XL) derived from the total cost against configured thresholds. Updated automatically when the cost changes.</td></tr>
+                <tr><td><strong>Shared By</strong></td><td>Required. The person or people who shared this estimate with stakeholders.</td></tr>
+                <tr><td><strong>Reviewed By</strong></td><td>Required when advancing to Reviewed or beyond. One or more internal reviewers.</td></tr>
+                <tr><td><strong>Estimate Link</strong></td><td>Optional URL to a detailed estimate document (e.g. a Confluence page or spreadsheet). Clicking the estimate row in the table opens this link.</td></tr>
+                <tr><td><strong>Note</strong></td><td>A free-text note recorded in the version history at the time of creation or update.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Creating an estimate</h3>
+            <ol class="rp-step-list">
+              <li>Open the project and click the <strong>Estimates</strong> tab.</li>
+              <li>Click <strong>Create Estimate</strong>.</li>
+              <li>Enter the number of <strong>Estimate Days</strong>.</li>
+              <li>Enter a <strong>Contingency %</strong> if applicable (leave blank for 0).</li>
+              <li>Select one or more people in <strong>Shared By</strong> — this field is required.</li>
+              <li>Optionally paste an <strong>Estimate Link</strong> URL and add a <strong>Note</strong>.</li>
+              <li>Click <strong>Save</strong>. The estimate is created in <strong>Draft</strong> status. The version number, day rate, total cost, and size are set automatically.</li>
+            </ol>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Versions are project-scoped.</strong>
+              Each new estimate on the same project gets the next version number (v1, v2, v3 …). Version numbers are never reused, even if an intermediate version is deleted.
+            </div>
+
+            <h3 class="rp-docs-subheading">Estimate status workflow</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Status</th><th>What it means</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Draft</strong></td><td>Being prepared. Not yet shared externally. Can be edited or deleted.</td></tr>
+                <tr><td><strong>Reviewed</strong></td><td>Reviewed internally. At least one reviewer must be named before advancing.</td></tr>
+                <tr><td><strong>Shared</strong></td><td>Sent to stakeholders for sign-off.</td></tr>
+                <tr><td><strong>Approved</strong></td><td>Formally agreed. Locked for editing and deletion. Only one estimate per project can be Approved at a time.</td></tr>
+                <tr><td><strong>Superseded</strong></td><td>Replaced by a newer Approved version. Kept permanently for historical reference. Locked.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Advancing an estimate through the workflow</h3>
+            <p class="small rp-muted">Use the <strong>Advance</strong> action on any estimate row. Each step moves the estimate to the next status. The action is hidden once an estimate reaches Approved or Superseded.</p>
+
+            <h4 class="rp-docs-subheading" style="font-size:0.82rem;margin-top:0.5rem;">Draft → Reviewed</h4>
+            <ol class="rp-step-list">
+              <li>Click <strong>Advance</strong> on a Draft estimate.</li>
+              <li>A <em>Mark as Reviewed</em> modal opens. Select one or more people in <strong>Reviewed By</strong> — this is required.</li>
+              <li>Click <strong>Confirm</strong>. The estimate moves to Reviewed.</li>
+            </ol>
+
+            <h4 class="rp-docs-subheading" style="font-size:0.82rem;margin-top:0.5rem;">Reviewed → Shared</h4>
+            <ol class="rp-step-list">
+              <li>Click <strong>Advance</strong> on a Reviewed estimate.</li>
+              <li>No additional input is needed. The estimate moves to Shared immediately.</li>
+            </ol>
+
+            <h4 class="rp-docs-subheading" style="font-size:0.82rem;margin-top:0.5rem;">Shared → Approved</h4>
+            <ol class="rp-step-list">
+              <li>Click <strong>Advance</strong> on a Shared estimate.</li>
+              <li>If the project already has a <strong>project code</strong> set, the estimate is approved immediately — no further input needed.</li>
+              <li>If the project does <em>not</em> yet have a project code, an <em>Approve Estimate</em> modal opens. Enter the project code (e.g. a Jira ID or portfolio reference). This is required before approval can proceed.</li>
+              <li>Click <strong>Approve</strong>. The estimate moves to Approved. Any previously Approved estimate on this project is automatically moved to Superseded.</li>
+            </ol>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-lock-fill"></i> Approved and Superseded estimates are locked.</strong>
+              Once an estimate reaches Approved or Superseded, it cannot be edited or deleted. This protects the record of what was agreed.
+            </div>
+
+            <h3 class="rp-docs-subheading">Approving via the Edit drawer</h3>
+            <p class="small rp-muted">You can also change an estimate's status directly in the <strong>Edit</strong> drawer using the Status dropdown. If you set Status to <em>Approved</em> and the project has no project code, the Approve Estimate modal will open to collect the code before saving. Setting status to <em>Reviewed</em>, <em>Shared</em>, or <em>Approved</em> requires at least one reviewer in the <strong>Reviewed By</strong> field.</p>
+
+            <h3 class="rp-docs-subheading">Approve and supersede</h3>
+            <p class="small rp-muted">Only one estimate per project can be Approved at a time. When you approve a new version, the system automatically:</p>
+            <ul class="rp-rule-list">
+              <li>Sets the new estimate to <strong>Approved</strong>.</li>
+              <li>Sets any previously Approved estimate to <strong>Superseded</strong>.</li>
+              <li>Records a <em>Superseded</em> history entry on the old estimate with the note: "Superseded by a newer approved estimate."</li>
+            </ul>
+            <p class="small rp-muted">Superseded estimates are kept permanently — they are never deleted automatically. They remain visible in the Estimates tab with a Superseded badge.</p>
+
+            <h3 class="rp-docs-subheading">Deleting an estimate</h3>
+            <p class="small rp-muted">Draft and Reviewed estimates can be deleted. Approved and Superseded estimates cannot be deleted.</p>
+            <ol class="rp-step-list">
+              <li>Click the <strong>Delete</strong> action on a Draft or Reviewed estimate.</li>
+              <li>A confirmation modal opens. Type the version label (e.g. <em>v2</em>) to confirm.</li>
+              <li>Click <strong>Delete</strong>. The estimate is permanently removed.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Version history panel</h3>
+            <p class="small rp-muted">Every estimate maintains a full, read-only change log. To view it:</p>
+            <ol class="rp-step-list">
+              <li>Navigate to the <strong>Estimates</strong> tab.</li>
+              <li>In the <strong>Version History</strong> panel, select a version from the picker.</li>
+              <li>The history list shows every action on that estimate: Created, Updated, Approved, or Superseded — with the status transition, timestamp, and actor email.</li>
+            </ol>
+            <p class="small rp-muted">History entries cannot be edited or deleted.</p>
+
+            <h3 class="rp-docs-subheading">Email action</h3>
+            <p class="small rp-muted">Once an estimate is Approved, an <strong>Email</strong> action appears on its row. Use it to trigger an approval notification email to stakeholders. After the first send the button changes to <strong>Resend Email</strong> — you can resend as many times as needed.</p>
+
+            <h3 class="rp-docs-subheading">Exporting estimates</h3>
+            <p class="small rp-muted">Click the <strong>Export</strong> button in the Estimates tab header to download estimate data. Choose from CSV, Excel (XLSX), PDF, or JSON. The export includes all estimate versions for the project and respects any active status filter.</p>
+            <p class="small rp-muted">Default export columns: Code, Project, Version, Status, Estimate Days, Contingency %, Day Rate (£), Total Cost (£), Active, Created On. Additional columns (Estimate Link, Approval Email Sent, Created By, Updated On, Updated By) can be selected from the export configuration panel.</p>
+
+            <h3 class="rp-docs-subheading">Project size bands</h3>
+            <p class="small rp-muted">The Size badge on each estimate is derived from its total cost against configurable thresholds. See <a href="#project-sizes">Project Sizes</a> for the full configuration guide and default values.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Size</th><th>Typical total cost range</th></tr></thead>
+              <tbody>
+                <tr><td><strong>XS</strong></td><td>Up to the XS threshold (default: £20,000)</td></tr>
+                <tr><td><strong>S</strong></td><td>Up to the S threshold (default: £60,000)</td></tr>
+                <tr><td><strong>M</strong></td><td>Up to the M threshold (default: £200,000)</td></tr>
+                <tr><td><strong>L</strong></td><td>Up to the L threshold (default: £500,000)</td></tr>
+                <tr><td><strong>XL</strong></td><td>Above the L threshold — automatically derived</td></tr>
+              </tbody>
+            </table>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Shared By is required"</strong> — at least one person must be selected in Shared By before an estimate can be created.<br><br>
+              <strong>"Please select at least one reviewer"</strong> — advancing to Reviewed requires at least one person in the Reviewed By field. Open the Mark as Reviewed modal and add a reviewer.<br><br>
+              <strong>"Project code is required before approving"</strong> — the project does not yet have a project code. The Approve Estimate modal will ask for one. Enter the portfolio or finance reference code and confirm.<br><br>
+              <strong>"Approved and superseded estimates cannot be edited"</strong> — the estimate is locked. To make changes, create a new estimate version, revise it, and advance it through the workflow.<br><br>
+              <strong>"Invalid estimate link — must be a valid URL"</strong> — the Estimate Link field only accepts full URLs (e.g. https://). Remove the link or correct the format.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Create a new estimate version for every significant scope change — do not overwrite an existing one. Having the full version history (v1 scoping, v2 revised scope, v3 final approved) makes it easy to explain cost movements to stakeholders at any later date.
+            </div>
+          </section>
+
+          <!-- ── Project Sizes ── -->
+          <section id="project-sizes" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-rulers" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Project Sizes</h2>
+                <p class="small rp-muted mb-0">Configure the budget thresholds that classify projects by T-shirt size — XS through XL.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Project Sizes lets administrators define the budget boundaries for each size band. Every estimate in the system automatically displays a size badge (XS, S, M, L, or XL) based on its total cost. Changing these thresholds immediately affects how <em>all</em> estimates are classified — no re-saving of individual estimates is required.</p>
+
+            <p class="small rp-muted">Navigate to <strong>Project → Configurations → Project Sizes</strong> to access this screen.</p>
+
+            <h3 class="rp-docs-subheading">The five size tiers</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Size</th><th>Badge</th><th>Range</th><th>Configurable?</th></tr></thead>
+              <tbody>
+                <tr><td><strong>XS — X-Small</strong></td><td><span class="rp-badge rp-badge-soft">XS</span></td><td>Up to the XS max amount</td><td>Yes</td></tr>
+                <tr><td><strong>S — Small</strong></td><td><span class="rp-badge rp-badge-soft rp-badge-info">S</span></td><td>XS max + 1 up to the S max amount</td><td>Yes</td></tr>
+                <tr><td><strong>M — Medium</strong></td><td><span class="rp-badge rp-badge-soft rp-badge-success">M</span></td><td>S max + 1 up to the M max amount</td><td>Yes</td></tr>
+                <tr><td><strong>L — Large</strong></td><td><span class="rp-badge rp-badge-soft rp-badge-warning">L</span></td><td>M max + 1 up to the L max amount</td><td>Yes</td></tr>
+                <tr><td><strong>XL — X-Large</strong></td><td><span class="rp-badge rp-badge-soft rp-badge-danger">XL</span></td><td>Above the L max amount — derived automatically</td><td>No</td></tr>
+              </tbody>
+            </table>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> XL is always derived.</strong>
+              The XL tier has no configurable upper boundary — it covers everything above the L max amount. It is read-only and cannot be adjusted directly. To change where XL begins, increase the L max amount.
+            </div>
+
+            <h3 class="rp-docs-subheading">System defaults</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Size</th><th>Default max amount</th><th>Default range</th></tr></thead>
+              <tbody>
+                <tr><td><strong>XS</strong></td><td>£20,000</td><td>Up to £20,000</td></tr>
+                <tr><td><strong>S</strong></td><td>£60,000</td><td>£20,001 — £60,000</td></tr>
+                <tr><td><strong>M</strong></td><td>£200,000</td><td>£60,001 — £200,000</td></tr>
+                <tr><td><strong>L</strong></td><td>£500,000</td><td>£200,001 — £500,000</td></tr>
+                <tr><td><strong>XL</strong></td><td>—</td><td>£500,001 and above</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Updating the thresholds</h3>
+            <ol class="rp-step-list">
+              <li>Navigate to <strong>Project → Configurations → Project Sizes</strong>.</li>
+              <li>Each editable tier card (XS, S, M, L) shows a <strong>Max Amount (£)</strong> field. Enter the new upper boundary for that tier.</li>
+              <li>The range hints beneath each field update live as you type, so you can see exactly where each band starts and ends before saving.</li>
+              <li>Review all four ranges to confirm they look correct.</li>
+              <li>Click <strong>Save Changes</strong>. The updated thresholds take effect immediately across all estimates in the system.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Live range hints</h3>
+            <p class="small rp-muted">As you type in any Max Amount field, the range label underneath it updates in real time — showing the exact currency boundaries for that tier. The XL card's range also updates live to reflect the new starting point whenever you change the L max amount. Use this to verify your thresholds before committing.</p>
+
+            <h3 class="rp-docs-subheading">Rules for valid thresholds</h3>
+            <ul class="rp-rule-list">
+              <li>All four values (XS, S, M, L) must be <strong>positive integers</strong> — zero and negative amounts are not accepted.</li>
+              <li>Values must be in <strong>strictly ascending order</strong>: XS &lt; S &lt; M &lt; L. Equal values between adjacent tiers are not allowed.</li>
+              <li>If the values are out of order when you click Save, an error is shown before anything is sent to the server — no partial saves occur.</li>
+            </ul>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Changes affect all estimates immediately.</strong>
+              Saving new thresholds re-classifies every estimate in the system on the next load. An estimate that was previously <em>M</em> may show as <em>L</em> after you raise the M boundary. There is no preview of how many estimates will change — plan threshold updates carefully.
+            </div>
+
+            <h3 class="rp-docs-subheading">Who can update Project Sizes</h3>
+            <p class="small rp-muted">Only users with the <strong>Change Configuration</strong> permission can view the editable fields and save changes. Users without this permission can still navigate to the page and see the current thresholds as read-only values — but cannot modify them. The Project Sizes menu item is only visible in the navigation when the user has this permission.</p>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Amounts must be in ascending order: XS &lt; S &lt; M &lt; L"</strong> — one or more of your values is equal to or greater than the next tier. Review all four fields side by side and ensure each is strictly larger than the one before it.<br><br>
+              <strong>"This field is required"</strong> — all four Max Amount fields must contain a value before saving. Clearing a field and clicking Save will trigger this validation.<br><br>
+              <strong>"S max amount must be greater than XS max amount"</strong> — the S value you entered is less than or equal to the XS value. Adjust accordingly.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Use round numbers that reflect how your organisation thinks about project scale — for example multiples of £25k or £50k. The range hints on the screen show the exact boundaries in real time, so you can see what you are setting before you save.
             </div>
           </section>
 
