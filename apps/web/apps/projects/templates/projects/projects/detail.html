@@ -21,280 +21,371 @@
 {% endblock page_actions %}
 {% block content %}
   <tab-panel id="rp-project-tabs">
-    <tab-items>
-      <tab-item id="general" active>
-        <tab-header title="General" icon="bi-info-circle"></tab-header>
-        <tab-content>
-          <div class="row g-4 align-items-start">
-            <div class="col-12 col-md-6">
-              <section-panel class="mt-2">
-                <panel-title>General Information</panel-title>
-                <panel-body>
-                  <view-field id="rp-project-detail-id" label="ID" code></view-field>
-                  <view-field id="rp-project-detail-name" label="Name"></view-field>
-                  <view-field id="rp-project-detail-type" label="Project Type"></view-field>
-                  <view-field id="rp-project-detail-programme" label="Programme"></view-field>
-                  <view-field id="rp-project-detail-description" label="Description" desc></view-field>
-                  <view-field id="rp-project-detail-status" label="Status"></view-field>
-                  <view-field id="rp-project-detail-sub-status" label="Sub-Status"></view-field>
-                  <view-field id="rp-project-detail-confidence" label="Confidence"></view-field>
-                  <view-field id="rp-project-detail-priority" label="Priority"></view-field>
-                  <view-field id="rp-project-detail-start-date" label="Tentative Start Date"></view-field>
-                  <view-field id="rp-project-detail-end-date" label="Tentative End Date"></view-field>
-                </panel-body>
-              </section-panel>
-              <section-panel class="mt-3">
-                <panel-title>Metadata</panel-title>
-                <panel-body>
-                  <view-field id="rp-project-detail-created-at" label="Created" meta></view-field>
-                  <view-field id="rp-project-detail-created-by" label="Created By" meta></view-field>
-                  <view-field id="rp-project-detail-updated-at" label="Updated" meta></view-field>
-                  <view-field id="rp-project-detail-updated-by" label="Updated By" meta></view-field>
-                </panel-body>
-              </section-panel>
-            </div>
-            <div class="col-12 col-md-6">
-              <section-panel class="mt-2">
-                <panel-title>Tags</panel-title>
-                <panel-body>
-                  <project-tags-field id="rp-project-detail-tags" col="col-12" free-form></project-tags-field>
-                  {% if can_change_project %}
-                    <div class="mt-3 d-flex justify-content-end">
-                      <primary-button id="rp-project-tags-save-btn" prefix-icon="bi-check2" label="Save Tags" size="sm"></primary-button>
-                    </div>
-                  {% endif %}
-                </panel-body>
-              </section-panel>
-            </div>
-          </div>
-        </tab-content>
-      </tab-item>
-      <tab-item id="operational">
-        <tab-header title="Operational" icon="bi-gear"></tab-header>
-        <tab-content>
-          <div class="row g-4 align-items-start">
-            <div class="col-12 col-md-6">
-              <section-panel class="mt-2">
-                <panel-title>Operational</panel-title>
-                <panel-body>
-                  <view-field id="rp-project-detail-efforts-issued" label="Efforts Issued"></view-field>
-                  <view-field id="rp-project-detail-commitment-date" label="Commitment Date"></view-field>
-                  <view-field id="rp-project-detail-run-cost" label="Run Cost Applies"></view-field>
-                </panel-body>
-              </section-panel>
-              <section-panel class="mt-3">
-                <panel-title>Project Code</panel-title>
-                <panel-body>
-                  <view-field id="rp-project-detail-code-value" label="Project Code" code></view-field>
-                </panel-body>
-              </section-panel>
-            </div>
-            <div class="col-12 col-md-6">
-              <section-panel class="mt-2">
-                <panel-title>Teams</panel-title>
-                <panel-body>
-                  <div id="rp-project-detail-teams-badges" class="d-flex flex-wrap gap-2"></div>
-                </panel-body>
-              </section-panel>
-              <section-panel class="mt-3">
-                <panel-title>Labels</panel-title>
-                <panel-body>
-                  <div id="rp-project-detail-labels-badges" class="d-flex flex-wrap gap-2"></div>
-                </panel-body>
-              </section-panel>
-            </div>
-          </div>
-        </tab-content>
-      </tab-item>
-      <tab-item id="estimates">
-        <tab-header title="Estimates" icon="bi-calculator"></tab-header>
-        <tab-content>
-          <div class="row g-4 align-items-start">
-            <div class="col-12 col-md-8 rp-estimate-main-col">
-              <section-panel class="mt-2">
-                <panel-title>Estimates</panel-title>
-                <panel-body>
-                  {% if can_change_estimate %}
-                  <div class="d-flex justify-content-end mb-3">
-                    <primary-button id="rp-estimate-create-btn" prefix-icon="bi-plus" label="Create Estimate" size="sm"></primary-button>
-                  </div>
-                  {% endif %}
-                  <data-table id="rp-estimates-table"
-                              paginated
-                              page-size="25"
-                              row-template="renderProjectEstimateRow"
-                              empty-message="No estimates found.">
-                    <table-columns>
-                      <table-column label="Version" key="version_display" sortable numeric></table-column>
-                      <table-column label="Estimate Days" key="estimate_days" sortable numeric></table-column>
-                      <table-column label="Contingency %" key="contingency_percentage" sortable numeric></table-column>
-                      <table-column label="Total Cost" key="total_cost" sortable></table-column>
-                      <table-column label="Size" key="size" sortable></table-column>
-                      <table-column label="Status" key="status" sortable></table-column>
-                    </table-columns>
-                    {% if can_change_estimate %}
-                    <table-actions>
-                      <table-action icon="bi-pencil" label="Edit" event="rp:estimate:edit"></table-action>
-                      <table-action icon="bi-arrow-right-circle" label="Advance" event="rp:estimate:advance"></table-action>
-                      <table-action icon="bi-envelope" label="Email" event="rp:estimate:email"></table-action>
-                      <table-action icon="bi-trash" label="Delete" event="rp:estimate:delete" danger></table-action>
-                    </table-actions>
-                    {% endif %}
-                  </data-table>
-                </panel-body>
-              </section-panel>
-            </div>
-            <div class="col-12 col-md-4 rp-estimate-history-col">
-              <history-panel title="Version History" icon="bi-clock-history" class="mt-2">
-                <dropdown-field id="rp-estimate-version-picker" label="Version" show-label class="mb-3">
-                  <values-list>
-                    <value label="— Select a version —" value=""></value>
-                  </values-list>
-                </dropdown-field>
-                <history-items id="rp-estimate-history-list" placeholder="Select a version to view its history.">
-                </history-items>
-              </history-panel>
-            </div>
-          </div>
-        </tab-content>
-      </tab-item>
-    </tab-items>
-  </tab-panel>
-  {% if can_change_estimate %}
-  <!-- Create Estimate drawer -->
-  <drawer-modal id="rp-estimate-create-drawer" width="900">
-    <drawer-header eyebrow="Project Estimate" title="New Estimate" no-sizes></drawer-header>
-    <drawer-panel>
-      <div class="row g-3">
-        <decimal-field id="rp-new-estimate-days" col="col-12 col-md-6" label="Estimate Days" placeholder="0.00" required></decimal-field>
-        <percentage-field id="rp-new-estimate-contingency" col="col-12 col-md-6" label="Contingency %" placeholder="0" min="0"></percentage-field>
-        <member-field id="rp-new-estimate-shared-by" col="col-12" label="Shared By" show-label multi-select required></member-field>
-        <website-field id="rp-new-estimate-link" col="col-12" label="Estimate Link">
-          <scheme-list>
-            <scheme>https://</scheme>
-            <scheme>http://</scheme>
-          </scheme-list>
-        </website-field>
-        <text-field id="rp-new-estimate-note" col="col-12" label="Note" placeholder="Any notes about this estimate…" maxlength="500" cols="3"></text-field>
-      </div>
-    </drawer-panel>
-    <drawer-footer close="Cancel" primary="Create Estimate" primary-icon="bi-check2"></drawer-footer>
-  </drawer-modal>
-  <!-- Edit Estimate drawer -->
-  <drawer-modal id="rp-estimate-edit-drawer" width="900">
-    <drawer-header eyebrow="Project Estimate" title="" no-sizes></drawer-header>
-    <drawer-panel>
-      <div class="row g-3">
-        <decimal-field id="rp-edit-estimate-days" col="col-12 col-md-6" label="Estimate Days" placeholder="0.00"></decimal-field>
-        <percentage-field id="rp-edit-estimate-contingency" col="col-12 col-md-6" label="Contingency %" placeholder="0" min="0"></percentage-field>
-        <project-estimate-status-field id="rp-edit-estimate-status" col="col-12 col-md-6" show-label></project-estimate-status-field>
-        <member-field id="rp-edit-estimate-shared-by" col="col-12" label="Shared By" show-label multi-select></member-field>
-        <member-field id="rp-edit-estimate-reviewed-by" col="col-12" label="Reviewed By" show-label multi-select></member-field>
-        <website-field id="rp-edit-estimate-link" col="col-12" label="Estimate Link">
-          <scheme-list>
-            <scheme>https://</scheme>
-            <scheme>http://</scheme>
-          </scheme-list>
-        </website-field>
-        <text-field id="rp-edit-estimate-note" col="col-12" label="Note" placeholder="Reason for this change…" maxlength="500" cols="3"></text-field>
-      </div>
-    </drawer-panel>
-    <drawer-footer close="Cancel" primary="Save Changes" primary-icon="bi-check2"></drawer-footer>
-  </drawer-modal>
-  <!-- Delete Estimate modal -->
-  <delete-modal id="rp-estimate-delete-modal"></delete-modal>
-  <!-- Advance to Reviewed modal -->
-  <form-modal id="rp-estimate-reviewed-modal" title="Mark as Reviewed" primary-label="Mark as Reviewed" primary-icon="bi-check2">
-    <div class="row g-3">
-      <member-field id="rp-estimate-reviewed-by-field" col="col-12" label="Reviewed By" show-label multi-select required></member-field>
+  <tab-items>
+  <tab-item id="general" active>
+  <tab-header title="General" icon="bi-info-circle"></tab-header>
+  <tab-content>
+  <div class="row g-4 align-items-start">
+    <div class="col-12 col-md-6">
+      <section-panel class="mt-2">
+        <panel-title>General Information</panel-title>
+        <panel-body>
+        <view-field id="rp-project-detail-id" label="ID" code></view-field>
+        <view-field id="rp-project-detail-name" label="Name"></view-field>
+        <view-field id="rp-project-detail-type" label="Project Type"></view-field>
+        <view-field id="rp-project-detail-programme" label="Programme"></view-field>
+        <view-field id="rp-project-detail-description" label="Description" desc></view-field>
+        <view-field id="rp-project-detail-status" label="Status"></view-field>
+        <view-field id="rp-project-detail-sub-status" label="Sub-Status"></view-field>
+        <view-field id="rp-project-detail-confidence" label="Confidence"></view-field>
+        <view-field id="rp-project-detail-priority" label="Priority"></view-field>
+        <view-field id="rp-project-detail-start-date" label="Tentative Start Date"></view-field>
+        <view-field id="rp-project-detail-end-date" label="Tentative End Date"></view-field>
+        </panel-body>
+      </section-panel>
+      <section-panel class="mt-3">
+        <panel-title>Metadata</panel-title>
+        <panel-body>
+        <view-field id="rp-project-detail-created-at" label="Created" meta></view-field>
+        <view-field id="rp-project-detail-created-by" label="Created By" meta></view-field>
+        <view-field id="rp-project-detail-updated-at" label="Updated" meta></view-field>
+        <view-field id="rp-project-detail-updated-by" label="Updated By" meta></view-field>
+        </panel-body>
+      </section-panel>
     </div>
-  </form-modal>
-  <!-- Advance to Approved modal -->
-  <form-modal id="rp-estimate-approve-modal" title="Approve Estimate" primary-label="Approve Estimate" primary-icon="bi-check2">
-    <p class="text-muted rp-fs-13 mb-3">A project code is required before approving this estimate. Please provide it below.</p>
-    <div class="row g-3">
-      <text-field id="rp-estimate-approve-code-field" col="col-12" label="Project Code" placeholder="e.g. DP-2025-001" maxlength="255" required></text-field>
-    </div>
-  </form-modal>
-  {% endif %}
-  {% if can_change_project %}
-  <!-- Edit Project drawer -->
-  <drawer-modal id="rp-project-edit-drawer" width="900">
-    <drawer-header eyebrow="Project" title="" no-sizes>
-      <identicon-field id="rp-project-edit-identicon" variant="geometric" no-border></identicon-field>
-    </drawer-header>
-    <drawer-panel>
-      <accordion-panel label="General" group="project-edit" open>
-        <accordion-body>
-          <div class="row g-3">
-            <text-field id="rp-edit-project-name" col="col-12" label="Project Name" placeholder="e.g. Digital Transformation" required maxlength="255" show-counter></text-field>
-            <project-type-field id="rp-edit-project-type" col="col-12 col-md-6" required show-label></project-type-field>
-            <programme-field id="rp-edit-project-programme" col="col-12 col-md-6" show-label searchable></programme-field>
-            <project-status-field id="rp-edit-project-status" col="col-12 col-md-6" required show-label></project-status-field>
-            <project-substatus-field id="rp-edit-project-sub-status" col="col-12 col-md-6" status-id="rp-edit-project-status" show-label></project-substatus-field>
-            <confidence-field id="rp-edit-project-confidence" col="col-12 col-md-6" show-label not-set></confidence-field>
-            <priority-field id="rp-edit-project-priority" col="col-12 col-md-6" show-label not-set></priority-field>
-            <date-field id="rp-edit-project-start-date" col="col-12 col-md-6" label="Tentative Start Date"></date-field>
-            <date-field id="rp-edit-project-end-date" col="col-12 col-md-6" label="Tentative End Date"></date-field>
-            <text-field id="rp-edit-project-description" col="col-12" cols="3" label="Description" placeholder="Optional project description" maxlength="500"></text-field>
+    <div class="col-12 col-md-6">
+      <section-panel class="mt-2">
+        <panel-title>Tags</panel-title>
+        <panel-body>
+        <project-tags-field id="rp-project-detail-tags" col="col-12" free-form></project-tags-field>
+        {% if can_change_project %}
+          <div class="mt-3 d-flex justify-content-end">
+            <primary-button id="rp-project-tags-save-btn" prefix-icon="bi-check2" label="Save Tags" size="sm"></primary-button>
           </div>
-        </accordion-body>
-      </accordion-panel>
-      <accordion-panel label="Operational" group="project-edit" class="mt-2">
-        <accordion-body>
-          <div class="row g-3">
-            <toggle-field id="rp-edit-project-efforts-issued" col="col-12 col-md-6" label="Efforts Issued"></toggle-field>
-            <date-field id="rp-edit-project-commitment-date" col="col-12 col-md-6" label="Commitment Date for Issuing Efforts"></date-field>
-            <toggle-field id="rp-edit-project-run-cost" col="col-12" label="Run Cost Applies"></toggle-field>
-          </div>
-        </accordion-body>
-      </accordion-panel>
-      <accordion-panel label="Team Assignment" group="project-edit" class="mt-2">
-        <accordion-body>
-          <div class="row g-3">
-            <team-field id="rp-edit-project-assigned-team" col="col-12" label="Assigned Team" show-label></team-field>
-            <team-field id="rp-edit-project-collaborators" col="col-12" label="Collaborating Teams" show-label multi-select></team-field>
-          </div>
-        </accordion-body>
-      </accordion-panel>
-      <accordion-panel label="Labels" group="project-edit" class="mt-2">
-        <accordion-body>
-          <div id="rp-edit-project-labels-container" class="d-flex flex-wrap gap-2"></div>
-          <p id="rp-edit-project-labels-empty" class="text-muted rp-fs-13 mb-0 mt-1" hidden>No labels added yet.</p>
-          <div class="mt-3">
-            <secondary-button id="rp-project-add-label-btn" prefix-icon="bi-plus" label="Add Label" size="sm" class="mt-3"></secondary-button>
-          </div>
-        </accordion-body>
-      </accordion-panel>
-      <accordion-panel label="Project Code" group="project-edit" class="mt-2">
-        <accordion-body>
-          <div class="row g-3">
-            <text-field id="rp-edit-project-code-value" col="col-12" label="Project Code" placeholder="e.g. DP-2025-001" maxlength="255"></text-field>
-          </div>
-        </accordion-body>
-      </accordion-panel>
-    </drawer-panel>
-    <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
-  </drawer-modal>
-  <!-- Add Label modal -->
-  <div id="rp-project-add-label-modal" class="rp-modal-back" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="rp-add-label-modal-title">
-    <div class="rp-modal" style="max-width:520px;">
-      <div class="rp-modal-head">
-        <strong id="rp-add-label-modal-title">Add Label</strong>
-        <button type="button" class="rp-iconbtn" id="rp-add-label-modal-close" aria-label="Close"><i class="bi bi-x-lg"></i></button>
-      </div>
-      <div class="rp-modal-body">
-        <div class="row g-3">
-          <text-field id="rp-add-label-input" col="col-12" label="Label" placeholder="e.g. FEATURE" required maxlength="50" hint="Uppercase letters (A–Z), digits (0–9), and underscores only." show-counter></text-field>
-          <toggle-field id="rp-add-label-is-default" col="col-12" label="Mark as Primary"></toggle-field>
-        </div>
-      </div>
-      <div class="rp-modal-foot">
-        <engine-button id="rp-add-label-suggest-btn" prefix-icon="bi-lightbulb" label="Suggest Label" class="me-auto"></engine-button>
-        <muted-button id="rp-add-label-modal-cancel" label="Cancel"></muted-button>
-        <primary-button id="rp-add-label-modal-submit" prefix-icon="bi-check2" label="Save Label"></primary-button>
-      </div>
+        {% endif %}
+        </panel-body>
+      </section-panel>
     </div>
   </div>
+  </tab-content>
+  </tab-item>
+  <tab-item id="operational">
+  <tab-header title="Operational" icon="bi-gear"></tab-header>
+  <tab-content>
+  <div class="row g-4 align-items-start">
+    <div class="col-12 col-md-6">
+      <section-panel class="mt-2">
+        <panel-title>Operational</panel-title>
+        <panel-body>
+        <view-field id="rp-project-detail-efforts-issued" label="Efforts Issued"></view-field>
+        <view-field id="rp-project-detail-commitment-date" label="Commitment Date"></view-field>
+        <view-field id="rp-project-detail-run-cost" label="Run Cost Applies"></view-field>
+        </panel-body>
+      </section-panel>
+      <section-panel class="mt-3">
+        <panel-title>Project Code</panel-title>
+        <panel-body>
+        <view-field id="rp-project-detail-code-value" label="Project Code" code></view-field>
+        </panel-body>
+      </section-panel>
+    </div>
+    <div class="col-12 col-md-6">
+      <section-panel class="mt-2">
+        <panel-title>Teams</panel-title>
+        <panel-body>
+        <div id="rp-project-detail-teams-badges" class="d-flex flex-wrap gap-2"></div>
+        </panel-body>
+      </section-panel>
+      <section-panel class="mt-3">
+        <panel-title>Labels</panel-title>
+        <panel-body>
+        <div id="rp-project-detail-labels-badges" class="d-flex flex-wrap gap-2"></div>
+        </panel-body>
+      </section-panel>
+    </div>
+  </div>
+  </tab-content>
+  </tab-item>
+  <tab-item id="estimates">
+  <tab-header title="Estimates" icon="bi-calculator"></tab-header>
+  <tab-content>
+  <div class="row g-4 align-items-start">
+    <div class="col-12 col-md-8 rp-estimate-main-col">
+      <section-panel class="mt-2">
+        <panel-title>Estimates</panel-title>
+        <panel-body>
+        {% if can_change_estimate %}
+          <div class="d-flex justify-content-end mb-3">
+            <primary-button id="rp-estimate-create-btn" prefix-icon="bi-plus" label="Create Estimate" size="sm"></primary-button>
+          </div>
+        {% endif %}
+        <data-table id="rp-estimates-table" paginated page-size="25" row-template="renderProjectEstimateRow" empty-message="No estimates found.">
+          <table-columns>
+            <table-column label="Version" key="version_display" sortable numeric>
+            </table-column>
+            <table-column label="Estimate Days" key="estimate_days" sortable numeric>
+            </table-column>
+            <table-column label="Contingency %" key="contingency_percentage" sortable numeric>
+            </table-column>
+            <table-column label="Total Cost" key="total_cost" sortable>
+            </table-column>
+            <table-column label="Size" key="size" sortable>
+            </table-column>
+            <table-column label="Status" key="status" sortable>
+            </table-column>
+          </table-columns>
+          {% if can_change_estimate %}
+            <table-actions>
+              <table-action icon="bi-pencil" label="Edit" event="rp:estimate:edit">
+              </table-action>
+              <table-action icon="bi-arrow-right-circle" label="Advance" event="rp:estimate:advance">
+              </table-action>
+              <table-action icon="bi-envelope" label="Email" event="rp:estimate:email">
+              </table-action>
+              <table-action icon="bi-trash" label="Delete" event="rp:estimate:delete" danger>
+              </table-action>
+            </table-actions>
+          {% endif %}
+        </data-table>
+        </panel-body>
+      </section-panel>
+    </div>
+    <div class="col-12 col-md-4 rp-estimate-history-col">
+      <history-panel title="Version History" icon="bi-clock-history" class="mt-2">
+      <dropdown-field id="rp-estimate-version-picker" label="Version" show-label class="mb-3">
+      <values-list>
+      <value label="— Select a version —" value=""></value>
+      </values-list>
+      </dropdown-field>
+      <history-items id="rp-estimate-history-list" placeholder="Select a version to view its history.">
+      </history-items>
+      </history-panel>
+    </div>
+  </div>
+  </tab-content>
+  </tab-item>
+  <tab-item id="links">
+  <tab-header title="Links" icon="bi-link-45deg"></tab-header>
+  <tab-content>
+  <div class="row g-4 align-items-start">
+    <div class="col-12">
+      <section-panel class="mt-2">
+        <panel-title>Links</panel-title>
+        <panel-body>
+        {% if can_change_link %}
+          <div class="d-flex justify-content-end mb-3">
+            <primary-button id="rp-link-create-btn" prefix-icon="bi-plus" label="Add Link" size="sm"></primary-button>
+          </div>
+        {% endif %}
+        <data-table id="rp-links-table" row-template="renderProjectLinkRow" empty-message="No links added yet.">
+          <table-columns>
+            <table-column label="Title" key="title" sortable>
+            </table-column>
+            <table-column label="URL" key="url">
+            </table-column>
+          </table-columns>
+          {% if can_change_link %}
+            <table-actions>
+              <table-action icon="bi-pencil" label="Edit" event="rp:link:edit">
+              </table-action>
+              <table-action icon="bi-trash" label="Delete" event="rp:link:delete" danger>
+              </table-action>
+            </table-actions>
+          {% endif %}
+        </data-table>
+        </panel-body>
+      </section-panel>
+    </div>
+  </div>
+  </tab-content>
+  </tab-item>
+  </tab-items>
+  </tab-panel>
+  {% if can_change_link %}
+    <!-- Create Link drawer -->
+    <drawer-modal id="rp-link-create-drawer" width="900">
+    <drawer-header eyebrow="Project Link" title="Add Link" no-sizes></drawer-header>
+    <drawer-panel>
+    <div class="row g-3">
+      <text-field id="rp-new-link-title" col="col-12" label="Title" placeholder="e.g. Confluence Page" required maxlength="200" show-counter></text-field>
+      <website-field id="rp-new-link-url" col="col-12" label="URL" required>
+      <scheme-list>
+      <scheme>https://</scheme>
+      <scheme>http://</scheme>
+      </scheme-list>
+      </website-field>
+    </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Add Link" primary-icon="bi-check2"></drawer-footer>
+    </drawer-modal>
+    <!-- Edit Link drawer -->
+    <drawer-modal id="rp-link-edit-drawer" width="900">
+    <drawer-header eyebrow="Project Link" title="" no-sizes></drawer-header>
+    <drawer-panel>
+    <div class="row g-3">
+      <text-field id="rp-edit-link-title" col="col-12" label="Title" placeholder="e.g. Confluence Page" required maxlength="200" show-counter></text-field>
+      <website-field id="rp-edit-link-url" col="col-12" label="URL" required>
+      <scheme-list>
+      <scheme>https://</scheme>
+      <scheme>http://</scheme>
+      </scheme-list>
+      </website-field>
+    </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Save Changes" primary-icon="bi-check2"></drawer-footer>
+    </drawer-modal>
+    <!-- Delete Link modal -->
+    <delete-modal id="rp-link-delete-modal"></delete-modal>
+  {% endif %}
+  {% if can_change_estimate %}
+    <!-- Create Estimate drawer -->
+    <drawer-modal id="rp-estimate-create-drawer" width="900">
+    <drawer-header eyebrow="Project Estimate" title="New Estimate" no-sizes></drawer-header>
+    <drawer-panel>
+    <div class="row g-3">
+      <decimal-field id="rp-new-estimate-days" col="col-12 col-md-6" label="Estimate Days" placeholder="0.00" required></decimal-field>
+      <percentage-field id="rp-new-estimate-contingency" col="col-12 col-md-6" label="Contingency %" placeholder="0" min="0"></percentage-field>
+      <member-field id="rp-new-estimate-shared-by" col="col-12" label="Shared By" show-label multi-select required></member-field>
+      <website-field id="rp-new-estimate-link" col="col-12" label="Estimate Link">
+      <scheme-list>
+      <scheme>https://</scheme>
+      <scheme>http://</scheme>
+      </scheme-list>
+      </website-field>
+      <text-field id="rp-new-estimate-note" col="col-12" label="Note" placeholder="Any notes about this estimate…" maxlength="500" cols="3"></text-field>
+    </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Create Estimate" primary-icon="bi-check2"></drawer-footer>
+    </drawer-modal>
+    <!-- Edit Estimate drawer -->
+    <drawer-modal id="rp-estimate-edit-drawer" width="900">
+    <drawer-header eyebrow="Project Estimate" title="" no-sizes></drawer-header>
+    <drawer-panel>
+    <div class="row g-3">
+      <decimal-field id="rp-edit-estimate-days" col="col-12 col-md-6" label="Estimate Days" placeholder="0.00"></decimal-field>
+      <percentage-field id="rp-edit-estimate-contingency" col="col-12 col-md-6" label="Contingency %" placeholder="0" min="0"></percentage-field>
+      <project-estimate-status-field id="rp-edit-estimate-status" col="col-12 col-md-6" show-label></project-estimate-status-field>
+      <member-field id="rp-edit-estimate-shared-by" col="col-12" label="Shared By" show-label multi-select></member-field>
+      <member-field id="rp-edit-estimate-reviewed-by" col="col-12" label="Reviewed By" show-label multi-select></member-field>
+      <website-field id="rp-edit-estimate-link" col="col-12" label="Estimate Link">
+      <scheme-list>
+      <scheme>https://</scheme>
+      <scheme>http://</scheme>
+      </scheme-list>
+      </website-field>
+      <text-field id="rp-edit-estimate-note" col="col-12" label="Note" placeholder="Reason for this change…" maxlength="500" cols="3"></text-field>
+    </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Save Changes" primary-icon="bi-check2"></drawer-footer>
+    </drawer-modal>
+    <!-- Delete Estimate modal -->
+    <delete-modal id="rp-estimate-delete-modal"></delete-modal>
+    <!-- Advance to Reviewed modal -->
+    <form-modal id="rp-estimate-reviewed-modal" title="Mark as Reviewed" primary-label="Mark as Reviewed" primary-icon="bi-check2">
+      <div class="row g-3">
+        <member-field id="rp-estimate-reviewed-by-field" col="col-12" label="Reviewed By" show-label multi-select required></member-field>
+      </div>
+    </form-modal>
+    <!-- Advance to Approved modal -->
+    <form-modal id="rp-estimate-approve-modal" title="Approve Estimate" primary-label="Approve Estimate" primary-icon="bi-check2">
+      <p class="text-muted rp-fs-13 mb-3">
+        A project code is required before approving this estimate. Please provide it below.
+      </p>
+      <div class="row g-3">
+        <text-field id="rp-estimate-approve-code-field" col="col-12" label="Project Code" placeholder="e.g. DP-2025-001" maxlength="255" required></text-field>
+      </div>
+    </form-modal>
+  {% endif %}
+  {% if can_change_project %}
+    <!-- Edit Project drawer -->
+    <drawer-modal id="rp-project-edit-drawer" width="900">
+    <drawer-header eyebrow="Project" title="" no-sizes>
+    <identicon-field id="rp-project-edit-identicon" variant="geometric" no-border></identicon-field>
+    </drawer-header>
+    <drawer-panel>
+    <accordion-panel label="General" group="project-edit" open>
+    <accordion-body>
+    <div class="row g-3">
+      <text-field id="rp-edit-project-name" col="col-12" label="Project Name" placeholder="e.g. Digital Transformation" required maxlength="255" show-counter></text-field>
+      <project-type-field id="rp-edit-project-type" col="col-12 col-md-6" required show-label></project-type-field>
+      <programme-field id="rp-edit-project-programme" col="col-12 col-md-6" show-label searchable></programme-field>
+      <project-status-field id="rp-edit-project-status" col="col-12 col-md-6" required show-label></project-status-field>
+      <project-substatus-field id="rp-edit-project-sub-status" col="col-12 col-md-6" status-id="rp-edit-project-status" show-label></project-substatus-field>
+      <confidence-field id="rp-edit-project-confidence" col="col-12 col-md-6" show-label not-set></confidence-field>
+      <priority-field id="rp-edit-project-priority" col="col-12 col-md-6" show-label not-set></priority-field>
+      <date-field id="rp-edit-project-start-date" col="col-12 col-md-6" label="Tentative Start Date"></date-field>
+      <date-field id="rp-edit-project-end-date" col="col-12 col-md-6" label="Tentative End Date"></date-field>
+      <text-field id="rp-edit-project-description" col="col-12" cols="3" label="Description" placeholder="Optional project description" maxlength="500"></text-field>
+    </div>
+    </accordion-body>
+    </accordion-panel>
+    <accordion-panel label="Operational" group="project-edit" class="mt-2">
+    <accordion-body>
+    <div class="row g-3">
+      <toggle-field id="rp-edit-project-efforts-issued" col="col-12 col-md-6" label="Efforts Issued"></toggle-field>
+      <date-field id="rp-edit-project-commitment-date" col="col-12 col-md-6" label="Commitment Date for Issuing Efforts"></date-field>
+      <toggle-field id="rp-edit-project-run-cost" col="col-12" label="Run Cost Applies"></toggle-field>
+    </div>
+    </accordion-body>
+    </accordion-panel>
+    <accordion-panel label="Team Assignment" group="project-edit" class="mt-2">
+    <accordion-body>
+    <div class="row g-3">
+      <team-field id="rp-edit-project-assigned-team" col="col-12" label="Assigned Team" show-label></team-field>
+      <team-field id="rp-edit-project-collaborators" col="col-12" label="Collaborating Teams" show-label multi-select></team-field>
+    </div>
+    </accordion-body>
+    </accordion-panel>
+    <accordion-panel label="Labels" group="project-edit" class="mt-2">
+    <accordion-body>
+    <div id="rp-edit-project-labels-container" class="d-flex flex-wrap gap-2"></div>
+    <p id="rp-edit-project-labels-empty"
+       class="text-muted rp-fs-13 mb-0 mt-1"
+       hidden>No labels added yet.</p>
+    <div class="mt-3">
+      <secondary-button id="rp-project-add-label-btn" prefix-icon="bi-plus" label="Add Label" size="sm" class="mt-3"></secondary-button>
+    </div>
+    </accordion-body>
+    </accordion-panel>
+    <accordion-panel label="Project Code" group="project-edit" class="mt-2">
+    <accordion-body>
+    <div class="row g-3">
+      <text-field id="rp-edit-project-code-value" col="col-12" label="Project Code" placeholder="e.g. DP-2025-001" maxlength="255"></text-field>
+    </div>
+    </accordion-body>
+    </accordion-panel>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
+    </drawer-modal>
+    <!-- Add Label modal -->
+    <div id="rp-project-add-label-modal"
+         class="rp-modal-back"
+         style="display:none"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="rp-add-label-modal-title">
+      <div class="rp-modal" style="max-width:520px;">
+        <div class="rp-modal-head">
+          <strong id="rp-add-label-modal-title">Add Label</strong>
+          <button type="button"
+                  class="rp-iconbtn"
+                  id="rp-add-label-modal-close"
+                  aria-label="Close">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+        <div class="rp-modal-body">
+          <div class="row g-3">
+            <text-field id="rp-add-label-input" col="col-12" label="Label" placeholder="e.g. FEATURE" required maxlength="50" hint="Uppercase letters (A–Z), digits (0–9), and underscores only." show-counter></text-field>
+            <toggle-field id="rp-add-label-is-default" col="col-12" label="Mark as Primary"></toggle-field>
+          </div>
+        </div>
+        <div class="rp-modal-foot">
+          <engine-button id="rp-add-label-suggest-btn" prefix-icon="bi-lightbulb" label="Suggest Label" class="me-auto"></engine-button>
+          <muted-button id="rp-add-label-modal-cancel" label="Cancel"></muted-button>
+          <primary-button id="rp-add-label-modal-submit" prefix-icon="bi-check2" label="Save Label"></primary-button>
+        </div>
+      </div>
+    </div>
   {% endif %}
 {% endblock content %}

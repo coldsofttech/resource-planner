@@ -6,6 +6,7 @@ from apps.projects.api_views import (
     ProjectEstimateViewSet,
     ProjectFollowerViewSet,
     ProjectLabelViewSet,
+    ProjectLinkViewSet,
     ProjectSizeConfigViewSet,
     ProjectStatusViewSet,
     ProjectSubStatusFlatOptionsViewSet,
@@ -417,6 +418,19 @@ urlpatterns = [
         "projects/<str:code>/estimates/<str:estimate_code>/history/",
         ProjectEstimateViewSet.as_view({"get": "history"}),
         name="project-estimates-history",
+    ),
+    # Project link nested routes
+    path(
+        "projects/<str:code>/links/",
+        ProjectLinkViewSet.as_view({"get": "list", "post": "create"}),
+        name="project-links-list",
+    ),
+    path(
+        "projects/<str:code>/links/<str:link_code>/",
+        ProjectLinkViewSet.as_view(
+            {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
+        ),
+        name="project-links-detail",
     ),
     # Project budget nested routes
     path(

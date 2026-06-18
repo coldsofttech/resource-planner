@@ -22,6 +22,8 @@ let currentEstimates = [];
 let estimatesLoaded = false;
 let pendingEstimateRow = null;
 let _pendingEditApprovePayload = null;
+let linksLoaded = false;
+let pendingLinkRow = null;
 
 function setView(id, val) {
   const el = document.getElementById(id);
@@ -1481,6 +1483,168 @@ function initEstimatesTab() {
   initAdvanceFlow(table);
 }
 
+window.renderProjectLinkRow = function renderProjectLinkRow(row) {
+  const urlDisplay = row.url ? row.url : "—";
+  return (
+    `<td>${esc(row.title ?? "")}</td>` +
+    `<td><a href="${esc(row.url ?? "")}" target="_blank" rel="noopener noreferrer" class="rp-link">${esc(urlDisplay)}</a></td>`
+  );
+};
+
+function initLinksTab() {
+  const table = document.getElementById("rp-links-table");
+  const baseUrl = API_URLS.projectLinks.list(projectCode).href;
+
+  const activateTab = () => {
+    if (!linksLoaded) {
+      linksLoaded = true;
+      if (table) table.setAttribute("url", baseUrl);
+    } else {
+      table?.refresh();
+    }
+  };
+
+  const tabPanel = document.querySelector("tab-panel");
+  if (tabPanel) {
+    if (tabPanel.activeTab === "links") {
+      activateTab();
+    }
+    tabPanel.addEventListener("rp:tab-change", (e) => {
+      if (e.detail.tab === "links") activateTab();
+    });
+  }
+
+  const createBtn = document.getElementById("rp-link-create-btn");
+  const createDrawer = document.getElementById("rp-link-create-drawer");
+  if (createBtn && createDrawer) {
+    createBtn.addEventListener("click", () => {
+      const titleField = document.getElementById("rp-new-link-title");
+      const urlField = document.getElementById("rp-new-link-url");
+      if (titleField) titleField.value = "";
+      if (urlField) urlField.value = "";
+      createDrawer.querySelectorAll("[data-rp-error]:not([hidden])").forEach((el) => {
+        el.hidden = true;
+      });
+      createDrawer.show();
+    });
+
+    createDrawer.addEventListener("rp:footer-primary", async () => {
+      const titleField = document.getElementById("rp-new-link-title");
+      const urlField = document.getElementById("rp-new-link-url");
+
+      [titleField, urlField].forEach((f) =>
+        f?.dispatchEvent(new Event("rp:validate", { bubbles: false })),
+      );
+      if (createDrawer.querySelector("[data-rp-error]:not([hidden])")) return;
+
+      const title = titleField?.value?.trim() ?? "";
+      const url = urlField?.value?.trim() ?? "";
+      if (!title || !url) return;
+
+      const submitBtn = createDrawer.querySelector("[data-footer-primary]");
+      const snap = snapshotButton(submitBtn);
+      setBusyButton(submitBtn, "Adding…");
+
+      try {
+        const { href, method } = API_URLS.projectLinks.create(projectCode);
+        await apiFetch(href, { method, body: JSON.stringify({ title, url }) });
+        restoreButton(submitBtn, snap);
+        createDrawer.hide();
+        table?.refresh();
+        toast({ type: "success", title: "Link added", message: `"${title}" has been added.` });
+      } catch (err) {
+        restoreButton(submitBtn, snap);
+        const msg = err?.data?.error?.message ?? "Failed to add link. Please try again.";
+        toast({ type: "error", title: "Error", message: msg });
+      }
+    });
+  }
+
+  const editDrawer = document.getElementById("rp-link-edit-drawer");
+  if (table && editDrawer) {
+    table.addEventListener("rp:link:edit", (e) => {
+      pendingLinkRow = e.detail.row;
+      const titleField = document.getElementById("rp-edit-link-title");
+      const urlField = document.getElementById("rp-edit-link-url");
+      if (titleField) titleField.value = pendingLinkRow.title ?? "";
+      if (urlField) urlField.value = pendingLinkRow.url ?? "";
+      editDrawer.setTitle(pendingLinkRow.title ?? "Edit Link");
+      editDrawer.querySelectorAll("[data-rp-error]:not([hidden])").forEach((el) => {
+        el.hidden = true;
+      });
+      editDrawer.show();
+    });
+
+    editDrawer.addEventListener("rp:footer-primary", async () => {
+      if (!pendingLinkRow) return;
+
+      const titleField = document.getElementById("rp-edit-link-title");
+      const urlField = document.getElementById("rp-edit-link-url");
+
+      [titleField, urlField].forEach((f) =>
+        f?.dispatchEvent(new Event("rp:validate", { bubbles: false })),
+      );
+      if (editDrawer.querySelector("[data-rp-error]:not([hidden])")) return;
+
+      const title = titleField?.value?.trim() ?? "";
+      const url = urlField?.value?.trim() ?? "";
+      if (!title || !url) return;
+
+      const submitBtn = editDrawer.querySelector("[data-footer-primary]");
+      const snap = snapshotButton(submitBtn);
+      setBusyButton(submitBtn, "Saving…");
+
+      try {
+        const { href, method } = API_URLS.projectLinks.update(projectCode, pendingLinkRow.code);
+        await apiFetch(href, { method, body: JSON.stringify({ title, url }) });
+        restoreButton(submitBtn, snap);
+        editDrawer.hide();
+        pendingLinkRow = null;
+        table.refresh();
+        toast({ type: "success", title: "Link updated", message: `"${title}" has been saved.` });
+      } catch (err) {
+        restoreButton(submitBtn, snap);
+        const msg = err?.data?.error?.message ?? "Failed to update link. Please try again.";
+        toast({ type: "error", title: "Error", message: msg });
+      }
+    });
+  }
+
+  const deleteModal = document.getElementById("rp-link-delete-modal");
+  if (table && deleteModal) {
+    table.addEventListener("rp:link:delete", (e) => {
+      pendingLinkRow = e.detail.row;
+      deleteModal.setAttribute("title", `Delete "${pendingLinkRow.title}"?`);
+      deleteModal.setAttribute(
+        "body",
+        "This will permanently remove this link and cannot be undone.",
+      );
+      deleteModal.setAttribute("confirm-value", pendingLinkRow.title);
+      deleteModal.show();
+    });
+
+    deleteModal.addEventListener("rp:delete", async () => {
+      if (!pendingLinkRow) return;
+      const deleteBtn = deleteModal.querySelector("[data-delete-modal]");
+      deleteBtn?.setAttribute("disabled", "");
+
+      try {
+        const { href, method } = API_URLS.projectLinks.delete(projectCode, pendingLinkRow.code);
+        await apiFetch(href, { method });
+        deleteModal.hide();
+        const title = pendingLinkRow.title;
+        pendingLinkRow = null;
+        table?.refresh();
+        toast({ type: "success", title: "Link deleted", message: `"${title}" has been removed.` });
+      } catch (err) {
+        deleteBtn?.removeAttribute("disabled");
+        const msg = err?.data?.error?.message ?? "Failed to delete link. Please try again.";
+        toast({ type: "error", title: "Error", message: msg });
+      }
+    });
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   if (!projectCode) return;
   loadProjectDetails();
@@ -1492,4 +1656,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initTagsSaveButton();
   initAddLabelModal();
   initEstimatesTab();
+  initLinksTab();
 });

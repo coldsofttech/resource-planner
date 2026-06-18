@@ -8,6 +8,7 @@ from apps.projects.models import (
     ProjectCollaborator,
     ProjectEstimate,
     ProjectEstimateStatusHistory,
+    ProjectLink,
     ProjectStatus,
     ProjectStatusHistory,
     ProjectSubStatus,
@@ -212,6 +213,19 @@ def make_project_tag(
     if tag is None:
         tag = make_tag()
     return ProjectTag.objects.create(project=project, tag=tag, **overrides)
+
+
+def make_project_link(
+    project: Project | None = None,
+    title: str = "Test Link",
+    url: str = "https://example.com",
+    **overrides,
+) -> ProjectLink:
+    if project is None:
+        project = make_project()
+    return ProjectLink.objects.create(
+        project=project, title=title, url=url, **overrides
+    )
 
 
 def make_csv_file(content: str, name: str = "programmes.csv"):

@@ -23,6 +23,11 @@ from .label import (
     get_sibling_labels,
     project_label_exists,
 )
+from .link import (
+    get_link_by_code,
+    get_links_for_project,
+    project_link_title_exists,
+)
 from .programme import (
     get_active_programmes,
     get_all_programmes,
@@ -118,4 +123,7 @@ __all__ = [
     "get_all_project_followers",
     "get_project_follower_by_code",
     "project_follower_exists",
+    "get_link_by_code",
+    "get_links_for_project",
+    "project_link_title_exists",
 ]

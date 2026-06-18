@@ -4,6 +4,7 @@ from .budget import ProjectBudget, ProjectBudgetStatusHistory
 from .estimate import ProjectEstimate, ProjectEstimateStatusHistory
 from .follower import ProjectFollower
 from .label import ProjectLabel
+from .link import ProjectLink
 from .programme import Programme
 from .project import Project, ProjectCollaborator
 from .project_code import ProjectCode, ProjectCodeHistory
@@ -22,6 +23,7 @@ __all__ = [
     "ProjectCode",
     "ProjectCodeHistory",
     "ProjectLabel",
+    "ProjectLink",
     "ProjectTag",
     "ProjectFollower",
     "ProjectEstimate",

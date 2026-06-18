@@ -4,6 +4,7 @@ from .budget import ProjectBudgetExportService, ProjectBudgetService
 from .estimate import ProjectEstimateExportService, ProjectEstimateService
 from .follower import ProjectFollowerService
 from .label import ProjectLabelService
+from .link import ProjectLinkService
 from .programme import ProgrammeExportService, ProgrammeImportService, ProgrammeService
 from .project import ProjectExportService, ProjectImportService, ProjectService
 from .project_status import (
@@ -40,6 +41,7 @@ __all__ = [
     "ProjectLabelService",
     "ProjectTagService",
     "ProjectFollowerService",
+    "ProjectLinkService",
     "ProjectEstimateService",
     "ProjectEstimateExportService",
     "ProjectBudgetService",

@@ -559,6 +559,18 @@ export const API_URLS = {
       href: `${API_BASE}projects/${code}/estimates/${estCode}/history/`,
     }),
   },
+  projectLinks: {
+    list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/links/` }),
+    create: (code) => ({ method: "POST", href: `${API_BASE}projects/${code}/links/` }),
+    update: (code, linkCode) => ({
+      method: "PATCH",
+      href: `${API_BASE}projects/${code}/links/${linkCode}/`,
+    }),
+    delete: (code, linkCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}projects/${code}/links/${linkCode}/`,
+    }),
+  },
   projectLabels: {
     list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/labels/` }),
     create: (code) => ({ method: "POST", href: `${API_BASE}projects/${code}/labels/` }),

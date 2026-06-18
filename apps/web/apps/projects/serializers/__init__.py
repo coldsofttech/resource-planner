@@ -22,6 +22,11 @@ from apps.projects.serializers.label import (
     ProjectLabelSerializer,
     ProjectLabelUpdateSerializer,
 )
+from apps.projects.serializers.link import (
+    ProjectLinkCreateSerializer,
+    ProjectLinkSerializer,
+    ProjectLinkUpdateSerializer,
+)
 from apps.projects.serializers.programme import (
     ProgrammeCreateSerializer,
     ProgrammeDetailSerializer,
@@ -81,6 +86,9 @@ __all__ = [
     "ProjectFollowerCreateSerializer",
     "ProjectFollowerListSerializer",
     "ProjectFollowerUpdateSerializer",
+    "ProjectLinkCreateSerializer",
+    "ProjectLinkSerializer",
+    "ProjectLinkUpdateSerializer",
     "ProjectLabelCreateSerializer",
     "ProjectLabelSerializer",
     "ProjectLabelUpdateSerializer",

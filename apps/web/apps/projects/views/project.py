@@ -22,4 +22,5 @@ class ProjectDetailView(ProtectedView):
         perms = get_user_permissions(self.request.user)
         ctx["can_change_project"] = "projects.change_project" in perms
         ctx["can_change_estimate"] = "projects.change_projectestimate" in perms
+        ctx["can_change_link"] = "projects.change_projectlink" in perms
         return ctx
