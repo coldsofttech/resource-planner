@@ -1,0 +1,454 @@
+{
+  "module": {
+    "slug": "project-sizes",
+    "name": "Project Sizes",
+    "sort_order": 30,
+    "parent": {
+      "slug": "projects-configurations",
+      "name": "Projects / Configurations",
+      "sort_order": 10
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-PSZ-100",
+      "name": "Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-PSZ-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user is redirected from the Project Sizes page",
+          "steps": "1. Open /projects/sizes/ without being logged in.",
+          "expected": "The browser redirects to the login page. The Project Sizes configuration screen is not displayed."
+        },
+        {
+          "id": "TC-PSZ-102",
+          "severity": "P0",
+          "scenario": "User with 'configurations.change_configuration' permission sees editable fields and Save button",
+          "steps": "1. Log in as a user with 'configurations.change_configuration' permission.\n2. Navigate to Projects / Configurations > Project Sizes.",
+          "expected": "Each of the four editable tier cards (XS, S, M, L) shows a number input field labelled 'Max Amount (£)'. A 'Save Changes' button is visible at the bottom of the page."
+        },
+        {
+          "id": "TC-PSZ-103",
+          "severity": "P1",
+          "scenario": "User without 'configurations.change_configuration' permission sees read-only values and no Save button",
+          "steps": "1. Log in as a user without 'configurations.change_configuration' permission.\n2. Navigate to Projects / Configurations > Project Sizes.",
+          "expected": "Each tier card shows a read-only view field (not an editable input). The 'Save Changes' button is not present on the page."
+        },
+        {
+          "id": "TC-PSZ-104",
+          "severity": "P1",
+          "scenario": "Project Sizes menu item is only visible to users with the change_configuration permission",
+          "steps": "1. Log in as a user without 'configurations.change_configuration' permission.\n2. Expand the Project > Configurations menu in the sidebar.",
+          "expected": "The 'Project Sizes' menu item is not shown in the navigation. The user cannot navigate to /projects/sizes/ from the menu."
+        },
+        {
+          "id": "TC-PSZ-105",
+          "severity": "P1",
+          "scenario": "User without change permission cannot update thresholds via the API directly",
+          "steps": "1. Log in as a user without 'configurations.change_configuration' permission.\n2. Send a PATCH request to /api/v1/projects/sizes/ with a valid payload.",
+          "expected": "The API returns HTTP 403 Forbidden. No configuration values are updated."
+        }
+      ]
+    },
+    {
+      "id": "TC-PSZ-200",
+      "name": "Page Load & Initial State",
+      "test_cases": [
+        {
+          "id": "TC-PSZ-201",
+          "severity": "P0",
+          "scenario": "Project Sizes page renders five tier cards: XS, S, M, L, and XL",
+          "steps": "1. Log in with configuration change permission.\n2. Navigate to /projects/sizes/.",
+          "expected": "Five tier cards are displayed in a row. Each card shows a coloured badge (XS = grey, S = blue, M = green, L = amber, XL = red/danger) with its full name (X-Small, Small, Medium, Large, X-Large)."
+        },
+        {
+          "id": "TC-PSZ-202",
+          "severity": "P0",
+          "scenario": "Current threshold values are loaded into the input fields on page load via the API",
+          "steps": "1. Navigate to /projects/sizes/.\n2. Wait for the page to finish loading.\n3. Observe the Max Amount fields in the XS, S, M, and L cards.",
+          "expected": "Each editable number field is populated with the current configured value (not blank). The values match what GET /api/v1/projects/sizes/ returns."
+        },
+        {
+          "id": "TC-PSZ-203",
+          "severity": "P1",
+          "scenario": "Out-of-the-box default values are XS=20,000 / S=60,000 / M=200,000 / L=500,000",
+          "steps": "1. On a fresh instance with no custom configuration, navigate to /projects/sizes/.",
+          "expected": "The four input fields show the default values: XS Max = 20000, S Max = 60000, M Max = 200000, L Max = 500000."
+        },
+        {
+          "id": "TC-PSZ-204",
+          "severity": "P1",
+          "scenario": "Range hints are displayed beneath the input fields on page load reflecting loaded values",
+          "steps": "1. Navigate to /projects/sizes/ with default configuration in place.",
+          "expected": "XS range shows 'Up to £20,000'. S range shows '£20,001 — £60,000'. M range shows '£60,001 — £200,000'. L range shows '£200,001 — £500,000'. XL range shows '£500,001 and above'."
+        },
+        {
+          "id": "TC-PSZ-205",
+          "severity": "P1",
+          "scenario": "XL tier card is visually distinct (dashed border) and contains no editable input",
+          "steps": "1. Navigate to /projects/sizes/.\n2. Observe the XL card.",
+          "expected": "The XL card has a dashed border and reduced opacity. It contains no number input or edit field. An italicised label reads 'Automatically derived from L max'."
+        },
+        {
+          "id": "TC-PSZ-206",
+          "severity": "P2",
+          "scenario": "XL range hint updates to reflect the current L max value on page load",
+          "steps": "1. Ensure L max is configured as 500000.\n2. Navigate to /projects/sizes/.",
+          "expected": "The XL range shows '£500,001 and above', derived from the current L max value."
+        },
+        {
+          "id": "TC-PSZ-207",
+          "severity": "P2",
+          "scenario": "Badge colours match the size category conventions used in the Estimates table",
+          "steps": "1. Navigate to /projects/sizes/ and observe the tier badge colours.\n2. Navigate to a project's Estimates tab and observe the Size column badge colours.",
+          "expected": "The badge colours are identical on both screens: XS = neutral grey, S = blue/info, M = green/success, L = amber/warning, XL = red/danger."
+        }
+      ]
+    },
+    {
+      "id": "TC-PSZ-300",
+      "name": "View Mode (Read-Only Users)",
+      "test_cases": [
+        {
+          "id": "TC-PSZ-301",
+          "severity": "P1",
+          "scenario": "Read-only user sees formatted currency values in view-field elements",
+          "steps": "1. Log in as a user without 'configurations.change_configuration' permission.\n2. Navigate to /projects/sizes/.",
+          "expected": "Each tier card (XS, S, M, L) displays the current max amount as formatted currency text (e.g. '£20,000'). The values are not in editable input fields."
+        },
+        {
+          "id": "TC-PSZ-302",
+          "severity": "P2",
+          "scenario": "Range hints are visible to read-only users and reflect the current configuration",
+          "steps": "1. Log in as a read-only user.\n2. Navigate to /projects/sizes/.",
+          "expected": "All five range hints (XS, S, M, L, XL) are visible and display the correct ranges based on the current configuration. The ranges are identical to what an admin user would see."
+        },
+        {
+          "id": "TC-PSZ-303",
+          "severity": "P2",
+          "scenario": "Read-only users can view the XL card and its derived range without any controls",
+          "steps": "1. Log in as a read-only user.\n2. Navigate to /projects/sizes/ and observe the XL card.",
+          "expected": "The XL card is visible with its dashed border, shows the derived range (e.g. '£500,001 and above'), and the 'Automatically derived from L max' label. No editable control or save button is present."
+        }
+      ]
+    },
+    {
+      "id": "TC-PSZ-400",
+      "name": "Editing Thresholds",
+      "test_cases": [
+        {
+          "id": "TC-PSZ-401",
+          "severity": "P0",
+          "scenario": "Typing in the XS Max field updates the XS range hint immediately",
+          "steps": "1. Navigate to /projects/sizes/.\n2. Clear the XS Max field and type '15000'.",
+          "expected": "The XS range hint updates immediately to 'Up to £15,000' without requiring a page save or reload."
+        },
+        {
+          "id": "TC-PSZ-402",
+          "severity": "P1",
+          "scenario": "Changing the S Max field updates both the S and M range hints live",
+          "steps": "1. Navigate to /projects/sizes/.\n2. Change the S Max field to '50000'.",
+          "expected": "The S range hint updates to '£{XS+1} — £50,000'. The M range hint updates to '£50,001 — £{M value}'."
+        },
+        {
+          "id": "TC-PSZ-403",
+          "severity": "P1",
+          "scenario": "Changing the L Max field updates the L range hint and the XL derived range live",
+          "steps": "1. Navigate to /projects/sizes/.\n2. Change the L Max field to '450000'.",
+          "expected": "The L range hint updates to reflect the new upper bound. The XL range hint updates to '£450,001 and above'."
+        },
+        {
+          "id": "TC-PSZ-404",
+          "severity": "P0",
+          "scenario": "Clicking Save Changes with valid ascending values saves all four thresholds",
+          "steps": "1. Set XS=10000, S=50000, M=150000, L=400000.\n2. Click the 'Save Changes' button.",
+          "expected": "The API receives the updated values. A success toast appears ('Project size thresholds updated successfully.'). The range hints update to reflect the saved values."
+        },
+        {
+          "id": "TC-PSZ-405",
+          "severity": "P0",
+          "scenario": "Success toast is displayed after a successful save",
+          "steps": "1. Enter valid ascending values.\n2. Click 'Save Changes'.",
+          "expected": "A green success toast with the message 'Project size thresholds updated successfully.' appears near the top of the screen and auto-dismisses."
+        },
+        {
+          "id": "TC-PSZ-406",
+          "severity": "P1",
+          "scenario": "Save Changes button shows 'Saving…' and is disabled while the API request is in-flight",
+          "steps": "1. Enter valid values.\n2. Click 'Save Changes' on a slow connection.\n3. Observe the button state before the response arrives.",
+          "expected": "The button label changes to 'Saving…' and is disabled while the request is pending. Once the response arrives, the button is re-enabled."
+        },
+        {
+          "id": "TC-PSZ-407",
+          "severity": "P1",
+          "scenario": "Save button is restored to its original state after a successful save",
+          "steps": "1. Enter valid values and click Save.\n2. Wait for the success response.",
+          "expected": "After the success toast appears, the Save Changes button is restored to its default label and enabled state."
+        },
+        {
+          "id": "TC-PSZ-408",
+          "severity": "P1",
+          "scenario": "Save button is restored after a server-side error",
+          "steps": "1. Simulate or trigger an API error (e.g. using dev tools to block the request).\n2. Click Save.\n3. Observe the button after the error response.",
+          "expected": "An error toast is shown. The Save Changes button is restored to its enabled state, allowing the user to try again."
+        },
+        {
+          "id": "TC-PSZ-409",
+          "severity": "P2",
+          "scenario": "Saved values are reflected in the input fields and range hints after a page refresh",
+          "steps": "1. Save new threshold values.\n2. Refresh the browser page.\n3. Observe the input fields and range hints.",
+          "expected": "The input fields show the previously saved values. The range hints are consistent with those values."
+        }
+      ]
+    },
+    {
+      "id": "TC-PSZ-500",
+      "name": "Validation",
+      "test_cases": [
+        {
+          "id": "TC-PSZ-501",
+          "severity": "P0",
+          "scenario": "Leaving any of the four required fields empty and clicking Save shows a validation error",
+          "steps": "1. Clear the M Max field so it is empty.\n2. Click 'Save Changes'.",
+          "expected": "The M Max field shows an inline validation error indicating the field is required. The API is not called. No changes are saved."
+        },
+        {
+          "id": "TC-PSZ-502",
+          "severity": "P0",
+          "scenario": "Setting XS ≥ S and clicking Save shows an error toast before the API call",
+          "steps": "1. Set XS Max = 60000 and S Max = 50000.\n2. Click 'Save Changes'.",
+          "expected": "An error toast appears: 'Amounts must be in ascending order: XS < S < M < L.' The API is not called. No values are saved."
+        },
+        {
+          "id": "TC-PSZ-503",
+          "severity": "P0",
+          "scenario": "Setting S ≥ M and clicking Save shows an error toast before the API call",
+          "steps": "1. Set S Max = 200000 and M Max = 150000.\n2. Click 'Save Changes'.",
+          "expected": "An error toast appears: 'Amounts must be in ascending order: XS < S < M < L.' The API is not called."
+        },
+        {
+          "id": "TC-PSZ-504",
+          "severity": "P0",
+          "scenario": "Setting M ≥ L and clicking Save shows an error toast before the API call",
+          "steps": "1. Set M Max = 500000 and L Max = 400000.\n2. Click 'Save Changes'.",
+          "expected": "An error toast appears: 'Amounts must be in ascending order: XS < S < M < L.' The API is not called."
+        },
+        {
+          "id": "TC-PSZ-505",
+          "severity": "P1",
+          "scenario": "Setting equal values across adjacent tiers is rejected",
+          "steps": "1. Set XS Max = 50000 and S Max = 50000 (equal values).\n2. Click 'Save Changes'.",
+          "expected": "An error is shown indicating the values must be strictly increasing. Equal values across tiers are not accepted."
+        },
+        {
+          "id": "TC-PSZ-506",
+          "severity": "P1",
+          "scenario": "Entering zero in any field is rejected on save",
+          "steps": "1. Change the XS Max field to 0.\n2. Click 'Save Changes'.",
+          "expected": "A validation error is shown on the XS Max field. The form is not submitted. All amounts must be at least 1."
+        },
+        {
+          "id": "TC-PSZ-507",
+          "severity": "P1",
+          "scenario": "Entering a negative value in any field is rejected on save",
+          "steps": "1. Change the L Max field to -1.\n2. Click 'Save Changes'.",
+          "expected": "A validation error is shown. The form is not submitted. Negative amounts are not allowed."
+        },
+        {
+          "id": "TC-PSZ-508",
+          "severity": "P2",
+          "scenario": "Entering non-numeric text in a number field is rejected by the field component",
+          "steps": "1. Attempt to type 'abc' in the S Max number input field.",
+          "expected": "The number field does not accept non-numeric characters. The value remains empty or unchanged."
+        },
+        {
+          "id": "TC-PSZ-509",
+          "severity": "P2",
+          "scenario": "Backend validation returns a field-level error when the ascending order constraint is violated",
+          "steps": "1. Send a PATCH request to /api/v1/projects/sizes/ with xs_max_amount=100 and s_max_amount=50.",
+          "expected": "The API returns HTTP 400 Bad Request with a field-level error on 's_max_amount': 'S max amount must be greater than XS max amount.'"
+        },
+        {
+          "id": "TC-PSZ-510",
+          "severity": "P2",
+          "scenario": "Validation errors are cleared when the user corrects the invalid fields and saves",
+          "steps": "1. Enter out-of-order values and trigger a validation error toast.\n2. Correct the values so they are in ascending order.\n3. Click Save again.",
+          "expected": "The error toast no longer appears. The valid values are submitted and saved successfully."
+        }
+      ]
+    },
+    {
+      "id": "TC-PSZ-600",
+      "name": "Non-Functional — Performance, Accessibility, Responsiveness",
+      "test_cases": [
+        {
+          "id": "TC-PSZ-601",
+          "severity": "P2",
+          "scenario": "Project Sizes page loads and renders within an acceptable time",
+          "steps": "1. Navigate to /projects/sizes/ on a stable network connection.\n2. Measure the time from navigation start to all tier card values visible.",
+          "expected": "The page fully renders with all five tier cards and populated input values within 2 seconds."
+        },
+        {
+          "id": "TC-PSZ-602",
+          "severity": "P2",
+          "scenario": "Values are populated in the input fields promptly after page load",
+          "steps": "1. Open /projects/sizes/.\n2. Observe whether input fields show values or remain blank during load.",
+          "expected": "The input fields populate with the current configuration values within 1 second of the page load. Fields do not remain blank for a noticeable period."
+        },
+        {
+          "id": "TC-PSZ-603",
+          "severity": "P2",
+          "scenario": "On mobile viewport (≤767px) the tier cards stack into a single-column layout",
+          "steps": "1. Open /projects/sizes/ on a mobile device or in a browser emulator set to ≤767px width.",
+          "expected": "All five tier cards stack vertically in a single column. No card is clipped or overlaps another. All inputs, range hints, and badge labels remain readable."
+        },
+        {
+          "id": "TC-PSZ-604",
+          "severity": "P2",
+          "scenario": "On tablet viewport (768px–1024px) the tier cards display in a 2-column grid",
+          "steps": "1. Open /projects/sizes/ at a viewport width of approximately 900px.",
+          "expected": "Tier cards arrange into two columns per row. All content within each card is fully visible. The Save button is reachable by scrolling."
+        },
+        {
+          "id": "TC-PSZ-605",
+          "severity": "P2",
+          "scenario": "On desktop viewport (≥1200px) all five tier cards appear side-by-side in a single row",
+          "steps": "1. Open /projects/sizes/ on a desktop browser at full width.",
+          "expected": "All five tier cards (XS, S, M, L, XL) are displayed side-by-side in one row. No wrapping occurs. All cards are equal height."
+        },
+        {
+          "id": "TC-PSZ-606",
+          "severity": "P2",
+          "scenario": "All interactive elements are keyboard-navigable",
+          "steps": "1. Navigate to /projects/sizes/ and use Tab to move through the focusable elements.\n2. Tab into each Max Amount field and use keyboard input to change the value.\n3. Tab to the Save Changes button and press Enter.",
+          "expected": "Tab focus moves through all four editable fields and the Save button in a logical order. Each element shows a visible focus ring. The Save action is triggered by pressing Enter on the button."
+        },
+        {
+          "id": "TC-PSZ-607",
+          "severity": "P2",
+          "scenario": "Page renders correctly in dark mode without readability issues",
+          "steps": "1. Toggle the application to dark mode using the theme toggle.\n2. Navigate to /projects/sizes/.",
+          "expected": "All tier cards, badges, input fields, range hints, and the Save button render correctly in dark mode. Text is readable. No invisible elements or harsh contrast issues."
+        },
+        {
+          "id": "TC-PSZ-608",
+          "severity": "P3",
+          "scenario": "Size badge colours pass WCAG AA colour contrast requirements",
+          "steps": "1. On /projects/sizes/, inspect the five tier badge elements (XS, S, M, L, XL) using an accessibility checker.\n2. Measure the contrast ratio of badge text against badge background for each.",
+          "expected": "Each badge passes WCAG AA with a contrast ratio of at least 4.5:1 for normal-sized text."
+        },
+        {
+          "id": "TC-PSZ-609",
+          "severity": "P3",
+          "scenario": "Error messages shown to the user do not expose internal implementation details",
+          "steps": "1. Trigger a server-side error (e.g. by blocking the API request in dev tools).\n2. Observe the error toast or feedback shown to the user.",
+          "expected": "The error message is user-friendly (e.g. 'Failed to save. Please try again.'). No stack trace, field names from the server payload, or internal error codes are visible."
+        }
+      ]
+    },
+    {
+      "id": "TC-PSZ-700",
+      "name": "Security",
+      "test_cases": [
+        {
+          "id": "TC-PSZ-701",
+          "severity": "P0",
+          "scenario": "Unauthenticated GET request to the sizes API returns 401",
+          "steps": "1. Send a GET request to /api/v1/projects/sizes/ without an Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned. No configuration data is included in the response."
+        },
+        {
+          "id": "TC-PSZ-702",
+          "severity": "P0",
+          "scenario": "Unauthenticated PATCH request to the sizes API returns 401",
+          "steps": "1. Send a PATCH request to /api/v1/projects/sizes/ with a valid payload but no Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned. No configuration values are updated."
+        },
+        {
+          "id": "TC-PSZ-703",
+          "severity": "P1",
+          "scenario": "Authenticated user without change_configuration permission receives 403 on PATCH",
+          "steps": "1. Log in as a user who does not have 'configurations.change_configuration'.\n2. Send an authenticated PATCH request to /api/v1/projects/sizes/ with valid values.",
+          "expected": "HTTP 403 Forbidden is returned. No configuration values are changed."
+        },
+        {
+          "id": "TC-PSZ-704",
+          "severity": "P1",
+          "scenario": "CSRF token is required for the PATCH request from the browser",
+          "steps": "1. Attempt to send a PATCH request to /api/v1/projects/sizes/ from a browser without including a valid CSRF token in the request headers.",
+          "expected": "The API rejects the request with a 403 or CSRF error. No mutation is performed."
+        },
+        {
+          "id": "TC-PSZ-705",
+          "severity": "P1",
+          "scenario": "API response does not expose sensitive configuration fields beyond the four size thresholds",
+          "steps": "1. Authenticate and call GET /api/v1/projects/sizes/.\n2. Inspect the response body.",
+          "expected": "The response contains only xs_max_amount, s_max_amount, m_max_amount, and l_max_amount. No other configuration fields, secrets, or internal metadata are included."
+        }
+      ]
+    },
+    {
+      "id": "TC-PSZ-800",
+      "name": "Integration & Edge Cases",
+      "test_cases": [
+        {
+          "id": "TC-PSZ-801",
+          "severity": "P0",
+          "scenario": "Updating thresholds on the Project Sizes screen affects the Size badge in the Estimates table",
+          "steps": "1. On the Project Sizes screen, change M Max to 100000 and L Max to 250000.\n2. Save the changes.\n3. Navigate to a project's Estimates tab and find an estimate with a total cost of, for example, £120,000.",
+          "expected": "The estimate's Size badge now reflects the updated tier classification based on the new thresholds. An estimate previously shown as 'M' may now show as 'L' depending on the new boundaries."
+        },
+        {
+          "id": "TC-PSZ-802",
+          "severity": "P1",
+          "scenario": "Saved configuration persists after a full page refresh",
+          "steps": "1. Update and save new threshold values on /projects/sizes/.\n2. Refresh the browser page.\n3. Observe the input fields.",
+          "expected": "The input fields show the values that were saved before the refresh. The configuration is not reset to defaults on reload."
+        },
+        {
+          "id": "TC-PSZ-803",
+          "severity": "P1",
+          "scenario": "Configuration change by one user is reflected when another user loads the page",
+          "steps": "1. User A updates and saves new thresholds.\n2. User B (logged in on a different browser session) navigates to /projects/sizes/.",
+          "expected": "User B sees the same threshold values that User A just saved. The configuration is shared globally across all users."
+        },
+        {
+          "id": "TC-PSZ-804",
+          "severity": "P2",
+          "scenario": "Minimum valid values (1, 2, 3, 4) are accepted and saved",
+          "steps": "1. Set XS Max = 1, S Max = 2, M Max = 3, L Max = 4.\n2. Click Save Changes.",
+          "expected": "The values are accepted and saved without error. The range hints display the correct ranges for these minimal thresholds."
+        },
+        {
+          "id": "TC-PSZ-805",
+          "severity": "P2",
+          "scenario": "Very large threshold values are accepted and displayed correctly",
+          "steps": "1. Set L Max to a very large number (e.g. 999999999).\n2. Ensure XS < S < M < L and save.",
+          "expected": "The value is accepted and saved. The L range hint and XL derived range display the large numbers formatted as readable currency without overflow."
+        },
+        {
+          "id": "TC-PSZ-806",
+          "severity": "P2",
+          "scenario": "GET endpoint always returns exactly the four threshold fields",
+          "steps": "1. Call GET /api/v1/projects/sizes/ as an authenticated user.",
+          "expected": "The response data object contains exactly four fields: xs_max_amount, s_max_amount, m_max_amount, l_max_amount. No fields are missing from the response even if they have not been explicitly configured."
+        },
+        {
+          "id": "TC-PSZ-807",
+          "severity": "P2",
+          "scenario": "Range hints show '—' when a field is cleared during editing before Save",
+          "steps": "1. Navigate to /projects/sizes/.\n2. Clear the S Max input field completely (leaving it blank).",
+          "expected": "The S range hint and the M range hint both update to show '—' because the boundary value is undefined. The XL range and XS range retain their valid hints."
+        },
+        {
+          "id": "TC-PSZ-808",
+          "severity": "P3",
+          "scenario": "Rapidly changing a field value updates the range hint in real time without lag",
+          "steps": "1. Navigate to /projects/sizes/.\n2. Click into the M Max field and quickly type several different values in sequence.",
+          "expected": "The M range hint and the adjacent L range hint update in real time after each keystroke with no perceptible lag or stale values shown."
+        }
+      ]
+    }
+  ]
+}
