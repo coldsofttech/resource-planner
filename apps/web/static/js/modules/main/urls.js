@@ -61,6 +61,9 @@ export const UI_URLS = {
   businessUnits: {
     list: () => "/bu/",
   },
+  projectSizes: {
+    list: () => "/projects/sizes/",
+  },
   projectTypes: {
     list: () => "/projects/types/",
   },
@@ -352,6 +355,10 @@ export const API_URLS = {
     import: () => ({ method: "POST", href: `${API_BASE}sprints/import/` }),
     exportSpecs: () => ({ method: "GET", href: `${API_BASE}sprints/export/specs/` }),
     export: () => ({ method: "GET", href: `${API_BASE}sprints/export/` }),
+  },
+  projectSizes: {
+    get: () => ({ method: "GET", href: `${API_BASE}projects/sizes/` }),
+    update: () => ({ method: "PATCH", href: `${API_BASE}projects/sizes/` }),
   },
   projectTypes: {
     list: () => ({ method: "GET", href: `${API_BASE}projects/types/` }),

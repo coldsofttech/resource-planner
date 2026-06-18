@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Project Sizes
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/project-sizes.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Projects / Configurations
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Project Sizes
+{% endblock page_title %}
+{% block page_sub %}
+  Define the budget thresholds that classify projects by size. Each tier covers amounts up to its configured maximum.
+{% endblock page_sub %}
+{% block content %}
+  <section-panel>
+    <panel-body>
+      <div class="row g-3 mb-4">
+        <!-- XS -->
+        <div class="col-12 col-sm-6 col-xl">
+          <div class="rp-size-tier-card">
+            <div class="rp-size-tier-head">
+              <span class="rp-badge rp-badge-soft">XS</span>
+              <span class="rp-size-tier-name">X-Small</span>
+            </div>
+            <div class="rp-size-tier-range" id="rp-size-xs-range">—</div>
+            {% if can_change_size_config %}
+              <number-field id="rp-size-xs-max" label="Max Amount (£)" placeholder="20000" min="1" required show-label></number-field>
+            {% else %}
+              <view-field id="rp-size-xs-view" label="Max Amount (£)" show-label></view-field>
+            {% endif %}
+          </div>
+        </div>
+        <!-- S -->
+        <div class="col-12 col-sm-6 col-xl">
+          <div class="rp-size-tier-card">
+            <div class="rp-size-tier-head">
+              <span class="rp-badge rp-badge-soft rp-badge-info">S</span>
+              <span class="rp-size-tier-name">Small</span>
+            </div>
+            <div class="rp-size-tier-range" id="rp-size-s-range">—</div>
+            {% if can_change_size_config %}
+              <number-field id="rp-size-s-max" label="Max Amount (£)" placeholder="60000" min="1" required show-label></number-field>
+            {% else %}
+              <view-field id="rp-size-s-view" label="Max Amount (£)" show-label></view-field>
+            {% endif %}
+          </div>
+        </div>
+        <!-- M -->
+        <div class="col-12 col-sm-6 col-xl">
+          <div class="rp-size-tier-card">
+            <div class="rp-size-tier-head">
+              <span class="rp-badge rp-badge-soft rp-badge-success">M</span>
+              <span class="rp-size-tier-name">Medium</span>
+            </div>
+            <div class="rp-size-tier-range" id="rp-size-m-range">—</div>
+            {% if can_change_size_config %}
+              <number-field id="rp-size-m-max" label="Max Amount (£)" placeholder="200000" min="1" required show-label></number-field>
+            {% else %}
+              <view-field id="rp-size-m-view" label="Max Amount (£)" show-label></view-field>
+            {% endif %}
+          </div>
+        </div>
+        <!-- L -->
+        <div class="col-12 col-sm-6 col-xl">
+          <div class="rp-size-tier-card">
+            <div class="rp-size-tier-head">
+              <span class="rp-badge rp-badge-soft rp-badge-warning">L</span>
+              <span class="rp-size-tier-name">Large</span>
+            </div>
+            <div class="rp-size-tier-range" id="rp-size-l-range">—</div>
+            {% if can_change_size_config %}
+              <number-field id="rp-size-l-max" label="Max Amount (£)" placeholder="500000" min="1" required show-label></number-field>
+            {% else %}
+              <view-field id="rp-size-l-view" label="Max Amount (£)" show-label></view-field>
+            {% endif %}
+          </div>
+        </div>
+        <!-- XL (read-only — implied) -->
+        <div class="col-12 col-sm-6 col-xl">
+          <div class="rp-size-tier-card rp-size-tier-xl">
+            <div class="rp-size-tier-head">
+              <span class="rp-badge rp-badge-soft rp-badge-danger">XL</span>
+              <span class="rp-size-tier-name">X-Large</span>
+            </div>
+            <div class="rp-size-tier-range" id="rp-size-xl-range">—</div>
+            <span class="rp-size-tier-implied">Automatically derived from L max</span>
+          </div>
+        </div>
+      </div>
+      {% if can_change_size_config %}
+        <div class="d-flex justify-content-end">
+          <primary-button id="rp-size-save-btn" label="Save Changes" prefix-icon="bi-check2"></primary-button>
+        </div>
+      {% endif %}
+    </panel-body>
+  </section-panel>
+{% endblock content %}
