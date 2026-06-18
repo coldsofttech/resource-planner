@@ -318,6 +318,62 @@ _USERS_DEFAULTS = {
 }
 
 
+_PROJECT_DEFAULTS = {
+    "PROJECT_SIZE_XS_MAX_AMOUNT": {
+        "label": "Project Size XS — Max Amount (£)",
+        "value": "20000",
+        "description": (
+            "Maximum budget amount (£) for an XS (extra-small) project. "
+            "Projects with a total budget at or below this value are classified as XS."
+        ),
+        "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "projects",
+    },
+    "PROJECT_SIZE_S_MAX_AMOUNT": {
+        "label": "Project Size S — Max Amount (£)",
+        "value": "60000",
+        "description": (
+            "Maximum budget amount (£) for an S (small) project. "
+            "Projects with a total budget above XS and at or below this value are "
+            "classified as S."
+        ),
+        "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "projects",
+    },
+    "PROJECT_SIZE_M_MAX_AMOUNT": {
+        "label": "Project Size M — Max Amount (£)",
+        "value": "200000",
+        "description": (
+            "Maximum budget amount (£) for an M (medium) project. "
+            "Projects with a total budget above S and at or below this value are "
+            "classified as M."
+        ),
+        "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "projects",
+    },
+    "PROJECT_SIZE_L_MAX_AMOUNT": {
+        "label": "Project Size L — Max Amount (£)",
+        "value": "500000",
+        "description": (
+            "Maximum budget amount (£) for an L (large) project. "
+            "Projects with a total budget above M and at or below this value are "
+            "classified as L. "
+            "Projects exceeding this value are classified as XL."
+        ),
+        "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "projects",
+    },
+}
+
+
 _AI_DEFAULTS = {
     "AI_ENABLED": {
         "label": "AI Enabled",
@@ -441,5 +497,6 @@ CONFIGURATION_DEFAULTS = {
     **_HOLIDAYS_DEFAULTS,
     **_SPRINT_DEFAULTS,
     **_USERS_DEFAULTS,
+    **_PROJECT_DEFAULTS,
     **_AI_DEFAULTS,
 }

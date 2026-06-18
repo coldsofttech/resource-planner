@@ -18,3 +18,4 @@ class Module(models.TextChoices):
     FINANCIAL_YEAR = "financial_year", "Financial Year"
     SPRINTS = "sprints", "Sprints"
     USERS = "users", "Users"
+    PROJECTS = "projects", "Projects"

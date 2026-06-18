@@ -113,8 +113,8 @@ class ModuleLabelsTest(SimpleTestCase):
 
 
 class ModuleChoicesTest(SimpleTestCase):
-    def test_choices_has_nine_entries(self):
-        self.assertEqual(len(Module.choices), 9)
+    def test_choices_has_ten_entries(self):
+        self.assertEqual(len(Module.choices), 10)
 
     def test_choices_contains_all_values(self):
         values = [v for v, _ in Module.choices]
@@ -126,3 +126,5 @@ class ModuleChoicesTest(SimpleTestCase):
         self.assertIn("holidays", values)
         self.assertIn("financial_year", values)
         self.assertIn("sprints", values)
+        self.assertIn("users", values)
+        self.assertIn("projects", values)
