@@ -1,10 +1,17 @@
 from django.db import IntegrityError
 from django.test import TestCase
 
-from apps.projects.models import Project, ProjectCollaborator
+from apps.projects.models import (
+    Project,
+    ProjectCode,
+    ProjectCodeHistory,
+    ProjectCollaborator,
+)
 from apps.projects.tests.factories import (
     make_programme,
     make_project,
+    make_project_code,
+    make_project_code_history,
     make_project_collaborator,
     make_project_status,
     make_project_type,
@@ -222,3 +229,131 @@ class ProjectCollaboratorOrderingTest(TestCase):
             ProjectCollaborator.objects.filter(project=p).values_list("pk", flat=True)
         )
         self.assertEqual(collab_pks, sorted(collab_pks))
+
+
+# ── ProjectCode ───────────────────────────────────────────────────────────────
+
+
+class ProjectCodeFieldDefaultsTest(TestCase):
+    def test_code_assigned_on_save(self):
+        pc = make_project_code()
+        self.assertTrue(pc.code.startswith("PROJCODE-"))
+
+    def test_code_contains_pk(self):
+        pc = make_project_code()
+        self.assertEqual(pc.code, f"PROJCODE-{pc.pk}")
+
+    def test_value_stores_correctly(self):
+        project = make_project("Code Value Project")
+        pc = make_project_code(project=project, value="JIRA-42")
+        self.assertEqual(pc.value, "JIRA-42")
+
+    def test_note_defaults_to_empty(self):
+        pc = make_project_code()
+        self.assertEqual(pc.note, "")
+
+    def test_note_stores_value(self):
+        project = make_project("Note Project")
+        pc = make_project_code(project=project, note="Assigned in Q1")
+        self.assertEqual(pc.note, "Assigned in Q1")
+
+    def test_created_by_defaults_to_none(self):
+        pc = make_project_code()
+        self.assertIsNone(pc.created_by)
+
+    def test_created_by_stores_user(self):
+        user = make_user()
+        project = make_project("Audited Code Project")
+        pc = make_project_code(project=project, created_by=user, updated_by=user)
+        self.assertEqual(pc.created_by, user)
+
+    def test_project_linked(self):
+        project = make_project("Linked Code Project")
+        pc = make_project_code(project=project)
+        self.assertEqual(pc.project, project)
+
+
+class ProjectCodeConstraintTest(TestCase):
+    def test_duplicate_project_raises_integrity_error(self):
+        project = make_project("Constrained Code Project")
+        make_project_code(project=project, value="CODE-1")
+        with self.assertRaises(IntegrityError):
+            make_project_code(project=project, value="CODE-2")
+
+    def test_same_value_on_different_projects_is_allowed(self):
+        p1 = make_project("Project Alpha Code")
+        p2 = make_project("Project Beta Code")
+        pc1 = make_project_code(project=p1, value="SAME-CODE")
+        pc2 = make_project_code(project=p2, value="SAME-CODE")
+        self.assertNotEqual(pc1.pk, pc2.pk)
+
+
+class ProjectCodeCascadeTest(TestCase):
+    def test_cascade_delete_with_project(self):
+        project = make_project("Cascade Code Project")
+        pc = make_project_code(project=project)
+        pc_pk = pc.pk
+        project.delete()
+        self.assertFalse(ProjectCode.objects.filter(pk=pc_pk).exists())
+
+
+# ── ProjectCodeHistory ────────────────────────────────────────────────────────
+
+
+class ProjectCodeHistoryFieldDefaultsTest(TestCase):
+    def test_changed_on_auto_set(self):
+        history = make_project_code_history()
+        self.assertIsNotNone(history.changed_on)
+
+    def test_note_defaults_to_empty(self):
+        history = make_project_code_history()
+        self.assertEqual(history.note, "")
+
+    def test_note_stores_value(self):
+        history = make_project_code_history(note="Initial code assignment")
+        self.assertEqual(history.note, "Initial code assignment")
+
+    def test_previous_code_defaults_to_none(self):
+        history = make_project_code_history()
+        self.assertIsNone(history.previous_code)
+
+    def test_new_code_defaults_to_none(self):
+        history = make_project_code_history()
+        self.assertIsNone(history.new_code)
+
+    def test_changed_by_defaults_to_none(self):
+        history = make_project_code_history()
+        self.assertIsNone(history.changed_by)
+
+    def test_changed_by_stores_user(self):
+        user = make_user()
+        history = make_project_code_history(changed_by=user)
+        self.assertEqual(history.changed_by, user)
+
+    def test_project_linked(self):
+        project = make_project("History Code Project")
+        history = make_project_code_history(project=project)
+        self.assertEqual(history.project, project)
+
+    def test_new_code_linked(self):
+        project = make_project("Code History Linked")
+        pc = make_project_code(project=project, value="NEW-100")
+        history = make_project_code_history(project=project, new_code=pc)
+        self.assertEqual(history.new_code, pc)
+
+
+class ProjectCodeHistoryCascadeTest(TestCase):
+    def test_cascade_delete_with_project(self):
+        project = make_project("Cascade Code History Project")
+        history = make_project_code_history(project=project)
+        history_pk = history.pk
+        project.delete()
+        self.assertFalse(ProjectCodeHistory.objects.filter(pk=history_pk).exists())
+
+    def test_new_code_set_null_on_code_delete(self):
+        project = make_project("Null Code History Project")
+        pc = make_project_code(project=project, value="TEMP-99")
+        history = make_project_code_history(project=project, new_code=pc)
+        pc.delete()
+        history.refresh_from_db()
+        self.assertIsNone(history.new_code)
