@@ -7,6 +7,22 @@ from botocore.exceptions import ClientError
 logger = logging.getLogger(__name__)
 
 
+def _log_secret_created(name: str) -> None:
+    logger.info("Secret created. (%s)", name)
+
+
+def _log_secret_create_error(name: str, code: str) -> None:
+    logger.error("Failed to create secret '%s': %s", name, code)
+
+
+def _log_secret_updated(name: str) -> None:
+    logger.info("Secret updated. (%s)", name)
+
+
+def _log_secret_update_error(name: str, code: str) -> None:
+    logger.error("Failed to update secret '%s': %s", name, code)
+
+
 class SecretsManager:
     """Thin wrapper around AWS Secrets Manager for Resource Planner secrets."""
 
@@ -42,7 +58,7 @@ class SecretsManager:
             return response.get("SecretString", "")
         except ClientError as exc:
             code = exc.response.get("Error", {}).get("Code", "UnknownError")
-            logger.error("Failed to retrieve secret: %s", code)
+            logger.error("Failed to retrieve secret '%s': %s", name, code)
             raise
 
     def put(self, name: str, value: str, description: str = "") -> None:
@@ -52,20 +68,20 @@ class SecretsManager:
             kwargs["Description"] = description
         try:
             self._client.create_secret(**kwargs)
-            logger.info("Secret created.")
+            _log_secret_created(name)
         except ClientError as exc:
             code = exc.response.get("Error", {}).get("Code", "UnknownError")
-            logger.error("Failed to create secret: %s", code)
+            _log_secret_create_error(name, code)
             raise
 
     def update(self, name: str, value: str) -> None:
         """Update the value of an existing secret."""
         try:
             self._client.put_secret_value(SecretId=name, SecretString=value)
-            logger.info("Secret updated.")
+            _log_secret_updated(name)
         except ClientError as exc:
             code = exc.response.get("Error", {}).get("Code", "UnknownError")
-            logger.error("Failed to update secret: %s", code)
+            _log_secret_update_error(name, code)
             raise
 
     def put_or_update(self, name: str, value: str, description: str = "") -> None:

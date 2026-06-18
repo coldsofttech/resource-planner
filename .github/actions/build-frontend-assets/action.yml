@@ -25,6 +25,7 @@ runs:
         test -f apps/web/static/js/dist/locations.min.js
         test -f apps/web/static/js/dist/main.min.js
         test -f apps/web/static/js/dist/programmes.min.js
+        test -f apps/web/static/js/dist/project-sizes.min.js
         test -f apps/web/static/js/dist/project-statuses.min.js
         test -f apps/web/static/js/dist/project-types.min.js
         test -f apps/web/static/js/dist/projects.min.js
