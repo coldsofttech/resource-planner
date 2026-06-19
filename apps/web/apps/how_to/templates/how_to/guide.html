@@ -57,6 +57,7 @@
           <a class="rp-docs-nav-link" href="#estimates"><i class="bi bi-calculator"></i> Project Estimates</a>
           <a class="rp-docs-nav-link" href="#project-sizes"><i class="bi bi-rulers"></i> Project Sizes</a>
           <a class="rp-docs-nav-link" href="#project-links"><i class="bi bi-link-45deg"></i> Project Links</a>
+          <a class="rp-docs-nav-link" href="#project-attachments"><i class="bi bi-paperclip"></i> Project Attachments</a>
           <a class="rp-docs-nav-link" href="#programmes"><i class="bi bi-collection"></i> Programmes</a>
 
           <div class="rp-docs-nav-section">Workforce</div>
@@ -711,6 +712,111 @@
 
             <div class="rp-tip-block">
               <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Use descriptive titles so that anyone opening the project immediately understands what each link points to. "Confluence" tells you nothing; "Confluence — Delivery Planning Page Q3" tells you exactly where to go and why.
+            </div>
+          </section>
+
+          <!-- ── Project Attachments ── -->
+          <section id="project-attachments" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-paperclip" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Project Attachments</h2>
+                <p class="small rp-muted mb-0">Upload, download, and manage files attached directly to a project — PDFs, spreadsheets, documents, and more.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Project Attachments let you store files directly alongside a project record. Use the Attachments tab to upload supporting documents — a signed-off proposal, a discovery deck, a budget spreadsheet, or any reference file your team needs easy access to. All file types are accepted. Files can be downloaded by anyone with access to the project, and deleted by users with the appropriate permission.</p>
+
+            <h3 class="rp-docs-subheading">Navigating to Project Attachments</h3>
+            <ol class="rp-step-list">
+              <li>Open any project from the <strong>Projects</strong> list.</li>
+              <li>Click the <strong>Attachments</strong> tab inside the project detail page.</li>
+              <li>All files attached to this project are listed here, with the most recently uploaded at the top.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Actions on the Attachments tab</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Upload zone</strong></td><td>Click <em>browse from your computer</em> or drag and drop files onto the zone to queue them for upload. Visible only to users with the upload permission.</td></tr>
+                <tr><td><strong>Download</strong> <i class="bi bi-download"></i></td><td>Downloads the file to your computer. Available to all users who can view the Attachments tab.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Permanently removes the file. A confirmation prompt appears before deletion. Requires the delete attachment permission.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Uploading a file</h3>
+            <ol class="rp-step-list">
+              <li>Open the project and click the <strong>Attachments</strong> tab.</li>
+              <li>Click <strong>browse from your computer</strong> in the upload zone, or drag one or more files directly onto the zone.</li>
+              <li>Selected files appear as tags below the upload zone. Each tag shows the filename and size. Click the <strong>×</strong> on any tag to remove a file from the queue before uploading.</li>
+              <li>Files upload automatically once queued. A success toast confirms each upload and the file appears at the top of the table immediately.</li>
+            </ol>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> All file types are accepted.</strong>
+              There is no restriction on file extension — PDFs, XLSX, Word documents, images, ZIP archives, and any other format can be attached. The file type icon in the table gives a quick visual hint: PDF, spreadsheet (XLSX/XLS), and CSV files each show a distinct icon; all other formats show a generic file icon.
+            </div>
+
+            <h3 class="rp-docs-subheading">Uploading multiple files at once</h3>
+            <ol class="rp-step-list">
+              <li>In the file picker, select multiple files using <strong>Ctrl+click</strong> (Windows) or <strong>Cmd+click</strong> (Mac), or drag a batch of files onto the upload zone.</li>
+              <li>Each file appears as a separate tag. Remove any you do not want to upload by clicking its <strong>×</strong> button.</li>
+              <li>All queued files upload in sequence. Each creates a separate attachment record with its own download link.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Downloading a file</h3>
+            <ol class="rp-step-list">
+              <li>On the <strong>Attachments</strong> tab, click the <strong>Download</strong> action on the row you want.</li>
+              <li>The file downloads to your computer using the original filename. No page navigation occurs.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Deleting a file</h3>
+            <ol class="rp-step-list">
+              <li>On the <strong>Attachments</strong> tab, click the <strong>Delete</strong> action on the file you want to remove.</li>
+              <li>Confirm the deletion in the prompt that appears.</li>
+              <li>The file is permanently removed from the project and from storage. This action cannot be undone.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Attachment table columns</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Column</th><th>What it shows</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Icon</strong></td><td>A visual indicator of the file type — PDF, spreadsheet, CSV, or generic.</td></tr>
+                <tr><td><strong>File Name</strong></td><td>The original name of the uploaded file. Click the column header to sort alphabetically.</td></tr>
+                <tr><td><strong>Type</strong></td><td>The file's MIME type (e.g. <em>application/pdf</em>). Sortable.</td></tr>
+                <tr><td><strong>Size</strong></td><td>The file size in human-readable units (KB or MB). Sortable.</td></tr>
+                <tr><td><strong>Uploaded By</strong></td><td>The name of the user who uploaded the file.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">File size limit</h3>
+            <p class="small rp-muted">Individual files must be <strong>25 MB or smaller</strong>. Files exceeding this limit are rejected at upload and an error message is shown. There is no limit on the total number of attachments per project.</p>
+
+            <h3 class="rp-docs-subheading">Who can upload and delete</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Action</th><th>Permission required</th></tr></thead>
+              <tbody>
+                <tr><td>View the Attachments tab and download files</td><td>Standard project view access</td></tr>
+                <tr><td>Upload files</td><td><strong>Add attachment</strong> permission (<code>projects.add_projectattachment</code>)</td></tr>
+                <tr><td>Delete files</td><td><strong>Delete attachment</strong> permission (<code>projects.delete_projectattachment</code>)</td></tr>
+              </tbody>
+            </table>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Deletion is permanent.</strong>
+              Deleted attachments cannot be recovered. The file is removed from storage immediately. If you need to keep a file but want to replace it, upload the new version first, then delete the old one.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"A file with this name already exists on this project"</strong> — each filename must be unique within the project. Rename the file before uploading, or delete the existing attachment first if you want to replace it.<br><br>
+              <strong>"File exceeds the maximum size of 25 MB"</strong> — compress or split the file before uploading. For large documents, consider linking to an external location (e.g. SharePoint or Google Drive) using <a href="#project-links">Project Links</a> instead.<br><br>
+              <strong>"No file uploaded"</strong> — the upload request arrived without a file. Try selecting the file again and re-uploading.<br><br>
+              <strong>"You do not have permission to upload attachments"</strong> — contact your administrator to request the <em>Add attachment</em> permission.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> For files too large to attach (over 25 MB), store them in SharePoint, Google Drive, or Confluence and add the link to the project using <a href="#project-links">Project Links</a>. Use Attachments for files that need to travel with the project record — signed documents, final deliverables, meeting minutes — and Links for living documents that are updated frequently in external tools.
             </div>
           </section>
 
