@@ -357,17 +357,22 @@ CSS for the drop zone lives in `static/css/styles/components/file-drops.css` (`.
 
 ### Attributes
 
-| Attribute      | Type    | Default                     | Description                                                                            |
-| -------------- | ------- | --------------------------- | -------------------------------------------------------------------------------------- |
-| `accept`       | string  | `.csv,.xlsx`                | Comma-separated extensions or MIME types; files not matching are silently rejected     |
-| `max-size`     | number  | `26214400` (25 MB)          | Maximum file size in bytes; oversized files are silently rejected                      |
-| `multiple`     | boolean | —                           | Allows selecting more than one file                                                    |
-| `icon`         | string  | `bi-cloud-upload`           | Bootstrap Icon class for the drop zone icon                                            |
-| `drop-label`   | string  | `Drop files here`           | Primary heading inside the drop zone                                                   |
-| `browse-label` | string  | `browse from your computer` | Text rendered inside the browse link                                                   |
-| `sub-text`     | string  | —                           | Small caption line below the browse link (e.g. `Max 25 MB · UTF-8 · headers on row 1`) |
+| Attribute      | Type    | Default                     | Description                                                                                                            |
+| -------------- | ------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `accept`       | string  | `.csv,.xlsx`                | Comma-separated extensions or MIME types; files not matching are silently rejected. Use `*/*` to accept all file types |
+| `max-size`     | number  | `26214400` (25 MB)          | Maximum file size in bytes; oversized files are silently rejected                                                      |
+| `multiple`     | boolean | —                           | Allows selecting more than one file; without this attribute only the first valid file is kept                          |
+| `simple-view`  | boolean | —                           | Renders a compact inline drop zone (single row, smaller padding) instead of the full centred drop zone                 |
+| `icon`         | string  | `bi-cloud-upload`           | Bootstrap Icon class for the drop zone icon                                                                            |
+| `drop-label`   | string  | `Drop files here`           | Primary heading inside the drop zone (full view only)                                                                  |
+| `browse-label` | string  | `browse from your computer` | Text rendered inside the browse link                                                                                   |
+| `sub-text`     | string  | —                           | Small caption line below the browse link, e.g. `Max 25 MB · UTF-8 · headers on row 1` (full view only)                 |
 
 All base attributes (`id`, `name`, `col`, `label`, `required`, `hint`, `hint-type`) are inherited from `BaseField`.
+
+#### `accept` wildcard
+
+Pass `accept="*/*"` (or `accept="*"`) to allow any file type. The hidden `<input type="file">` will have no filter and every dropped or browsed file will be accepted regardless of extension or MIME type.
 
 ### Public API
 
@@ -400,7 +405,7 @@ All base attributes (`id`, `name`, `col`, `label`, `required`, `hint`, `hint-typ
 ### Examples
 
 ```html
-<!-- Single-file CSV/XLSX import (wizard step) -->
+<!-- Single-file CSV/XLSX import (wizard step, full drop zone) -->
 <file-import-field
   id="import-file"
   label="Import file"
@@ -413,15 +418,18 @@ All base attributes (`id`, `name`, `col`, `label`, `required`, `hint`, `hint-typ
 >
 </file-import-field>
 
-<!-- Multi-file with PDF support -->
+<!-- Multi-file, accept any file type -->
 <file-import-field
   id="attachments"
   label="Attachments"
   multiple
-  accept=".pdf,.xlsx"
+  accept="*/*"
   drop-label="Drop files here"
 >
 </file-import-field>
+
+<!-- Compact inline uploader (simple-view) — suitable for tight layouts such as detail panels -->
+<file-import-field id="rp-attachment-upload" accept="*/*" multiple simple-view> </file-import-field>
 ```
 
 ```js
