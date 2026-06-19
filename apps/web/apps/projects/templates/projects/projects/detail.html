@@ -199,8 +199,48 @@
   </div>
   </tab-content>
   </tab-item>
+  <tab-item id="attachments">
+  <tab-header title="Attachments" icon="bi-paperclip"></tab-header>
+  <tab-content>
+  <div class="row g-4 align-items-start">
+    <div class="col-12">
+      <section-panel class="mt-2">
+        <panel-title>Attachments</panel-title>
+        <panel-body>
+        {% if can_add_attachment %}
+          <file-import-field id="rp-attachment-upload" accept="*/*" multiple simple-view class="mb-3"></file-import-field>
+        {% endif %}
+        <data-table id="rp-attachments-table" row-template="renderProjectAttachmentRow" empty-message="No attachments added yet.">
+          <table-columns>
+            <table-column label="" key="icon" width="36px">
+            </table-column>
+            <table-column label="File Name" key="file_name" sortable>
+            </table-column>
+            <table-column label="Type" key="content_type" hide-mobile>
+            </table-column>
+            <table-column label="Size" key="file_size" hide-mobile>
+            </table-column>
+            <table-column label="Uploaded By" key="created_by" hide-mobile>
+            </table-column>
+          </table-columns>
+          <table-actions>
+            <table-action icon="bi-download" label="Download" event="rp:attachment:download">
+            </table-action>
+            {% if can_delete_attachment %}
+              <table-action icon="bi-trash" label="Delete" event="rp:attachment:delete" danger>
+              </table-action>
+            {% endif %}
+          </table-actions>
+        </data-table>
+        </panel-body>
+      </section-panel>
+    </div>
+  </div>
+  </tab-content>
+  </tab-item>
   </tab-items>
   </tab-panel>
+  {% if can_delete_attachment %}<delete-modal id="rp-attachment-delete-modal"></delete-modal>{% endif %}
   {% if can_change_link %}
     <!-- Create Link drawer -->
     <drawer-modal id="rp-link-create-drawer" width="900">

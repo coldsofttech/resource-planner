@@ -2,6 +2,7 @@ from django.urls import path
 
 from apps.projects.api_views import (
     ProgrammeViewSet,
+    ProjectAttachmentViewSet,
     ProjectBudgetViewSet,
     ProjectEstimateViewSet,
     ProjectFollowerViewSet,
@@ -459,5 +460,20 @@ urlpatterns = [
         "projects/<str:code>/budgets/<str:budget_code>/history/",
         ProjectBudgetViewSet.as_view({"get": "history"}),
         name="project-budgets-history",
+    ),
+    path(
+        "projects/<str:code>/attachments/",
+        ProjectAttachmentViewSet.as_view({"get": "list", "post": "create"}),
+        name="project-attachments-list",
+    ),
+    path(
+        "projects/<str:code>/attachments/<str:attachment_code>/",
+        ProjectAttachmentViewSet.as_view({"delete": "destroy"}),
+        name="project-attachments-detail",
+    ),
+    path(
+        "projects/<str:code>/attachments/<str:attachment_code>/download/",
+        ProjectAttachmentViewSet.as_view({"get": "download"}),
+        name="project-attachments-download",
     ),
 ]

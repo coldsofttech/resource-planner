@@ -1,3 +1,8 @@
+from .attachment import (
+    get_attachment_by_code,
+    get_attachments_for_project,
+    project_attachment_filename_exists,
+)
 from .budget import (
     budget_exists_for_project_and_fy,
     get_budget_by_code,
@@ -123,6 +128,9 @@ __all__ = [
     "get_all_project_followers",
     "get_project_follower_by_code",
     "project_follower_exists",
+    "get_attachment_by_code",
+    "get_attachments_for_project",
+    "project_attachment_filename_exists",
     "get_link_by_code",
     "get_links_for_project",
     "project_link_title_exists",

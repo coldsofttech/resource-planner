@@ -1,3 +1,4 @@
+from apps.projects.serializers.attachment import ProjectAttachmentSerializer
 from apps.projects.serializers.budget import (
     ProjectBudgetCreateSerializer,
     ProjectBudgetDetailSerializer,
@@ -86,6 +87,7 @@ __all__ = [
     "ProjectFollowerCreateSerializer",
     "ProjectFollowerListSerializer",
     "ProjectFollowerUpdateSerializer",
+    "ProjectAttachmentSerializer",
     "ProjectLinkCreateSerializer",
     "ProjectLinkSerializer",
     "ProjectLinkUpdateSerializer",

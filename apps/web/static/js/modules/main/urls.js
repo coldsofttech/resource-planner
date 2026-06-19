@@ -571,6 +571,16 @@ export const API_URLS = {
       href: `${API_BASE}projects/${code}/links/${linkCode}/`,
     }),
   },
+  projectAttachments: {
+    list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/attachments/` }),
+    upload: (code) => ({ method: "POST", href: `${API_BASE}projects/${code}/attachments/` }),
+    delete: (code, attachmentCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}projects/${code}/attachments/${attachmentCode}/`,
+    }),
+    download: (code, attachmentCode) =>
+      `${API_BASE}projects/${code}/attachments/${attachmentCode}/download/`,
+  },
   projectLabels: {
     list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/labels/` }),
     create: (code) => ({ method: "POST", href: `${API_BASE}projects/${code}/labels/` }),

@@ -1,5 +1,6 @@
 from apps.projects.constants import ProjectBudgetAction, ProjectEstimateAction
 
+from .attachment import ProjectAttachment
 from .budget import ProjectBudget, ProjectBudgetStatusHistory
 from .estimate import ProjectEstimate, ProjectEstimateStatusHistory
 from .follower import ProjectFollower
@@ -23,6 +24,7 @@ __all__ = [
     "ProjectCode",
     "ProjectCodeHistory",
     "ProjectLabel",
+    "ProjectAttachment",
     "ProjectLink",
     "ProjectTag",
     "ProjectFollower",

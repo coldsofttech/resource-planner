@@ -23,4 +23,6 @@ class ProjectDetailView(ProtectedView):
         ctx["can_change_project"] = "projects.change_project" in perms
         ctx["can_change_estimate"] = "projects.change_projectestimate" in perms
         ctx["can_change_link"] = "projects.change_projectlink" in perms
+        ctx["can_add_attachment"] = "projects.add_projectattachment" in perms
+        ctx["can_delete_attachment"] = "projects.delete_projectattachment" in perms
         return ctx

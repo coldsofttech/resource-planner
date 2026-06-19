@@ -5,6 +5,7 @@ import {
   apiFetch,
   formatCurrency,
   formatDate,
+  getCsrfToken,
   snapshotButton,
   setBusyButton,
   restoreButton,
@@ -24,6 +25,8 @@ let pendingEstimateRow = null;
 let _pendingEditApprovePayload = null;
 let linksLoaded = false;
 let pendingLinkRow = null;
+let attachmentsLoaded = false;
+let pendingAttachmentRow = null;
 
 function setView(id, val) {
   const el = document.getElementById(id);
@@ -1645,6 +1648,158 @@ function initLinksTab() {
   }
 }
 
+function getFileIcon(contentType) {
+  const ct = (contentType || "").toLowerCase();
+  if (ct === "application/pdf") return "bi-file-pdf";
+  if (ct.includes("spreadsheet") || ct.includes("excel") || ct === "text/csv")
+    return "bi-file-earmark-spreadsheet";
+  if (ct.includes("wordprocessing") || ct.includes("word") || ct.includes("msword"))
+    return "bi-file-earmark-word";
+  if (ct.includes("presentation") || ct.includes("powerpoint")) return "bi-file-earmark-slides";
+  if (ct.startsWith("image/")) return "bi-file-earmark-image";
+  if (ct.startsWith("video/")) return "bi-file-earmark-play";
+  if (ct.startsWith("audio/")) return "bi-file-earmark-music";
+  if (ct.includes("zip") || ct.includes("compressed") || ct.includes("tar") || ct.includes("gzip"))
+    return "bi-file-earmark-zip";
+  if (ct.startsWith("text/")) return "bi-file-earmark-text";
+  return "bi-file-earmark";
+}
+
+function formatFileSize(bytes) {
+  if (!bytes || bytes === 0) return "0 B";
+  const units = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${(bytes / Math.pow(1024, i)).toFixed(i > 0 ? 1 : 0)} ${units[i]}`;
+}
+
+window.renderProjectAttachmentRow = function renderProjectAttachmentRow(row) {
+  const icon = getFileIcon(row.content_type);
+  const uploadedBy = row.created_by
+    ? esc(
+        `${row.created_by.first_name ?? ""} ${row.created_by.last_name ?? ""}`.trim() ||
+          row.created_by.email ||
+          "",
+      )
+    : "—";
+  return (
+    `<td style="width:36px;"><i class="bi ${esc(icon)}" style="font-size:1.1rem;opacity:0.75;"></i></td>` +
+    `<td>${esc(row.file_name ?? "")}</td>` +
+    `<td>${esc(row.content_type || "—")}</td>` +
+    `<td>${esc(formatFileSize(row.file_size))}</td>` +
+    `<td>${uploadedBy}</td>`
+  );
+};
+
+function initAttachmentsTab() {
+  const table = document.getElementById("rp-attachments-table");
+  const baseUrl = API_URLS.projectAttachments.list(projectCode).href;
+
+  const activateTab = () => {
+    if (!attachmentsLoaded) {
+      attachmentsLoaded = true;
+      if (table) table.setAttribute("url", baseUrl);
+    } else {
+      table?.refresh();
+    }
+  };
+
+  const tabPanel = document.querySelector("tab-panel");
+  if (tabPanel) {
+    if (tabPanel.activeTab === "attachments") {
+      activateTab();
+    }
+    tabPanel.addEventListener("rp:tab-change", (e) => {
+      if (e.detail.tab === "attachments") activateTab();
+    });
+  }
+
+  const uploadField = document.getElementById("rp-attachment-upload");
+  if (uploadField) {
+    uploadField.addEventListener("rp:change", async (e) => {
+      const files = e.detail?.files;
+      if (!files || files.length === 0) return;
+
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const uploadUrl = API_URLS.projectAttachments.upload(projectCode).href;
+        try {
+          await fetch(uploadUrl, {
+            method: "POST",
+            headers: { "X-CSRFToken": getCsrfToken() },
+            body: formData,
+          }).then(async (res) => {
+            if (!res.ok) {
+              const body = await res.json().catch(() => ({}));
+              throw body;
+            }
+            return res.json();
+          });
+          toast({
+            type: "success",
+            title: "Uploaded",
+            message: `"${file.name}" has been attached.`,
+          });
+        } catch (err) {
+          const msg = err?.message ?? `Failed to upload "${file.name}". Please try again.`;
+          toast({ type: "error", title: "Upload failed", message: msg });
+        }
+      }
+      uploadField.clear?.();
+      table?.refresh();
+    });
+  }
+
+  if (table) {
+    table.addEventListener("rp:attachment:download", (e) => {
+      const row = e.detail.row;
+      const href = API_URLS.projectAttachments.download(projectCode, row.code);
+      window.open(href, "_blank");
+    });
+  }
+
+  const deleteModal = document.getElementById("rp-attachment-delete-modal");
+  if (table && deleteModal) {
+    table.addEventListener("rp:attachment:delete", (e) => {
+      pendingAttachmentRow = e.detail.row;
+      deleteModal.setAttribute("title", `Delete "${pendingAttachmentRow.file_name}"?`);
+      deleteModal.setAttribute(
+        "body",
+        "This will permanently remove this attachment and cannot be undone.",
+      );
+      deleteModal.setAttribute("confirm-value", pendingAttachmentRow.file_name);
+      deleteModal.show();
+    });
+
+    deleteModal.addEventListener("rp:delete", async () => {
+      if (!pendingAttachmentRow) return;
+      const deleteBtn = deleteModal.querySelector("[data-delete-modal]");
+      deleteBtn?.setAttribute("disabled", "");
+
+      try {
+        const { href, method } = API_URLS.projectAttachments.delete(
+          projectCode,
+          pendingAttachmentRow.code,
+        );
+        await apiFetch(href, { method });
+        deleteModal.hide();
+        const name = pendingAttachmentRow.file_name;
+        pendingAttachmentRow = null;
+        table?.refresh();
+        toast({
+          type: "success",
+          title: "Attachment deleted",
+          message: `"${name}" has been removed.`,
+        });
+      } catch (err) {
+        deleteBtn?.removeAttribute("disabled");
+        const msg = err?.data?.message ?? "Failed to delete attachment. Please try again.";
+        toast({ type: "error", title: "Error", message: msg });
+      }
+    });
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   if (!projectCode) return;
   loadProjectDetails();
@@ -1657,4 +1812,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initAddLabelModal();
   initEstimatesTab();
   initLinksTab();
+  initAttachmentsTab();
 });
