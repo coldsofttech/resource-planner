@@ -3,6 +3,11 @@
   gap: 4px;
   border-bottom: 1px solid var(--rp-border);
   padding: 0 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.rp-tabs::-webkit-scrollbar {
+  display: none;
 }
 .rp-tab {
   display: inline-flex;
@@ -17,6 +22,8 @@
   font-size: var(--rp-fs-13);
   cursor: pointer;
   margin-bottom: -1px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 .rp-tab:hover {
   color: var(--rp-text);
