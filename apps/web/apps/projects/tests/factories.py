@@ -3,6 +3,7 @@ from apps.projects.constants import ProjectEstimateAction, ProjectEstimateStatus
 from apps.projects.models import (
     Programme,
     Project,
+    ProjectAttachment,
     ProjectCode,
     ProjectCodeHistory,
     ProjectCollaborator,
@@ -225,6 +226,26 @@ def make_project_link(
         project = make_project()
     return ProjectLink.objects.create(
         project=project, title=title, url=url, **overrides
+    )
+
+
+def make_project_attachment(
+    project: Project | None = None,
+    file_name: str = "test.pdf",
+    content_type: str = "application/pdf",
+    file_size: int = 1024,
+    file_path: str = "file:///tmp/test.pdf",
+    **overrides,
+) -> ProjectAttachment:
+    if project is None:
+        project = make_project()
+    return ProjectAttachment.objects.create(
+        project=project,
+        file_name=file_name,
+        content_type=content_type,
+        file_size=file_size,
+        file_path=file_path,
+        **overrides,
     )
 
 
