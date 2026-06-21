@@ -128,6 +128,10 @@ export const API_URLS = {
     }),
     adminExportSpecs: () => ({ method: "GET", href: `${API_BASE}users/export/specs/` }),
     adminExport: () => ({ method: "GET", href: `${API_BASE}users/export/` }),
+    search: (q) => ({
+      method: "GET",
+      href: `${API_BASE}users/search/?q=${encodeURIComponent(q || "")}`,
+    }),
   },
   teams: {
     list: () => ({ method: "GET", href: `${API_BASE}teams/` }),
