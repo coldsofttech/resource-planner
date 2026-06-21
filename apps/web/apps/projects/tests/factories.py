@@ -1,9 +1,19 @@
+from datetime import date
+
+from apps.financial_years.constants import FinancialYearStatus
+from apps.financial_years.models import FinancialYear
 from apps.projects import selectors as project_selectors
-from apps.projects.constants import ProjectEstimateAction, ProjectEstimateStatus
+from apps.projects.constants import (
+    ProjectBudgetAction,
+    ProjectEstimateAction,
+    ProjectEstimateStatus,
+)
 from apps.projects.models import (
     Programme,
     Project,
     ProjectAttachment,
+    ProjectBudget,
+    ProjectBudgetStatusHistory,
     ProjectCode,
     ProjectCodeHistory,
     ProjectCollaborator,
@@ -245,6 +255,56 @@ def make_project_attachment(
         content_type=content_type,
         file_size=file_size,
         file_path=file_path,
+        **overrides,
+    )
+
+
+def make_financial_year(
+    start_date: date = date(2024, 4, 1),
+    end_date: date = date(2025, 3, 31),
+    status: str = FinancialYearStatus.FUTURE,  # type: ignore[assignment]
+    is_active: bool = True,
+    **overrides,
+) -> FinancialYear:
+    return FinancialYear.objects.create(
+        start_date=start_date,
+        end_date=end_date,
+        status=status,
+        is_active=is_active,
+        **overrides,
+    )
+
+
+def make_budget(
+    project: Project | None = None,
+    financial_year: FinancialYear | None = None,
+    allocated_budget: float = 10000,
+    **overrides,
+) -> ProjectBudget:
+    if project is None:
+        project = make_project()
+    if financial_year is None:
+        financial_year = make_financial_year()
+    return ProjectBudget.objects.create(
+        project=project,
+        financial_year=financial_year,
+        allocated_budget=allocated_budget,
+        **overrides,
+    )
+
+
+def make_budget_history(
+    budget: ProjectBudget | None = None,
+    action: str = ProjectBudgetAction.CREATED,  # type: ignore[assignment]
+    new_allocated_budget: float = 10000,
+    **overrides,
+) -> ProjectBudgetStatusHistory:
+    if budget is None:
+        budget = make_budget()
+    return ProjectBudgetStatusHistory.objects.create(
+        budget=budget,
+        action=action,
+        new_allocated_budget=new_allocated_budget,
         **overrides,
     )
 
