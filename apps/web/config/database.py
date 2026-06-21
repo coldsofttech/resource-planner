@@ -4,6 +4,23 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def _enable_sqlite_wal(sender, connection, **kwargs):
+    """Switch SQLite to WAL journal mode on every new connection.
+
+    WAL allows concurrent reads and a writer to coexist, eliminating the
+    "database is locked" errors that occur in the dev server's threaded mode.
+    Only applied to SQLite; PostgreSQL is unaffected.
+
+    Registered in CoreConfig.on_ready() with dispatch_uid="enable_sqlite_wal"
+    so that Django's StatReloader does not accumulate duplicate handlers across
+    module reloads.
+    """
+    if connection.vendor == "sqlite":
+        with connection.cursor() as cursor:
+            cursor.execute("PRAGMA journal_mode=WAL;")
+            cursor.execute("PRAGMA synchronous=NORMAL;")
+
+
 def _resolve_db_password() -> str:
     source = os.environ.get("DB_PASSWORD_SOURCE", "env").lower()
 
@@ -73,6 +90,7 @@ def build_databases() -> dict:
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": str(BASE_DIR / "db.sqlite3"),
+            "OPTIONS": {"timeout": 20},
             "TEST": {
                 "NAME": ":memory:",
             },
