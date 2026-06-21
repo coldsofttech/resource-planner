@@ -450,6 +450,11 @@ urlpatterns = [
         name="project-budgets-export",
     ),
     path(
+        "projects/<str:code>/budgets/lifetime/",
+        ProjectBudgetViewSet.as_view({"get": "lifetime"}),
+        name="project-budgets-lifetime",
+    ),
+    path(
         "projects/<str:code>/budgets/<str:budget_code>/",
         ProjectBudgetViewSet.as_view(
             {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}

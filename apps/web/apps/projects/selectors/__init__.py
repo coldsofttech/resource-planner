@@ -8,6 +8,7 @@ from .budget import (
     get_budget_by_code,
     get_budget_status_history,
     get_budgets_for_project,
+    get_lifetime_budget_summary,
 )
 from .estimate import (
     get_estimate_by_code,
@@ -111,6 +112,7 @@ __all__ = [
     "get_budget_by_code",
     "get_budgets_for_project",
     "budget_exists_for_project_and_fy",
+    "get_lifetime_budget_summary",
     "get_budget_status_history",
     "get_estimate_by_code",
     "get_estimate_status_history",

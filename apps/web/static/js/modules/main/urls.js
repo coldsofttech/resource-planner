@@ -364,6 +364,29 @@ export const API_URLS = {
     get: () => ({ method: "GET", href: `${API_BASE}projects/sizes/` }),
     update: () => ({ method: "PATCH", href: `${API_BASE}projects/sizes/` }),
   },
+  projectBudgets: {
+    list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/budgets/` }),
+    create: (code) => ({ method: "POST", href: `${API_BASE}projects/${code}/budgets/` }),
+    detail: (code, budgetCode) => ({
+      method: "GET",
+      href: `${API_BASE}projects/${code}/budgets/${budgetCode}/`,
+    }),
+    update: (code, budgetCode) => ({
+      method: "PATCH",
+      href: `${API_BASE}projects/${code}/budgets/${budgetCode}/`,
+    }),
+    delete: (code, budgetCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}projects/${code}/budgets/${budgetCode}/`,
+    }),
+    history: (code, budgetCode) => ({
+      method: "GET",
+      href: `${API_BASE}projects/${code}/budgets/${budgetCode}/history/`,
+    }),
+    lifetime: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/budgets/lifetime/` }),
+    exportSpecs: () => ({ method: "GET", href: `${API_BASE}projects/budgets/export/specs/` }),
+    export: () => ({ method: "GET", href: `${API_BASE}projects/budgets/export/` }),
+  },
   projectTypes: {
     list: () => ({ method: "GET", href: `${API_BASE}projects/types/` }),
     create: () => ({ method: "POST", href: `${API_BASE}projects/types/` }),

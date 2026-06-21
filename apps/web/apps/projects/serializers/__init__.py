@@ -2,6 +2,7 @@ from apps.projects.serializers.attachment import ProjectAttachmentSerializer
 from apps.projects.serializers.budget import (
     ProjectBudgetCreateSerializer,
     ProjectBudgetDetailSerializer,
+    ProjectBudgetLifetimeSerializer,
     ProjectBudgetListSerializer,
     ProjectBudgetStatusHistorySerializer,
     ProjectBudgetUpdateSerializer,
@@ -72,6 +73,7 @@ __all__ = [
     "ProgrammeUpdateSerializer",
     "ProjectBudgetCreateSerializer",
     "ProjectBudgetDetailSerializer",
+    "ProjectBudgetLifetimeSerializer",
     "ProjectBudgetListSerializer",
     "ProjectBudgetStatusHistorySerializer",
     "ProjectBudgetUpdateSerializer",
