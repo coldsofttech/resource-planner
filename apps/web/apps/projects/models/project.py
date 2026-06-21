@@ -78,6 +78,22 @@ class Project(
     )
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
+    sprint_started_in = models.ForeignKey(
+        "sprints.Sprint",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="projects_started_in",
+        db_index=True,
+    )
+    sprint_completed_in = models.ForeignKey(
+        "sprints.Sprint",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="projects_completed_in",
+        db_index=True,
+    )
 
     class Meta:
         ordering = ["name"]

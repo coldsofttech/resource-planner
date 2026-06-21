@@ -60,6 +60,18 @@ class ProjectListSerializer(ListMixin, CodeSerializer):
     commitment_date = serializers.DateField(read_only=True, allow_null=True)
     efforts_issued = serializers.BooleanField(read_only=True)
     run_cost_applies = serializers.BooleanField(read_only=True)
+    sprint_started_in_code = serializers.CharField(
+        source="sprint_started_in.code", read_only=True, allow_null=True
+    )
+    sprint_started_in_name = serializers.CharField(
+        source="sprint_started_in.name", read_only=True, allow_null=True
+    )
+    sprint_completed_in_code = serializers.CharField(
+        source="sprint_completed_in.code", read_only=True, allow_null=True
+    )
+    sprint_completed_in_name = serializers.CharField(
+        source="sprint_completed_in.name", read_only=True, allow_null=True
+    )
     created_at = serializers.DateTimeField(read_only=True)
     created_by = UserMiniSerializer(read_only=True, allow_null=True)
     updated_at = serializers.DateTimeField(read_only=True)
@@ -90,6 +102,10 @@ class ProjectListSerializer(ListMixin, CodeSerializer):
             "commitment_date",
             "efforts_issued",
             "run_cost_applies",
+            "sprint_started_in_code",
+            "sprint_started_in_name",
+            "sprint_completed_in_code",
+            "sprint_completed_in_name",
             "created_at",
             "created_by",
             "updated_at",
@@ -136,6 +152,18 @@ class ProjectDetailSerializer(ReadMixin, AuditableSerializer):
     commitment_date = serializers.DateField(read_only=True, allow_null=True)
     efforts_issued = serializers.BooleanField(read_only=True)
     run_cost_applies = serializers.BooleanField(read_only=True)
+    sprint_started_in_code = serializers.CharField(
+        source="sprint_started_in.code", read_only=True, allow_null=True
+    )
+    sprint_started_in_name = serializers.CharField(
+        source="sprint_started_in.name", read_only=True, allow_null=True
+    )
+    sprint_completed_in_code = serializers.CharField(
+        source="sprint_completed_in.code", read_only=True, allow_null=True
+    )
+    sprint_completed_in_name = serializers.CharField(
+        source="sprint_completed_in.name", read_only=True, allow_null=True
+    )
     collaborators = ProjectCollaboratorListSerializer(many=True, read_only=True)
     is_following = serializers.SerializerMethodField()
     follower_code = serializers.SerializerMethodField()
@@ -183,6 +211,10 @@ class ProjectDetailSerializer(ReadMixin, AuditableSerializer):
             "commitment_date",
             "efforts_issued",
             "run_cost_applies",
+            "sprint_started_in_code",
+            "sprint_started_in_name",
+            "sprint_completed_in_code",
+            "sprint_completed_in_name",
             "collaborators",
             "is_following",
             "follower_code",
@@ -222,6 +254,12 @@ class ProjectCreateSerializer(WriteMixin, serializers.Serializer):
     )
     efforts_issued = serializers.BooleanField(default=False, required=False)
     run_cost_applies = serializers.BooleanField(default=False, required=False)
+    sprint_started_in_code = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True, default=None
+    )
+    sprint_completed_in_code = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True, default=None
+    )
 
 
 class ProjectUpdateSerializer(WriteMixin, serializers.Serializer):
@@ -249,6 +287,12 @@ class ProjectUpdateSerializer(WriteMixin, serializers.Serializer):
     efforts_issued = serializers.BooleanField(required=False)
     run_cost_applies = serializers.BooleanField(required=False)
     project_code_value = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True
+    )
+    sprint_started_in_code = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True
+    )
+    sprint_completed_in_code = serializers.CharField(
         required=False, allow_blank=True, allow_null=True
     )
 
