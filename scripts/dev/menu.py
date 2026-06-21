@@ -5,9 +5,14 @@ from .constants import RESET, YELLOW
 from .core.shell import pause
 from .modules.autofix import auto_fix_menu, run_ruff_fix
 from .modules.cleanup import (
+    clean_all,
+    clean_dev_cache,
+    clean_logs,
     clean_mypy,
+    clean_node_modules,
     clean_pycache,
     clean_pytest,
+    clean_pytest_reports,
     clean_ruff,
     cleanup_menu,
 )
@@ -48,10 +53,21 @@ MENU_TREE = {
         "label": "Cleanup",
         "action": cleanup_menu,
         "children": {
-            "1": {"label": "Python Cache (__pycache__)", "action": clean_pycache},
-            "2": {"label": "Mypy Cache (.mypy_cache)", "action": clean_mypy},
-            "3": {"label": "Pytest Cache (.pytest_cache)", "action": clean_pytest},
-            "4": {"label": "Ruff Cache (.ruff_cache)", "action": clean_ruff},
+            "1": {"label": "All", "action": clean_all},
+            "2": {"label": "Python Cache (__pycache__)", "action": clean_pycache},
+            "3": {"label": "Mypy Cache (.mypy_cache)", "action": clean_mypy},
+            "4": {"label": "Pytest Cache (.pytest_cache)", "action": clean_pytest},
+            "5": {"label": "Ruff Cache (.ruff_cache)", "action": clean_ruff},
+            "6": {"label": "Dev Cache (.dev-cache)", "action": clean_dev_cache},
+            "7": {
+                "label": "Pytest Reports (.pytest-reports)",
+                "action": clean_pytest_reports,
+            },
+            "8": {"label": "Logs (.logs)", "action": clean_logs},
+            "9": {
+                "label": "Node Modules (clean + install)",
+                "action": clean_node_modules,
+            },
         },
     },
     "2": {"label": "Pre-Commit (all files)", "action": run_precommit},

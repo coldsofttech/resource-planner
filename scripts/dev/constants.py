@@ -6,6 +6,7 @@ WEB_DIR = ROOT / "apps" / "web"
 PACKAGES_DIR = ROOT / "packages"
 REPORTS_DIR = ROOT / ".pytest-reports"
 CACHE_DIR = ROOT / ".dev-cache"
+LOGS_DIR = ROOT / ".logs"
 TEST_TRACKER_DIR = ROOT / "tools" / "test-tracker"
 TEST_TRACKER_PORT = 8001
 
