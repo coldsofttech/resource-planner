@@ -299,6 +299,19 @@ _SPRINT_DEFAULTS = {
         "is_admin": False,
         "module": "sprints",
     },
+    "HOURS_PER_DAY": {
+        "label": "Hours Per Day",
+        "value": "7",
+        "description": (
+            "Number of productive hours an engineer is expected to work per day. "
+            "Used to convert story-point efforts into day equivalents during "
+            "sprint capacity and forecast calculations."
+        ),
+        "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "sprints",
+    },
 }
 
 
@@ -367,6 +380,85 @@ _PROJECT_DEFAULTS = {
             "Projects exceeding this value are classified as XL."
         ),
         "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "projects",
+    },
+    "PROJECT_BUDGET_RISK_THRESHOLD": {
+        "label": "Project Budget Risk Threshold (%)",
+        "value": "10.0",
+        "description": (
+            "Percentage band used to classify project budget risk. "
+            "Budget remaining above +threshold% is GREEN (on track), "
+            "within ±threshold% is AMBER (at risk), "
+            "and below -threshold% is RED (over budget)."
+        ),
+        "data_type": "float",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "projects",
+    },
+    "PROJECT_SIZE_XS_BUDGET_VARIANCE": {
+        "label": "Project Size XS — Budget Variance (%)",
+        "value": "0.5",
+        "description": (
+            "Variance percentage within which an XS project budget or estimate "
+            "is considered on budget (green). Used when assessing estimate accuracy "
+            "for XS-sized projects."
+        ),
+        "data_type": "float",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "projects",
+    },
+    "PROJECT_SIZE_S_BUDGET_VARIANCE": {
+        "label": "Project Size S — Budget Variance (%)",
+        "value": "0.5",
+        "description": (
+            "Variance percentage within which an S project budget or estimate "
+            "is considered on budget (green). Used when assessing estimate accuracy "
+            "for S-sized projects."
+        ),
+        "data_type": "float",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "projects",
+    },
+    "PROJECT_SIZE_M_BUDGET_VARIANCE": {
+        "label": "Project Size M — Budget Variance (%)",
+        "value": "0.5",
+        "description": (
+            "Variance percentage within which an M project budget or estimate "
+            "is considered on budget (green). Used when assessing estimate accuracy "
+            "for M-sized projects."
+        ),
+        "data_type": "float",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "projects",
+    },
+    "PROJECT_SIZE_L_BUDGET_VARIANCE": {
+        "label": "Project Size L — Budget Variance (%)",
+        "value": "1.0",
+        "description": (
+            "Variance percentage within which an L project budget or estimate "
+            "is considered on budget (green). Used when assessing estimate accuracy "
+            "for L-sized projects."
+        ),
+        "data_type": "float",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "projects",
+    },
+    "PROJECT_SIZE_XL_BUDGET_VARIANCE": {
+        "label": "Project Size XL — Budget Variance (%)",
+        "value": "1.0",
+        "description": (
+            "Variance percentage within which an XL project budget or estimate "
+            "is considered on budget (green). Used when assessing estimate accuracy "
+            "for XL-sized projects."
+        ),
+        "data_type": "float",
         "is_secret": False,  # nosec B105
         "is_admin": False,
         "module": "projects",
