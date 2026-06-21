@@ -8,6 +8,12 @@ _CONFIG_MAP = {
     "s_max_amount": "PROJECT_SIZE_S_MAX_AMOUNT",
     "m_max_amount": "PROJECT_SIZE_M_MAX_AMOUNT",
     "l_max_amount": "PROJECT_SIZE_L_MAX_AMOUNT",
+    "budget_risk_threshold": "PROJECT_BUDGET_RISK_THRESHOLD",
+    "xs_budget_variance": "PROJECT_SIZE_XS_BUDGET_VARIANCE",
+    "s_budget_variance": "PROJECT_SIZE_S_BUDGET_VARIANCE",
+    "m_budget_variance": "PROJECT_SIZE_M_BUDGET_VARIANCE",
+    "l_budget_variance": "PROJECT_SIZE_L_BUDGET_VARIANCE",
+    "xl_budget_variance": "PROJECT_SIZE_XL_BUDGET_VARIANCE",
 }
 
 
@@ -17,6 +23,12 @@ def _current_config() -> dict:
         "s_max_amount": ProjectSizeSelector.get_size_s_max_amount(),
         "m_max_amount": ProjectSizeSelector.get_size_m_max_amount(),
         "l_max_amount": ProjectSizeSelector.get_size_l_max_amount(),
+        "budget_risk_threshold": ProjectSizeSelector.get_budget_risk_threshold(),
+        "xs_budget_variance": ProjectSizeSelector.get_size_xs_budget_variance(),
+        "s_budget_variance": ProjectSizeSelector.get_size_s_budget_variance(),
+        "m_budget_variance": ProjectSizeSelector.get_size_m_budget_variance(),
+        "l_budget_variance": ProjectSizeSelector.get_size_l_budget_variance(),
+        "xl_budget_variance": ProjectSizeSelector.get_size_xl_budget_variance(),
     }
 
 
@@ -35,5 +47,5 @@ class ProjectSizeConfigViewSet(BaseViewSet):
 
         return self.response(
             data=_current_config(),
-            message="Project size thresholds updated successfully.",
+            message="Project size configuration updated successfully.",
         )

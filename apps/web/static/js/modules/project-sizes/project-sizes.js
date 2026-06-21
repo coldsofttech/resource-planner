@@ -12,6 +12,10 @@ function fieldVal(id) {
   return parseInt(document.getElementById(id)?.value || "0", 10) || 0;
 }
 
+function floatFieldVal(id) {
+  return parseFloat(document.getElementById(id)?.value || "0") || 0;
+}
+
 function updateRangeHints(xs, s, m, l) {
   const safe = (n) => Number.isFinite(n) && n > 0;
   const set = (id, text) => {
@@ -55,6 +59,32 @@ async function loadConfig() {
     }
 
     updateRangeHints(d.xs_max_amount, d.s_max_amount, d.m_max_amount, d.l_max_amount);
+
+    const budgetEditFields = {
+      "rp-budget-risk-threshold": d.budget_risk_threshold,
+      "rp-budget-xs-variance": d.xs_budget_variance,
+      "rp-budget-s-variance": d.s_budget_variance,
+      "rp-budget-m-variance": d.m_budget_variance,
+      "rp-budget-l-variance": d.l_budget_variance,
+      "rp-budget-xl-variance": d.xl_budget_variance,
+    };
+    for (const [id, val] of Object.entries(budgetEditFields)) {
+      const el = document.getElementById(id);
+      if (el) el.value = String(val ?? "");
+    }
+
+    const budgetViewFields = {
+      "rp-budget-risk-threshold-view": d.budget_risk_threshold,
+      "rp-budget-xs-variance-view": d.xs_budget_variance,
+      "rp-budget-s-variance-view": d.s_budget_variance,
+      "rp-budget-m-variance-view": d.m_budget_variance,
+      "rp-budget-l-variance-view": d.l_budget_variance,
+      "rp-budget-xl-variance-view": d.xl_budget_variance,
+    };
+    for (const [id, val] of Object.entries(budgetViewFields)) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val != null ? `${val}%` : "—";
+    }
   } catch {
     toast({
       type: "error",
@@ -134,8 +164,59 @@ function initSaveButton() {
   });
 }
 
+function initBudgetSaveButton() {
+  const btn = document.getElementById("rp-budget-save-btn");
+  if (!btn) return;
+
+  btn.addEventListener("click", async () => {
+    [
+      "rp-budget-risk-threshold",
+      "rp-budget-xs-variance",
+      "rp-budget-s-variance",
+      "rp-budget-m-variance",
+      "rp-budget-l-variance",
+      "rp-budget-xl-variance",
+    ].forEach((id) =>
+      document.getElementById(id)?.dispatchEvent(new Event("rp:validate", { bubbles: false })),
+    );
+    if (document.querySelector("[data-rp-error]:not([hidden])")) return;
+
+    const snap = snapshotButton(btn);
+    setBusyButton(btn, "Saving…");
+
+    try {
+      const { href, method } = API_URLS.projectSizes.update();
+      await apiFetch(href, {
+        method,
+        body: JSON.stringify({
+          budget_risk_threshold: floatFieldVal("rp-budget-risk-threshold"),
+          xs_budget_variance: floatFieldVal("rp-budget-xs-variance"),
+          s_budget_variance: floatFieldVal("rp-budget-s-variance"),
+          m_budget_variance: floatFieldVal("rp-budget-m-variance"),
+          l_budget_variance: floatFieldVal("rp-budget-l-variance"),
+          xl_budget_variance: floatFieldVal("rp-budget-xl-variance"),
+        }),
+      });
+      restoreButton(btn, snap);
+      toast({
+        type: "success",
+        title: "Saved",
+        message: "Budget configuration updated successfully.",
+      });
+    } catch (err) {
+      restoreButton(btn, snap);
+      toast({
+        type: "error",
+        title: "Error",
+        message: err?.data?.error?.message ?? "Failed to save. Please try again.",
+      });
+    }
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   loadConfig();
   initLiveHints();
   initSaveButton();
+  initBudgetSaveButton();
 });
