@@ -250,7 +250,7 @@ These fields extend `DropdownField` and support a `multi-select` attribute that 
 | ----------------------- | ------------- | ------------------------------------ | ------------------------------------------------------------ |
 | `<team-field>`          | Team          | `GET /api/v1/teams/options/`         | `unassign` — prepends "Unassign" option (single-select only) |
 | `<business-unit-field>` | Business Unit | `GET /api/v1/bu/options/`            |                                                              |
-| `<member-field>`        | Member        | `GET /api/v1/members/?page_size=200` | Options render as display name / email / code fallback       |
+| `<member-field>`        | Member        | `GET /api/v1/members/?page_size=200` | See full details below                                       |
 
 ```html
 <!-- Single-select with allow-all for filters -->
@@ -264,6 +264,79 @@ These fields extend `DropdownField` and support a `multi-select` attribute that 
 // Read multi-select value
 JSON.parse(document.getElementById("project-teams").value); // → ["TEAM-1", "TEAM-2"]
 document.getElementById("project-teams").values; // → [{ id, label, value }, …]
+```
+
+---
+
+#### `<member-field>`
+
+Options are fetched from `GET /api/v1/members/?page_size=200` on first connect. Each option renders as the member's **display name**, falling back to **email**, then **member code**.
+
+| Attribute      | Type    | Description                                                                                                                                                                                                                 |
+| -------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `multi-select` | boolean | Switches to chip-based multi-select mode. `value` returns a JSON array string; the setter accepts a JSON array, CSV string, or `Array`.                                                                                     |
+| `allow-all`    | boolean | **Single-select only** — prepends **All Members** (`value=""`) as the first option, selected by default. Ignored when `multi-select` is present.                                                                            |
+| `show-label`   | boolean | Renders "Member" as the visible field label (hidden by default).                                                                                                                                                            |
+| `max`          | number  | **Multi-select only** — maximum number of chips that can be selected. The search input hides once this limit is reached.                                                                                                    |
+| `value`        | string  | Pre-selected member code (single-select), or a JSON array / CSV string of codes (multi-select). In multi-select mode chips appear immediately as code placeholders and are resolved to real names once options have loaded. |
+
+**Reading the value:**
+
+```js
+// Single-select
+field.value; // → "MBR-0001"
+
+// Multi-select
+JSON.parse(field.value); // → ["MBR-0001", "MBR-0002"]
+field.values; // → [{ id, label, value }, …]
+```
+
+**Multi-select keyboard navigation:**
+
+| Key       | Behaviour                                            |
+| --------- | ---------------------------------------------------- |
+| Type      | Filters the dropdown to matching member names        |
+| ↓ / ↑     | Moves highlight through dropdown options             |
+| Enter     | Adds the highlighted option as a chip                |
+| Backspace | Removes the last chip when the search input is empty |
+| Escape    | Closes the dropdown                                  |
+
+**Loading state:** In single-select mode the `<select>` is disabled while options load. In multi-select mode the search input shows "Loading…" as a placeholder. Any pre-selected codes appear as chips immediately with the code as a temporary label; labels are upgraded to display names once options arrive.
+
+**Error state:** If the API request fails, the field is disabled and shows "Could not load members. Refresh the page to retry." In multi-select mode the `.rp-multiselect` wrapper also receives the `is-invalid` class.
+
+```html
+<!-- Single-select (form / create context) -->
+<member-field id="leave-member" required col="col-12" show-label></member-field>
+
+<!-- Single-select with pre-selected value -->
+<member-field id="leave-member" value="MBR-0001" show-label col="col-md-6"></member-field>
+
+<!-- Single-select filter (all members option) -->
+<member-field id="filter-member" name="member" allow-all show-label></member-field>
+
+<!-- Multi-select (no cap on selections) -->
+<member-field id="sprint-members" multi-select required col="col-12" show-label></member-field>
+
+<!-- Multi-select with pre-selected values and a cap of 5 -->
+<member-field
+  id="sprint-members"
+  multi-select
+  required
+  max="5"
+  value='["MBR-0001","MBR-0002"]'
+  col="col-12"
+  show-label
+></member-field>
+```
+
+```js
+// Set value programmatically (multi-select)
+document.getElementById("sprint-members").value = JSON.stringify(["MBR-0001", "MBR-0002"]);
+
+// Read selected chips
+const chips = document.getElementById("sprint-members").values;
+// → [{ id: "MBR-0001", label: "Alice Smith", value: "MBR-0001" }, …]
 ```
 
 ---
