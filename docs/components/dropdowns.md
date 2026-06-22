@@ -151,7 +151,7 @@ These fields fetch their options from the API on first connect and cache them fo
 | `<project-status-field>`    | Project Status     | `GET /api/v1/projects/statuses/options/`          |                                                                 |
 | `<project-substatus-field>` | Project Sub-Status | `GET /api/v1/projects/sub-statuses/options/`      | See `status-id` below                                           |
 | `<project-type-field>`      | Project Type       | `GET /api/v1/projects/types/options/`             |                                                                 |
-| `<sprint-field>`            | Sprint             | `GET /api/v1/sprints/options/`                    | See `fy-code` below                                             |
+| `<sprint-field>`            | Sprint             | `GET /api/v1/sprints/options/`                    | See `fy-code`, `allow-all`, `unassign` below                    |
 
 **Additional attributes for specific fields:**
 
@@ -198,9 +198,43 @@ These fields fetch their options from the API on first connect and cache them fo
 
 `<sprint-field>`:
 
-| Attribute | Type   | Description                                                        |
-| --------- | ------ | ------------------------------------------------------------------ |
-| `fy-code` | string | Financial year code to filter sprint options; re-fetches on change |
+Options are fetched from `GET /api/v1/sprints/options/` on first connect. The select is disabled while loading and re-fetches automatically when `fy-code` changes.
+
+| Attribute    | Type    | Description                                                                                                                                                                             |
+| ------------ | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fy-code`    | string  | Financial year code; filters options to sprints in that FY. Changing the attribute immediately re-fetches and disables the select until the new options arrive.                         |
+| `allow-all`  | boolean | Prepends **All Sprints** (`value=""`) as the first option, selected by default. Use in filter contexts.                                                                                 |
+| `unassign`   | boolean | Prepends **Unassign from current sprint** (`value=""`) as the first option. Use in edit contexts when the field already has a value and the user should be able to explicitly clear it. |
+| `show-label` | boolean | Renders "Sprint" as the visible field label (hidden by default, matching the label-less variant used in most inline field groups).                                                      |
+
+**Public API:**
+
+| Method            | Description                                                                                                                                                            |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `field.refresh()` | Re-fetches sprint options from the API. Disables the select during loading and restores it when done. Useful after a new sprint is created without a full page reload. |
+
+**Error state:** If the API request fails, the select is disabled and shows "Could not load sprints". The field error element shows "Could not load sprints. Refresh the page to retry."
+
+```html
+<!-- Form / create context: required, scoped to a FY, with visible label -->
+<sprint-field id="plan-sprint" required col="col-md-6" fy-code="FY-1" show-label></sprint-field>
+
+<!-- Filter context: show all sprints in the selected FY, with an "All Sprints" option -->
+<sprint-field id="filter-sprint" name="sprint" fy-code="FY-1" allow-all show-label></sprint-field>
+
+<!-- Edit context: allow the user to clear the current sprint assignment -->
+<sprint-field id="edit-sprint" col="col-md-6" unassign show-label></sprint-field>
+```
+
+```js
+// Scope options to whichever FY the user selects
+fyField.addEventListener("rp:change", (e) => {
+  sprintField.setAttribute("fy-code", e.detail.value);
+});
+
+// Refresh options after a new sprint is created
+document.getElementById("plan-sprint").refresh();
+```
 
 ---
 
