@@ -58,6 +58,9 @@
           <a class="rp-docs-nav-link" href="#project-sizes"><i class="bi bi-rulers"></i> Project Sizes</a>
           <a class="rp-docs-nav-link" href="#project-links"><i class="bi bi-link-45deg"></i> Project Links</a>
           <a class="rp-docs-nav-link" href="#project-attachments"><i class="bi bi-paperclip"></i> Project Attachments</a>
+          <a class="rp-docs-nav-link" href="#project-budgets"><i class="bi bi-cash-stack"></i> Project Budgets</a>
+          <a class="rp-docs-nav-link" href="#project-contacts"><i class="bi bi-person-lines-fill"></i> Project Contacts</a>
+          <a class="rp-docs-nav-link" href="#project-comments"><i class="bi bi-chat-left-text"></i> Project Comments</a>
           <a class="rp-docs-nav-link" href="#programmes"><i class="bi bi-collection"></i> Programmes</a>
 
           <div class="rp-docs-nav-section">Workforce</div>
@@ -73,6 +76,7 @@
           <a class="rp-docs-nav-link" href="#locations"><i class="bi bi-geo-alt"></i> Locations</a>
           <a class="rp-docs-nav-link" href="#holidays"><i class="bi bi-calendar-heart"></i> Holidays</a>
           <a class="rp-docs-nav-link" href="#tags"><i class="bi bi-tag"></i> Tags</a>
+          <a class="rp-docs-nav-link" href="#recharge-types"><i class="bi bi-arrow-repeat"></i> Recharge Types</a>
         </nav>
 
         <!-- Main content -->
@@ -381,6 +385,33 @@
             <p class="small rp-muted">A project has one <strong>primary team</strong> that leads delivery. Other teams contributing can be added as <strong>Collaborators</strong>. Collaborating teams appear alongside the primary team in resource planning and capacity views.</p>
             <p class="small rp-muted">To add a collaborator: open the project, go to the <strong>Collaborators</strong> tab, and click <strong>Add Collaborator</strong>. Select the team and their role on the project.</p>
 
+            <h3 class="rp-docs-subheading">Sprint milestones</h3>
+            <p class="small rp-muted">Two optional sprint fields let you record the sprint in which a project's delivery actually began and the sprint in which it was completed:</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Field</th><th>Purpose</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Sprint Started In</strong></td>
+                  <td>The sprint in which the team first began active delivery on this project. Set this when work formally kicks off — not when the project is created or scoped, but when the first sprint of delivery starts.</td>
+                </tr>
+                <tr>
+                  <td><strong>Sprint Completed In</strong></td>
+                  <td>The sprint in which the project was fully delivered and signed off. Set this when delivery ends so portfolio and velocity reports can show the actual delivery window.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="small rp-muted">Both fields are optional and independent — you can set <strong>Sprint Started In</strong> at the start of delivery and leave <strong>Sprint Completed In</strong> blank until the project closes. To set or update either field, open the project and click <strong>Edit</strong>. Select the sprint from the dropdown. To clear a sprint milestone, remove the selection and save.</p>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Sprint milestones are for recording actuals, not planning.</strong>
+              These fields capture what <em>happened</em> — not what was planned. Use the project's start and end date fields for planned dates; use sprint milestones only once a sprint has actually begun or completed. This distinction keeps planned vs. actual data clean in reports.
+            </div>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Deleting a sprint clears its milestone references.</strong>
+              If a sprint that is set as a project's <strong>Sprint Started In</strong> or <strong>Sprint Completed In</strong> is deleted, the field is automatically cleared on all linked projects. Re-set the milestone if a replacement sprint is created.
+            </div>
+
             <h3 class="rp-docs-subheading">Project codes</h3>
             <p class="small rp-muted">A project code is an external reference — a Jira ID, portfolio number, or finance code. Only one code is active per project at a time. Every code change is stored in the <strong>Code History</strong> log with a timestamp and who made the change.</p>
 
@@ -593,13 +624,49 @@
               </tbody>
             </table>
 
+            <h3 class="rp-docs-subheading">Budget variance per size</h3>
+            <p class="small rp-muted">Each size tier has a configurable <strong>Budget Variance (%)</strong> — the percentage within which a project of that size is considered <em>On Budget</em> (GREEN) when comparing its actual budget against the linked estimate's total cost. Variance beyond this band but within the global risk threshold shows as AMBER; beyond the risk threshold shows as RED.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Size</th><th>Default budget variance</th><th>Effect</th></tr></thead>
+              <tbody>
+                <tr><td><strong>XS</strong></td><td>0.5 %</td><td>Cost must be within 0.5% of the actual budget to show GREEN.</td></tr>
+                <tr><td><strong>S</strong></td><td>0.5 %</td><td>Cost must be within 0.5% of the actual budget to show GREEN.</td></tr>
+                <tr><td><strong>M</strong></td><td>0.5 %</td><td>Cost must be within 0.5% of the actual budget to show GREEN.</td></tr>
+                <tr><td><strong>L</strong></td><td>1.0 %</td><td>Cost must be within 1.0% of the actual budget to show GREEN.</td></tr>
+                <tr><td><strong>XL</strong></td><td>1.0 %</td><td>Cost must be within 1.0% of the actual budget to show GREEN.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Budget risk threshold</h3>
+            <p class="small rp-muted">The <strong>Budget Risk Threshold (%)</strong> is a single global setting that defines the AMBER/RED boundary for all project sizes. When the cost variance exceeds the per-size budget variance but stays within this threshold the risk status is AMBER; beyond it the status is RED.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Setting</th><th>Default</th><th>Effect</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Budget Risk Threshold</strong></td>
+                  <td>10.0 %</td>
+                  <td>
+                    Cost variance &lt; per-size variance → <strong style="color:var(--rp-success,green);">GREEN</strong><br>
+                    Per-size variance ≤ cost variance ≤ 10% → <strong style="color:var(--rp-warning,orange);">AMBER</strong><br>
+                    Cost variance &gt; 10% → <strong style="color:var(--rp-danger,red);">RED</strong>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> These settings power the budget risk badges on Project Budgets.</strong>
+              The size-specific variance and global risk threshold work together to produce the GREEN / AMBER / RED status shown on each budget record. See <a href="#project-budgets">Project Budgets</a> for details on how the risk status is displayed and what each colour means.
+            </div>
+
             <h3 class="rp-docs-subheading">Updating the thresholds</h3>
             <ol class="rp-step-list">
               <li>Navigate to <strong>Project → Configurations → Project Sizes</strong>.</li>
-              <li>Each editable tier card (XS, S, M, L) shows a <strong>Max Amount (£)</strong> field. Enter the new upper boundary for that tier.</li>
-              <li>The range hints beneath each field update live as you type, so you can see exactly where each band starts and ends before saving.</li>
-              <li>Review all four ranges to confirm they look correct.</li>
-              <li>Click <strong>Save Changes</strong>. The updated thresholds take effect immediately across all estimates in the system.</li>
+              <li>Each tier card (XS, S, M, L) shows two editable fields: <strong>Max Amount (£)</strong> and <strong>Budget Variance (%)</strong>. The XL card shows only the <strong>Budget Variance (%)</strong> field — its max amount is derived automatically.</li>
+              <li>Update the <strong>Max Amount</strong> fields to change where each size band starts and ends. The range hints beneath each field update live as you type.</li>
+              <li>Update the <strong>Budget Variance (%)</strong> fields to change how tightly each size tier is evaluated for budget risk.</li>
+              <li>Update the <strong>Budget Risk Threshold (%)</strong> field (shown below the size cards) to change the global AMBER/RED boundary.</li>
+              <li>Review all values and click <strong>Save Changes</strong>. All thresholds take effect immediately across all estimates and budget records in the system.</li>
             </ol>
 
             <h3 class="rp-docs-subheading">Live range hints</h3>
@@ -607,9 +674,11 @@
 
             <h3 class="rp-docs-subheading">Rules for valid thresholds</h3>
             <ul class="rp-rule-list">
-              <li>All four values (XS, S, M, L) must be <strong>positive integers</strong> — zero and negative amounts are not accepted.</li>
-              <li>Values must be in <strong>strictly ascending order</strong>: XS &lt; S &lt; M &lt; L. Equal values between adjacent tiers are not allowed.</li>
-              <li>If the values are out of order when you click Save, an error is shown before anything is sent to the server — no partial saves occur.</li>
+              <li>All four Max Amount values (XS, S, M, L) must be <strong>positive integers</strong> — zero and negative amounts are not accepted.</li>
+              <li>Max Amount values must be in <strong>strictly ascending order</strong>: XS &lt; S &lt; M &lt; L. Equal values between adjacent tiers are not allowed.</li>
+              <li>Budget Variance values must be <strong>positive decimal numbers</strong> greater than zero.</li>
+              <li>The Budget Risk Threshold must be a <strong>positive decimal number</strong> greater than zero.</li>
+              <li>If any value fails validation when you click Save, an error is shown before anything is sent to the server — no partial saves occur.</li>
             </ul>
 
             <div class="rp-warn-block">
@@ -623,8 +692,9 @@
             <div class="rp-error-block">
               <div class="rp-error-label">Common errors</div>
               <strong>"Amounts must be in ascending order: XS &lt; S &lt; M &lt; L"</strong> — one or more of your values is equal to or greater than the next tier. Review all four fields side by side and ensure each is strictly larger than the one before it.<br><br>
-              <strong>"This field is required"</strong> — all four Max Amount fields must contain a value before saving. Clearing a field and clicking Save will trigger this validation.<br><br>
-              <strong>"S max amount must be greater than XS max amount"</strong> — the S value you entered is less than or equal to the XS value. Adjust accordingly.
+              <strong>"This field is required"</strong> — all Max Amount and Budget Variance fields must contain a value before saving. Clearing any field and clicking Save will trigger this validation.<br><br>
+              <strong>"S max amount must be greater than XS max amount"</strong> — the S value you entered is less than or equal to the XS value. Adjust accordingly.<br><br>
+              <strong>"Budget variance must be a positive number"</strong> — Budget Variance and the Budget Risk Threshold must be greater than zero. Enter a decimal value such as <em>0.5</em> or <em>10.0</em>.
             </div>
 
             <div class="rp-tip-block">
@@ -817,6 +887,338 @@
 
             <div class="rp-tip-block">
               <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> For files too large to attach (over 25 MB), store them in SharePoint, Google Drive, or Confluence and add the link to the project using <a href="#project-links">Project Links</a>. Use Attachments for files that need to travel with the project record — signed documents, final deliverables, meeting minutes — and Links for living documents that are updated frequently in external tools.
+            </div>
+          </section>
+
+          <!-- ── Project Budgets ── -->
+          <section id="project-budgets" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-cash-stack" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Project Budgets</h2>
+                <p class="small rp-muted mb-0">Track allocated, refined, and remaining budget per financial year — with automatic risk status based on your estimate.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Project Budgets let you record and track financial budgets for each project on a per-financial-year basis. Each budget record captures the approved allocation, an optional refined figure, and links to an estimate version so the remaining budget and risk status can be calculated automatically. One budget record is allowed per project per financial year.</p>
+
+            <h3 class="rp-docs-subheading">Navigating to Project Budgets</h3>
+            <ol class="rp-step-list">
+              <li>Open any project from the <strong>Projects</strong> list.</li>
+              <li>Click the <strong>Budgets</strong> tab inside the project detail page.</li>
+              <li>All budget records for this project are listed here, one per financial year.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Budget fields</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Field</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Financial Year</strong></td>
+                  <td>The financial year this budget applies to. Each project can have at most one budget record per financial year.</td>
+                </tr>
+                <tr>
+                  <td><strong>Allocated Budget</strong></td>
+                  <td>The initial approved budget for this project in the chosen financial year. Always required.</td>
+                </tr>
+                <tr>
+                  <td><strong>Refined Budget</strong></td>
+                  <td>An optional revised budget figure. When set, this replaces the Allocated Budget as the <em>actual budget</em> used for remaining budget and risk calculations. Use this when the approved amount is revised mid-year without wanting to overwrite the original allocation.</td>
+                </tr>
+                <tr>
+                  <td><strong>Actual Budget</strong></td>
+                  <td>Read-only. The effective budget — the Refined Budget if one is set, otherwise the Allocated Budget.</td>
+                </tr>
+                <tr>
+                  <td><strong>Estimate Version</strong></td>
+                  <td>Optional. Link a saved estimate version to this budget record. When linked, the estimate's total cost is used to calculate the Remaining Budget and Risk Status automatically.</td>
+                </tr>
+                <tr>
+                  <td><strong>Remaining Budget</strong></td>
+                  <td>Read-only. Actual Budget minus the linked estimate's total cost. Only shown when an Estimate Version is linked.</td>
+                </tr>
+                <tr>
+                  <td><strong>Note</strong></td>
+                  <td>Optional free-text field for recording context about this budget record — approval references, revision rationale, or planning notes.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Adding a budget record</h3>
+            <ol class="rp-step-list">
+              <li>Open the project and click the <strong>Budgets</strong> tab.</li>
+              <li>Click <strong>Add Budget</strong>.</li>
+              <li>Select the <strong>Financial Year</strong> this budget covers.</li>
+              <li>Enter the <strong>Allocated Budget</strong> — the approved amount for this financial year.</li>
+              <li>Optionally enter a <strong>Refined Budget</strong> if the original allocation has been revised.</li>
+              <li>Optionally link an <strong>Estimate Version</strong> to enable automatic remaining budget and risk status calculation.</li>
+              <li>Add a <strong>Note</strong> if needed and click <strong>Save</strong>.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Editing a budget record</h3>
+            <ol class="rp-step-list">
+              <li>On the <strong>Budgets</strong> tab, click the <strong>Edit</strong> action on the record you want to change.</li>
+              <li>Update the fields as needed and click <strong>Save</strong>.</li>
+              <li>Every change is automatically recorded in the budget's history log — you can always see what was changed, when, and by whom.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Budget risk status</h3>
+            <p class="small rp-muted">When an Estimate Version is linked, Resource Planner calculates a risk status by comparing the estimate's total cost against the Actual Budget. The variance percentage determines the colour-coded risk level.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Status</th><th>Colour</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>On Budget</strong></td>
+                  <td><span style="color:var(--rp-success,green);font-weight:600;">GREEN</span></td>
+                  <td>The cost variance is within the acceptable range for this project's size. The project is tracking on budget.</td>
+                </tr>
+                <tr>
+                  <td><strong>At Risk (Over)</strong></td>
+                  <td><span style="color:var(--rp-warning,orange);font-weight:600;">AMBER</span></td>
+                  <td>The estimate exceeds the actual budget, but the overspend is within the configured risk threshold. Monitor closely.</td>
+                </tr>
+                <tr>
+                  <td><strong>At Risk (Under)</strong></td>
+                  <td><span style="color:var(--rp-warning,orange);font-weight:600;">AMBER</span></td>
+                  <td>The estimate is below the actual budget within the risk threshold — the project may be under-utilising its allocation.</td>
+                </tr>
+                <tr>
+                  <td><strong>Over Budget</strong></td>
+                  <td><span style="color:var(--rp-danger,red);font-weight:600;">RED</span></td>
+                  <td>The estimate cost exceeds the actual budget beyond the configured threshold. Immediate attention required.</td>
+                </tr>
+                <tr>
+                  <td><strong>Under Budget</strong></td>
+                  <td><span style="color:var(--rp-danger,red);font-weight:600;">RED</span></td>
+                  <td>The estimate cost is significantly below the actual budget beyond the threshold — a large underspend that may indicate planning issues.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Risk thresholds are configurable.</strong>
+              The AMBER/RED boundary is set by the <strong>Budget Risk Threshold</strong> configuration. The GREEN/AMBER boundary is set per project size (XS, S, M, L, XL) using size-specific budget variance settings. Contact your administrator to adjust these thresholds under <strong>Settings → Projects</strong>.
+            </div>
+
+            <h3 class="rp-docs-subheading">Lifetime summary</h3>
+            <p class="small rp-muted">The <strong>Lifetime</strong> view aggregates budget figures across all financial years for the project. It gives a single rolled-up picture of total allocated budget, total refined budget, total estimate cost, and total remaining budget over the life of the project. Access it from the Budgets tab by clicking <strong>Lifetime Summary</strong>.</p>
+
+            <h3 class="rp-docs-subheading">Budget history</h3>
+            <p class="small rp-muted">Every change to a budget record — an allocation update, a refined budget entry, a linked estimate change — is automatically recorded in the budget's history log. Click the <strong>History</strong> action on any budget record to see the full audit trail: what changed, the previous and new values, the total cost at the time, and who made the change.</p>
+
+            <h3 class="rp-docs-subheading">Exporting budgets</h3>
+            <p class="small rp-muted">Click <strong>Export</strong> on the Budgets tab to download the budget records for this project. Choose which columns to include — allocated budget, refined budget, actual budget, remaining budget, estimate version, and more. The export respects your current filter selection.</p>
+
+            <h3 class="rp-docs-subheading">Permissions</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Action</th><th>Permission required</th></tr></thead>
+              <tbody>
+                <tr><td>View budget records and lifetime summary</td><td>Standard project view access (<code>projects.view_projectbudget</code>)</td></tr>
+                <tr><td>Add a budget record</td><td><strong>Add project budget</strong> (<code>projects.add_projectbudget</code>)</td></tr>
+                <tr><td>Edit a budget record</td><td><strong>Change project budget</strong> (<code>projects.change_projectbudget</code>)</td></tr>
+                <tr><td>Delete a budget record</td><td><strong>Delete project budget</strong> (<code>projects.delete_projectbudget</code>)</td></tr>
+                <tr><td>Export budgets</td><td><strong>Export project budgets</strong> (<code>projects.export_projectbudget</code>)</td></tr>
+              </tbody>
+            </table>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> One budget per financial year per project.</strong>
+              You cannot create two budget records for the same financial year on the same project. If you need to revise the budget for a year that already has a record, edit the existing record and use the <strong>Refined Budget</strong> field rather than deleting and recreating it — this preserves the original allocation and the full history.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"A budget for this financial year already exists on this project"</strong> — edit the existing record instead of creating a new one. Use <strong>Refined Budget</strong> to record a revision without losing the original allocated figure.<br><br>
+              <strong>"No risk status shown"</strong> — risk status only appears when an Estimate Version is linked and both the actual budget and the estimate's total cost are non-zero. Link an estimate version to enable automatic risk calculation.<br><br>
+              <strong>"Remaining budget shows as the full actual budget"</strong> — no estimate version is linked. The remaining budget defaults to the actual budget when no estimate is attached. Link an estimate version to get an accurate remaining figure.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Create budget records at the start of each financial year before planning begins. Link the most relevant estimate version as soon as one is finalised — this activates automatic risk tracking and gives the team an immediate view of where the project stands financially without any manual calculation.
+            </div>
+          </section>
+
+          <!-- ── Project Contacts ── -->
+          <section id="project-contacts" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-person-lines-fill" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Project Contacts</h2>
+                <p class="small rp-muted mb-0">Record the key external or internal stakeholders associated with a project — delivery contacts, finance contacts, and more.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Project Contacts let you attach named individuals to a project in a specific role. Use them to record who the business stakeholders are — who is accountable for delivery decisions and who holds the financial sign-off — without requiring them to have a Resource Planner account. Contacts are drawn from a shared contact library; adding a new name to a project automatically adds it to that library for reuse on future projects.</p>
+
+            <h3 class="rp-docs-subheading">Navigating to Project Contacts</h3>
+            <ol class="rp-step-list">
+              <li>Open any project from the <strong>Projects</strong> list.</li>
+              <li>Click the <strong>Contacts</strong> tab inside the project detail page.</li>
+              <li>All contacts currently assigned to this project are listed here, sorted by name.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Contact roles</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Role</th><th>Intended for</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Project</strong></td>
+                  <td>The primary delivery stakeholder — the business sponsor, product owner, or senior responsible owner who is accountable for what the project delivers.</td>
+                </tr>
+                <tr>
+                  <td><strong>Finance</strong></td>
+                  <td>The financial contact — the budget holder, finance business partner, or cost centre owner who approves and monitors project spend.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Actions on the Contacts tab</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Contact</strong></td><td>Opens a panel to enter the contact's name, optional email, and role. Saves the contact to the shared library if they are not already in it.</td></tr>
+                <tr><td><strong>Remove</strong> <i class="bi bi-trash"></i></td><td>Removes the contact from this project. The contact record remains in the shared library and can be reused on other projects.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Adding a contact</h3>
+            <ol class="rp-step-list">
+              <li>Open the project and click the <strong>Contacts</strong> tab.</li>
+              <li>Click <strong>Add Contact</strong>.</li>
+              <li>Enter the contact's <strong>Name</strong>. This field is required.</li>
+              <li>Optionally enter their <strong>Email</strong> address.</li>
+              <li>Select the <strong>Role</strong> — choose <strong>Project</strong> for the delivery stakeholder or <strong>Finance</strong> for the budget holder.</li>
+              <li>Click <strong>Save</strong>. The contact is assigned to the project immediately.</li>
+            </ol>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Contacts are shared across projects.</strong>
+              When you add a contact by name and email, the system checks the shared contact library first. If a contact with the same name and email already exists, it is linked to this project rather than created again. This means the same person can be a stakeholder on multiple projects without duplicating their record.
+            </div>
+
+            <h3 class="rp-docs-subheading">Removing a contact</h3>
+            <ol class="rp-step-list">
+              <li>On the <strong>Contacts</strong> tab, click the <strong>Remove</strong> action next to the contact you want to unlink.</li>
+              <li>Confirm the removal. The contact is removed from this project only — their record in the shared contact library is preserved, and they remain linked to any other projects they are assigned to.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Permissions</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Action</th><th>Permission required</th></tr></thead>
+              <tbody>
+                <tr><td>View contacts on a project</td><td>Standard project view access (<code>projects.view_projectcontact</code>)</td></tr>
+                <tr><td>Add a contact to a project</td><td><strong>Add project contact</strong> (<code>projects.add_projectcontact</code>)</td></tr>
+                <tr><td>Remove a contact from a project</td><td><strong>Delete project contact</strong> (<code>projects.delete_projectcontact</code>)</td></tr>
+              </tbody>
+            </table>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Each contact can only be assigned once per project.</strong>
+              The same person cannot be added to the same project twice, even with a different role. If you need to change a contact's role, remove them and re-add them with the correct role.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Contact is already assigned to this project"</strong> — this person is already listed on the Contacts tab. Each contact can appear on a project only once. If their role needs updating, remove the existing entry and add them again with the correct role.<br><br>
+              <strong>"Name is required"</strong> — the contact's name cannot be blank. Email is optional, but a name is always required to identify the contact.<br><br>
+              <strong>"You do not have permission to add contacts"</strong> — contact your administrator to request the <em>Add project contact</em> permission.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Add contacts at project creation time so that stakeholders are always visible alongside the project record. Including an email address makes it easier for team members to reach the right person directly from the project page — especially useful for Finance contacts during budget review cycles.
+            </div>
+          </section>
+
+          <!-- ── Project Comments ── -->
+          <section id="project-comments" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-chat-left-text" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Project Comments</h2>
+                <p class="small rp-muted mb-0">Leave threaded notes on a project — pin the most important ones to the top so they are always visible.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Project Comments give the delivery team a place to record decisions, flag blockers, or leave context notes directly on the project record. Comments are visible to everyone with access to the project. You can mention specific team members to draw their attention, edit your comment if the situation changes, and pin the most important comment to keep it at the top of the list.</p>
+
+            <h3 class="rp-docs-subheading">Navigating to Project Comments</h3>
+            <ol class="rp-step-list">
+              <li>Open any project from the <strong>Projects</strong> list.</li>
+              <li>Click the <strong>Comments</strong> tab inside the project detail page.</li>
+              <li>Comments are shown newest-first, with any pinned comment always at the top.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Actions on the Comments tab</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Comment</strong></td><td>Opens the comment input. Enter your text, optionally mention team members, and submit.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Updates the comment text and/or mentions. The comment is marked as <em>edited</em> after saving.</td></tr>
+                <tr><td><strong>Pin</strong></td><td>Moves the comment to the top of the list so it stays visible regardless of when it was posted. Only one comment can be pinned at a time per project.</td></tr>
+                <tr><td><strong>Unpin</strong></td><td>Returns a pinned comment to its natural position in the list (sorted by date).</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Permanently removes the comment and any mentions it contained.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Adding a comment</h3>
+            <ol class="rp-step-list">
+              <li>Open the project and click the <strong>Comments</strong> tab.</li>
+              <li>Click <strong>Add Comment</strong>.</li>
+              <li>Type your comment in the text field.</li>
+              <li>Optionally mention one or more team members — type their name in the <strong>Mentions</strong> field and select from the suggestions. Mentioned users receive a notification.</li>
+              <li>Click <strong>Save</strong>. Your comment appears at the top of the list.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Editing a comment</h3>
+            <ol class="rp-step-list">
+              <li>On the <strong>Comments</strong> tab, click the <strong>Edit</strong> action on the comment you want to update.</li>
+              <li>Modify the text and/or update the mentions list.</li>
+              <li>Click <strong>Save</strong>. The comment is updated and marked as <em>edited</em> so other team members can see it was revised.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Pinning a comment</h3>
+            <p class="small rp-muted">Pinning keeps one comment permanently visible at the top of the list — useful for decisions, blockers, or context that every team member needs to see when they open the project.</p>
+            <ol class="rp-step-list">
+              <li>On the <strong>Comments</strong> tab, click <strong>Pin</strong> on the comment you want to highlight.</li>
+              <li>The comment moves to the top of the list and displays a <em>pinned</em> indicator.</li>
+              <li>To pin a different comment, first <strong>Unpin</strong> the current one, then pin the new one — or pin the new one directly and the previous pin is replaced.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Comment ordering</h3>
+            <p class="small rp-muted">Comments are sorted in two tiers:</p>
+            <ul class="rp-rule-list">
+              <li>The <strong>pinned comment</strong> (if any) always appears first.</li>
+              <li>All remaining comments appear below it, ordered <strong>newest first</strong>.</li>
+            </ul>
+
+            <h3 class="rp-docs-subheading">Mentions</h3>
+            <p class="small rp-muted">Use mentions to notify specific team members about a comment. Mentioned users are listed on the comment and receive a notification. Mentions can be added when creating a comment and updated when editing one. Each user can only be mentioned once per comment.</p>
+
+            <h3 class="rp-docs-subheading">Permissions</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Action</th><th>Permission required</th></tr></thead>
+              <tbody>
+                <tr><td>View comments</td><td>Standard project view access (<code>projects.view_projectcomment</code>)</td></tr>
+                <tr><td>Add a comment</td><td><strong>Add project comment</strong> (<code>projects.add_projectcomment</code>)</td></tr>
+                <tr><td>Edit, pin, or unpin a comment</td><td><strong>Change project comment</strong> (<code>projects.change_projectcomment</code>)</td></tr>
+                <tr><td>Delete a comment</td><td><strong>Delete project comment</strong> (<code>projects.delete_projectcomment</code>)</td></tr>
+              </tbody>
+            </table>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Deletion is permanent.</strong>
+              Deleting a comment removes it and all its mentions immediately. There is no undo. If you need to correct a comment rather than remove it, use <strong>Edit</strong> instead — the comment is updated in place and marked as edited for transparency.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Comment text is required"</strong> — a comment cannot be blank. Enter at least one character before saving.<br><br>
+              <strong>"You do not have permission to edit comments"</strong> — editing, pinning, and unpinning all require the <em>Change project comment</em> permission. Contact your administrator to request access.<br><br>
+              <strong>"You do not have permission to delete comments"</strong> — contact your administrator to request the <em>Delete project comment</em> permission.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Use the <strong>Pin</strong> feature for the single most important piece of information at any given time — a key decision, an open blocker, or a handover note. Change what is pinned as the project evolves. It is the first thing anyone sees when they open the Comments tab, so keep it current and actionable.
             </div>
           </section>
 
@@ -1359,6 +1761,95 @@
 
             <div class="rp-tip-block">
               <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Agree on a tag vocabulary with your team before creating the library. Having <em>cloud</em>, <em>cloud-migration</em>, and <em>Cloud Migration</em> as three separate tags fragments your portfolio view. Pick one name per concept and stick to it.
+            </div>
+          </section>
+
+          <!-- ── Recharge Types ── -->
+          <section id="recharge-types" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-arrow-repeat" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Recharge Types</h2>
+                <p class="small rp-muted mb-0">Classify the nature of work for financial recharging purposes and link each type to applicable project types.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Recharge types define the categories of work that are recharged to cost centres or budgets — for example <strong>BAU</strong> (Business as Usual), <strong>PROJECT</strong>, or <strong>HOLIDAY</strong>. Each recharge type can be mapped to one or more project types, so the system knows which financial category applies when a project of that type is recharged.</p>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Recharge Types vs. Project Types</strong><br>
+              <strong>Project Types</strong> describe what a project <em>is</em> (e.g. Internal, External, Regulatory). <strong>Recharge Types</strong> describe how the work is <em>funded or recovered</em> (e.g. BAU, PROJECT, OVERHEAD). Mappings link the two so the correct recharge category is applied automatically.
+            </div>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Recharge Type</strong></td><td>Create a new recharge type with a unique UPPER_SNAKE_CASE name.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the name, description, or active status of an existing recharge type.</td></tr>
+                <tr><td><strong>Activate / Deactivate</strong></td><td>Toggle whether a recharge type is available for selection and mapping. Inactive types are hidden from pickers.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Permanently removes the recharge type and all its project type mappings. Cannot be undone.</td></tr>
+                <tr><td><strong>Import / Export</strong></td><td>Bulk-create recharge types from a spreadsheet, or download the full list.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Recharge type fields</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Field</th><th>Required</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Name</strong></td><td>Yes</td><td>UPPER_SNAKE_CASE only — uppercase letters, digits, and underscores. Must start with a letter. Max 50 characters. Examples: <code>BAU</code>, <code>HOLIDAY_PROJECTS</code>, <code>PROJECT123</code>.</td></tr>
+                <tr><td><strong>Description</strong></td><td>No</td><td>Optional free-text description. Defaults to empty.</td></tr>
+                <tr><td><strong>Active</strong></td><td>No</td><td>Defaults to <em>Yes</em>. Only active recharge types appear in dropdowns and options.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">How to add a recharge type</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Recharge Types</strong> and click <strong>Add Recharge Type</strong>.</li>
+              <li>Enter a name in UPPER_SNAKE_CASE — for example <code>BAU</code> or <code>HOLIDAY_PROJECTS</code>. Names must be unique across all recharge types.</li>
+              <li>Optionally add a description and confirm the active status.</li>
+              <li>Click <strong>Save</strong>. The new recharge type is assigned a system code (<code>RECHTY-{n}</code>) and is immediately available for project type mapping.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Project type mappings</h3>
+            <p class="small rp-muted">Each recharge type can be linked to one or more project types. Mappings are managed from the recharge type detail view and define which financial category applies when a project of that type is recharged. A project type can only appear once per recharge type — duplicates are rejected.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Mapping</strong></td><td>Links a project type (by code) to this recharge type. Duplicate mappings are rejected with a conflict error.</td></tr>
+                <tr><td><strong>Remove Mapping</strong> <i class="bi bi-trash"></i></td><td>Unlinks the project type from this recharge type. The project type itself is not deleted.</td></tr>
+                <tr><td><strong>Import Mappings</strong></td><td>Upload a CSV with a <code>project_type_code</code> column to bulk-add mappings. Duplicate or non-existent codes are skipped and reported.</td></tr>
+                <tr><td><strong>Export Mappings</strong></td><td>Download the current mappings for this recharge type as a spreadsheet.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Required permissions</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Action</th><th>Permission</th></tr></thead>
+              <tbody>
+                <tr><td>View recharge types</td><td><code>recharges.view_rechargetype</code></td></tr>
+                <tr><td>Create recharge type</td><td><code>recharges.add_rechargetype</code></td></tr>
+                <tr><td>Edit / Activate / Deactivate</td><td><code>recharges.change_rechargetype</code></td></tr>
+                <tr><td>Delete recharge type</td><td><code>recharges.delete_rechargetype</code></td></tr>
+                <tr><td>Import recharge types</td><td><code>recharges.import_rechargetype</code></td></tr>
+                <tr><td>Export recharge types</td><td><code>recharges.export_rechargetype</code></td></tr>
+                <tr><td>View project type mappings</td><td><code>recharges.view_projecttypemapping</code></td></tr>
+                <tr><td>Add / remove project type mappings</td><td><code>recharges.add_projecttypemapping</code> / <code>recharges.delete_projecttypemapping</code></td></tr>
+                <tr><td>Import / export mappings</td><td><code>recharges.import_projecttypemapping</code> / <code>recharges.export_projecttypemapping</code></td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Common errors</h3>
+            <ul class="rp-rule-list">
+              <li><span class="rp-error-inline">Name must be UPPER_SNAKE_CASE</span> — Lowercase letters, spaces, hyphens, and leading digits are not allowed. Use <code>BAU</code>, not <code>bau</code>, <code>Bau</code>, or <code>1BAU</code>.</li>
+              <li><span class="rp-error-inline">Name exceeds 50 characters</span> — Shorten the name to 50 characters or fewer.</li>
+              <li><span class="rp-error-inline">A recharge type with this name already exists</span> — Names are unique. Choose a different name or reactivate the existing inactive type instead.</li>
+              <li><span class="rp-error-inline">Mapping already exists</span> — A project type can only be mapped once per recharge type. The existing mapping must be removed before it can be re-added.</li>
+              <li><span class="rp-error-inline">Project type not found</span> — The project type code does not exist. Verify the code in the Project Types list and try again.</li>
+            </ul>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Keep names short and stable — they appear in exports and financial reports. Common conventions: <code>BAU</code> for run-the-business work, <code>PROJECT</code> for funded change, <code>OVERHEAD</code> for non-rechargeables, and <code>HOLIDAY</code> for leave cover. Agree on the vocabulary with your finance team before creating the library.
             </div>
           </section>
 

@@ -138,20 +138,22 @@ These fields fetch their options from the API on first connect and cache them fo
 | `allow-all`  | boolean | Prepends an "All …" option with `value=""`, selected by default; use in filter contexts                  |
 | `show-label` | boolean | Renders the field label as visible text; without this attribute the label is hidden (label-less variant) |
 
-| Element                     | Default label      | API endpoint                                      | Notes                                                           |
-| --------------------------- | ------------------ | ------------------------------------------------- | --------------------------------------------------------------- |
-| `<role-field>`              | Role               | `GET /api/v1/roles/options/`                      | Pre-selects `is_default` role when `value` is absent            |
-| `<timezone-field>`          | Timezone           | `GET /api/v1/users/options/`                      | No `allow-all`                                                  |
-| `<employment-type-field>`   | Employment Type    | `GET /api/v1/emp-types/options/`                  | Pre-selects `is_default` employment type when `value` is absent |
-| `<location-field>`          | Location           | `GET /api/v1/locations/options/`                  | Options render as "City, Country"; pre-selects `is_default`     |
-| `<confidence-field>`        | Confidence         | `GET /api/v1/projects/options/?fields=confidence` |                                                                 |
-| `<priority-field>`          | Priority           | `GET /api/v1/projects/options/?fields=priority`   |                                                                 |
-| `<programme-field>`         | Programme          | `GET /api/v1/programmes/options/`                 |                                                                 |
-| `<project-field>`           | Project            | `GET /api/v1/projects/options/`                   | See `programme-id` below                                        |
-| `<project-status-field>`    | Project Status     | `GET /api/v1/projects/statuses/options/`          |                                                                 |
-| `<project-substatus-field>` | Project Sub-Status | `GET /api/v1/projects/sub-statuses/options/`      | See `status-id` below                                           |
-| `<project-type-field>`      | Project Type       | `GET /api/v1/projects/types/options/`             |                                                                 |
-| `<sprint-field>`            | Sprint             | `GET /api/v1/sprints/options/`                    | See `fy-code` below                                             |
+| Element                     | Default label      | API endpoint                                      | Notes                                                                     |
+| --------------------------- | ------------------ | ------------------------------------------------- | ------------------------------------------------------------------------- |
+| `<role-field>`              | Role               | `GET /api/v1/roles/options/`                      | Pre-selects `is_default` role when `value` is absent                      |
+| `<timezone-field>`          | Timezone           | `GET /api/v1/users/options/`                      | No `allow-all`                                                            |
+| `<employment-type-field>`   | Employment Type    | `GET /api/v1/emp-types/options/`                  | Pre-selects `is_default` employment type when `value` is absent           |
+| `<location-field>`          | Location           | `GET /api/v1/locations/options/`                  | Options render as "City, Country"; pre-selects `is_default`               |
+| `<confidence-field>`        | Confidence         | `GET /api/v1/projects/options/?fields=confidence` |                                                                           |
+| `<priority-field>`          | Priority           | `GET /api/v1/projects/options/?fields=priority`   |                                                                           |
+| `<programme-field>`         | Programme          | `GET /api/v1/programmes/options/`                 |                                                                           |
+| `<project-field>`           | Project            | `GET /api/v1/projects/options/`                   | See `programme-id` below                                                  |
+| `<project-status-field>`    | Project Status     | `GET /api/v1/projects/statuses/options/`          |                                                                           |
+| `<project-substatus-field>` | Project Sub-Status | `GET /api/v1/projects/sub-statuses/options/`      | See `status-id` below                                                     |
+| `<project-type-field>`      | Project Type       | `GET /api/v1/projects/types/options/`             |                                                                           |
+| `<project-label-field>`     | Label              | `GET /api/v1/projects/labels/options/`            | Always searchable; options render as "Label (Project)"; see details below |
+| `<sprint-field>`            | Sprint             | `GET /api/v1/sprints/options/`                    | See `fy-code`, `allow-all`, `unassign` below                              |
+| `<recharge-type-field>`     | Mapping            | `GET /api/v1/recharges/types/options/`            | Default label/placeholder use "Mapping"; see details below                |
 
 **Additional attributes for specific fields:**
 
@@ -198,9 +200,92 @@ These fields fetch their options from the API on first connect and cache them fo
 
 `<sprint-field>`:
 
-| Attribute | Type   | Description                                                        |
-| --------- | ------ | ------------------------------------------------------------------ |
-| `fy-code` | string | Financial year code to filter sprint options; re-fetches on change |
+Options are fetched from `GET /api/v1/sprints/options/` on first connect. The select is disabled while loading and re-fetches automatically when `fy-code` changes.
+
+| Attribute    | Type    | Description                                                                                                                                                                             |
+| ------------ | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fy-code`    | string  | Financial year code; filters options to sprints in that FY. Changing the attribute immediately re-fetches and disables the select until the new options arrive.                         |
+| `allow-all`  | boolean | Prepends **All Sprints** (`value=""`) as the first option, selected by default. Use in filter contexts.                                                                                 |
+| `unassign`   | boolean | Prepends **Unassign from current sprint** (`value=""`) as the first option. Use in edit contexts when the field already has a value and the user should be able to explicitly clear it. |
+| `show-label` | boolean | Renders "Sprint" as the visible field label (hidden by default, matching the label-less variant used in most inline field groups).                                                      |
+
+**Public API:**
+
+| Method            | Description                                                                                                                                                            |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `field.refresh()` | Re-fetches sprint options from the API. Disables the select during loading and restores it when done. Useful after a new sprint is created without a full page reload. |
+
+**Error state:** If the API request fails, the select is disabled and shows "Could not load sprints". The field error element shows "Could not load sprints. Refresh the page to retry."
+
+```html
+<!-- Form / create context: required, scoped to a FY, with visible label -->
+<sprint-field id="plan-sprint" required col="col-md-6" fy-code="FY-1" show-label></sprint-field>
+
+<!-- Filter context: show all sprints in the selected FY, with an "All Sprints" option -->
+<sprint-field id="filter-sprint" name="sprint" fy-code="FY-1" allow-all show-label></sprint-field>
+
+<!-- Edit context: allow the user to clear the current sprint assignment -->
+<sprint-field id="edit-sprint" col="col-md-6" unassign show-label></sprint-field>
+```
+
+```js
+// Scope options to whichever FY the user selects
+fyField.addEventListener("rp:change", (e) => {
+  sprintField.setAttribute("fy-code", e.detail.value);
+});
+
+// Refresh options after a new sprint is created
+document.getElementById("plan-sprint").refresh();
+```
+
+`<project-label-field>`:
+
+Always operates in searchable (combobox) mode — `searchable` is set automatically on connect and cannot be disabled. Options are fetched from `GET /api/v1/projects/labels/options/`. Each option displays as **"Label (Project Name)"** (e.g. `"MVP (Project Alpha)"`). Value is the ProjectLabel code (e.g. `"PRJLBL-1"`).
+
+| Attribute    | Type    | Description                                                                                            |
+| ------------ | ------- | ------------------------------------------------------------------------------------------------------ |
+| `show-label` | boolean | Renders "Label" as the visible field label (hidden by default).                                        |
+| `allow-all`  | boolean | Prepends **All Labels** (`value=""`) as the first option, selected by default. Use in filter contexts. |
+
+**Loading state:** The select is disabled while options load.
+
+**Error state:** The select is disabled and shows "Could not load labels. Refresh the page to retry."
+
+```html
+<!-- Filter context -->
+<project-label-field name="label" allow-all show-label></project-label-field>
+
+<!-- Form context -->
+<project-label-field id="edit-label" required col="col-md-6" show-label></project-label-field>
+```
+
+---
+
+`<recharge-type-field>`:
+
+Options are fetched from `GET /api/v1/recharges/types/options/`. Value is the RechargeType code (e.g. `"RT-1"`). The default label and placeholder use the word **"Mapping"** to match how recharge types are labelled in the UI.
+
+| Attribute    | Type    | Description                                                                                           |
+| ------------ | ------- | ----------------------------------------------------------------------------------------------------- |
+| `show-label` | boolean | Renders "Mapping" as the visible field label (hidden by default).                                     |
+| `allow-all`  | boolean | Prepends **All Types** (`value=""`) as the first option, selected by default. Use in filter contexts. |
+
+**Loading state:** The select is disabled while options load.
+
+**Error state:** The select is disabled and shows "Could not load mappings. Refresh the page to retry."
+
+```html
+<!-- Filter context -->
+<recharge-type-field name="recharge_type" allow-all show-label></recharge-type-field>
+
+<!-- Form context -->
+<recharge-type-field
+  id="edit-recharge-type"
+  required
+  col="col-md-6"
+  show-label
+></recharge-type-field>
+```
 
 ---
 
@@ -216,7 +301,7 @@ These fields extend `DropdownField` and support a `multi-select` attribute that 
 | ----------------------- | ------------- | ------------------------------------ | ------------------------------------------------------------ |
 | `<team-field>`          | Team          | `GET /api/v1/teams/options/`         | `unassign` — prepends "Unassign" option (single-select only) |
 | `<business-unit-field>` | Business Unit | `GET /api/v1/bu/options/`            |                                                              |
-| `<member-field>`        | Member        | `GET /api/v1/members/?page_size=200` | Options render as display name / email / code fallback       |
+| `<member-field>`        | Member        | `GET /api/v1/members/?page_size=200` | See full details below                                       |
 
 ```html
 <!-- Single-select with allow-all for filters -->
@@ -230,6 +315,79 @@ These fields extend `DropdownField` and support a `multi-select` attribute that 
 // Read multi-select value
 JSON.parse(document.getElementById("project-teams").value); // → ["TEAM-1", "TEAM-2"]
 document.getElementById("project-teams").values; // → [{ id, label, value }, …]
+```
+
+---
+
+#### `<member-field>`
+
+Options are fetched from `GET /api/v1/members/?page_size=200` on first connect. Each option renders as the member's **display name**, falling back to **email**, then **member code**.
+
+| Attribute      | Type    | Description                                                                                                                                                                                                                 |
+| -------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `multi-select` | boolean | Switches to chip-based multi-select mode. `value` returns a JSON array string; the setter accepts a JSON array, CSV string, or `Array`.                                                                                     |
+| `allow-all`    | boolean | **Single-select only** — prepends **All Members** (`value=""`) as the first option, selected by default. Ignored when `multi-select` is present.                                                                            |
+| `show-label`   | boolean | Renders "Member" as the visible field label (hidden by default).                                                                                                                                                            |
+| `max`          | number  | **Multi-select only** — maximum number of chips that can be selected. The search input hides once this limit is reached.                                                                                                    |
+| `value`        | string  | Pre-selected member code (single-select), or a JSON array / CSV string of codes (multi-select). In multi-select mode chips appear immediately as code placeholders and are resolved to real names once options have loaded. |
+
+**Reading the value:**
+
+```js
+// Single-select
+field.value; // → "MBR-0001"
+
+// Multi-select
+JSON.parse(field.value); // → ["MBR-0001", "MBR-0002"]
+field.values; // → [{ id, label, value }, …]
+```
+
+**Multi-select keyboard navigation:**
+
+| Key       | Behaviour                                            |
+| --------- | ---------------------------------------------------- |
+| Type      | Filters the dropdown to matching member names        |
+| ↓ / ↑     | Moves highlight through dropdown options             |
+| Enter     | Adds the highlighted option as a chip                |
+| Backspace | Removes the last chip when the search input is empty |
+| Escape    | Closes the dropdown                                  |
+
+**Loading state:** In single-select mode the `<select>` is disabled while options load. In multi-select mode the search input shows "Loading…" as a placeholder. Any pre-selected codes appear as chips immediately with the code as a temporary label; labels are upgraded to display names once options arrive.
+
+**Error state:** If the API request fails, the field is disabled and shows "Could not load members. Refresh the page to retry." In multi-select mode the `.rp-multiselect` wrapper also receives the `is-invalid` class.
+
+```html
+<!-- Single-select (form / create context) -->
+<member-field id="leave-member" required col="col-12" show-label></member-field>
+
+<!-- Single-select with pre-selected value -->
+<member-field id="leave-member" value="MBR-0001" show-label col="col-md-6"></member-field>
+
+<!-- Single-select filter (all members option) -->
+<member-field id="filter-member" name="member" allow-all show-label></member-field>
+
+<!-- Multi-select (no cap on selections) -->
+<member-field id="sprint-members" multi-select required col="col-12" show-label></member-field>
+
+<!-- Multi-select with pre-selected values and a cap of 5 -->
+<member-field
+  id="sprint-members"
+  multi-select
+  required
+  max="5"
+  value='["MBR-0001","MBR-0002"]'
+  col="col-12"
+  show-label
+></member-field>
+```
+
+```js
+// Set value programmatically (multi-select)
+document.getElementById("sprint-members").value = JSON.stringify(["MBR-0001", "MBR-0002"]);
+
+// Read selected chips
+const chips = document.getElementById("sprint-members").values;
+// → [{ id: "MBR-0001", label: "Alice Smith", value: "MBR-0001" }, …]
 ```
 
 ---
