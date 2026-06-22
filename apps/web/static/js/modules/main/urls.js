@@ -558,6 +558,18 @@ export const API_URLS = {
       href: `${API_BASE}projects/${code}/followers/${followerCode}/`,
     }),
   },
+  projectContacts: {
+    list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/contacts/` }),
+    create: (code) => ({ method: "POST", href: `${API_BASE}projects/${code}/contacts/` }),
+    update: (code, contactCode) => ({
+      method: "PATCH",
+      href: `${API_BASE}projects/${code}/contacts/${contactCode}/`,
+    }),
+    delete: (code, contactCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}projects/${code}/contacts/${contactCode}/`,
+    }),
+  },
   projectTags: {
     list: (projectCode) => ({ method: "GET", href: `${API_BASE}projects/${projectCode}/tags/` }),
     create: (projectCode) => ({ method: "POST", href: `${API_BASE}projects/${projectCode}/tags/` }),
@@ -610,6 +622,8 @@ export const API_URLS = {
   },
   projectLabels: {
     list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/labels/` }),
+    options: () => ({ method: "GET", href: `${API_BASE}projects/labels/options/` }),
+
     create: (code) => ({ method: "POST", href: `${API_BASE}projects/${code}/labels/` }),
     suggest: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/labels/suggest/` }),
     detail: (code, labelCode) => ({

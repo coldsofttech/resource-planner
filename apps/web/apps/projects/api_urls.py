@@ -4,6 +4,7 @@ from apps.projects.api_views import (
     ProgrammeViewSet,
     ProjectAttachmentViewSet,
     ProjectBudgetViewSet,
+    ProjectContactViewSet,
     ProjectEstimateViewSet,
     ProjectFollowerViewSet,
     ProjectLabelViewSet,
@@ -465,6 +466,23 @@ urlpatterns = [
         "projects/<str:code>/budgets/<str:budget_code>/history/",
         ProjectBudgetViewSet.as_view({"get": "history"}),
         name="project-budgets-history",
+    ),
+    path(
+        "projects/labels/options/",
+        ProjectLabelViewSet.as_view({"get": "options"}),
+        name="project-labels-options-global",
+    ),
+    path(
+        "projects/<str:code>/contacts/",
+        ProjectContactViewSet.as_view({"get": "list", "post": "create"}),
+        name="project-contacts-list",
+    ),
+    path(
+        "projects/<str:code>/contacts/<str:contact_code>/",
+        ProjectContactViewSet.as_view(
+            {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
+        ),
+        name="project-contacts-detail",
     ),
     path(
         "projects/<str:code>/attachments/",

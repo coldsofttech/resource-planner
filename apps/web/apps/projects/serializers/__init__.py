@@ -7,6 +7,10 @@ from apps.projects.serializers.budget import (
     ProjectBudgetStatusHistorySerializer,
     ProjectBudgetUpdateSerializer,
 )
+from apps.projects.serializers.contact import (
+    ProjectContactCreateSerializer,
+    ProjectContactSerializer,
+)
 from apps.projects.serializers.estimate import (
     ProjectEstimateCreateSerializer,
     ProjectEstimateDetailSerializer,
@@ -86,6 +90,8 @@ __all__ = [
     "ProjectEstimateListSerializer",
     "ProjectEstimateStatusHistorySerializer",
     "ProjectEstimateUpdateSerializer",
+    "ProjectContactSerializer",
+    "ProjectContactCreateSerializer",
     "ProjectFollowerCreateSerializer",
     "ProjectFollowerListSerializer",
     "ProjectFollowerUpdateSerializer",

@@ -10,6 +10,12 @@ from .budget import (
     get_budgets_for_project,
     get_lifetime_budget_summary,
 )
+from .contact import (
+    get_all_project_contacts,
+    get_contact_by_name_and_email,
+    get_project_contact_by_code,
+    project_contact_exists,
+)
 from .estimate import (
     get_estimate_by_code,
     get_estimate_status_history,
@@ -127,6 +133,10 @@ __all__ = [
     "get_all_project_tags",
     "get_project_tag_by_code",
     "project_tag_exists",
+    "get_all_project_contacts",
+    "get_project_contact_by_code",
+    "project_contact_exists",
+    "get_contact_by_name_and_email",
     "get_all_project_followers",
     "get_project_follower_by_code",
     "project_follower_exists",

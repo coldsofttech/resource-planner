@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from .attachment import ProjectAttachmentService
 from .budget import ProjectBudgetExportService, ProjectBudgetService
+from .contact import ProjectContactService
 from .estimate import ProjectEstimateExportService, ProjectEstimateService
 from .follower import ProjectFollowerService
 from .label import ProjectLabelService
@@ -41,6 +42,7 @@ __all__ = [
     "ProjectExportService",
     "ProjectLabelService",
     "ProjectTagService",
+    "ProjectContactService",
     "ProjectFollowerService",
     "ProjectAttachmentService",
     "ProjectLinkService",
