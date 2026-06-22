@@ -82,6 +82,7 @@ INSTALLED_APPS = [
     "apps.business_units.apps.BusinessUnitConfig",
     "apps.tags.apps.TagConfig",
     "apps.contacts.apps.ContactConfig",
+    "apps.comments.apps.CommentsConfig",
     "apps.how_to.apps.HowToConfig",
     "apps.notifications.apps.NotificationsConfig",
 ]
