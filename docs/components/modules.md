@@ -152,24 +152,40 @@ Components from `apps/web/static/js/components/modules/account/` and `apps/web/s
 
 ### `<user-avatar>`
 
-Circular avatar display for user or member rows, drawers, and any other context that needs to show a user photo with an initials fallback. Applies the `rp-avatar` class (and a size modifier) directly to itself.
+Circular avatar display for user and member rows, drawers, and any context that needs a user photo with an initials fallback. Applies the `rp-avatar` class (and a size modifier) directly to itself, so it can be dropped in anywhere an `rp-avatar` div would have been used.
 
-| Attribute    | Type   | Default | Description                                               |
-| ------------ | ------ | ------- | --------------------------------------------------------- |
-| `avatar-url` | string | —       | Photo URL; absent or empty triggers the initials fallback |
-| `name`       | string | —       | Display name used for alt text and initials derivation    |
-| `size`       | string | `"md"`  | `"sm"` \| `"md"` (32 px) \| `"lg"` \| `"xl"`              |
+| Attribute    | Type   | Default | Description                                                                                                                                                                                                                                                                                                                |
+| ------------ | ------ | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `avatar-url` | string | —       | Photo URL. Absent or empty renders the initials fallback. If the image fails to load, the element silently falls back to initials.                                                                                                                                                                                         |
+| `name`       | string | —       | Display name — used for the `<img alt>` attribute and to derive initials when `seed` is not set. Initials are taken from the first letter of the first and last space-separated word (e.g. `"Mira Aslan"` → `MA`; a single word uses its first two characters).                                                            |
+| `seed`       | string | —       | Alternative seed for initials — splits on `@`, `.`, `_`, `-`, and whitespace rather than spaces only. Use this when the only available value is an email address (e.g. `"mira.aslan@co.com"` → `MA`). When both `name` and `seed` are set, `seed` takes precedence for initials only; `name` is still used for `alt` text. |
+| `size`       | string | `"md"`  | `"sm"` \| `"md"` (32 px, default) \| `"lg"` \| `"xl"`                                                                                                                                                                                                                                                                      |
+
+All four attributes are observed — updating any of them re-renders the element in place.
 
 ```html
+<!-- Display name → initials fallback -->
 <user-avatar name="Mira Aslan" size="sm"></user-avatar>
+
+<!-- Photo with name for alt text -->
 <user-avatar avatar-url="/media/avatars/1.jpg" name="Mira Aslan" size="lg"></user-avatar>
+
+<!-- Email seed (e.g. when display_name is not available) -->
+<user-avatar seed="mira.aslan@company.com" size="md"></user-avatar>
+
+<!-- Both name (for alt) and seed (for initials) -->
+<user-avatar name="Mira Aslan" seed="mira.aslan@company.com" size="md"></user-avatar>
 ```
 
 ```js
-// Set from row data after API response
+// Set from row data after an API response
 const el = document.querySelector("user-avatar");
 el.setAttribute("avatar-url", row.avatar_url || "");
-el.setAttribute("name", row.full_name);
+el.setAttribute("name", row.display_name || row.email || "");
+// Supply seed when the user may not have a display name
+if (!row.display_name && row.email) {
+  el.setAttribute("seed", row.email);
+}
 ```
 
 ---
