@@ -4,6 +4,7 @@ from apps.projects.api_views import (
     ProgrammeViewSet,
     ProjectAttachmentViewSet,
     ProjectBudgetViewSet,
+    ProjectCommentViewSet,
     ProjectContactViewSet,
     ProjectEstimateViewSet,
     ProjectFollowerViewSet,
@@ -471,6 +472,28 @@ urlpatterns = [
         "projects/labels/options/",
         ProjectLabelViewSet.as_view({"get": "options"}),
         name="project-labels-options-global",
+    ),
+    path(
+        "projects/<str:code>/comments/",
+        ProjectCommentViewSet.as_view({"get": "list", "post": "create"}),
+        name="project-comments-list",
+    ),
+    path(
+        "projects/<str:code>/comments/<str:comment_code>/",
+        ProjectCommentViewSet.as_view(
+            {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
+        ),
+        name="project-comments-detail",
+    ),
+    path(
+        "projects/<str:code>/comments/<str:comment_code>/pin/",
+        ProjectCommentViewSet.as_view({"post": "pin"}),
+        name="project-comments-pin",
+    ),
+    path(
+        "projects/<str:code>/comments/<str:comment_code>/unpin/",
+        ProjectCommentViewSet.as_view({"post": "unpin"}),
+        name="project-comments-unpin",
     ),
     path(
         "projects/<str:code>/contacts/",

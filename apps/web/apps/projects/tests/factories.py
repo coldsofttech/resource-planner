@@ -1,5 +1,6 @@
 from datetime import date
 
+from apps.comments.models import Comment
 from apps.contacts.models import Contact
 from apps.financial_years.constants import FinancialYearStatus
 from apps.financial_years.models import FinancialYear
@@ -19,6 +20,7 @@ from apps.projects.models import (
     ProjectCode,
     ProjectCodeHistory,
     ProjectCollaborator,
+    ProjectComment,
     ProjectContact,
     ProjectEstimate,
     ProjectEstimateStatusHistory,
@@ -333,6 +335,17 @@ def make_project_contact(
     return ProjectContact.objects.create(
         project=project, contact=contact, role=role, **overrides
     )
+
+
+def make_project_comment(
+    project: Project | None = None,
+    comment_text: str = "Test comment.",
+    **overrides,
+) -> ProjectComment:
+    if project is None:
+        project = make_project()
+    comment = Comment.objects.create(comment=comment_text)
+    return ProjectComment.objects.create(project=project, comment=comment, **overrides)
 
 
 def make_csv_file(content: str, name: str = "programmes.csv"):
