@@ -596,13 +596,49 @@
               </tbody>
             </table>
 
+            <h3 class="rp-docs-subheading">Budget variance per size</h3>
+            <p class="small rp-muted">Each size tier has a configurable <strong>Budget Variance (%)</strong> — the percentage within which a project of that size is considered <em>On Budget</em> (GREEN) when comparing its actual budget against the linked estimate's total cost. Variance beyond this band but within the global risk threshold shows as AMBER; beyond the risk threshold shows as RED.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Size</th><th>Default budget variance</th><th>Effect</th></tr></thead>
+              <tbody>
+                <tr><td><strong>XS</strong></td><td>0.5 %</td><td>Cost must be within 0.5% of the actual budget to show GREEN.</td></tr>
+                <tr><td><strong>S</strong></td><td>0.5 %</td><td>Cost must be within 0.5% of the actual budget to show GREEN.</td></tr>
+                <tr><td><strong>M</strong></td><td>0.5 %</td><td>Cost must be within 0.5% of the actual budget to show GREEN.</td></tr>
+                <tr><td><strong>L</strong></td><td>1.0 %</td><td>Cost must be within 1.0% of the actual budget to show GREEN.</td></tr>
+                <tr><td><strong>XL</strong></td><td>1.0 %</td><td>Cost must be within 1.0% of the actual budget to show GREEN.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Budget risk threshold</h3>
+            <p class="small rp-muted">The <strong>Budget Risk Threshold (%)</strong> is a single global setting that defines the AMBER/RED boundary for all project sizes. When the cost variance exceeds the per-size budget variance but stays within this threshold the risk status is AMBER; beyond it the status is RED.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Setting</th><th>Default</th><th>Effect</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Budget Risk Threshold</strong></td>
+                  <td>10.0 %</td>
+                  <td>
+                    Cost variance &lt; per-size variance → <strong style="color:var(--rp-success,green);">GREEN</strong><br>
+                    Per-size variance ≤ cost variance ≤ 10% → <strong style="color:var(--rp-warning,orange);">AMBER</strong><br>
+                    Cost variance &gt; 10% → <strong style="color:var(--rp-danger,red);">RED</strong>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> These settings power the budget risk badges on Project Budgets.</strong>
+              The size-specific variance and global risk threshold work together to produce the GREEN / AMBER / RED status shown on each budget record. See <a href="#project-budgets">Project Budgets</a> for details on how the risk status is displayed and what each colour means.
+            </div>
+
             <h3 class="rp-docs-subheading">Updating the thresholds</h3>
             <ol class="rp-step-list">
               <li>Navigate to <strong>Project → Configurations → Project Sizes</strong>.</li>
-              <li>Each editable tier card (XS, S, M, L) shows a <strong>Max Amount (£)</strong> field. Enter the new upper boundary for that tier.</li>
-              <li>The range hints beneath each field update live as you type, so you can see exactly where each band starts and ends before saving.</li>
-              <li>Review all four ranges to confirm they look correct.</li>
-              <li>Click <strong>Save Changes</strong>. The updated thresholds take effect immediately across all estimates in the system.</li>
+              <li>Each tier card (XS, S, M, L) shows two editable fields: <strong>Max Amount (£)</strong> and <strong>Budget Variance (%)</strong>. The XL card shows only the <strong>Budget Variance (%)</strong> field — its max amount is derived automatically.</li>
+              <li>Update the <strong>Max Amount</strong> fields to change where each size band starts and ends. The range hints beneath each field update live as you type.</li>
+              <li>Update the <strong>Budget Variance (%)</strong> fields to change how tightly each size tier is evaluated for budget risk.</li>
+              <li>Update the <strong>Budget Risk Threshold (%)</strong> field (shown below the size cards) to change the global AMBER/RED boundary.</li>
+              <li>Review all values and click <strong>Save Changes</strong>. All thresholds take effect immediately across all estimates and budget records in the system.</li>
             </ol>
 
             <h3 class="rp-docs-subheading">Live range hints</h3>
@@ -610,9 +646,11 @@
 
             <h3 class="rp-docs-subheading">Rules for valid thresholds</h3>
             <ul class="rp-rule-list">
-              <li>All four values (XS, S, M, L) must be <strong>positive integers</strong> — zero and negative amounts are not accepted.</li>
-              <li>Values must be in <strong>strictly ascending order</strong>: XS &lt; S &lt; M &lt; L. Equal values between adjacent tiers are not allowed.</li>
-              <li>If the values are out of order when you click Save, an error is shown before anything is sent to the server — no partial saves occur.</li>
+              <li>All four Max Amount values (XS, S, M, L) must be <strong>positive integers</strong> — zero and negative amounts are not accepted.</li>
+              <li>Max Amount values must be in <strong>strictly ascending order</strong>: XS &lt; S &lt; M &lt; L. Equal values between adjacent tiers are not allowed.</li>
+              <li>Budget Variance values must be <strong>positive decimal numbers</strong> greater than zero.</li>
+              <li>The Budget Risk Threshold must be a <strong>positive decimal number</strong> greater than zero.</li>
+              <li>If any value fails validation when you click Save, an error is shown before anything is sent to the server — no partial saves occur.</li>
             </ul>
 
             <div class="rp-warn-block">
@@ -626,8 +664,9 @@
             <div class="rp-error-block">
               <div class="rp-error-label">Common errors</div>
               <strong>"Amounts must be in ascending order: XS &lt; S &lt; M &lt; L"</strong> — one or more of your values is equal to or greater than the next tier. Review all four fields side by side and ensure each is strictly larger than the one before it.<br><br>
-              <strong>"This field is required"</strong> — all four Max Amount fields must contain a value before saving. Clearing a field and clicking Save will trigger this validation.<br><br>
-              <strong>"S max amount must be greater than XS max amount"</strong> — the S value you entered is less than or equal to the XS value. Adjust accordingly.
+              <strong>"This field is required"</strong> — all Max Amount and Budget Variance fields must contain a value before saving. Clearing any field and clicking Save will trigger this validation.<br><br>
+              <strong>"S max amount must be greater than XS max amount"</strong> — the S value you entered is less than or equal to the XS value. Adjust accordingly.<br><br>
+              <strong>"Budget variance must be a positive number"</strong> — Budget Variance and the Budget Risk Threshold must be greater than zero. Enter a decimal value such as <em>0.5</em> or <em>10.0</em>.
             </div>
 
             <div class="rp-tip-block">
