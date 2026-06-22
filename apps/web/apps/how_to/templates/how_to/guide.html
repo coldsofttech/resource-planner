@@ -384,6 +384,33 @@
             <p class="small rp-muted">A project has one <strong>primary team</strong> that leads delivery. Other teams contributing can be added as <strong>Collaborators</strong>. Collaborating teams appear alongside the primary team in resource planning and capacity views.</p>
             <p class="small rp-muted">To add a collaborator: open the project, go to the <strong>Collaborators</strong> tab, and click <strong>Add Collaborator</strong>. Select the team and their role on the project.</p>
 
+            <h3 class="rp-docs-subheading">Sprint milestones</h3>
+            <p class="small rp-muted">Two optional sprint fields let you record the sprint in which a project's delivery actually began and the sprint in which it was completed:</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Field</th><th>Purpose</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Sprint Started In</strong></td>
+                  <td>The sprint in which the team first began active delivery on this project. Set this when work formally kicks off — not when the project is created or scoped, but when the first sprint of delivery starts.</td>
+                </tr>
+                <tr>
+                  <td><strong>Sprint Completed In</strong></td>
+                  <td>The sprint in which the project was fully delivered and signed off. Set this when delivery ends so portfolio and velocity reports can show the actual delivery window.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="small rp-muted">Both fields are optional and independent — you can set <strong>Sprint Started In</strong> at the start of delivery and leave <strong>Sprint Completed In</strong> blank until the project closes. To set or update either field, open the project and click <strong>Edit</strong>. Select the sprint from the dropdown. To clear a sprint milestone, remove the selection and save.</p>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Sprint milestones are for recording actuals, not planning.</strong>
+              These fields capture what <em>happened</em> — not what was planned. Use the project's start and end date fields for planned dates; use sprint milestones only once a sprint has actually begun or completed. This distinction keeps planned vs. actual data clean in reports.
+            </div>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Deleting a sprint clears its milestone references.</strong>
+              If a sprint that is set as a project's <strong>Sprint Started In</strong> or <strong>Sprint Completed In</strong> is deleted, the field is automatically cleared on all linked projects. Re-set the milestone if a replacement sprint is created.
+            </div>
+
             <h3 class="rp-docs-subheading">Project codes</h3>
             <p class="small rp-muted">A project code is an external reference — a Jira ID, portfolio number, or finance code. Only one code is active per project at a time. Every code change is stored in the <strong>Code History</strong> log with a timestamp and who made the change.</p>
 
