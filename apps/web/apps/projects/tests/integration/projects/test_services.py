@@ -16,6 +16,7 @@ from apps.projects.tests.factories import (
     make_project_status,
     make_project_type,
 )
+from apps.sprints.tests.factories import make_sprint
 from apps.teams.tests.factories import make_team
 from apps.users.tests.factories import make_user
 
@@ -238,6 +239,44 @@ class ProjectServiceCreateTest(TestCase):
         self.assertTrue(p.efforts_issued)
         self.assertTrue(p.run_cost_applies)
 
+    def test_creates_with_sprint_started_in(self):
+        sprint = make_sprint(sprint_number=201, name="Sprint 201")
+        p = self.svc.create(
+            name="Sprint Start Project",
+            project_type_code=self.pt.code,
+            status_code=self.st.code,
+            sprint_started_in_code=sprint.code,
+        )
+        self.assertEqual(p.sprint_started_in, sprint)
+
+    def test_creates_with_sprint_completed_in(self):
+        sprint = make_sprint(sprint_number=202, name="Sprint 202")
+        p = self.svc.create(
+            name="Sprint Complete Project",
+            project_type_code=self.pt.code,
+            status_code=self.st.code,
+            sprint_completed_in_code=sprint.code,
+        )
+        self.assertEqual(p.sprint_completed_in, sprint)
+
+    def test_raises_not_found_for_unknown_sprint_started_in(self):
+        with self.assertRaises(NotFoundException):
+            self.svc.create(
+                name="Bad Sprint Start",
+                project_type_code=self.pt.code,
+                status_code=self.st.code,
+                sprint_started_in_code="SPRINT-99999",
+            )
+
+    def test_raises_not_found_for_unknown_sprint_completed_in(self):
+        with self.assertRaises(NotFoundException):
+            self.svc.create(
+                name="Bad Sprint Complete",
+                project_type_code=self.pt.code,
+                status_code=self.st.code,
+                sprint_completed_in_code="SPRINT-99999",
+            )
+
 
 class ProjectServiceUpdateTest(TestCase):
     def setUp(self):
@@ -278,6 +317,44 @@ class ProjectServiceUpdateTest(TestCase):
         self.svc.update(code=p.code, name="New Name")
         p.refresh_from_db()
         self.assertEqual(p.display_name, "Initiative: New Name")
+
+    def test_updates_sprint_started_in(self):
+        sprint = make_sprint(sprint_number=211, name="Sprint 211")
+        p = make_project("Sprint Start Update")
+        self.svc.update(code=p.code, sprint_started_in_code=sprint.code)
+        p.refresh_from_db()
+        self.assertEqual(p.sprint_started_in, sprint)
+
+    def test_updates_sprint_completed_in(self):
+        sprint = make_sprint(sprint_number=212, name="Sprint 212")
+        p = make_project("Sprint Complete Update")
+        self.svc.update(code=p.code, sprint_completed_in_code=sprint.code)
+        p.refresh_from_db()
+        self.assertEqual(p.sprint_completed_in, sprint)
+
+    def test_clears_sprint_started_in_when_none_passed(self):
+        sprint = make_sprint(sprint_number=213, name="Sprint 213")
+        p = make_project("Sprint Start Clear", sprint_started_in=sprint)
+        self.svc.update(code=p.code, sprint_started_in_code=None)
+        p.refresh_from_db()
+        self.assertIsNone(p.sprint_started_in)
+
+    def test_clears_sprint_completed_in_when_none_passed(self):
+        sprint = make_sprint(sprint_number=214, name="Sprint 214")
+        p = make_project("Sprint Complete Clear", sprint_completed_in=sprint)
+        self.svc.update(code=p.code, sprint_completed_in_code=None)
+        p.refresh_from_db()
+        self.assertIsNone(p.sprint_completed_in)
+
+    def test_raises_not_found_for_unknown_sprint_started_in_on_update(self):
+        p = make_project("Bad Sprint Start Update")
+        with self.assertRaises(NotFoundException):
+            self.svc.update(code=p.code, sprint_started_in_code="SPRINT-99999")
+
+    def test_raises_not_found_for_unknown_sprint_completed_in_on_update(self):
+        p = make_project("Bad Sprint Complete Update")
+        with self.assertRaises(NotFoundException):
+            self.svc.update(code=p.code, sprint_completed_in_code="SPRINT-99999")
 
 
 class ProjectServiceActivateDeactivateTest(TestCase):

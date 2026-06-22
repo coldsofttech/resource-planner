@@ -10,6 +10,7 @@ from apps.projects.tests.factories import (
     make_project_status,
     make_project_type,
 )
+from apps.sprints.tests.factories import make_sprint
 from apps.teams.tests.factories import make_team
 from apps.users.tests.factories import make_user
 
@@ -181,6 +182,62 @@ class ProjectCreateAPITest(TestCase):
         )
         self.assertEqual(response.data["data"]["display_name"], "Core: Display Test")
 
+    def test_creates_with_sprint_started_in_code(self):
+        sprint = make_sprint(sprint_number=301, name="Sprint 301")
+        response = self.client.post(
+            LIST_URL,
+            {
+                "name": "Sprint Start API",
+                "project_type_code": self.pt.code,
+                "status_code": self.st.code,
+                "sprint_started_in_code": sprint.code,
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["data"]["sprint_started_in_code"], sprint.code)
+
+    def test_creates_with_sprint_completed_in_code(self):
+        sprint = make_sprint(sprint_number=302, name="Sprint 302")
+        response = self.client.post(
+            LIST_URL,
+            {
+                "name": "Sprint Complete API",
+                "project_type_code": self.pt.code,
+                "status_code": self.st.code,
+                "sprint_completed_in_code": sprint.code,
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["data"]["sprint_completed_in_code"], sprint.code)
+
+    def test_unknown_sprint_started_in_code_returns_404(self):
+        response = self.client.post(
+            LIST_URL,
+            {
+                "name": "Bad Sprint Start",
+                "project_type_code": self.pt.code,
+                "status_code": self.st.code,
+                "sprint_started_in_code": "SPRINT-99999",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_unknown_sprint_completed_in_code_returns_404(self):
+        response = self.client.post(
+            LIST_URL,
+            {
+                "name": "Bad Sprint Complete",
+                "project_type_code": self.pt.code,
+                "status_code": self.st.code,
+                "sprint_completed_in_code": "SPRINT-99999",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 404)
+
 
 # ── GET /projects/<code>/ ─────────────────────────────────────────────────────
 
@@ -213,6 +270,24 @@ class ProjectRetrieveAPITest(TestCase):
     def test_response_includes_display_name(self):
         response = self.client.get(DETAIL_URL.format(self.project.code))
         self.assertIn("display_name", response.data["data"])
+
+    def test_response_includes_sprint_started_in_fields(self):
+        response = self.client.get(DETAIL_URL.format(self.project.code))
+        data = response.data["data"]
+        self.assertIn("sprint_started_in_code", data)
+        self.assertIn("sprint_started_in_name", data)
+
+    def test_response_includes_sprint_completed_in_fields(self):
+        response = self.client.get(DETAIL_URL.format(self.project.code))
+        data = response.data["data"]
+        self.assertIn("sprint_completed_in_code", data)
+        self.assertIn("sprint_completed_in_name", data)
+
+    def test_sprint_fields_null_when_not_set(self):
+        response = self.client.get(DETAIL_URL.format(self.project.code))
+        data = response.data["data"]
+        self.assertIsNone(data["sprint_started_in_code"])
+        self.assertIsNone(data["sprint_completed_in_code"])
 
 
 # ── PATCH /projects/<code>/ ───────────────────────────────────────────────────
@@ -257,6 +332,70 @@ class ProjectUpdateAPITest(TestCase):
         client = APIClient()
         response = client.patch(DETAIL_URL.format(self.project.code), {}, format="json")
         self.assertEqual(response.status_code, 401)
+
+    def test_updates_sprint_started_in_code(self):
+        sprint = make_sprint(sprint_number=311, name="Sprint 311")
+        response = self.client.patch(
+            DETAIL_URL.format(self.project.code),
+            {"sprint_started_in_code": sprint.code},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.sprint_started_in, sprint)
+
+    def test_updates_sprint_completed_in_code(self):
+        sprint = make_sprint(sprint_number=312, name="Sprint 312")
+        response = self.client.patch(
+            DETAIL_URL.format(self.project.code),
+            {"sprint_completed_in_code": sprint.code},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.sprint_completed_in, sprint)
+
+    def test_clears_sprint_started_in_when_null_sent(self):
+        sprint = make_sprint(sprint_number=313, name="Sprint 313")
+        self.project.sprint_started_in = sprint
+        self.project.save(update_fields=["sprint_started_in"])
+        response = self.client.patch(
+            DETAIL_URL.format(self.project.code),
+            {"sprint_started_in_code": None},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.project.refresh_from_db()
+        self.assertIsNone(self.project.sprint_started_in)
+
+    def test_clears_sprint_completed_in_when_null_sent(self):
+        sprint = make_sprint(sprint_number=314, name="Sprint 314")
+        self.project.sprint_completed_in = sprint
+        self.project.save(update_fields=["sprint_completed_in"])
+        response = self.client.patch(
+            DETAIL_URL.format(self.project.code),
+            {"sprint_completed_in_code": None},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.project.refresh_from_db()
+        self.assertIsNone(self.project.sprint_completed_in)
+
+    def test_unknown_sprint_started_in_returns_404(self):
+        response = self.client.patch(
+            DETAIL_URL.format(self.project.code),
+            {"sprint_started_in_code": "SPRINT-99999"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_unknown_sprint_completed_in_returns_404(self):
+        response = self.client.patch(
+            DETAIL_URL.format(self.project.code),
+            {"sprint_completed_in_code": "SPRINT-99999"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 404)
 
 
 # ── DELETE /projects/<code>/ ──────────────────────────────────────────────────

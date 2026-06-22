@@ -16,6 +16,7 @@ from apps.projects.tests.factories import (
     make_project_status,
     make_project_type,
 )
+from apps.sprints.tests.factories import make_sprint
 from apps.teams.tests.factories import make_team
 from apps.users.tests.factories import make_user
 
@@ -74,6 +75,12 @@ class ProjectFieldDefaultsTest(TestCase):
 
     def test_sub_status_defaults_to_none(self):
         self.assertIsNone(self.project.sub_status)
+
+    def test_sprint_started_in_defaults_to_none(self):
+        self.assertIsNone(self.project.sprint_started_in)
+
+    def test_sprint_completed_in_defaults_to_none(self):
+        self.assertIsNone(self.project.sprint_completed_in)
 
     def test_created_by_defaults_to_none(self):
         self.assertIsNone(self.project.created_by)
@@ -177,6 +184,32 @@ class ProjectForeignKeyTest(TestCase):
         prog = make_programme("Initiative A")
         p = make_project("Prog Test", programme=prog)
         self.assertEqual(p.programme, prog)
+
+
+class ProjectSprintForeignKeyTest(TestCase):
+    def test_sprint_started_in_linked(self):
+        sprint = make_sprint(sprint_number=101, name="Sprint 101")
+        p = make_project("Sprint Start Test", sprint_started_in=sprint)
+        self.assertEqual(p.sprint_started_in, sprint)
+
+    def test_sprint_completed_in_linked(self):
+        sprint = make_sprint(sprint_number=102, name="Sprint 102")
+        p = make_project("Sprint Complete Test", sprint_completed_in=sprint)
+        self.assertEqual(p.sprint_completed_in, sprint)
+
+    def test_sprint_started_in_set_null_on_sprint_delete(self):
+        sprint = make_sprint(sprint_number=103, name="Sprint 103")
+        p = make_project("Sprint Start Null Test", sprint_started_in=sprint)
+        sprint.delete()
+        p.refresh_from_db()
+        self.assertIsNone(p.sprint_started_in)
+
+    def test_sprint_completed_in_set_null_on_sprint_delete(self):
+        sprint = make_sprint(sprint_number=104, name="Sprint 104")
+        p = make_project("Sprint Complete Null Test", sprint_completed_in=sprint)
+        sprint.delete()
+        p.refresh_from_db()
+        self.assertIsNone(p.sprint_completed_in)
 
 
 class ProjectCollaboratorFieldDefaultsTest(TestCase):
