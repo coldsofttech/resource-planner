@@ -1,9 +1,12 @@
 from datetime import date
 
+from apps.comments.models import Comment
+from apps.contacts.models import Contact
 from apps.financial_years.constants import FinancialYearStatus
 from apps.financial_years.models import FinancialYear
 from apps.projects import selectors as project_selectors
 from apps.projects.constants import (
+    ContactRole,
     ProjectBudgetAction,
     ProjectEstimateAction,
     ProjectEstimateStatus,
@@ -17,6 +20,8 @@ from apps.projects.models import (
     ProjectCode,
     ProjectCodeHistory,
     ProjectCollaborator,
+    ProjectComment,
+    ProjectContact,
     ProjectEstimate,
     ProjectEstimateStatusHistory,
     ProjectLink,
@@ -307,6 +312,40 @@ def make_budget_history(
         new_allocated_budget=new_allocated_budget,
         **overrides,
     )
+
+
+def make_contact(
+    name: str = "Test Contact",
+    email: str = "contact@example.com",
+    **overrides,
+) -> Contact:
+    return Contact.objects.create(name=name, email=email, **overrides)
+
+
+def make_project_contact(
+    project: Project | None = None,
+    contact: Contact | None = None,
+    role: str = ContactRole.PROJECT,  # type: ignore[assignment]
+    **overrides,
+) -> ProjectContact:
+    if project is None:
+        project = make_project()
+    if contact is None:
+        contact = make_contact()
+    return ProjectContact.objects.create(
+        project=project, contact=contact, role=role, **overrides
+    )
+
+
+def make_project_comment(
+    project: Project | None = None,
+    comment_text: str = "Test comment.",
+    **overrides,
+) -> ProjectComment:
+    if project is None:
+        project = make_project()
+    comment = Comment.objects.create(comment=comment_text)
+    return ProjectComment.objects.create(project=project, comment=comment, **overrides)
 
 
 def make_csv_file(content: str, name: str = "programmes.csv"):

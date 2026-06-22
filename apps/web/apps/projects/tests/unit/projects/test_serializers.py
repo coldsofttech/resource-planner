@@ -101,6 +101,64 @@ class ProjectCreateSerializerTest(SimpleTestCase):
         )
         self.assertTrue(s.is_valid(), s.errors)
 
+    def test_sprint_started_in_code_defaults_to_none(self):
+        s = ProjectCreateSerializer(
+            data={
+                "name": "Sprint Default",
+                "project_type_code": "PROJTYPE-1",
+                "status_code": "PROJSTAT-1",
+            }
+        )
+        self.assertTrue(s.is_valid(), s.errors)
+        self.assertIsNone(s.validated_data["sprint_started_in_code"])
+
+    def test_sprint_completed_in_code_defaults_to_none(self):
+        s = ProjectCreateSerializer(
+            data={
+                "name": "Sprint Default 2",
+                "project_type_code": "PROJTYPE-1",
+                "status_code": "PROJSTAT-1",
+            }
+        )
+        self.assertTrue(s.is_valid(), s.errors)
+        self.assertIsNone(s.validated_data["sprint_completed_in_code"])
+
+    def test_sprint_started_in_code_accepted(self):
+        s = ProjectCreateSerializer(
+            data={
+                "name": "Sprint Start",
+                "project_type_code": "PROJTYPE-1",
+                "status_code": "PROJSTAT-1",
+                "sprint_started_in_code": "SPRINT-1",
+            }
+        )
+        self.assertTrue(s.is_valid(), s.errors)
+        self.assertEqual(s.validated_data["sprint_started_in_code"], "SPRINT-1")
+
+    def test_sprint_completed_in_code_accepted(self):
+        s = ProjectCreateSerializer(
+            data={
+                "name": "Sprint Complete",
+                "project_type_code": "PROJTYPE-1",
+                "status_code": "PROJSTAT-1",
+                "sprint_completed_in_code": "SPRINT-2",
+            }
+        )
+        self.assertTrue(s.is_valid(), s.errors)
+        self.assertEqual(s.validated_data["sprint_completed_in_code"], "SPRINT-2")
+
+    def test_sprint_codes_blank_accepted(self):
+        s = ProjectCreateSerializer(
+            data={
+                "name": "Blank Sprints",
+                "project_type_code": "PROJTYPE-1",
+                "status_code": "PROJSTAT-1",
+                "sprint_started_in_code": "",
+                "sprint_completed_in_code": "",
+            }
+        )
+        self.assertTrue(s.is_valid(), s.errors)
+
 
 class ProjectUpdateSerializerTest(SimpleTestCase):
     def test_empty_payload_is_valid(self):
@@ -131,6 +189,30 @@ class ProjectUpdateSerializerTest(SimpleTestCase):
                 "priority": "high",
                 "is_active": False,
             }
+        )
+        self.assertTrue(s.is_valid(), s.errors)
+
+    def test_sprint_started_in_code_accepted(self):
+        s = ProjectUpdateSerializer(data={"sprint_started_in_code": "SPRINT-1"})
+        self.assertTrue(s.is_valid(), s.errors)
+        self.assertEqual(s.validated_data["sprint_started_in_code"], "SPRINT-1")
+
+    def test_sprint_completed_in_code_accepted(self):
+        s = ProjectUpdateSerializer(data={"sprint_completed_in_code": "SPRINT-2"})
+        self.assertTrue(s.is_valid(), s.errors)
+        self.assertEqual(s.validated_data["sprint_completed_in_code"], "SPRINT-2")
+
+    def test_sprint_codes_can_be_null(self):
+        s = ProjectUpdateSerializer(
+            data={"sprint_started_in_code": None, "sprint_completed_in_code": None}
+        )
+        self.assertTrue(s.is_valid(), s.errors)
+        self.assertIsNone(s.validated_data["sprint_started_in_code"])
+        self.assertIsNone(s.validated_data["sprint_completed_in_code"])
+
+    def test_sprint_codes_can_be_blank(self):
+        s = ProjectUpdateSerializer(
+            data={"sprint_started_in_code": "", "sprint_completed_in_code": ""}
         )
         self.assertTrue(s.is_valid(), s.errors)
 

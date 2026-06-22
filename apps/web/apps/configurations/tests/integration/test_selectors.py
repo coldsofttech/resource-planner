@@ -6,12 +6,17 @@ from django.test import TestCase
 from apps.auth.constants import AuthMode
 from apps.configurations.models import Configuration
 from apps.configurations.selectors import (
+    AI,
     Auth,
     Email,
+    FinancialYear,
     General,
+    Holidays,
     Infra,
     Project,
     Setup,
+    Sprint,
+    Users,
     get_config_id,
     get_config_value,
 )
@@ -418,3 +423,162 @@ class ProjectSelectorTest(TestCase):
         self.assertIsInstance(Project.get_size_m_budget_variance(), float)
         self.assertIsInstance(Project.get_size_l_budget_variance(), float)
         self.assertIsInstance(Project.get_size_xl_budget_variance(), float)
+
+
+class HolidaysSelectorTest(TestCase):
+    def test_get_default_holidays_returns_default(self):
+        # Seeded default value is "20".
+        self.assertEqual(Holidays.get_default_holidays(), 20)
+
+    def test_get_default_holidays_returns_configured_value(self):
+        Configuration.objects.filter(config_code="DEFAULT_HOLIDAYS").update(value="25")
+        self.assertEqual(Holidays.get_default_holidays(), 25)
+
+    def test_get_default_holidays_returns_int(self):
+        self.assertIsInstance(Holidays.get_default_holidays(), int)
+
+
+class FinancialYearSelectorTest(TestCase):
+    def test_get_fy_expiry_warning_days_returns_default(self):
+        # Seeded default value is "30".
+        self.assertEqual(FinancialYear.get_fy_expiry_warning_days(), 30)
+
+    def test_get_fy_expiry_warning_days_returns_configured_value(self):
+        Configuration.objects.filter(config_code="FY_EXPIRY_WARNING_DAYS").update(
+            value="14"
+        )
+        self.assertEqual(FinancialYear.get_fy_expiry_warning_days(), 14)
+
+    def test_get_fy_expiry_warning_days_returns_int(self):
+        self.assertIsInstance(FinancialYear.get_fy_expiry_warning_days(), int)
+
+
+class UsersSelectorTest(TestCase):
+    def test_get_password_reset_timeout_returns_default(self):
+        # Seeded default value is "120".
+        self.assertEqual(Users.get_password_reset_timeout(), 120)
+
+    def test_get_password_reset_timeout_returns_configured_value(self):
+        Configuration.objects.filter(config_code="PASSWORD_RESET_TIMEOUT").update(
+            value="60"
+        )
+        self.assertEqual(Users.get_password_reset_timeout(), 60)
+
+    def test_get_password_reset_timeout_returns_int(self):
+        self.assertIsInstance(Users.get_password_reset_timeout(), int)
+
+
+class SprintSelectorTest(TestCase):
+    def test_get_sprint_name_prefix_returns_default(self):
+        # Seeded default value is "Sprint".
+        self.assertEqual(Sprint.get_sprint_name_prefix(), "Sprint")
+
+    def test_get_sprint_name_prefix_returns_configured_value(self):
+        Configuration.objects.filter(config_code="SPRINT_NAME_PREFIX").update(
+            value="SP"
+        )
+        self.assertEqual(Sprint.get_sprint_name_prefix(), "SP")
+
+    def test_get_sprint_start_number_returns_default(self):
+        # Seeded default value is "1".
+        self.assertEqual(Sprint.get_sprint_start_number(), 1)
+
+    def test_get_sprint_start_number_returns_configured_value(self):
+        Configuration.objects.filter(config_code="SPRINT_START_NUMBER").update(
+            value="10"
+        )
+        self.assertEqual(Sprint.get_sprint_start_number(), 10)
+
+    def test_get_sprint_duration_days_returns_default(self):
+        # Seeded default value is "14".
+        self.assertEqual(Sprint.get_sprint_duration_days(), 14)
+
+    def test_get_sprint_duration_days_returns_configured_value(self):
+        Configuration.objects.filter(config_code="SPRINT_DURATION_DAYS").update(
+            value="7"
+        )
+        self.assertEqual(Sprint.get_sprint_duration_days(), 7)
+
+    def test_get_sprint_point_price_returns_default(self):
+        # Seeded default value is "1150".
+        self.assertEqual(Sprint.get_sprint_point_price(), 1150)
+
+    def test_get_sprint_point_price_returns_configured_value(self):
+        Configuration.objects.filter(config_code="SPRINT_POINT_PRICE").update(
+            value="2000"
+        )
+        self.assertEqual(Sprint.get_sprint_point_price(), 2000)
+
+    def test_get_hours_per_day_returns_default(self):
+        # Seeded default value is "7".
+        self.assertEqual(Sprint.get_hours_per_day(), 7)
+
+    def test_get_hours_per_day_returns_configured_value(self):
+        Configuration.objects.filter(config_code="HOURS_PER_DAY").update(value="8")
+        self.assertEqual(Sprint.get_hours_per_day(), 8)
+
+    def test_sprint_numeric_selectors_return_int(self):
+        self.assertIsInstance(Sprint.get_sprint_start_number(), int)
+        self.assertIsInstance(Sprint.get_sprint_duration_days(), int)
+        self.assertIsInstance(Sprint.get_sprint_point_price(), int)
+        self.assertIsInstance(Sprint.get_hours_per_day(), int)
+
+
+class AISelectorTest(TestCase):
+    def _set(self, config_code: str, value: str) -> None:
+        Configuration.objects.update_or_create(
+            config_code=config_code,
+            defaults={"value": value},
+        )
+
+    def test_is_ai_enabled_returns_false_by_default(self):
+        self._set("AI_ENABLED", "false")
+        self.assertFalse(AI.is_ai_enabled())
+
+    def test_is_ai_enabled_returns_true_when_set(self):
+        self._set("AI_ENABLED", "true")
+        self.assertTrue(AI.is_ai_enabled())
+
+    def test_get_ai_provider_returns_default(self):
+        self._set("AI_PROVIDER", "anthropic")
+        self.assertEqual(AI.get_ai_provider(), "anthropic")
+
+    def test_get_ai_provider_returns_configured_value(self):
+        self._set("AI_PROVIDER", "bedrock")
+        self.assertEqual(AI.get_ai_provider(), "bedrock")
+
+    def test_get_ai_model_returns_empty_by_default(self):
+        self._set("AI_MODEL", "")
+        self.assertEqual(AI.get_ai_model(), "")
+
+    def test_get_ai_model_returns_configured_value(self):
+        self._set("AI_MODEL", "claude-sonnet-4-20250514")
+        self.assertEqual(AI.get_ai_model(), "claude-sonnet-4-20250514")
+
+    def test_get_anthropic_api_key_returns_empty_by_default(self):
+        self._set("AI_ANTHROPIC_API_KEY", "")
+        self.assertEqual(AI.get_anthropic_api_key(), "")
+
+    def test_get_bedrock_region_returns_default(self):
+        self._set("AI_BEDROCK_REGION", "us-east-1")
+        self.assertEqual(AI.get_bedrock_region(), "us-east-1")
+
+    def test_get_bedrock_region_returns_configured_value(self):
+        self._set("AI_BEDROCK_REGION", "eu-west-2")
+        self.assertEqual(AI.get_bedrock_region(), "eu-west-2")
+
+    def test_get_bedrock_auth_mode_returns_default(self):
+        self._set("AI_BEDROCK_AUTH_MODE", "role")
+        self.assertEqual(AI.get_bedrock_auth_mode(), "role")
+
+    def test_get_bedrock_auth_mode_returns_configured_value(self):
+        self._set("AI_BEDROCK_AUTH_MODE", "user")
+        self.assertEqual(AI.get_bedrock_auth_mode(), "user")
+
+    def test_get_bedrock_iam_key_returns_empty_by_default(self):
+        self._set("AI_BEDROCK_IAM_KEY", "")
+        self.assertEqual(AI.get_bedrock_iam_key(), "")
+
+    def test_get_bedrock_iam_secret_returns_empty_by_default(self):
+        self._set("AI_BEDROCK_IAM_SECRET", "")
+        self.assertEqual(AI.get_bedrock_iam_secret(), "")
