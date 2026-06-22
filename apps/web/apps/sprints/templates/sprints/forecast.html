@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Sprint Forecast
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/sprints.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Planning
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <span id="rp-forecast-title">Forecast</span>
+{% endblock page_title %}
+{% block page_actions %}
+  <primary-button id="rp-forecast-template-btn" label="Download Template" prefix-icon="bi-file-earmark-arrow-down"></primary-button>
+{% endblock page_actions %}
+{% block content %}
+  <div class="row g-4">
+    <div class="col-12">
+      <section-panel>
+        <panel-title>Teams</panel-title>
+        <panel-body>
+          <div id="rp-forecast-teams-container">
+            <div id="rp-forecast-teams-loading" class="rp-empty-state">
+              <span class="rp-empty-icon bi bi-hourglass-split"></span>
+              <p class="rp-empty-title">Loading teams…</p>
+            </div>
+          </div>
+        </panel-body>
+      </section-panel>
+    </div>
+  </div>
+  {% if can_import_forecast %}
+    <input type="file" id="rp-forecast-file-input" accept=".csv" hidden>
+  {% endif %}
+{% endblock content %}

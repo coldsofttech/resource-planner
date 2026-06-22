@@ -15,6 +15,16 @@ from .sprint import (
     get_sprints_overlapping_range,
     has_overlapping_sprint,
 )
+from .sprint_data_import import (
+    get_capacity_check_results_for_import,
+    get_completion_for_import,
+    get_failing_row_ids_for_check,
+    get_has_review_for_import,
+    get_import_by_code,
+    get_imports_for_sprint_team,
+    get_latest_active_import,
+    get_rows_for_import,
+)
 
 __all__ = [
     "get_all_sprints",
@@ -30,4 +40,12 @@ __all__ = [
     "get_sprints_overlapping_range",
     "get_active_and_future_sprints",
     "get_capacity_for_sprint",
+    "get_imports_for_sprint_team",
+    "get_latest_active_import",
+    "get_import_by_code",
+    "get_rows_for_import",
+    "get_failing_row_ids_for_check",
+    "get_has_review_for_import",
+    "get_capacity_check_results_for_import",
+    "get_completion_for_import",
 ]

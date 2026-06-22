@@ -165,6 +165,16 @@ async function loadSprintDetails() {
       closedEl.value = sprint.is_closed ? "Locked" : "Open";
     }
 
+    const forecastBtn = document.getElementById("rp-sprint-forecast-btn");
+    const actualsBtn = document.getElementById("rp-sprint-actuals-btn");
+    if (sprint.is_closed) {
+      forecastBtn?.setAttribute("disabled", "");
+      actualsBtn?.setAttribute("disabled", "");
+    } else {
+      forecastBtn?.removeAttribute("disabled");
+      actualsBtn?.removeAttribute("disabled");
+    }
+
     setView("rp-sprint-detail-note", sprint.note || "—");
     setView("rp-sprint-detail-created", formatDate(sprint.created_at));
     setView("rp-sprint-detail-created-by", sprint.created_by?.email ?? "—");
@@ -188,6 +198,14 @@ function initCapacityFilters(table) {
   panel.addEventListener("rp:filter:change", (e) => {
     const qs = e.detail.params.toString();
     table.setAttribute("url", qs ? `${baseUrl}?${qs}` : baseUrl);
+  });
+}
+
+function initForecastButton() {
+  const btn = document.getElementById("rp-sprint-forecast-btn");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    window.location.href = UI_URLS.sprints.forecast(sprintCode);
   });
 }
 
@@ -220,6 +238,7 @@ function initRebuildButton() {
 document.addEventListener("DOMContentLoaded", () => {
   if (!sprintCode) return;
   loadSprintDetails();
+  initForecastButton();
   initRebuildButton();
 
   const table = document.getElementById("rp-sprint-capacity-table");

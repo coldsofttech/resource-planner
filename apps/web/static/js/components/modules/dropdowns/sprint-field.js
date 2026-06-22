@@ -17,6 +17,9 @@ import { API_URLS } from "../../../modules/main/urls.js";
  *   fy-code    – filters options to the given financial year code; re-fetches on change.
  *   allow-all  – prepends an "All Sprints" option (value="") selected by default;
  *                used in filter contexts.
+ *   unassign   – prepends an "Unassign from current sprint" option (value="");
+ *                used in edit contexts when the field already has a value and the user
+ *                should be able to explicitly clear the sprint assignment.
  *   show-label – when present, renders "Sprint" as the visible field label.
  *
  * Usage:
@@ -26,7 +29,7 @@ import { API_URLS } from "../../../modules/main/urls.js";
  */
 class SprintField extends DropdownField {
   static get observedAttributes() {
-    return [...super.observedAttributes, "show-label", "allow-all", "fy-code"];
+    return [...super.observedAttributes, "show-label", "allow-all", "unassign", "fy-code"];
   }
 
   get _label() {
@@ -37,9 +40,16 @@ class SprintField extends DropdownField {
   }
 
   attributeChangedCallback(name, oldVal, newVal) {
-    if (name === "allow-all" && this._connected && this._sprintOptions !== undefined) {
-      this._initialOptions = this._buildOptions();
-      this._doRender();
+    if (name === "allow-all" || name === "unassign") {
+      if (this._connected && this._sprintOptions !== undefined) {
+        const saved = this._savedValue();
+        this._initialOptions = this._collectSprintOptions();
+        this._doRender();
+        if (saved !== null) this._restoreValue(saved);
+      }
+      // If not yet connected or options not loaded, _fetchOptions / connectedCallback
+      // will call _collectSprintOptions() and pick up the current attribute state.
+      return;
     } else if (name === "fy-code" && this._connected && oldVal !== newVal) {
       this._sprintOptions = undefined;
       this._initialOptions = [];
@@ -76,6 +86,11 @@ class SprintField extends DropdownField {
     this._loadId = Symbol();
   }
 
+  refresh() {
+    this._loadId = Symbol();
+    this._fetchOptions(this._loadId);
+  }
+
   async _fetchOptions(id) {
     try {
       const fyCode = this.getAttribute("fy-code") || null;
@@ -93,7 +108,7 @@ class SprintField extends DropdownField {
         disabled: false,
       }));
 
-      this._initialOptions = this._buildOptions();
+      this._initialOptions = this._collectSprintOptions();
       this._doRender();
     } catch {
       if (this._loadId !== id) return;
@@ -101,11 +116,25 @@ class SprintField extends DropdownField {
     }
   }
 
-  _buildOptions() {
+  // Builds the option-objects array for _initialOptions.
+  // Named distinctly to avoid shadowing DropdownField._buildOptions() (the HTML string builder).
+  _collectSprintOptions() {
     const hasAllOpt = this.hasAttribute("allow-all");
+    const hasUnassign = this.hasAttribute("unassign");
     return [
       ...(hasAllOpt
         ? [{ id: "", label: "All Sprints", value: "", selected: true, disabled: false }]
+        : []),
+      ...(hasUnassign
+        ? [
+            {
+              id: "",
+              label: "Unassign from current sprint",
+              value: "",
+              selected: false,
+              disabled: false,
+            },
+          ]
         : []),
       ...(this._sprintOptions || []),
     ];

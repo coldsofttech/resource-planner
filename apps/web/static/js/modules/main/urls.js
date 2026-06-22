@@ -54,6 +54,9 @@ export const UI_URLS = {
   sprints: {
     list: () => "/sprints/",
     detail: (code) => `/sprints/${code}/`,
+    forecast: (code) => `/sprints/${code}/forecast/`,
+    forecastImportDetail: (sprintCode, importCode) =>
+      `/sprints/${sprintCode}/forecast/${importCode}/`,
   },
   programmes: {
     list: () => "/programmes/",
@@ -363,6 +366,54 @@ export const API_URLS = {
     import: () => ({ method: "POST", href: `${API_BASE}sprints/import/` }),
     exportSpecs: () => ({ method: "GET", href: `${API_BASE}sprints/export/specs/` }),
     export: () => ({ method: "GET", href: `${API_BASE}sprints/export/` }),
+    forecastTemplate: (sprintCode) => ({
+      method: "GET",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/template/`,
+    }),
+    forecastUpload: (sprintCode, teamCode) => ({
+      method: "POST",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/${teamCode}/upload/`,
+    }),
+    forecastImports: (sprintCode, teamCode) => ({
+      method: "GET",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/${teamCode}/imports/`,
+    }),
+    forecastImportDetail: (sprintCode, importCode) => ({
+      method: "GET",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/${importCode}/`,
+    }),
+    forecastImportRows: (sprintCode, importCode) => ({
+      method: "GET",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/${importCode}/rows/`,
+    }),
+    forecastImportRowCreate: (sprintCode, importCode) => ({
+      method: "POST",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/${importCode}/rows/`,
+    }),
+    forecastImportRowUpdate: (sprintCode, importCode, rowCode) => ({
+      method: "PATCH",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/${importCode}/rows/${rowCode}/`,
+    }),
+    forecastImportRowDelete: (sprintCode, importCode, rowCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/${importCode}/rows/${rowCode}/`,
+    }),
+    forecastImportReview: (sprintCode, importCode) => ({
+      method: "POST",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/${importCode}/review/`,
+    }),
+    forecastImportConfirm: (sprintCode, importCode) => ({
+      method: "POST",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/${importCode}/confirm/`,
+    }),
+    actualsTemplate: (sprintCode) => ({
+      method: "GET",
+      href: `${API_BASE}sprints/${sprintCode}/actuals/template/`,
+    }),
+    actualsUpload: (sprintCode, teamCode) => ({
+      method: "POST",
+      href: `${API_BASE}sprints/${sprintCode}/actuals/${teamCode}/upload/`,
+    }),
   },
   projectSizes: {
     get: () => ({ method: "GET", href: `${API_BASE}projects/sizes/` }),
