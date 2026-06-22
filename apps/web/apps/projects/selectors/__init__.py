@@ -33,6 +33,7 @@ from .follower import (
     project_follower_exists,
 )
 from .label import (
+    get_all_labels_as_options,
     get_all_project_labels,
     get_all_system_labels,
     get_project_default_label,
@@ -129,6 +130,7 @@ __all__ = [
     "get_estimate_status_history",
     "get_estimates_for_project",
     "get_next_version",
+    "get_all_labels_as_options",
     "get_all_project_labels",
     "get_all_system_labels",
     "get_sibling_labels",

@@ -11,6 +11,7 @@ import "./priority-field.js";
 import "./programme-field.js";
 import "./project-estimate-status-field.js";
 import "./project-field.js";
+import "./project-label-field.js";
 import "./project-tags-field.js";
 import "./project-status-field.js";
 import "./project-substatus-field.js";
