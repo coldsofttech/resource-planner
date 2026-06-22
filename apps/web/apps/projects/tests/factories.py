@@ -1,9 +1,11 @@
 from datetime import date
 
+from apps.contacts.models import Contact
 from apps.financial_years.constants import FinancialYearStatus
 from apps.financial_years.models import FinancialYear
 from apps.projects import selectors as project_selectors
 from apps.projects.constants import (
+    ContactRole,
     ProjectBudgetAction,
     ProjectEstimateAction,
     ProjectEstimateStatus,
@@ -17,6 +19,7 @@ from apps.projects.models import (
     ProjectCode,
     ProjectCodeHistory,
     ProjectCollaborator,
+    ProjectContact,
     ProjectEstimate,
     ProjectEstimateStatusHistory,
     ProjectLink,
@@ -306,6 +309,29 @@ def make_budget_history(
         action=action,
         new_allocated_budget=new_allocated_budget,
         **overrides,
+    )
+
+
+def make_contact(
+    name: str = "Test Contact",
+    email: str = "contact@example.com",
+    **overrides,
+) -> Contact:
+    return Contact.objects.create(name=name, email=email, **overrides)
+
+
+def make_project_contact(
+    project: Project | None = None,
+    contact: Contact | None = None,
+    role: str = ContactRole.PROJECT,  # type: ignore[assignment]
+    **overrides,
+) -> ProjectContact:
+    if project is None:
+        project = make_project()
+    if contact is None:
+        contact = make_contact()
+    return ProjectContact.objects.create(
+        project=project, contact=contact, role=role, **overrides
     )
 
 
