@@ -60,6 +60,7 @@
           <a class="rp-docs-nav-link" href="#project-attachments"><i class="bi bi-paperclip"></i> Project Attachments</a>
           <a class="rp-docs-nav-link" href="#project-budgets"><i class="bi bi-cash-stack"></i> Project Budgets</a>
           <a class="rp-docs-nav-link" href="#project-contacts"><i class="bi bi-person-lines-fill"></i> Project Contacts</a>
+          <a class="rp-docs-nav-link" href="#project-comments"><i class="bi bi-chat-left-text"></i> Project Comments</a>
           <a class="rp-docs-nav-link" href="#programmes"><i class="bi bi-collection"></i> Programmes</a>
 
           <div class="rp-docs-nav-section">Workforce</div>
@@ -1058,6 +1059,99 @@
 
             <div class="rp-tip-block">
               <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Add contacts at project creation time so that stakeholders are always visible alongside the project record. Including an email address makes it easier for team members to reach the right person directly from the project page — especially useful for Finance contacts during budget review cycles.
+            </div>
+          </section>
+
+          <!-- ── Project Comments ── -->
+          <section id="project-comments" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-chat-left-text" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Project Comments</h2>
+                <p class="small rp-muted mb-0">Leave threaded notes on a project — pin the most important ones to the top so they are always visible.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Project Comments give the delivery team a place to record decisions, flag blockers, or leave context notes directly on the project record. Comments are visible to everyone with access to the project. You can mention specific team members to draw their attention, edit your comment if the situation changes, and pin the most important comment to keep it at the top of the list.</p>
+
+            <h3 class="rp-docs-subheading">Navigating to Project Comments</h3>
+            <ol class="rp-step-list">
+              <li>Open any project from the <strong>Projects</strong> list.</li>
+              <li>Click the <strong>Comments</strong> tab inside the project detail page.</li>
+              <li>Comments are shown newest-first, with any pinned comment always at the top.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Actions on the Comments tab</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Comment</strong></td><td>Opens the comment input. Enter your text, optionally mention team members, and submit.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Updates the comment text and/or mentions. The comment is marked as <em>edited</em> after saving.</td></tr>
+                <tr><td><strong>Pin</strong></td><td>Moves the comment to the top of the list so it stays visible regardless of when it was posted. Only one comment can be pinned at a time per project.</td></tr>
+                <tr><td><strong>Unpin</strong></td><td>Returns a pinned comment to its natural position in the list (sorted by date).</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Permanently removes the comment and any mentions it contained.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Adding a comment</h3>
+            <ol class="rp-step-list">
+              <li>Open the project and click the <strong>Comments</strong> tab.</li>
+              <li>Click <strong>Add Comment</strong>.</li>
+              <li>Type your comment in the text field.</li>
+              <li>Optionally mention one or more team members — type their name in the <strong>Mentions</strong> field and select from the suggestions. Mentioned users receive a notification.</li>
+              <li>Click <strong>Save</strong>. Your comment appears at the top of the list.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Editing a comment</h3>
+            <ol class="rp-step-list">
+              <li>On the <strong>Comments</strong> tab, click the <strong>Edit</strong> action on the comment you want to update.</li>
+              <li>Modify the text and/or update the mentions list.</li>
+              <li>Click <strong>Save</strong>. The comment is updated and marked as <em>edited</em> so other team members can see it was revised.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Pinning a comment</h3>
+            <p class="small rp-muted">Pinning keeps one comment permanently visible at the top of the list — useful for decisions, blockers, or context that every team member needs to see when they open the project.</p>
+            <ol class="rp-step-list">
+              <li>On the <strong>Comments</strong> tab, click <strong>Pin</strong> on the comment you want to highlight.</li>
+              <li>The comment moves to the top of the list and displays a <em>pinned</em> indicator.</li>
+              <li>To pin a different comment, first <strong>Unpin</strong> the current one, then pin the new one — or pin the new one directly and the previous pin is replaced.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Comment ordering</h3>
+            <p class="small rp-muted">Comments are sorted in two tiers:</p>
+            <ul class="rp-rule-list">
+              <li>The <strong>pinned comment</strong> (if any) always appears first.</li>
+              <li>All remaining comments appear below it, ordered <strong>newest first</strong>.</li>
+            </ul>
+
+            <h3 class="rp-docs-subheading">Mentions</h3>
+            <p class="small rp-muted">Use mentions to notify specific team members about a comment. Mentioned users are listed on the comment and receive a notification. Mentions can be added when creating a comment and updated when editing one. Each user can only be mentioned once per comment.</p>
+
+            <h3 class="rp-docs-subheading">Permissions</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Action</th><th>Permission required</th></tr></thead>
+              <tbody>
+                <tr><td>View comments</td><td>Standard project view access (<code>projects.view_projectcomment</code>)</td></tr>
+                <tr><td>Add a comment</td><td><strong>Add project comment</strong> (<code>projects.add_projectcomment</code>)</td></tr>
+                <tr><td>Edit, pin, or unpin a comment</td><td><strong>Change project comment</strong> (<code>projects.change_projectcomment</code>)</td></tr>
+                <tr><td>Delete a comment</td><td><strong>Delete project comment</strong> (<code>projects.delete_projectcomment</code>)</td></tr>
+              </tbody>
+            </table>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Deletion is permanent.</strong>
+              Deleting a comment removes it and all its mentions immediately. There is no undo. If you need to correct a comment rather than remove it, use <strong>Edit</strong> instead — the comment is updated in place and marked as edited for transparency.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Comment text is required"</strong> — a comment cannot be blank. Enter at least one character before saving.<br><br>
+              <strong>"You do not have permission to edit comments"</strong> — editing, pinning, and unpinning all require the <em>Change project comment</em> permission. Contact your administrator to request access.<br><br>
+              <strong>"You do not have permission to delete comments"</strong> — contact your administrator to request the <em>Delete project comment</em> permission.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Use the <strong>Pin</strong> feature for the single most important piece of information at any given time — a key decision, an open blocker, or a handover note. Change what is pinned as the project evolves. It is the first thing anyone sees when they open the Comments tab, so keep it current and actionable.
             </div>
           </section>
 
