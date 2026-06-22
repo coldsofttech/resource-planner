@@ -138,20 +138,22 @@ These fields fetch their options from the API on first connect and cache them fo
 | `allow-all`  | boolean | Prepends an "All …" option with `value=""`, selected by default; use in filter contexts                  |
 | `show-label` | boolean | Renders the field label as visible text; without this attribute the label is hidden (label-less variant) |
 
-| Element                     | Default label      | API endpoint                                      | Notes                                                           |
-| --------------------------- | ------------------ | ------------------------------------------------- | --------------------------------------------------------------- |
-| `<role-field>`              | Role               | `GET /api/v1/roles/options/`                      | Pre-selects `is_default` role when `value` is absent            |
-| `<timezone-field>`          | Timezone           | `GET /api/v1/users/options/`                      | No `allow-all`                                                  |
-| `<employment-type-field>`   | Employment Type    | `GET /api/v1/emp-types/options/`                  | Pre-selects `is_default` employment type when `value` is absent |
-| `<location-field>`          | Location           | `GET /api/v1/locations/options/`                  | Options render as "City, Country"; pre-selects `is_default`     |
-| `<confidence-field>`        | Confidence         | `GET /api/v1/projects/options/?fields=confidence` |                                                                 |
-| `<priority-field>`          | Priority           | `GET /api/v1/projects/options/?fields=priority`   |                                                                 |
-| `<programme-field>`         | Programme          | `GET /api/v1/programmes/options/`                 |                                                                 |
-| `<project-field>`           | Project            | `GET /api/v1/projects/options/`                   | See `programme-id` below                                        |
-| `<project-status-field>`    | Project Status     | `GET /api/v1/projects/statuses/options/`          |                                                                 |
-| `<project-substatus-field>` | Project Sub-Status | `GET /api/v1/projects/sub-statuses/options/`      | See `status-id` below                                           |
-| `<project-type-field>`      | Project Type       | `GET /api/v1/projects/types/options/`             |                                                                 |
-| `<sprint-field>`            | Sprint             | `GET /api/v1/sprints/options/`                    | See `fy-code`, `allow-all`, `unassign` below                    |
+| Element                     | Default label      | API endpoint                                      | Notes                                                                     |
+| --------------------------- | ------------------ | ------------------------------------------------- | ------------------------------------------------------------------------- |
+| `<role-field>`              | Role               | `GET /api/v1/roles/options/`                      | Pre-selects `is_default` role when `value` is absent                      |
+| `<timezone-field>`          | Timezone           | `GET /api/v1/users/options/`                      | No `allow-all`                                                            |
+| `<employment-type-field>`   | Employment Type    | `GET /api/v1/emp-types/options/`                  | Pre-selects `is_default` employment type when `value` is absent           |
+| `<location-field>`          | Location           | `GET /api/v1/locations/options/`                  | Options render as "City, Country"; pre-selects `is_default`               |
+| `<confidence-field>`        | Confidence         | `GET /api/v1/projects/options/?fields=confidence` |                                                                           |
+| `<priority-field>`          | Priority           | `GET /api/v1/projects/options/?fields=priority`   |                                                                           |
+| `<programme-field>`         | Programme          | `GET /api/v1/programmes/options/`                 |                                                                           |
+| `<project-field>`           | Project            | `GET /api/v1/projects/options/`                   | See `programme-id` below                                                  |
+| `<project-status-field>`    | Project Status     | `GET /api/v1/projects/statuses/options/`          |                                                                           |
+| `<project-substatus-field>` | Project Sub-Status | `GET /api/v1/projects/sub-statuses/options/`      | See `status-id` below                                                     |
+| `<project-type-field>`      | Project Type       | `GET /api/v1/projects/types/options/`             |                                                                           |
+| `<project-label-field>`     | Label              | `GET /api/v1/projects/labels/options/`            | Always searchable; options render as "Label (Project)"; see details below |
+| `<sprint-field>`            | Sprint             | `GET /api/v1/sprints/options/`                    | See `fy-code`, `allow-all`, `unassign` below                              |
+| `<recharge-type-field>`     | Mapping            | `GET /api/v1/recharges/types/options/`            | Default label/placeholder use "Mapping"; see details below                |
 
 **Additional attributes for specific fields:**
 
@@ -234,6 +236,55 @@ fyField.addEventListener("rp:change", (e) => {
 
 // Refresh options after a new sprint is created
 document.getElementById("plan-sprint").refresh();
+```
+
+`<project-label-field>`:
+
+Always operates in searchable (combobox) mode — `searchable` is set automatically on connect and cannot be disabled. Options are fetched from `GET /api/v1/projects/labels/options/`. Each option displays as **"Label (Project Name)"** (e.g. `"MVP (Project Alpha)"`). Value is the ProjectLabel code (e.g. `"PRJLBL-1"`).
+
+| Attribute    | Type    | Description                                                                                            |
+| ------------ | ------- | ------------------------------------------------------------------------------------------------------ |
+| `show-label` | boolean | Renders "Label" as the visible field label (hidden by default).                                        |
+| `allow-all`  | boolean | Prepends **All Labels** (`value=""`) as the first option, selected by default. Use in filter contexts. |
+
+**Loading state:** The select is disabled while options load.
+
+**Error state:** The select is disabled and shows "Could not load labels. Refresh the page to retry."
+
+```html
+<!-- Filter context -->
+<project-label-field name="label" allow-all show-label></project-label-field>
+
+<!-- Form context -->
+<project-label-field id="edit-label" required col="col-md-6" show-label></project-label-field>
+```
+
+---
+
+`<recharge-type-field>`:
+
+Options are fetched from `GET /api/v1/recharges/types/options/`. Value is the RechargeType code (e.g. `"RT-1"`). The default label and placeholder use the word **"Mapping"** to match how recharge types are labelled in the UI.
+
+| Attribute    | Type    | Description                                                                                           |
+| ------------ | ------- | ----------------------------------------------------------------------------------------------------- |
+| `show-label` | boolean | Renders "Mapping" as the visible field label (hidden by default).                                     |
+| `allow-all`  | boolean | Prepends **All Types** (`value=""`) as the first option, selected by default. Use in filter contexts. |
+
+**Loading state:** The select is disabled while options load.
+
+**Error state:** The select is disabled and shows "Could not load mappings. Refresh the page to retry."
+
+```html
+<!-- Filter context -->
+<recharge-type-field name="recharge_type" allow-all show-label></recharge-type-field>
+
+<!-- Form context -->
+<recharge-type-field
+  id="edit-recharge-type"
+  required
+  col="col-md-6"
+  show-label
+></recharge-type-field>
 ```
 
 ---
