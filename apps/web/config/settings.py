@@ -83,6 +83,7 @@ INSTALLED_APPS = [
     "apps.tags.apps.TagConfig",
     "apps.contacts.apps.ContactConfig",
     "apps.comments.apps.CommentsConfig",
+    "apps.recharges.apps.RechargeConfig",
     "apps.how_to.apps.HowToConfig",
     "apps.notifications.apps.NotificationsConfig",
 ]

@@ -67,6 +67,10 @@ export const UI_URLS = {
   projectTypes: {
     list: () => "/projects/types/",
   },
+  recharges: {
+    types: () => "/recharges/types/",
+    detail: (code) => `/recharges/types/${code}/`,
+  },
   projectStatuses: {
     list: () => "/projects/statuses/",
   },
@@ -386,6 +390,58 @@ export const API_URLS = {
     lifetime: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/budgets/lifetime/` }),
     exportSpecs: () => ({ method: "GET", href: `${API_BASE}projects/budgets/export/specs/` }),
     export: () => ({ method: "GET", href: `${API_BASE}projects/budgets/export/` }),
+  },
+  rechargeTypes: {
+    list: () => ({ method: "GET", href: `${API_BASE}recharges/types/` }),
+    create: () => ({ method: "POST", href: `${API_BASE}recharges/types/` }),
+    stats: () => ({ method: "GET", href: `${API_BASE}recharges/types/stats/` }),
+    options: () => ({ method: "GET", href: `${API_BASE}recharges/types/options/` }),
+    detail: (code) => ({ method: "GET", href: `${API_BASE}recharges/types/${code}/` }),
+    update: (code) => ({ method: "PATCH", href: `${API_BASE}recharges/types/${code}/` }),
+    delete: (code) => ({ method: "DELETE", href: `${API_BASE}recharges/types/${code}/` }),
+    activate: (code) => ({
+      method: "POST",
+      href: `${API_BASE}recharges/types/${code}/activate/`,
+    }),
+    deactivate: (code) => ({
+      method: "POST",
+      href: `${API_BASE}recharges/types/${code}/deactivate/`,
+    }),
+    importSpecs: () => ({ method: "GET", href: `${API_BASE}recharges/types/import/specs/` }),
+    importSample: () => ({ method: "GET", href: `${API_BASE}recharges/types/import/sample/` }),
+    import: () => ({ method: "POST", href: `${API_BASE}recharges/types/import/` }),
+    exportSpecs: () => ({ method: "GET", href: `${API_BASE}recharges/types/export/specs/` }),
+    export: () => ({ method: "GET", href: `${API_BASE}recharges/types/export/` }),
+  },
+  projectTypeMappings: {
+    list: (rc) => ({ method: "GET", href: `${API_BASE}recharges/types/${rc}/mappings/` }),
+    create: (rc) => ({ method: "POST", href: `${API_BASE}recharges/types/${rc}/mappings/` }),
+    detail: (rc, id) => ({
+      method: "GET",
+      href: `${API_BASE}recharges/types/${rc}/mappings/${id}/`,
+    }),
+    update: (rc, id) => ({
+      method: "PATCH",
+      href: `${API_BASE}recharges/types/${rc}/mappings/${id}/`,
+    }),
+    delete: (rc, id) => ({
+      method: "DELETE",
+      href: `${API_BASE}recharges/types/${rc}/mappings/${id}/`,
+    }),
+    importSpecs: (rc) => ({
+      method: "GET",
+      href: `${API_BASE}recharges/types/${rc}/mappings/import/specs/`,
+    }),
+    importSample: (rc) => ({
+      method: "GET",
+      href: `${API_BASE}recharges/types/${rc}/mappings/import/sample/`,
+    }),
+    import: (rc) => ({ method: "POST", href: `${API_BASE}recharges/types/${rc}/mappings/import/` }),
+    exportSpecs: (rc) => ({
+      method: "GET",
+      href: `${API_BASE}recharges/types/${rc}/mappings/export/specs/`,
+    }),
+    export: (rc) => ({ method: "GET", href: `${API_BASE}recharges/types/${rc}/mappings/export/` }),
   },
   projectTypes: {
     list: () => ({ method: "GET", href: `${API_BASE}projects/types/` }),
