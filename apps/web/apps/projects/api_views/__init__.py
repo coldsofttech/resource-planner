@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from .attachment import ProjectAttachmentViewSet
 from .budget import ProjectBudgetViewSet
+from .comment import ProjectCommentViewSet
 from .contact import ProjectContactViewSet
 from .estimate import ProjectEstimateViewSet
 from .follower import ProjectFollowerViewSet
@@ -32,6 +33,7 @@ __all__ = [
     "ProjectTagViewSet",
     "ProjectFollowerViewSet",
     "ProjectAttachmentViewSet",
+    "ProjectCommentViewSet",
     "ProjectContactViewSet",
     "ProjectLinkViewSet",
     "ProjectEstimateViewSet",

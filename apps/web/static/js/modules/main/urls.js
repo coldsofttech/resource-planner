@@ -558,6 +558,26 @@ export const API_URLS = {
       href: `${API_BASE}projects/${code}/followers/${followerCode}/`,
     }),
   },
+  projectComments: {
+    list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/comments/` }),
+    create: (code) => ({ method: "POST", href: `${API_BASE}projects/${code}/comments/` }),
+    update: (code, commentCode) => ({
+      method: "PATCH",
+      href: `${API_BASE}projects/${code}/comments/${commentCode}/`,
+    }),
+    delete: (code, commentCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}projects/${code}/comments/${commentCode}/`,
+    }),
+    pin: (code, commentCode) => ({
+      method: "POST",
+      href: `${API_BASE}projects/${code}/comments/${commentCode}/pin/`,
+    }),
+    unpin: (code, commentCode) => ({
+      method: "POST",
+      href: `${API_BASE}projects/${code}/comments/${commentCode}/unpin/`,
+    }),
+  },
   projectContacts: {
     list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/contacts/` }),
     create: (code) => ({ method: "POST", href: `${API_BASE}projects/${code}/contacts/` }),

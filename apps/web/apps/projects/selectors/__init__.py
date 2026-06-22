@@ -10,6 +10,11 @@ from .budget import (
     get_budgets_for_project,
     get_lifetime_budget_summary,
 )
+from .comment import (
+    get_all_project_comments,
+    get_pinned_project_comments_count,
+    get_project_comment_by_code,
+)
 from .contact import (
     get_all_project_contacts,
     get_contact_by_name_and_email,
@@ -133,6 +138,9 @@ __all__ = [
     "get_all_project_tags",
     "get_project_tag_by_code",
     "project_tag_exists",
+    "get_all_project_comments",
+    "get_pinned_project_comments_count",
+    "get_project_comment_by_code",
     "get_all_project_contacts",
     "get_project_contact_by_code",
     "project_contact_exists",
