@@ -76,6 +76,7 @@
           <a class="rp-docs-nav-link" href="#locations"><i class="bi bi-geo-alt"></i> Locations</a>
           <a class="rp-docs-nav-link" href="#holidays"><i class="bi bi-calendar-heart"></i> Holidays</a>
           <a class="rp-docs-nav-link" href="#tags"><i class="bi bi-tag"></i> Tags</a>
+          <a class="rp-docs-nav-link" href="#recharge-types"><i class="bi bi-arrow-repeat"></i> Recharge Types</a>
         </nav>
 
         <!-- Main content -->
@@ -1760,6 +1761,95 @@
 
             <div class="rp-tip-block">
               <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Agree on a tag vocabulary with your team before creating the library. Having <em>cloud</em>, <em>cloud-migration</em>, and <em>Cloud Migration</em> as three separate tags fragments your portfolio view. Pick one name per concept and stick to it.
+            </div>
+          </section>
+
+          <!-- ── Recharge Types ── -->
+          <section id="recharge-types" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-arrow-repeat" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Recharge Types</h2>
+                <p class="small rp-muted mb-0">Classify the nature of work for financial recharging purposes and link each type to applicable project types.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Recharge types define the categories of work that are recharged to cost centres or budgets — for example <strong>BAU</strong> (Business as Usual), <strong>PROJECT</strong>, or <strong>HOLIDAY</strong>. Each recharge type can be mapped to one or more project types, so the system knows which financial category applies when a project of that type is recharged.</p>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Recharge Types vs. Project Types</strong><br>
+              <strong>Project Types</strong> describe what a project <em>is</em> (e.g. Internal, External, Regulatory). <strong>Recharge Types</strong> describe how the work is <em>funded or recovered</em> (e.g. BAU, PROJECT, OVERHEAD). Mappings link the two so the correct recharge category is applied automatically.
+            </div>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Recharge Type</strong></td><td>Create a new recharge type with a unique UPPER_SNAKE_CASE name.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the name, description, or active status of an existing recharge type.</td></tr>
+                <tr><td><strong>Activate / Deactivate</strong></td><td>Toggle whether a recharge type is available for selection and mapping. Inactive types are hidden from pickers.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Permanently removes the recharge type and all its project type mappings. Cannot be undone.</td></tr>
+                <tr><td><strong>Import / Export</strong></td><td>Bulk-create recharge types from a spreadsheet, or download the full list.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Recharge type fields</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Field</th><th>Required</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Name</strong></td><td>Yes</td><td>UPPER_SNAKE_CASE only — uppercase letters, digits, and underscores. Must start with a letter. Max 50 characters. Examples: <code>BAU</code>, <code>HOLIDAY_PROJECTS</code>, <code>PROJECT123</code>.</td></tr>
+                <tr><td><strong>Description</strong></td><td>No</td><td>Optional free-text description. Defaults to empty.</td></tr>
+                <tr><td><strong>Active</strong></td><td>No</td><td>Defaults to <em>Yes</em>. Only active recharge types appear in dropdowns and options.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">How to add a recharge type</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Recharge Types</strong> and click <strong>Add Recharge Type</strong>.</li>
+              <li>Enter a name in UPPER_SNAKE_CASE — for example <code>BAU</code> or <code>HOLIDAY_PROJECTS</code>. Names must be unique across all recharge types.</li>
+              <li>Optionally add a description and confirm the active status.</li>
+              <li>Click <strong>Save</strong>. The new recharge type is assigned a system code (<code>RECHTY-{n}</code>) and is immediately available for project type mapping.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Project type mappings</h3>
+            <p class="small rp-muted">Each recharge type can be linked to one or more project types. Mappings are managed from the recharge type detail view and define which financial category applies when a project of that type is recharged. A project type can only appear once per recharge type — duplicates are rejected.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Mapping</strong></td><td>Links a project type (by code) to this recharge type. Duplicate mappings are rejected with a conflict error.</td></tr>
+                <tr><td><strong>Remove Mapping</strong> <i class="bi bi-trash"></i></td><td>Unlinks the project type from this recharge type. The project type itself is not deleted.</td></tr>
+                <tr><td><strong>Import Mappings</strong></td><td>Upload a CSV with a <code>project_type_code</code> column to bulk-add mappings. Duplicate or non-existent codes are skipped and reported.</td></tr>
+                <tr><td><strong>Export Mappings</strong></td><td>Download the current mappings for this recharge type as a spreadsheet.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Required permissions</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Action</th><th>Permission</th></tr></thead>
+              <tbody>
+                <tr><td>View recharge types</td><td><code>recharges.view_rechargetype</code></td></tr>
+                <tr><td>Create recharge type</td><td><code>recharges.add_rechargetype</code></td></tr>
+                <tr><td>Edit / Activate / Deactivate</td><td><code>recharges.change_rechargetype</code></td></tr>
+                <tr><td>Delete recharge type</td><td><code>recharges.delete_rechargetype</code></td></tr>
+                <tr><td>Import recharge types</td><td><code>recharges.import_rechargetype</code></td></tr>
+                <tr><td>Export recharge types</td><td><code>recharges.export_rechargetype</code></td></tr>
+                <tr><td>View project type mappings</td><td><code>recharges.view_projecttypemapping</code></td></tr>
+                <tr><td>Add / remove project type mappings</td><td><code>recharges.add_projecttypemapping</code> / <code>recharges.delete_projecttypemapping</code></td></tr>
+                <tr><td>Import / export mappings</td><td><code>recharges.import_projecttypemapping</code> / <code>recharges.export_projecttypemapping</code></td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Common errors</h3>
+            <ul class="rp-rule-list">
+              <li><span class="rp-error-inline">Name must be UPPER_SNAKE_CASE</span> — Lowercase letters, spaces, hyphens, and leading digits are not allowed. Use <code>BAU</code>, not <code>bau</code>, <code>Bau</code>, or <code>1BAU</code>.</li>
+              <li><span class="rp-error-inline">Name exceeds 50 characters</span> — Shorten the name to 50 characters or fewer.</li>
+              <li><span class="rp-error-inline">A recharge type with this name already exists</span> — Names are unique. Choose a different name or reactivate the existing inactive type instead.</li>
+              <li><span class="rp-error-inline">Mapping already exists</span> — A project type can only be mapped once per recharge type. The existing mapping must be removed before it can be re-added.</li>
+              <li><span class="rp-error-inline">Project type not found</span> — The project type code does not exist. Verify the code in the Project Types list and try again.</li>
+            </ul>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Keep names short and stable — they appear in exports and financial reports. Common conventions: <code>BAU</code> for run-the-business work, <code>PROJECT</code> for funded change, <code>OVERHEAD</code> for non-rechargeables, and <code>HOLIDAY</code> for leave cover. Agree on the vocabulary with your finance team before creating the library.
             </div>
           </section>
 
