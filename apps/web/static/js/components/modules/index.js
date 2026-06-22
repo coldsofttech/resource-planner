@@ -1,5 +1,6 @@
 import "./account/index.js";
 import "./banners/index.js";
+import "./comments/index.js";
 import "./buttons/index.js";
 import "./dropdowns/index.js";
 import "./fields/index.js";

@@ -1,0 +1,234 @@
+.rp-comment-composer {
+  display: flex;
+  gap: 10px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--rp-divider);
+}
+.rp-comment-composer > .rp-avatar {
+  width: 36px;
+  height: 36px;
+  font-size: 14px;
+  flex-shrink: 0;
+  line-height: 36px;
+  text-align: center;
+}
+comment-items {
+  display: block;
+}
+.rp-comment-composer-body {
+  flex: 1;
+  min-width: 0;
+}
+.rp-comment-composer textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+.rp-comment-composer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+.rp-comment-composer-tools {
+  display: flex;
+  gap: 2px;
+}
+
+.rp-comment {
+  display: block;
+  position: relative;
+}
+.rp-comment-actions {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+.rp-comment:hover .rp-comment-actions,
+.rp-comment.is-editing .rp-comment-actions {
+  opacity: 1;
+}
+.rp-comment-edit {
+  display: none;
+  margin-top: 6px;
+}
+.rp-comment.is-editing .rp-comment-edit {
+  display: block;
+}
+.rp-comment.is-editing .rp-comment-body {
+  display: none;
+}
+
+.rp-comment {
+  padding: 8px 0;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+.rp-comment-divider {
+  border: none;
+  border-top: 1px solid var(--rp-divider);
+  margin: 0;
+  opacity: 1;
+}
+.rp-comment-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: var(--rp-fs-13);
+}
+/* user-avatar sets its own className on connectedCallback — hide it below lg via media query */
+@media (max-width: 991.98px) {
+  .rp-comment-head user-avatar {
+    display: none !important;
+  }
+}
+.rp-comment-author {
+  font-weight: 600;
+}
+.rp-comment-time {
+  color: var(--rp-text-muted);
+  font-size: var(--rp-fs-12);
+}
+.rp-comment-body {
+  font-size: var(--rp-fs-14);
+  color: var(--rp-text);
+}
+
+.rp-comment.is-pinned {
+  background: oklch(0.96 0.05 80);
+  border: 1px solid oklch(0.83 0.1 75);
+  border-radius: var(--rp-r-8);
+  padding: 12px 14px;
+  margin: 4px 0 12px;
+}
+[data-theme="dark"] .rp-comment.is-pinned {
+  background: oklch(0.28 0.06 75);
+  border-color: oklch(0.4 0.1 75);
+}
+.rp-comment.is-pinned .rp-comment-head::before {
+  content: "\F26D";
+  font-family: bootstrap-icons;
+  color: var(--rp-warning-soft-text);
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.rp-comment.is-pinned .rp-comment-body {
+  font-weight: 600;
+}
+
+/* Rich-text comment editor (contentEditable) */
+.rp-comment-editor {
+  outline: none;
+  resize: none;
+}
+.rp-comment-editor:empty::before {
+  content: attr(data-placeholder);
+  color: var(--rp-text-placeholder, var(--rp-text-muted));
+  pointer-events: none;
+}
+
+/* @-mention chip — inside editor and in rendered comment body */
+.rp-mention {
+  display: inline-block;
+  color: var(--rp-primary);
+  font-weight: 600;
+  border-radius: 4px;
+  padding: 0 2px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Mention autocomplete dropdown */
+.rp-comment-mention-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--rp-surface);
+  border: 1px solid var(--rp-divider);
+  border-radius: var(--rp-r-8);
+  box-shadow: var(--rp-shadow-md);
+  display: flex;
+  flex-direction: column;
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 200;
+}
+.rp-comment-mention-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  text-align: left;
+  width: 100%;
+  font-size: var(--rp-fs-13);
+}
+.rp-comment-mention-item:hover,
+.rp-comment-mention-item[aria-selected="true"] {
+  background: var(--rp-hover);
+}
+.rp-comment-mention-name {
+  font-weight: 600;
+}
+.rp-comment-mention-email {
+  margin-left: auto;
+}
+
+/* Floating link-insert overlay (positioned to document.body) */
+.rp-link-overlay {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: var(--rp-surface);
+  border: 1px solid var(--rp-divider);
+  border-radius: var(--rp-r-8);
+  box-shadow: var(--rp-shadow-md);
+  min-width: 280px;
+  max-width: 400px;
+}
+.rp-link-overlay input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Pagination */
+.rp-comment-pager {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 12px 0;
+}
+.rp-comment-pager-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 6px;
+  border: 1px solid var(--rp-divider);
+  border-radius: var(--rp-r-4);
+  background: transparent;
+  cursor: pointer;
+  font-size: var(--rp-fs-13);
+  color: var(--rp-text);
+}
+.rp-comment-pager-btn:hover:not(:disabled) {
+  background: var(--rp-hover);
+}
+.rp-comment-pager-btn.is-active {
+  background: var(--rp-primary);
+  color: #fff;
+  border-color: var(--rp-primary);
+}
+.rp-comment-pager-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
