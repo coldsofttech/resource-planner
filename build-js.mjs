@@ -14,6 +14,7 @@ const esmModules = [
   "project-statuses",
   "project-types",
   "projects",
+  "recharge-types",
   "roles",
   "setup",
   "skills",

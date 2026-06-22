@@ -35,7 +35,7 @@ class SectionPanel extends HTMLElement {
     }
     // When the wizard moves this element the .rp-card shell is still intact —
     // skip the full re-render to avoid detaching/reattaching body nodes.
-    if (!this.querySelector(".rp-card")) this._render();
+    if (!this.querySelector(":scope > .rp-card")) this._render();
   }
 
   attributeChangedCallback(name, oldVal, newVal) {
