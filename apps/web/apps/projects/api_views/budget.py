@@ -10,6 +10,7 @@ from apps.core.viewsets import BaseViewSet, ExportMixin
 from apps.projects.serializers import (
     ProjectBudgetCreateSerializer,
     ProjectBudgetDetailSerializer,
+    ProjectBudgetLifetimeSerializer,
     ProjectBudgetListSerializer,
     ProjectBudgetStatusHistorySerializer,
     ProjectBudgetUpdateSerializer,
@@ -46,6 +47,7 @@ class ProjectBudgetViewSet(ExportMixin, BaseViewSet):
             "partial_update": "projects.change_projectbudget",
             "destroy": "projects.delete_projectbudget",
             "history": "projects.view_projectbudget",
+            "lifetime": "projects.view_projectbudget",
             "export_specs": "projects.export_projectbudget",
             "export": "projects.export_projectbudget",
         }
@@ -60,11 +62,13 @@ class ProjectBudgetViewSet(ExportMixin, BaseViewSet):
     )
     def list(self, request: Request, code=None):
         """GET /projects/<code>/budgets/"""
-        result = self.service.list(project_code=code)
-        data = ProjectBudgetListSerializer(
-            result, many=True, context=self.get_serializer_context()
-        ).data
-        return self.response(data=data, message="Budgets retrieved successfully.")
+        params = self.get_list_params(request)
+        result = self.service.list(project_code=code, params=params)
+        return self.paginated_response(
+            result=result,
+            serializer_class=ProjectBudgetListSerializer,
+            message="Budgets retrieved successfully.",
+        )
 
     @extend_schema(
         summary="Retrieve a project budget",
@@ -154,3 +158,15 @@ class ProjectBudgetViewSet(ExportMixin, BaseViewSet):
         rows = self.service.history(code=budget_code)
         data = ProjectBudgetStatusHistorySerializer(rows, many=True).data
         return self.response(data=data, message="History retrieved successfully.")
+
+    @extend_schema(
+        summary="Get lifetime budget summary for a project",
+        responses={200: ProjectBudgetLifetimeSerializer},
+    )
+    def lifetime(self, request: Request, code=None):
+        """GET /projects/<code>/budgets/lifetime/"""
+        data = self.service.lifetime(project_code=code)
+        return self.response(
+            data=ProjectBudgetLifetimeSerializer(data).data,
+            message="Lifetime budget summary retrieved successfully.",
+        )

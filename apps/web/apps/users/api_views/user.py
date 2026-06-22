@@ -220,6 +220,42 @@ class UserMeViewSet(BaseViewSet):
         )
 
     @extend_schema(
+        summary="Search users",
+        description=(
+            "Returns active users matching the given query (display name or email). "
+            "Intended for typeahead / mention search."
+        ),
+        responses={
+            200: OpenApiResponse(description="Results returned."),
+            401: OpenApiResponse(description="Authentication required."),
+        },
+    )
+    @action(detail=False, methods=["get"], url_path="search", url_name="search")
+    def search(self, request: Request):
+        """GET /users/search/?q=<query>"""
+        from django.db.models import Q
+
+        from apps.users.models import User
+
+        q = request.query_params.get("q", "").strip()
+        qs = User.objects.filter(is_active=True).select_related("profile")
+        if q:
+            qs = qs.filter(
+                Q(profile__display_name__icontains=q) | Q(email__icontains=q)
+            )
+        qs = qs.order_by("profile__display_name")[:20]
+        results = [
+            {
+                "code": getattr(u.profile, "code", None),
+                "display_name": getattr(u.profile, "display_name", u.email),
+                "email": u.email,
+            }
+            for u in qs
+            if hasattr(u, "profile")
+        ]
+        return self.response(data={"results": results})
+
+    @extend_schema(
         summary="User options",
         description="Returns available timezone options.",
         responses={

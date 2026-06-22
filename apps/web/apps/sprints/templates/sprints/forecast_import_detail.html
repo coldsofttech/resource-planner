@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Forecast Import
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/sprints.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Planning
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <span id="rp-forecast-import-title">Import</span>
+{% endblock page_title %}
+{% block page_actions %}
+  <success-button id="rp-forecast-import-confirm-btn" label="Confirm" prefix-icon="bi-check2" disabled></success-button>
+  <engine-button id="rp-forecast-import-review-btn" label="Review" prefix-icon="bi-cpu"></engine-button>
+  <primary-button id="rp-forecast-import-add-row-btn" label="Add Row" prefix-icon="bi-plus-lg"></primary-button>
+{% endblock page_actions %}
+{% block content %}
+  <tab-panel id="rp-forecast-import-tabs">
+  <tab-items>
+  <tab-item id="rows" active>
+  <tab-header title="Rows" icon="bi-table"></tab-header>
+  <tab-content>
+  <list-view id="rp-forecast-import-rows-list" class="mt-2">
+  <filter-panel id="rp-forecast-import-rows-filter">
+  <search-field id="rp-forecast-import-rows-search" name="search" placeholder="Search rows…" shortcut="/" show-label></search-field>
+  <dropdown-field id="rp-forecast-import-check-filter" name="check_type" label="Check Type" show-label>
+  <values-list>
+  <value value="">All Checks</value>
+  <value value="CHECK_ASSIGNEE">Assignee</value>
+  <value value="CHECK_SPRINT">Sprint</value>
+  <value value="CHECK_LABEL">Label</value>
+  <value value="CHECK_MAPPING">Mapping</value>
+  </values-list>
+  </dropdown-field>
+  </filter-panel>
+  <data-table id="rp-forecast-import-rows-table" row-template="renderForecastImportRowDetail" empty-message="No rows found for this import.">
+    <table-columns>
+      <table-column label="Story Type" key="story_type" sortable>
+      </table-column>
+      <table-column label="Jira ID" key="jira_id" mono sortable>
+      </table-column>
+      <table-column label="Title" key="title" sortable>
+      </table-column>
+      <table-column label="Assignee" key="assignee" sortable>
+      </table-column>
+      <table-column label="Efforts" key="efforts" numeric sortable>
+      </table-column>
+      <table-column label="Days" key="days" numeric sortable>
+      </table-column>
+      <table-column label="Sprint" key="sprint" sortable>
+      </table-column>
+      <table-column label="Label" key="label" sortable>
+      </table-column>
+      <table-column label="Mapping" key="mapping" sortable>
+      </table-column>
+      <table-column label="Checks" key="checks">
+      </table-column>
+    </table-columns>
+    <table-actions>
+      <table-action icon="bi-pencil" label="Edit" event="rp:import-row:edit">
+      </table-action>
+      <table-action icon="bi-trash" label="Delete" event="rp:import-row:delete" danger>
+      </table-action>
+    </table-actions>
+  </data-table>
+  </list-view>
+  </tab-content>
+  </tab-item>
+  <tab-item id="capacity">
+  <tab-header title="Engineer Capacity" icon="bi-people"></tab-header>
+  <tab-content>
+  <list-view id="rp-forecast-import-capacity-list" class="mt-2">
+  <filter-panel id="rp-forecast-import-capacity-filter">
+  <search-field id="rp-forecast-import-capacity-search" name="search" placeholder="Search engineers…" shortcut="/" show-label></search-field>
+  </filter-panel>
+  <data-table id="rp-forecast-import-capacity-table" row-template="renderForecastImportCapacityRow" empty-message="No engineers found for this team.">
+    <table-columns>
+      <table-column label="Engineer" key="member">
+      </table-column>
+      <table-column label="Net Capacity (days)" key="net_capacity" numeric>
+      </table-column>
+      <table-column label="Allocated (days)" key="allocated_days" numeric>
+      </table-column>
+      <table-column label="Checks" key="capacity_status">
+      </table-column>
+    </table-columns>
+  </data-table>
+  </list-view>
+  </tab-content>
+  </tab-item>
+  </tab-items>
+  </tab-panel>
+  <delete-modal id="rp-import-row-delete-modal"></delete-modal>
+  <drawer-modal id="rp-forecast-import-confirm-drawer" width="900">
+  <drawer-header eyebrow="Forecast Import" title="Confirm Import" no-sizes></drawer-header>
+  <drawer-panel>
+  <p id="rp-confirm-import-message"
+     class="mb-3"
+     style="color:var(--rp-muted)"></p>
+  <text-field id="rp-confirm-import-notes" cols="4" label="Override Notes" placeholder="Provide a reason for confirming with failing checks…" hidden></text-field>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Confirm" primary-icon="bi-check2" data-footer-primary></drawer-footer>
+  </drawer-modal>
+  <drawer-modal id="rp-import-add-row-drawer" width="900">
+  <drawer-header eyebrow="Forecast Import" title="Add Row" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-new-import-row-story-type" col="col-md-6" label="Story Type" placeholder="e.g. Story, Bug, Task"></text-field>
+    <text-field id="rp-new-import-row-jira-id" col="col-md-6" label="Jira ID" placeholder="e.g. PROJ-123"></text-field>
+    <text-field id="rp-new-import-row-title" col="col-12" label="Title" placeholder="Story title or description"></text-field>
+    <member-field id="rp-new-import-row-assignee" col="col-md-6" label="Assignee" searchable show-label placeholder="Search assignee…"></member-field>
+    <number-field id="rp-new-import-row-efforts" col="col-md-6" label="Efforts (seconds)" placeholder="e.g. 28800"></number-field>
+    <sprint-field id="rp-new-import-row-sprint" col="col-md-6" show-label></sprint-field>
+    <project-label-field id="rp-new-import-row-label" col="col-md-6" show-label></project-label-field>
+    <recharge-type-field id="rp-new-import-row-mapping" col="col-md-6" show-label></recharge-type-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Add Row" primary-icon="bi-plus-lg" data-footer-primary></drawer-footer>
+  </drawer-modal>
+  <drawer-modal id="rp-import-edit-row-drawer" width="900">
+  <drawer-header eyebrow="Forecast Import" title="Edit Row" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-edit-import-row-story-type" col="col-md-6" label="Story Type" placeholder="e.g. Story, Bug, Task"></text-field>
+    <text-field id="rp-edit-import-row-jira-id" col="col-md-6" label="Jira ID" placeholder="e.g. PROJ-123"></text-field>
+    <text-field id="rp-edit-import-row-title" col="col-12" label="Title" placeholder="Story title or description"></text-field>
+    <member-field id="rp-edit-import-row-assignee" col="col-md-6" label="Assignee" searchable show-label placeholder="Search assignee…"></member-field>
+    <number-field id="rp-edit-import-row-efforts" col="col-md-6" label="Efforts (seconds)" placeholder="e.g. 28800"></number-field>
+    <sprint-field id="rp-edit-import-row-sprint" col="col-md-6" show-label></sprint-field>
+    <project-label-field id="rp-edit-import-row-label" col="col-md-6" show-label></project-label-field>
+    <recharge-type-field id="rp-edit-import-row-mapping" col="col-md-6" show-label></recharge-type-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save Changes" primary-icon="bi-check-lg" data-footer-primary></drawer-footer>
+  </drawer-modal>
+{% endblock content %}

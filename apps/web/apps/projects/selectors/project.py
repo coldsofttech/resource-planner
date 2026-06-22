@@ -15,6 +15,8 @@ def get_all_projects() -> QuerySet[Project]:
             "status",
             "sub_status",
             "assigned_team",
+            "sprint_started_in",
+            "sprint_completed_in",
             "created_by",
             "updated_by",
         )
@@ -32,6 +34,8 @@ def get_project_by_code(code: str) -> Project | None:
                 "status",
                 "sub_status",
                 "assigned_team",
+                "sprint_started_in",
+                "sprint_completed_in",
                 "created_by",
                 "updated_by",
             )

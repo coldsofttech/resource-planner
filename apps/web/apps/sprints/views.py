@@ -27,3 +27,17 @@ class SprintDetailView(ProtectedView):
         ctx["sprint_code"] = self.kwargs.get("sprint_code", "")
         ctx["can_change_sprint"] = "sprints.change_sprint" in perms
         return ctx
+
+
+class SprintForecastView(ProtectedView):
+    template_name = "sprints/forecast.html"
+
+    def get_context_data(self, **kwargs: object) -> dict[str, object]:
+        ctx = super().get_context_data(**kwargs)
+        perms = get_user_permissions(self.request.user)
+        ctx["can_import_forecast"] = "sprints.import_forecast" in perms
+        return ctx
+
+
+class SprintForecastImportDetailView(ProtectedView):
+    template_name = "sprints/forecast_import_detail.html"

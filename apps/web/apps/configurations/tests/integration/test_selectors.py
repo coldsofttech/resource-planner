@@ -10,6 +10,7 @@ from apps.configurations.selectors import (
     Email,
     General,
     Infra,
+    Project,
     Setup,
     get_config_id,
     get_config_value,
@@ -298,3 +299,122 @@ class EmailSelectorTest(TestCase):
             value="mypassword", is_secret=True
         )
         self.assertEqual(Email.get_smtp_password(), "mypassword")
+
+
+class ProjectSelectorTest(TestCase):
+    # ── Size max amount ────────────────────────────────────────────────────────
+
+    def test_get_size_xs_max_amount_returns_default(self):
+        # Seeded default value is "20000".
+        self.assertEqual(Project.get_size_xs_max_amount(), 20000)
+
+    def test_get_size_xs_max_amount_returns_configured_value(self):
+        Configuration.objects.filter(config_code="PROJECT_SIZE_XS_MAX_AMOUNT").update(
+            value="25000"
+        )
+        self.assertEqual(Project.get_size_xs_max_amount(), 25000)
+
+    def test_get_size_s_max_amount_returns_default(self):
+        # Seeded default value is "60000".
+        self.assertEqual(Project.get_size_s_max_amount(), 60000)
+
+    def test_get_size_s_max_amount_returns_configured_value(self):
+        Configuration.objects.filter(config_code="PROJECT_SIZE_S_MAX_AMOUNT").update(
+            value="75000"
+        )
+        self.assertEqual(Project.get_size_s_max_amount(), 75000)
+
+    def test_get_size_m_max_amount_returns_default(self):
+        # Seeded default value is "200000".
+        self.assertEqual(Project.get_size_m_max_amount(), 200000)
+
+    def test_get_size_m_max_amount_returns_configured_value(self):
+        Configuration.objects.filter(config_code="PROJECT_SIZE_M_MAX_AMOUNT").update(
+            value="250000"
+        )
+        self.assertEqual(Project.get_size_m_max_amount(), 250000)
+
+    def test_get_size_l_max_amount_returns_default(self):
+        # Seeded default value is "500000".
+        self.assertEqual(Project.get_size_l_max_amount(), 500000)
+
+    def test_get_size_l_max_amount_returns_configured_value(self):
+        Configuration.objects.filter(config_code="PROJECT_SIZE_L_MAX_AMOUNT").update(
+            value="600000"
+        )
+        self.assertEqual(Project.get_size_l_max_amount(), 600000)
+
+    def test_size_max_amount_selectors_return_int(self):
+        self.assertIsInstance(Project.get_size_xs_max_amount(), int)
+        self.assertIsInstance(Project.get_size_s_max_amount(), int)
+        self.assertIsInstance(Project.get_size_m_max_amount(), int)
+        self.assertIsInstance(Project.get_size_l_max_amount(), int)
+
+    # ── Budget risk threshold ──────────────────────────────────────────────────
+
+    def test_get_budget_risk_threshold_returns_default(self):
+        # Seeded default value is "10.0".
+        self.assertEqual(Project.get_budget_risk_threshold(), 10.0)
+
+    def test_get_budget_risk_threshold_returns_configured_value(self):
+        Configuration.objects.filter(
+            config_code="PROJECT_BUDGET_RISK_THRESHOLD"
+        ).update(value="15.0")
+        self.assertEqual(Project.get_budget_risk_threshold(), 15.0)
+
+    def test_get_budget_risk_threshold_returns_float(self):
+        self.assertIsInstance(Project.get_budget_risk_threshold(), float)
+
+    # ── Budget variance per size ───────────────────────────────────────────────
+
+    def test_get_size_xs_budget_variance_returns_default(self):
+        self.assertEqual(Project.get_size_xs_budget_variance(), 0.5)
+
+    def test_get_size_xs_budget_variance_returns_configured_value(self):
+        Configuration.objects.filter(
+            config_code="PROJECT_SIZE_XS_BUDGET_VARIANCE"
+        ).update(value="1.0")
+        self.assertEqual(Project.get_size_xs_budget_variance(), 1.0)
+
+    def test_get_size_s_budget_variance_returns_default(self):
+        self.assertEqual(Project.get_size_s_budget_variance(), 0.5)
+
+    def test_get_size_s_budget_variance_returns_configured_value(self):
+        Configuration.objects.filter(
+            config_code="PROJECT_SIZE_S_BUDGET_VARIANCE"
+        ).update(value="2.0")
+        self.assertEqual(Project.get_size_s_budget_variance(), 2.0)
+
+    def test_get_size_m_budget_variance_returns_default(self):
+        self.assertEqual(Project.get_size_m_budget_variance(), 0.5)
+
+    def test_get_size_m_budget_variance_returns_configured_value(self):
+        Configuration.objects.filter(
+            config_code="PROJECT_SIZE_M_BUDGET_VARIANCE"
+        ).update(value="0.75")
+        self.assertEqual(Project.get_size_m_budget_variance(), 0.75)
+
+    def test_get_size_l_budget_variance_returns_default(self):
+        self.assertEqual(Project.get_size_l_budget_variance(), 1.0)
+
+    def test_get_size_l_budget_variance_returns_configured_value(self):
+        Configuration.objects.filter(
+            config_code="PROJECT_SIZE_L_BUDGET_VARIANCE"
+        ).update(value="2.5")
+        self.assertEqual(Project.get_size_l_budget_variance(), 2.5)
+
+    def test_get_size_xl_budget_variance_returns_default(self):
+        self.assertEqual(Project.get_size_xl_budget_variance(), 1.0)
+
+    def test_get_size_xl_budget_variance_returns_configured_value(self):
+        Configuration.objects.filter(
+            config_code="PROJECT_SIZE_XL_BUDGET_VARIANCE"
+        ).update(value="3.0")
+        self.assertEqual(Project.get_size_xl_budget_variance(), 3.0)
+
+    def test_budget_variance_selectors_return_float(self):
+        self.assertIsInstance(Project.get_size_xs_budget_variance(), float)
+        self.assertIsInstance(Project.get_size_s_budget_variance(), float)
+        self.assertIsInstance(Project.get_size_m_budget_variance(), float)
+        self.assertIsInstance(Project.get_size_l_budget_variance(), float)
+        self.assertIsInstance(Project.get_size_xl_budget_variance(), float)

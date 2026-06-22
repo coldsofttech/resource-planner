@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Recharge Type
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/recharge-types.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Recharges / Configurations
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <span id="rp-recharge-type-detail-title">Recharge Type</span>
+{% endblock page_title %}
+{% block page_actions %}
+  {% if can_import_mapping %}
+    <secondary-button id="rp-mappings-import-btn" label="Import" prefix-icon="bi-upload" hidden></secondary-button>
+  {% endif %}
+  {% if can_export_mapping %}
+    <secondary-button id="rp-mappings-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+  {% endif %}
+  {% if can_add_mapping %}
+    <primary-button id="rp-mappings-add-btn" label="Add Mapping" prefix-icon="bi-plus-lg" hidden></primary-button>
+  {% endif %}
+{% endblock page_actions %}
+{% block content %}
+  <div class="row g-4 align-items-start">
+    <!-- Left panel: detail fields -->
+    <div class="col-12 col-md-4">
+      <section-panel class="mt-2">
+        <panel-title>Recharge Type</panel-title>
+        <panel-body>
+        <view-field id="rp-detail-recharge-type-name" label="Name"></view-field>
+        <view-field id="rp-detail-recharge-type-code" label="Code" code></view-field>
+        <view-field id="rp-detail-recharge-type-status" label="Status"></view-field>
+        <view-field id="rp-detail-recharge-type-description" label="Description" desc></view-field>
+        </panel-body>
+      </section-panel>
+      <section-panel class="mt-3">
+        <panel-title>Metadata</panel-title>
+        <panel-body>
+        <view-field id="rp-detail-recharge-type-created-at" label="Created" meta></view-field>
+        <view-field id="rp-detail-recharge-type-created-by" label="Created By" meta></view-field>
+        <view-field id="rp-detail-recharge-type-updated-at" label="Updated" meta></view-field>
+        <view-field id="rp-detail-recharge-type-updated-by" label="Updated By" meta></view-field>
+        </panel-body>
+      </section-panel>
+    </div>
+    <!-- Right panel: project type mappings table -->
+    <div class="col-12 col-md-8">
+      <section-panel class="mt-2">
+        <panel-title>Project Type Mappings</panel-title>
+        <panel-body>
+        <list-view show-active-filters>
+        <filter-panel id="rp-mappings-filter-panel">
+        <search-field id="rp-mappings-search" name="search" placeholder="Search project types..." shortcut="/" show-label></search-field>
+        </filter-panel>
+        <data-table id="rp-mappings-table" paginated page-size="25" row-template="renderProjectTypeMappingRow" empty-message="No project type mappings found.">
+          <table-columns>
+            <table-column label="Project Type" key="project_type.name" sortable>
+            </table-column>
+            <table-column label="Code" key="project_type.code" mono width="160px" hide-mobile>
+            </table-column>
+            <table-column label="Status" key="project_type.is_active" hide-mobile>
+            </table-column>
+            <table-column label="Mapped On" key="created_at" hide-mobile sortable>
+            </table-column>
+          </table-columns>
+          <table-actions>
+            {% if can_delete_mapping %}
+              <table-action icon="bi-trash" label="Remove" event="rp:mapping:delete" danger>
+              </table-action>
+            {% endif %}
+          </table-actions>
+        </data-table>
+        </list-view>
+        </panel-body>
+      </section-panel>
+    </div>
+  </div>
+  <!-- Create mapping drawer -->
+  {% if can_add_mapping %}
+    <drawer-modal id="rp-mapping-create-drawer" width="900">
+    <drawer-header eyebrow="New mapping" title="Add Project Type Mapping" no-sizes></drawer-header>
+    <drawer-panel>
+    <div class="row g-3">
+      <project-type-field id="rp-new-mapping-project-type" col="col-12" required show-label></project-type-field>
+    </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Add mapping" primary-icon="bi-check2"></drawer-footer>
+    </drawer-modal>
+  {% endif %}
+  <!-- Delete mapping modal -->
+  {% if can_delete_mapping %}
+    <delete-modal id="rp-mapping-delete-modal" action-label="Remove mapping"></delete-modal>
+  {% endif %}
+  <!-- Import / export views -->
+  {% if can_import_mapping %}
+    <import-view id="rp-mappings-import-view" title="Import Project Type Mappings" eyebrow="Project Type Mappings"></import-view>
+  {% endif %}
+  {% if can_export_mapping %}
+    <export-view id="rp-mappings-export-view" title="Export Project Type Mappings" eyebrow="Project Type Mappings" active-filter-id="rp-mappings-filter-panel"></export-view>
+  {% endif %}
+{% endblock content %}

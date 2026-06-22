@@ -29,6 +29,7 @@ runs:
         test -f apps/web/static/js/dist/project-statuses.min.js
         test -f apps/web/static/js/dist/project-types.min.js
         test -f apps/web/static/js/dist/projects.min.js
+        test -f apps/web/static/js/dist/recharge-types.min.js
         test -f apps/web/static/js/dist/roles.min.js
         test -f apps/web/static/js/dist/setup.min.js
         test -f apps/web/static/js/dist/skills.min.js

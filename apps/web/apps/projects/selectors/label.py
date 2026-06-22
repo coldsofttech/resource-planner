@@ -1,3 +1,4 @@
+from django.db import models
 from django.db.models import QuerySet
 
 from apps.projects.models import Project, ProjectLabel
@@ -12,6 +13,14 @@ def get_sibling_labels(programme_name: str) -> list[str]:
         ProjectLabel.objects.filter(project__programme__name=programme_name)
         .values_list("label", flat=True)
         .order_by("label")
+    )
+
+
+def get_all_labels_as_options() -> list[dict]:
+    return list(
+        ProjectLabel.objects.select_related("project")
+        .order_by("project__name", "label")
+        .values("code", "label", project_name=models.F("project__name"))
     )
 
 

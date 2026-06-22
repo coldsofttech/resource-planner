@@ -2,10 +2,13 @@ from django.urls import path
 
 from apps.projects.api_views import (
     ProgrammeViewSet,
+    ProjectAttachmentViewSet,
     ProjectBudgetViewSet,
+    ProjectContactViewSet,
     ProjectEstimateViewSet,
     ProjectFollowerViewSet,
     ProjectLabelViewSet,
+    ProjectLinkViewSet,
     ProjectSizeConfigViewSet,
     ProjectStatusViewSet,
     ProjectSubStatusFlatOptionsViewSet,
@@ -418,6 +421,19 @@ urlpatterns = [
         ProjectEstimateViewSet.as_view({"get": "history"}),
         name="project-estimates-history",
     ),
+    # Project link nested routes
+    path(
+        "projects/<str:code>/links/",
+        ProjectLinkViewSet.as_view({"get": "list", "post": "create"}),
+        name="project-links-list",
+    ),
+    path(
+        "projects/<str:code>/links/<str:link_code>/",
+        ProjectLinkViewSet.as_view(
+            {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
+        ),
+        name="project-links-detail",
+    ),
     # Project budget nested routes
     path(
         "projects/<str:code>/budgets/",
@@ -435,6 +451,11 @@ urlpatterns = [
         name="project-budgets-export",
     ),
     path(
+        "projects/<str:code>/budgets/lifetime/",
+        ProjectBudgetViewSet.as_view({"get": "lifetime"}),
+        name="project-budgets-lifetime",
+    ),
+    path(
         "projects/<str:code>/budgets/<str:budget_code>/",
         ProjectBudgetViewSet.as_view(
             {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
@@ -445,5 +466,37 @@ urlpatterns = [
         "projects/<str:code>/budgets/<str:budget_code>/history/",
         ProjectBudgetViewSet.as_view({"get": "history"}),
         name="project-budgets-history",
+    ),
+    path(
+        "projects/labels/options/",
+        ProjectLabelViewSet.as_view({"get": "options"}),
+        name="project-labels-options-global",
+    ),
+    path(
+        "projects/<str:code>/contacts/",
+        ProjectContactViewSet.as_view({"get": "list", "post": "create"}),
+        name="project-contacts-list",
+    ),
+    path(
+        "projects/<str:code>/contacts/<str:contact_code>/",
+        ProjectContactViewSet.as_view(
+            {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
+        ),
+        name="project-contacts-detail",
+    ),
+    path(
+        "projects/<str:code>/attachments/",
+        ProjectAttachmentViewSet.as_view({"get": "list", "post": "create"}),
+        name="project-attachments-list",
+    ),
+    path(
+        "projects/<str:code>/attachments/<str:attachment_code>/",
+        ProjectAttachmentViewSet.as_view({"delete": "destroy"}),
+        name="project-attachments-detail",
+    ),
+    path(
+        "projects/<str:code>/attachments/<str:attachment_code>/download/",
+        ProjectAttachmentViewSet.as_view({"get": "download"}),
+        name="project-attachments-download",
     ),
 ]

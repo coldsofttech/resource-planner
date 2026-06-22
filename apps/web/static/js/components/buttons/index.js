@@ -6,3 +6,4 @@ import "./engine-button.js";
 import "./muted-button.js";
 import "./primary-button.js";
 import "./secondary-button.js";
+import "./success-button.js";

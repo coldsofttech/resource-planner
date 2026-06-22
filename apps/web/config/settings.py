@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "drf_spectacular",
+    "apps.core.apps.CoreConfig",
     "apps.setup.apps.SetupConfig",
     "apps.configurations.apps.ConfigurationConfig",
     "apps.auth.apps.AuthConfig",
@@ -80,6 +81,9 @@ INSTALLED_APPS = [
     "apps.dashboard.apps.DashboardConfig",
     "apps.business_units.apps.BusinessUnitConfig",
     "apps.tags.apps.TagConfig",
+    "apps.contacts.apps.ContactConfig",
+    "apps.comments.apps.CommentsConfig",
+    "apps.recharges.apps.RechargeConfig",
     "apps.how_to.apps.HowToConfig",
     "apps.notifications.apps.NotificationsConfig",
 ]

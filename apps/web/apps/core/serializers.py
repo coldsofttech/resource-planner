@@ -29,6 +29,8 @@ class BaseModelSerializer(serializers.ModelSerializer):
 
 class UserMiniSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
+    profile_code = serializers.SerializerMethodField()
+    display_name = serializers.SerializerMethodField()
 
     def get_id(self, obj):
         try:
@@ -36,9 +38,21 @@ class UserMiniSerializer(serializers.ModelSerializer):
         except Exception:
             return None
 
+    def get_profile_code(self, obj):
+        try:
+            return obj.profile.code
+        except Exception:
+            return None
+
+    def get_display_name(self, obj):
+        try:
+            return obj.profile.display_name or ""
+        except Exception:
+            return ""
+
     class Meta:
         model = User
-        fields = ["id", "email"]
+        fields = ["id", "profile_code", "email", "display_name"]
 
 
 class CodeSerializer(serializers.ModelSerializer):

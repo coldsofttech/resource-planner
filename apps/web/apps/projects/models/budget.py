@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from decimal import Decimal, InvalidOperation
+
 from django.conf import settings
 from django.db import models
 
@@ -7,6 +11,88 @@ from apps.projects.constants import ProjectBudgetAction
 
 from .estimate import ProjectEstimate
 from .project import Project
+
+
+def _get_size_for_amount(amount: float) -> str:
+    from apps.configurations.selectors import Project as ProjectConfig
+
+    if amount <= ProjectConfig.get_size_xs_max_amount():
+        return "XS"
+    if amount <= ProjectConfig.get_size_s_max_amount():
+        return "S"
+    if amount <= ProjectConfig.get_size_m_max_amount():
+        return "M"
+    if amount <= ProjectConfig.get_size_l_max_amount():
+        return "L"
+    return "XL"
+
+
+def _compute_risk(
+    actual_budget: float | None,
+    estimate_total_cost: float | None,
+) -> dict | None:
+    if actual_budget is None or estimate_total_cost is None:
+        return None
+    try:
+        actual = Decimal(str(actual_budget))
+        cost = Decimal(str(estimate_total_cost))
+    except (InvalidOperation, TypeError):
+        return None
+    if actual == 0 or cost == 0:
+        return None
+
+    from apps.configurations.selectors import Project as ProjectConfig
+
+    threshold = Decimal(str(ProjectConfig.get_budget_risk_threshold()))
+    size = _get_size_for_amount(float(actual))
+    _size_variance = {
+        "XS": ProjectConfig.get_size_xs_budget_variance,
+        "S": ProjectConfig.get_size_s_budget_variance,
+        "M": ProjectConfig.get_size_m_budget_variance,
+        "L": ProjectConfig.get_size_l_budget_variance,
+        "XL": ProjectConfig.get_size_xl_budget_variance,
+    }
+    green_pct = Decimal(str(_size_variance[size]()))
+
+    variance_pct = (cost - actual) / actual * 100
+    sign = "+" if variance_pct >= 0 else ""
+    percentage = f"{sign}{variance_pct:.2f}"
+    abs_variance = abs(variance_pct)
+
+    if abs_variance <= green_pct:
+        return {
+            "color": "GREEN",
+            "display": "On Budget",
+            "short": "OB",
+            "percentage": percentage,
+        }
+    if abs_variance <= threshold:
+        if variance_pct > 0:
+            return {
+                "color": "AMBER",
+                "display": "At Risk (Over)",
+                "short": "AR+",
+                "percentage": percentage,
+            }
+        return {
+            "color": "AMBER",
+            "display": "At Risk (Under)",
+            "short": "AR-",
+            "percentage": percentage,
+        }
+    if variance_pct > 0:
+        return {
+            "color": "RED",
+            "display": "Over Budget",
+            "short": "OVR",
+            "percentage": percentage,
+        }
+    return {
+        "color": "RED",
+        "display": "Under Budget",
+        "short": "UND",
+        "percentage": percentage,
+    }
 
 
 class ProjectBudget(CodeModel, AuditableModel):
@@ -55,6 +141,13 @@ class ProjectBudget(CodeModel, AuditableModel):
         if self.estimate_version is None:
             return actual
         return round(actual - self.estimate_version.total_cost, 2)
+
+    @property
+    def risk(self) -> dict | None:
+        estimate_cost = (
+            float(self.estimate_version.total_cost) if self.estimate_version else None
+        )
+        return _compute_risk(self.actual_budget, estimate_cost)
 
     class Meta:
         ordering = ["project", "financial_year__start_date"]

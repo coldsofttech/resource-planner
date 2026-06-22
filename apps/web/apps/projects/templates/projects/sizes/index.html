@@ -17,85 +17,179 @@
 {% endblock page_sub %}
 {% block content %}
   <section-panel>
+    <panel-title>Project T-Shirt Configuration</panel-title>
     <panel-body>
-      <div class="row g-3 mb-4">
-        <!-- XS -->
-        <div class="col-12 col-sm-6 col-xl">
-          <div class="rp-size-tier-card">
-            <div class="rp-size-tier-head">
-              <span class="rp-badge rp-badge-soft">XS</span>
-              <span class="rp-size-tier-name">X-Small</span>
-            </div>
-            <div class="rp-size-tier-range" id="rp-size-xs-range">—</div>
-            {% if can_change_size_config %}
-              <number-field id="rp-size-xs-max" label="Max Amount (£)" placeholder="20000" min="1" required show-label></number-field>
-            {% else %}
-              <view-field id="rp-size-xs-view" label="Max Amount (£)" show-label></view-field>
-            {% endif %}
+    <div class="row g-3 mb-4">
+      <!-- XS -->
+      <div class="col-12 col-sm-6 col-xl">
+        <div class="rp-size-tier-card">
+          <div class="rp-size-tier-head">
+            <span class="rp-badge rp-badge-soft">XS</span>
+            <span class="rp-size-tier-name">X-Small</span>
           </div>
-        </div>
-        <!-- S -->
-        <div class="col-12 col-sm-6 col-xl">
-          <div class="rp-size-tier-card">
-            <div class="rp-size-tier-head">
-              <span class="rp-badge rp-badge-soft rp-badge-info">S</span>
-              <span class="rp-size-tier-name">Small</span>
-            </div>
-            <div class="rp-size-tier-range" id="rp-size-s-range">—</div>
-            {% if can_change_size_config %}
-              <number-field id="rp-size-s-max" label="Max Amount (£)" placeholder="60000" min="1" required show-label></number-field>
-            {% else %}
-              <view-field id="rp-size-s-view" label="Max Amount (£)" show-label></view-field>
-            {% endif %}
-          </div>
-        </div>
-        <!-- M -->
-        <div class="col-12 col-sm-6 col-xl">
-          <div class="rp-size-tier-card">
-            <div class="rp-size-tier-head">
-              <span class="rp-badge rp-badge-soft rp-badge-success">M</span>
-              <span class="rp-size-tier-name">Medium</span>
-            </div>
-            <div class="rp-size-tier-range" id="rp-size-m-range">—</div>
-            {% if can_change_size_config %}
-              <number-field id="rp-size-m-max" label="Max Amount (£)" placeholder="200000" min="1" required show-label></number-field>
-            {% else %}
-              <view-field id="rp-size-m-view" label="Max Amount (£)" show-label></view-field>
-            {% endif %}
-          </div>
-        </div>
-        <!-- L -->
-        <div class="col-12 col-sm-6 col-xl">
-          <div class="rp-size-tier-card">
-            <div class="rp-size-tier-head">
-              <span class="rp-badge rp-badge-soft rp-badge-warning">L</span>
-              <span class="rp-size-tier-name">Large</span>
-            </div>
-            <div class="rp-size-tier-range" id="rp-size-l-range">—</div>
-            {% if can_change_size_config %}
-              <number-field id="rp-size-l-max" label="Max Amount (£)" placeholder="500000" min="1" required show-label></number-field>
-            {% else %}
-              <view-field id="rp-size-l-view" label="Max Amount (£)" show-label></view-field>
-            {% endif %}
-          </div>
-        </div>
-        <!-- XL (read-only — implied) -->
-        <div class="col-12 col-sm-6 col-xl">
-          <div class="rp-size-tier-card rp-size-tier-xl">
-            <div class="rp-size-tier-head">
-              <span class="rp-badge rp-badge-soft rp-badge-danger">XL</span>
-              <span class="rp-size-tier-name">X-Large</span>
-            </div>
-            <div class="rp-size-tier-range" id="rp-size-xl-range">—</div>
-            <span class="rp-size-tier-implied">Automatically derived from L max</span>
-          </div>
+          <div class="rp-size-tier-range" id="rp-size-xs-range">—</div>
+          {% if can_change_size_config %}
+            <number-field id="rp-size-xs-max" label="Max Amount (£)" placeholder="20000" min="1" required show-label></number-field>
+          {% else %}
+            <view-field id="rp-size-xs-view" label="Max Amount (£)" show-label></view-field>
+          {% endif %}
         </div>
       </div>
-      {% if can_change_size_config %}
-        <div class="d-flex justify-content-end">
-          <primary-button id="rp-size-save-btn" label="Save Changes" prefix-icon="bi-check2"></primary-button>
+      <!-- S -->
+      <div class="col-12 col-sm-6 col-xl">
+        <div class="rp-size-tier-card">
+          <div class="rp-size-tier-head">
+            <span class="rp-badge rp-badge-soft rp-badge-info">S</span>
+            <span class="rp-size-tier-name">Small</span>
+          </div>
+          <div class="rp-size-tier-range" id="rp-size-s-range">—</div>
+          {% if can_change_size_config %}
+            <number-field id="rp-size-s-max" label="Max Amount (£)" placeholder="60000" min="1" required show-label></number-field>
+          {% else %}
+            <view-field id="rp-size-s-view" label="Max Amount (£)" show-label></view-field>
+          {% endif %}
         </div>
-      {% endif %}
+      </div>
+      <!-- M -->
+      <div class="col-12 col-sm-6 col-xl">
+        <div class="rp-size-tier-card">
+          <div class="rp-size-tier-head">
+            <span class="rp-badge rp-badge-soft rp-badge-success">M</span>
+            <span class="rp-size-tier-name">Medium</span>
+          </div>
+          <div class="rp-size-tier-range" id="rp-size-m-range">—</div>
+          {% if can_change_size_config %}
+            <number-field id="rp-size-m-max" label="Max Amount (£)" placeholder="200000" min="1" required show-label></number-field>
+          {% else %}
+            <view-field id="rp-size-m-view" label="Max Amount (£)" show-label></view-field>
+          {% endif %}
+        </div>
+      </div>
+      <!-- L -->
+      <div class="col-12 col-sm-6 col-xl">
+        <div class="rp-size-tier-card">
+          <div class="rp-size-tier-head">
+            <span class="rp-badge rp-badge-soft rp-badge-warning">L</span>
+            <span class="rp-size-tier-name">Large</span>
+          </div>
+          <div class="rp-size-tier-range" id="rp-size-l-range">—</div>
+          {% if can_change_size_config %}
+            <number-field id="rp-size-l-max" label="Max Amount (£)" placeholder="500000" min="1" required show-label></number-field>
+          {% else %}
+            <view-field id="rp-size-l-view" label="Max Amount (£)" show-label></view-field>
+          {% endif %}
+        </div>
+      </div>
+      <!-- XL (read-only — implied) -->
+      <div class="col-12 col-sm-6 col-xl">
+        <div class="rp-size-tier-card rp-size-tier-xl">
+          <div class="rp-size-tier-head">
+            <span class="rp-badge rp-badge-soft rp-badge-danger">XL</span>
+            <span class="rp-size-tier-name">X-Large</span>
+          </div>
+          <div class="rp-size-tier-range" id="rp-size-xl-range">—</div>
+          <span class="rp-size-tier-implied">Automatically derived from L max</span>
+        </div>
+      </div>
+    </div>
+    {% if can_change_size_config %}
+      <div class="d-flex justify-content-end">
+        <primary-button id="rp-size-save-btn" label="Save Changes" prefix-icon="bi-check2"></primary-button>
+      </div>
+    {% endif %}
+    </panel-body>
+  </section-panel>
+  <div class="mt-4"></div>
+  <section-panel>
+    <panel-title>Project Budget Configuration</panel-title>
+    <panel-body>
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-6 col-xl-4">
+        {% if can_change_size_config %}
+          <percentage-field id="rp-budget-risk-threshold" label="Budget Risk Threshold (%)" placeholder="10.0" min="0" show-label required></percentage-field>
+        {% else %}
+          <view-field id="rp-budget-risk-threshold-view" label="Budget Risk Threshold (%)" show-label></view-field>
+        {% endif %}
+        <div class="mt-2"><hint-field>Percentage band for risk classification. Above +threshold = GREEN, within ±threshold = AMBER, below −threshold = RED.</hint-field></div>
+      </div>
+    </div>
+    <div class="row g-3 mb-4">
+      <!-- XS variance -->
+      <div class="col-12 col-sm-6 col-xl">
+        <div class="rp-size-tier-card">
+          <div class="rp-size-tier-head">
+            <span class="rp-badge rp-badge-soft">XS</span>
+            <span class="rp-size-tier-name">X-Small</span>
+          </div>
+          {% if can_change_size_config %}
+            <percentage-field id="rp-budget-xs-variance" label="Budget Variance (%)" placeholder="0.5" min="0" show-label required></percentage-field>
+          {% else %}
+            <view-field id="rp-budget-xs-variance-view" label="Budget Variance (%)" show-label></view-field>
+          {% endif %}
+        </div>
+      </div>
+      <!-- S variance -->
+      <div class="col-12 col-sm-6 col-xl">
+        <div class="rp-size-tier-card">
+          <div class="rp-size-tier-head">
+            <span class="rp-badge rp-badge-soft rp-badge-info">S</span>
+            <span class="rp-size-tier-name">Small</span>
+          </div>
+          {% if can_change_size_config %}
+            <percentage-field id="rp-budget-s-variance" label="Budget Variance (%)" placeholder="0.5" min="0" show-label required></percentage-field>
+          {% else %}
+            <view-field id="rp-budget-s-variance-view" label="Budget Variance (%)" show-label></view-field>
+          {% endif %}
+        </div>
+      </div>
+      <!-- M variance -->
+      <div class="col-12 col-sm-6 col-xl">
+        <div class="rp-size-tier-card">
+          <div class="rp-size-tier-head">
+            <span class="rp-badge rp-badge-soft rp-badge-success">M</span>
+            <span class="rp-size-tier-name">Medium</span>
+          </div>
+          {% if can_change_size_config %}
+            <percentage-field id="rp-budget-m-variance" label="Budget Variance (%)" placeholder="0.5" min="0" show-label required></percentage-field>
+          {% else %}
+            <view-field id="rp-budget-m-variance-view" label="Budget Variance (%)" show-label></view-field>
+          {% endif %}
+        </div>
+      </div>
+      <!-- L variance -->
+      <div class="col-12 col-sm-6 col-xl">
+        <div class="rp-size-tier-card">
+          <div class="rp-size-tier-head">
+            <span class="rp-badge rp-badge-soft rp-badge-warning">L</span>
+            <span class="rp-size-tier-name">Large</span>
+          </div>
+          {% if can_change_size_config %}
+            <percentage-field id="rp-budget-l-variance" label="Budget Variance (%)" placeholder="1.0" min="0" show-label required></percentage-field>
+          {% else %}
+            <view-field id="rp-budget-l-variance-view" label="Budget Variance (%)" show-label></view-field>
+          {% endif %}
+        </div>
+      </div>
+      <!-- XL variance -->
+      <div class="col-12 col-sm-6 col-xl">
+        <div class="rp-size-tier-card">
+          <div class="rp-size-tier-head">
+            <span class="rp-badge rp-badge-soft rp-badge-danger">XL</span>
+            <span class="rp-size-tier-name">X-Large</span>
+          </div>
+          {% if can_change_size_config %}
+            <percentage-field id="rp-budget-xl-variance" label="Budget Variance (%)" placeholder="1.0" min="0" show-label required></percentage-field>
+          {% else %}
+            <view-field id="rp-budget-xl-variance-view" label="Budget Variance (%)" show-label></view-field>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% if can_change_size_config %}
+      <div class="d-flex justify-content-end">
+        <primary-button id="rp-budget-save-btn" label="Save Changes" prefix-icon="bi-check2"></primary-button>
+      </div>
+    {% endif %}
     </panel-body>
   </section-panel>
 {% endblock content %}

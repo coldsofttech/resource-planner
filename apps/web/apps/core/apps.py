@@ -33,4 +33,18 @@ class BaseAppConfig(AppConfig):
 
     def on_ready(self):
         """Override in subclasses for custom startup behaviour."""
-        pass
+
+
+class CoreConfig(BaseAppConfig):
+    name = "apps.core"
+    label = "core"
+    verbose_name = "Core"
+
+    def on_ready(self):
+        from config.database import _enable_sqlite_wal
+        from django.db.backends.signals import connection_created
+
+        connection_created.connect(
+            _enable_sqlite_wal,
+            dispatch_uid="enable_sqlite_wal",
+        )

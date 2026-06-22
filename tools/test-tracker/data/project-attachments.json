@@ -1,0 +1,787 @@
+{
+  "module": {
+    "slug": "project-attachments",
+    "name": "Project Attachments",
+    "sort_order": 5,
+    "parent": {
+      "slug": "projects",
+      "name": "Projects",
+      "sort_order": 2
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-PAT-100",
+      "name": "Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-PAT-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user cannot access the Attachments tab on a project detail page",
+          "steps": "1. Open a project detail URL (e.g. /projects/PROJ-1/) without being logged in.",
+          "expected": "The browser redirects to the login page. The Attachments tab and its content are not accessible."
+        },
+        {
+          "id": "TC-PAT-102",
+          "severity": "P1",
+          "scenario": "Attachments tab is visible to all authenticated users regardless of upload/delete permissions",
+          "steps": "1. Log in as any authenticated user.\n2. Open any project detail page.\n3. Observe the tab bar.",
+          "expected": "The 'Attachments' tab (with a paperclip or file icon) is visible in the project tab bar. Clicking it reveals the attachments table."
+        },
+        {
+          "id": "TC-PAT-103",
+          "severity": "P1",
+          "scenario": "File upload zone is visible only to users with 'projects.add_projectattachment' permission",
+          "steps": "1. Log in as a user with 'projects.add_projectattachment' permission.\n2. Open any project detail page and click the Attachments tab.",
+          "expected": "The file import zone ('browse from your computer or drag & drop') is visible above the attachments table."
+        },
+        {
+          "id": "TC-PAT-104",
+          "severity": "P1",
+          "scenario": "File upload zone is not visible to users without 'projects.add_projectattachment'",
+          "steps": "1. Log in as a user without 'projects.add_projectattachment' permission.\n2. Open any project detail page and click the Attachments tab.",
+          "expected": "No file import zone is visible. The attachments table is shown in read-only mode."
+        },
+        {
+          "id": "TC-PAT-105",
+          "severity": "P1",
+          "scenario": "Download action is visible to all users who can view the Attachments tab",
+          "steps": "1. Log in as a user with view permission but no delete or add permission.\n2. Open the Attachments tab on a project that has at least one attachment.\n3. Observe the row action controls.",
+          "expected": "A Download action is visible on each attachment row. No Delete action is visible."
+        },
+        {
+          "id": "TC-PAT-106",
+          "severity": "P1",
+          "scenario": "Delete action is visible only to users with 'projects.delete_projectattachment'",
+          "steps": "1. Log in as a user with 'projects.delete_projectattachment' permission.\n2. Open the Attachments tab on a project with at least one attachment.\n3. Observe the row action controls.",
+          "expected": "Each row shows both a Download action and a Delete action."
+        },
+        {
+          "id": "TC-PAT-107",
+          "severity": "P1",
+          "scenario": "Delete action is absent for users without 'projects.delete_projectattachment'",
+          "steps": "1. Log in as a user without 'projects.delete_projectattachment' permission.\n2. Open the Attachments tab on a project with attachments.",
+          "expected": "No Delete action is visible on any row. Only the Download action appears."
+        },
+        {
+          "id": "TC-PAT-108",
+          "severity": "P0",
+          "scenario": "Unauthenticated POST to the upload API returns 401",
+          "steps": "1. Send a multipart POST request to /api/v1/projects/PROJ-1/attachments/ with a file payload but no Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned. No attachment record is created."
+        },
+        {
+          "id": "TC-PAT-109",
+          "severity": "P1",
+          "scenario": "Authenticated user without 'projects.add_projectattachment' receives 403 on upload",
+          "steps": "1. Log in as a user without 'projects.add_projectattachment'.\n2. Send an authenticated multipart POST to /api/v1/projects/PROJ-1/attachments/ with a valid file.",
+          "expected": "HTTP 403 Forbidden is returned. No attachment is created."
+        },
+        {
+          "id": "TC-PAT-110",
+          "severity": "P0",
+          "scenario": "Unauthenticated GET to the attachments list API returns 401",
+          "steps": "1. Send a GET request to /api/v1/projects/PROJ-1/attachments/ without an Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned. No attachment data is exposed."
+        },
+        {
+          "id": "TC-PAT-111",
+          "severity": "P0",
+          "scenario": "Unauthenticated GET to the download endpoint returns 401",
+          "steps": "1. Send a GET request to /api/v1/projects/PROJ-1/attachments/PROJAT-1/download/ without an Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned. No file content is served."
+        },
+        {
+          "id": "TC-PAT-112",
+          "severity": "P0",
+          "scenario": "Unauthenticated DELETE to the attachment endpoint returns 401",
+          "steps": "1. Send a DELETE request to /api/v1/projects/PROJ-1/attachments/PROJAT-1/ without an Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned. The attachment is not deleted."
+        },
+        {
+          "id": "TC-PAT-113",
+          "severity": "P1",
+          "scenario": "Authenticated user without 'projects.delete_projectattachment' receives 403 on DELETE",
+          "steps": "1. Log in as a user without 'projects.delete_projectattachment'.\n2. Send an authenticated DELETE to /api/v1/projects/PROJ-1/attachments/PROJAT-1/.",
+          "expected": "HTTP 403 Forbidden is returned. The attachment is not deleted."
+        }
+      ]
+    },
+    {
+      "id": "TC-PAT-200",
+      "name": "Viewing Attachments",
+      "test_cases": [
+        {
+          "id": "TC-PAT-201",
+          "severity": "P0",
+          "scenario": "Attachments tab shows all attachments in a data table with the correct columns",
+          "steps": "1. Upload two or more attachments to a project.\n2. Open the project detail page and click the Attachments tab.",
+          "expected": "The table shows all attachments. Visible columns are: (icon), File Name, Type, Size, Uploaded By. Each uploaded attachment has a row."
+        },
+        {
+          "id": "TC-PAT-202",
+          "severity": "P1",
+          "scenario": "Empty state message is shown when a project has no attachments",
+          "steps": "1. Open a project that has no attachments.\n2. Click the Attachments tab.",
+          "expected": "The table shows an empty-state message (e.g. 'No attachments found.'). No rows are displayed. The file upload zone is still visible for permitted users."
+        },
+        {
+          "id": "TC-PAT-203",
+          "severity": "P1",
+          "scenario": "PDF attachments display a PDF-specific file icon in the icon column",
+          "steps": "1. Upload a file with a .pdf extension to a project.\n2. Open the Attachments tab.",
+          "expected": "The first column for the PDF row shows a PDF document icon (e.g. a red document icon), distinct from generic file icons."
+        },
+        {
+          "id": "TC-PAT-204",
+          "severity": "P1",
+          "scenario": "Spreadsheet attachments (.xlsx, .xls) display a spreadsheet-specific icon",
+          "steps": "1. Upload files with .xlsx and .xls extensions.\n2. Open the Attachments tab.",
+          "expected": "Both rows display a spreadsheet icon (e.g. green grid). The icon is distinguishable from the PDF and generic icons."
+        },
+        {
+          "id": "TC-PAT-205",
+          "severity": "P2",
+          "scenario": "CSV attachments display a CSV-specific icon",
+          "steps": "1. Upload a file with a .csv extension.\n2. Open the Attachments tab.",
+          "expected": "The row displays a CSV-specific icon that differs from the spreadsheet and PDF icons."
+        },
+        {
+          "id": "TC-PAT-206",
+          "severity": "P2",
+          "scenario": "Attachments with unrecognised extensions display a generic file icon",
+          "steps": "1. Upload a file with an obscure extension (e.g. .log, .bin, .xyz).\n2. Open the Attachments tab.",
+          "expected": "The row displays a generic file icon. No error occurs; the file is shown correctly in all other columns."
+        },
+        {
+          "id": "TC-PAT-207",
+          "severity": "P1",
+          "scenario": "Attachments are displayed with the most recently uploaded first by default",
+          "steps": "1. Upload 'first.pdf' to a project, then upload 'second.pdf'.\n2. Open the Attachments tab.",
+          "expected": "'second.pdf' appears at the top of the table. 'first.pdf' appears below it. The default ordering is newest-first."
+        },
+        {
+          "id": "TC-PAT-208",
+          "severity": "P2",
+          "scenario": "Table can be sorted by File Name in ascending order",
+          "steps": "1. Upload files with names 'zebra.pdf', 'alpha.txt', 'mango.xlsx'.\n2. Open the Attachments tab.\n3. Click the 'File Name' column header to sort ascending.",
+          "expected": "The rows reorder to: alpha.txt, mango.xlsx, zebra.pdf — alphabetically ascending by file name."
+        },
+        {
+          "id": "TC-PAT-209",
+          "severity": "P2",
+          "scenario": "Table can be sorted by File Name in descending order",
+          "steps": "1. With files 'zebra.pdf', 'alpha.txt', 'mango.xlsx' uploaded.\n2. Click the 'File Name' column header twice to sort descending.",
+          "expected": "The rows reorder to: zebra.pdf, mango.xlsx, alpha.txt — alphabetically descending."
+        },
+        {
+          "id": "TC-PAT-210",
+          "severity": "P2",
+          "scenario": "Table can be sorted by file size",
+          "steps": "1. Upload a small file (10 KB) and a large file (5 MB).\n2. Click the 'Size' column header.",
+          "expected": "The rows reorder by file size either ascending or descending based on the sort toggle. The sizes displayed match the actual file sizes."
+        },
+        {
+          "id": "TC-PAT-211",
+          "severity": "P2",
+          "scenario": "Uploaded By column shows the display name or email of the user who uploaded each file",
+          "steps": "1. Log in as User A and upload a file to a project.\n2. Log in as User B and upload another file.\n3. Open the Attachments tab.",
+          "expected": "The first file's row shows User A's name in the Uploaded By column. The second file's row shows User B's name."
+        },
+        {
+          "id": "TC-PAT-212",
+          "severity": "P2",
+          "scenario": "Attachments tab data is loaded lazily — the API is not called until the tab is first activated",
+          "steps": "1. Open a project detail page (defaulting to another tab).\n2. Monitor network requests.\n3. Click the Attachments tab.\n4. Monitor network requests again.",
+          "expected": "No call to /api/v1/projects/.../attachments/ is made when the page first loads. The API is called only when the Attachments tab is first clicked."
+        },
+        {
+          "id": "TC-PAT-213",
+          "severity": "P2",
+          "scenario": "Switching away from Attachments tab and back does not reload data from the API",
+          "steps": "1. Click the Attachments tab — data loads.\n2. Click a different tab (e.g. General).\n3. Click the Attachments tab again.",
+          "expected": "Previously loaded attachments appear immediately. No additional API request is made on the second activation of the Attachments tab."
+        }
+      ]
+    },
+    {
+      "id": "TC-PAT-300",
+      "name": "Uploading Attachments",
+      "test_cases": [
+        {
+          "id": "TC-PAT-301",
+          "severity": "P1",
+          "scenario": "File upload zone renders as a compact single-line row above the attachments table",
+          "steps": "1. Open the Attachments tab as a user with upload permission.",
+          "expected": "A compact single-line upload zone is displayed above the table. It shows a browse link ('browse from your computer') and 'or drag & drop' text without occupying excessive vertical space."
+        },
+        {
+          "id": "TC-PAT-302",
+          "severity": "P0",
+          "scenario": "Clicking 'browse from your computer' opens the system file picker",
+          "steps": "1. Open the Attachments tab with upload permission.\n2. Click the 'browse from your computer' link in the upload zone.",
+          "expected": "The operating system's file picker dialog opens. The user can browse and select a file."
+        },
+        {
+          "id": "TC-PAT-303",
+          "severity": "P1",
+          "scenario": "Clicking anywhere else on the upload zone also opens the file picker",
+          "steps": "1. Open the Attachments tab with upload permission.\n2. Click on the upload zone area (not the browse link).",
+          "expected": "The system file picker opens, allowing the user to select a file."
+        },
+        {
+          "id": "TC-PAT-304",
+          "severity": "P0",
+          "scenario": "Files can be dragged and dropped onto the upload zone",
+          "steps": "1. Open the Attachments tab with upload permission.\n2. Drag one or more files from the desktop or file explorer onto the upload zone.\n3. Release the files.",
+          "expected": "The upload zone highlights or changes appearance when files are dragged over it. On drop, the files are accepted and their names appear as tags below the zone."
+        },
+        {
+          "id": "TC-PAT-305",
+          "severity": "P1",
+          "scenario": "Multiple files can be selected at once via the file picker",
+          "steps": "1. Click 'browse from your computer'.\n2. In the file picker, select three files using multi-select (Ctrl+click or Shift+click).\n3. Confirm the selection.",
+          "expected": "All three selected files appear as separate tags below the upload zone. Each tag shows the filename and file size."
+        },
+        {
+          "id": "TC-PAT-306",
+          "severity": "P1",
+          "scenario": "Selected files appear as removable tags below the upload zone before uploading",
+          "steps": "1. Select two files via the upload zone.",
+          "expected": "Two tags appear below the zone, each showing a file-type icon, the filename, and the file size. Each tag has an × button to remove it individually."
+        },
+        {
+          "id": "TC-PAT-307",
+          "severity": "P1",
+          "scenario": "An individual selected file can be removed from the queue before uploading",
+          "steps": "1. Select three files via the upload zone.\n2. Click the × button on the second file's tag.",
+          "expected": "The second file's tag is removed. The remaining two file tags are still present. Clicking upload should only upload those two files."
+        },
+        {
+          "id": "TC-PAT-308",
+          "severity": "P0",
+          "scenario": "Uploading a valid file shows a success toast and the new attachment appears in the table",
+          "steps": "1. Select a valid file (e.g. a PDF under 25 MB) via the upload zone.\n2. The file uploads automatically or via a button.\n3. Observe the table.",
+          "expected": "A success toast message appears (e.g. 'Attachment uploaded successfully.'). The new file appears as a new row at the top of the attachments table."
+        },
+        {
+          "id": "TC-PAT-309",
+          "severity": "P1",
+          "scenario": "Each file in a multi-file selection is uploaded as a separate attachment record",
+          "steps": "1. Select three files via the upload zone.\n2. Wait for all uploads to complete.",
+          "expected": "Three new rows appear in the attachments table — one for each file. Each has its own code (PROJAT-N) and metadata."
+        },
+        {
+          "id": "TC-PAT-310",
+          "severity": "P1",
+          "scenario": "Upload zone accepts any file type — not restricted to specific extensions",
+          "steps": "1. Attempt to upload files with diverse extensions: .pdf, .docx, .mp4, .zip, .log, .txt.\n2. Observe whether each file is accepted by the upload zone.",
+          "expected": "All file types are accepted by the upload zone. No file is silently rejected based on its extension. Each appears as a tag below the zone."
+        },
+        {
+          "id": "TC-PAT-311",
+          "severity": "P1",
+          "scenario": "Upload shows a busy/loading state while the file is being transmitted",
+          "steps": "1. Select a large file (e.g. 10 MB) via the upload zone on a slow connection.\n2. Observe the upload zone or any upload indicator before the response arrives.",
+          "expected": "A loading or progress indicator is visible during the upload. The upload zone or button is not clickable again while an upload is in progress."
+        },
+        {
+          "id": "TC-PAT-312",
+          "severity": "P2",
+          "scenario": "The same filename can be uploaded to a different project without conflict",
+          "steps": "1. Upload 'report.pdf' to Project A.\n2. Open Project B and upload 'report.pdf' to Project B.",
+          "expected": "The upload to Project B succeeds. The filename uniqueness constraint is scoped to the project — the same filename on different projects is allowed."
+        }
+      ]
+    },
+    {
+      "id": "TC-PAT-400",
+      "name": "Downloading Attachments",
+      "test_cases": [
+        {
+          "id": "TC-PAT-401",
+          "severity": "P0",
+          "scenario": "Clicking the Download action on an attachment row triggers a file download",
+          "steps": "1. Open the Attachments tab on a project with at least one attachment.\n2. Click the Download action on a row.",
+          "expected": "The browser initiates a file download. A download prompt or automatic download begins for the attachment's file."
+        },
+        {
+          "id": "TC-PAT-402",
+          "severity": "P0",
+          "scenario": "The downloaded file has the same name as the original uploaded filename",
+          "steps": "1. Upload a file named 'Q4 Report.pdf'.\n2. Click the Download action for that attachment.",
+          "expected": "The browser downloads the file with the name 'Q4 Report.pdf'. The filename is not changed to a code or hash."
+        },
+        {
+          "id": "TC-PAT-403",
+          "severity": "P0",
+          "scenario": "The downloaded file content is identical to the originally uploaded content",
+          "steps": "1. Upload a known file (e.g. a PDF with specific content).\n2. Download it via the Download action.\n3. Compare the downloaded file with the original.",
+          "expected": "The downloaded file is byte-for-byte identical to the uploaded file. No corruption or content alteration occurs."
+        },
+        {
+          "id": "TC-PAT-404",
+          "severity": "P1",
+          "scenario": "Downloaded PDF file has the correct Content-Type header (application/pdf)",
+          "steps": "1. Upload a PDF file.\n2. Inspect the network response headers when clicking the Download action for that attachment.",
+          "expected": "The response Content-Type header is 'application/pdf'. The browser handles the file as a PDF download."
+        },
+        {
+          "id": "TC-PAT-405",
+          "severity": "P1",
+          "scenario": "Downloaded XLSX file has the correct Content-Type header for spreadsheets",
+          "steps": "1. Upload an .xlsx file.\n2. Inspect the network response headers when downloading that attachment.",
+          "expected": "The Content-Type header is 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' or similar spreadsheet MIME type."
+        },
+        {
+          "id": "TC-PAT-406",
+          "severity": "P1",
+          "scenario": "Filenames with spaces and special characters download correctly with proper encoding",
+          "steps": "1. Upload a file named 'Q4 Report — Final (v2).pdf'.\n2. Click the Download action.",
+          "expected": "The browser downloads the file. The saved filename matches the original (including spaces and special characters), thanks to RFC 5987 Content-Disposition encoding."
+        },
+        {
+          "id": "TC-PAT-407",
+          "severity": "P1",
+          "scenario": "Attempting to download an attachment that has already been deleted returns a 404 error",
+          "steps": "1. Open the download URL for an attachment.\n2. In a separate session, delete that attachment.\n3. Use the original URL to attempt the download.",
+          "expected": "HTTP 404 Not Found is returned. No file content is served."
+        },
+        {
+          "id": "TC-PAT-408",
+          "severity": "P2",
+          "scenario": "Downloading a large file (close to 25 MB) completes without a timeout or corruption",
+          "steps": "1. Upload a file close to 25 MB in size.\n2. Click the Download action.",
+          "expected": "The download completes fully. The downloaded file size matches the uploaded file size. No network timeout or partial-download error occurs."
+        }
+      ]
+    },
+    {
+      "id": "TC-PAT-500",
+      "name": "Deleting Attachments",
+      "test_cases": [
+        {
+          "id": "TC-PAT-501",
+          "severity": "P0",
+          "scenario": "Clicking the Delete action opens a confirmation modal",
+          "steps": "1. Open the Attachments tab as a user with delete permission.\n2. Click the Delete action on a row.",
+          "expected": "A confirmation modal opens. It displays the attachment filename and asks the user to confirm the deletion."
+        },
+        {
+          "id": "TC-PAT-502",
+          "severity": "P1",
+          "scenario": "Confirming deletion removes the attachment row from the table",
+          "steps": "1. Click the Delete action on an attachment row.\n2. Confirm deletion in the modal.",
+          "expected": "The modal closes. A success toast appears (e.g. 'Attachment deleted successfully.'). The deleted attachment is no longer visible in the table. If it was the only attachment, the empty-state message appears."
+        },
+        {
+          "id": "TC-PAT-503",
+          "severity": "P1",
+          "scenario": "Cancelling the delete confirmation modal leaves the attachment unchanged",
+          "steps": "1. Click the Delete action on an attachment row.\n2. Cancel or dismiss the confirmation modal without confirming.",
+          "expected": "The modal closes. The attachment remains in the table."
+        },
+        {
+          "id": "TC-PAT-504",
+          "severity": "P1",
+          "scenario": "Deleting one attachment does not affect other attachments on the same project",
+          "steps": "1. A project has three attachments: A, B, and C.\n2. Delete attachment B.",
+          "expected": "Attachments A and C remain in the table. Only attachment B is removed."
+        },
+        {
+          "id": "TC-PAT-505",
+          "severity": "P2",
+          "scenario": "Attempting to delete an attachment that was already deleted shows an error",
+          "steps": "1. Open the delete confirmation for an attachment.\n2. In a separate session, delete the same attachment.\n3. Confirm deletion in the original session.",
+          "expected": "An error toast is shown indicating the attachment was not found. The table is updated to reflect the current state."
+        },
+        {
+          "id": "TC-PAT-506",
+          "severity": "P2",
+          "scenario": "After deletion, the same filename can be re-uploaded to the same project",
+          "steps": "1. Upload 'report.pdf' to a project.\n2. Delete it.\n3. Upload 'report.pdf' again to the same project.",
+          "expected": "The re-upload succeeds without a duplicate filename error. The attachment appears in the table as a new entry."
+        }
+      ]
+    },
+    {
+      "id": "TC-PAT-600",
+      "name": "File Validation",
+      "test_cases": [
+        {
+          "id": "TC-PAT-601",
+          "severity": "P0",
+          "scenario": "A file within the 25 MB size limit uploads successfully",
+          "steps": "1. Upload a file that is 10 MB in size via the Attachments tab.",
+          "expected": "The file uploads successfully. A success toast appears and the file appears in the table."
+        },
+        {
+          "id": "TC-PAT-602",
+          "severity": "P0",
+          "scenario": "A file exceeding 25 MB is rejected with a clear error message",
+          "steps": "1. Attempt to upload a file that is 26 MB in size via the Attachments tab.",
+          "expected": "An error toast or inline error message appears indicating the file exceeds the maximum allowed size of 25 MB. No attachment record is created."
+        },
+        {
+          "id": "TC-PAT-603",
+          "severity": "P1",
+          "scenario": "Uploading a file with the same name as an existing attachment on the same project returns a 409 conflict",
+          "steps": "1. Upload a file named 'report.pdf' to a project.\n2. Attempt to upload another file also named 'report.pdf' to the same project.",
+          "expected": "An error toast appears indicating a file with this name already exists for this project. The duplicate upload is not created."
+        },
+        {
+          "id": "TC-PAT-604",
+          "severity": "P1",
+          "scenario": "Uploading with no file selected (empty POST) returns a validation error",
+          "steps": "1. Send a POST request to /api/v1/projects/PROJ-1/attachments/ with no file part in the multipart body.",
+          "expected": "HTTP 422 Unprocessable Entity is returned with a message indicating no file was uploaded. No attachment is created."
+        },
+        {
+          "id": "TC-PAT-605",
+          "severity": "P1",
+          "scenario": "Uploading to a non-existent project code returns 404",
+          "steps": "1. Send a multipart POST to /api/v1/projects/PROJ-999999/attachments/ with a valid file.",
+          "expected": "HTTP 404 Not Found is returned. No attachment record is created."
+        },
+        {
+          "id": "TC-PAT-606",
+          "severity": "P1",
+          "scenario": "A filename containing path separators is sanitised to just the base name on the server",
+          "steps": "1. Upload a file whose name includes a path component such as '../../config/secrets.env'.",
+          "expected": "The attachment is stored with only the base filename (e.g. 'secrets.env'). The path component is stripped. The attachment can be downloaded and deleted normally."
+        },
+        {
+          "id": "TC-PAT-607",
+          "severity": "P2",
+          "scenario": "A file submitted with an empty or whitespace-only filename is stored under the fallback name 'attachment'",
+          "steps": "1. Upload a file whose name is empty or contains only spaces/whitespace.",
+          "expected": "The attachment is created with the filename 'attachment'. No error is raised. The record appears in the table."
+        },
+        {
+          "id": "TC-PAT-608",
+          "severity": "P2",
+          "scenario": "Content type is inferred from the file extension when the browser supplies an empty MIME type",
+          "steps": "1. Upload a file named 'data.pdf' while simulating a missing Content-Type in the upload request.",
+          "expected": "The attachment is created with content_type 'application/pdf', inferred from the .pdf extension. The Type column in the table shows the correct MIME type."
+        },
+        {
+          "id": "TC-PAT-609",
+          "severity": "P2",
+          "scenario": "A file with no extension is accepted and stored with a generic content type",
+          "steps": "1. Upload a file with no extension in its name (e.g. 'README').",
+          "expected": "The file uploads successfully. The content type is set to 'application/octet-stream' or a reasonable generic type. The attachment row shows the filename as 'README'."
+        },
+        {
+          "id": "TC-PAT-610",
+          "severity": "P2",
+          "scenario": "File size displayed in the table uses a human-readable format, not raw bytes",
+          "steps": "1. Upload a file that is 2,048,000 bytes in size.\n2. Open the Attachments tab.",
+          "expected": "The Size column shows a human-readable value such as '2.0 MB' or '1.95 MB', not '2048000 bytes'."
+        }
+      ]
+    },
+    {
+      "id": "TC-PAT-700",
+      "name": "Non-Functional — Performance",
+      "test_cases": [
+        {
+          "id": "TC-PAT-701",
+          "severity": "P2",
+          "scenario": "Attachments tab with 20+ attachments loads and renders within an acceptable time",
+          "steps": "1. Upload 20 or more files to a project.\n2. Open the Attachments tab.\n3. Measure the time from tab click to all rows being visible.",
+          "expected": "All attachment rows are visible within 2 seconds on a standard connection. No loading spinner persists beyond that time."
+        },
+        {
+          "id": "TC-PAT-702",
+          "severity": "P2",
+          "scenario": "Uploading a large file (close to 25 MB) completes without a browser timeout",
+          "steps": "1. Select a file close to 25 MB via the upload zone on a standard connection.\n2. Observe the upload process until it completes or fails.",
+          "expected": "The upload completes fully. A success toast appears and the row is added to the table. No browser timeout or network error occurs within a reasonable transfer time."
+        },
+        {
+          "id": "TC-PAT-703",
+          "severity": "P2",
+          "scenario": "Upload busy state persists for the full duration of a large file upload",
+          "steps": "1. Select a file close to 25 MB.\n2. Observe the upload zone or relevant UI from the moment upload begins until the success response.",
+          "expected": "A loading or progress indicator remains active for the entire duration of the upload. The zone cannot be used to trigger another upload while the current one is in progress."
+        },
+        {
+          "id": "TC-PAT-704",
+          "severity": "P3",
+          "scenario": "Sorting a table with 50+ attachments by file name is responsive",
+          "steps": "1. Upload 50+ attachments to a project.\n2. Open the Attachments tab.\n3. Click the File Name column header to sort.",
+          "expected": "The sort operation completes and the table re-renders within 1 second. No visible lag or browser freeze occurs."
+        }
+      ]
+    },
+    {
+      "id": "TC-PAT-800",
+      "name": "Desktop",
+      "test_cases": [
+        {
+          "id": "TC-PAT-801",
+          "severity": "P1",
+          "scenario": "Attachments table is clearly laid out on a desktop viewport",
+          "steps": "1. Open the Attachments tab on a desktop browser (≥1200px wide).\n2. Observe the table columns.",
+          "expected": "The icon, File Name, Type, Size, and Uploaded By columns are clearly visible. Column headers are readable. Row action buttons are not clipped. The file type icons are displayed at an appropriate size."
+        },
+        {
+          "id": "TC-PAT-802",
+          "severity": "P1",
+          "scenario": "File upload zone renders as a compact, single-line component above the table on desktop",
+          "steps": "1. Open the Attachments tab with upload permission on a desktop browser.",
+          "expected": "The upload zone is a single horizontal row containing a small icon, a 'browse from your computer' link, and 'or drag & drop' text. It does not take up excessive vertical space."
+        },
+        {
+          "id": "TC-PAT-803",
+          "severity": "P1",
+          "scenario": "Long filenames wrap or truncate without breaking the table layout on desktop",
+          "steps": "1. Upload a file with a very long filename (e.g. 200+ characters).\n2. View it in the Attachments table on a desktop browser.",
+          "expected": "The File Name column adjusts — text wraps or truncates with an ellipsis. The row does not overflow into adjacent columns or past the table boundary."
+        },
+        {
+          "id": "TC-PAT-804",
+          "severity": "P2",
+          "scenario": "Delete confirmation modal is centred and fully visible on a desktop browser",
+          "steps": "1. Click the Delete action on an attachment row on a desktop browser.",
+          "expected": "The confirmation modal appears centred on the screen. The filename, confirmation message, and confirm/cancel buttons are all visible without scrolling."
+        },
+        {
+          "id": "TC-PAT-805",
+          "severity": "P2",
+          "scenario": "Drag-and-drop visual feedback is clear on desktop when dragging files over the upload zone",
+          "steps": "1. Drag a file from the desktop and hover it over the upload zone without releasing.",
+          "expected": "The upload zone changes its appearance (e.g. border highlights, background colour change, or 'is-over' state) to indicate it will accept the drop. On release the file is queued."
+        },
+        {
+          "id": "TC-PAT-806",
+          "severity": "P2",
+          "scenario": "The file size column on desktop shows values in appropriate units (B, KB, MB)",
+          "steps": "1. Upload one file under 1024 bytes, one between 1 KB and 1 MB, and one larger than 1 MB.\n2. Open the Attachments tab.",
+          "expected": "The Size column displays each file's size in the most appropriate unit: e.g. '512 B', '4.5 KB', '2.1 MB'. Raw byte counts are not shown."
+        }
+      ]
+    },
+    {
+      "id": "TC-PAT-900",
+      "name": "Mobile",
+      "test_cases": [
+        {
+          "id": "TC-PAT-901",
+          "severity": "P1",
+          "scenario": "Attachments tab is reachable and readable on a mobile device",
+          "steps": "1. Open a project detail page on a mobile device (≤767px).\n2. Tap the Attachments tab.",
+          "expected": "The Attachments tab is visible in the tab bar (possibly in a scrollable tab row). The attachments table renders within the viewport without horizontal overflow."
+        },
+        {
+          "id": "TC-PAT-902",
+          "severity": "P1",
+          "scenario": "Tapping the file upload zone opens the mobile file picker",
+          "steps": "1. Open the Attachments tab on a mobile device with upload permission.\n2. Tap on the upload zone or the 'browse from your computer' link.",
+          "expected": "The mobile file picker or document browser opens, allowing the user to select a file from the device's storage."
+        },
+        {
+          "id": "TC-PAT-903",
+          "severity": "P2",
+          "scenario": "Selected file tags are clearly visible and removable on a mobile screen",
+          "steps": "1. Select a file via the upload zone on a mobile device.\n2. Observe the tag that appears.",
+          "expected": "The file tag is fully visible within the mobile viewport. The × remove button is large enough to tap without mis-tapping adjacent elements."
+        },
+        {
+          "id": "TC-PAT-904",
+          "severity": "P1",
+          "scenario": "Download action is tappable on mobile and initiates a file download",
+          "steps": "1. Open the Attachments tab on a mobile device.\n2. Tap the Download action on an attachment row.",
+          "expected": "The file download begins. The mobile browser or OS download manager handles the file. The tap target is large enough to activate without difficulty."
+        },
+        {
+          "id": "TC-PAT-905",
+          "severity": "P1",
+          "scenario": "Delete action and confirmation modal are accessible and usable on mobile",
+          "steps": "1. Open the Attachments tab on a mobile device with delete permission.\n2. Tap the Delete action (in the overflow menu or directly on the row).\n3. Confirm in the modal.",
+          "expected": "The Delete action is accessible via a tap-friendly control. The confirmation modal fits within the mobile viewport. Confirm and cancel buttons are reachable without scrolling or zooming."
+        },
+        {
+          "id": "TC-PAT-906",
+          "severity": "P2",
+          "scenario": "File type icons in the table are visible at mobile icon sizes",
+          "steps": "1. Open the Attachments tab on a mobile device with various file types uploaded (PDF, XLSX, generic).",
+          "expected": "File type icons are rendered at a readable size for mobile. Icons are not clipped or invisible. Different file types remain visually distinguishable."
+        }
+      ]
+    },
+    {
+      "id": "TC-PAT-1000",
+      "name": "Security",
+      "test_cases": [
+        {
+          "id": "TC-PAT-1001",
+          "severity": "P0",
+          "scenario": "Unauthenticated GET to the attachments list returns 401",
+          "steps": "1. Send a GET request to /api/v1/projects/PROJ-1/attachments/ with no Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned. No attachment data is included in the response."
+        },
+        {
+          "id": "TC-PAT-1002",
+          "severity": "P0",
+          "scenario": "Unauthenticated multipart POST to the upload endpoint returns 401",
+          "steps": "1. Send a multipart POST to /api/v1/projects/PROJ-1/attachments/ with a file but no Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned. No attachment record is created and no file is stored."
+        },
+        {
+          "id": "TC-PAT-1003",
+          "severity": "P0",
+          "scenario": "Unauthenticated GET to the download endpoint returns 401",
+          "steps": "1. Send a GET to /api/v1/projects/PROJ-1/attachments/PROJAT-1/download/ with no Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned. No file content or binary data is served."
+        },
+        {
+          "id": "TC-PAT-1004",
+          "severity": "P0",
+          "scenario": "Unauthenticated DELETE to the attachment endpoint returns 401",
+          "steps": "1. Send a DELETE to /api/v1/projects/PROJ-1/attachments/PROJAT-1/ with no Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned. The attachment is not deleted."
+        },
+        {
+          "id": "TC-PAT-1005",
+          "severity": "P1",
+          "scenario": "CSRF token is required for the multipart upload POST from the browser",
+          "steps": "1. From a browser session, send a POST to /api/v1/projects/PROJ-1/attachments/ as an authenticated user without including the X-CSRFToken header.",
+          "expected": "The request is rejected. No attachment is created."
+        },
+        {
+          "id": "TC-PAT-1006",
+          "severity": "P1",
+          "scenario": "An attachment from Project A cannot be downloaded via Project B's URL namespace",
+          "steps": "1. Upload an attachment PROJAT-99 to Project A (PROJ-1).\n2. Send GET /api/v1/projects/PROJ-2/attachments/PROJAT-99/download/ as an authenticated user.",
+          "expected": "HTTP 404 Not Found is returned. The attachment file is not served."
+        },
+        {
+          "id": "TC-PAT-1007",
+          "severity": "P1",
+          "scenario": "An attachment from Project A cannot be deleted via Project B's URL namespace",
+          "steps": "1. Upload an attachment PROJAT-99 to Project A.\n2. Send DELETE /api/v1/projects/PROJ-2/attachments/PROJAT-99/ as an authenticated user.",
+          "expected": "HTTP 404 Not Found is returned. The attachment is not deleted."
+        },
+        {
+          "id": "TC-PAT-1008",
+          "severity": "P1",
+          "scenario": "A filename containing path traversal characters is sanitised and cannot escape the storage directory",
+          "steps": "1. Upload a file named '../../etc/passwd' or similar path-traversal filename.",
+          "expected": "The server strips the path components and stores the file under the basename only (e.g. 'passwd'). No server-side path traversal occurs. The file is accessible via normal download and delete flows."
+        },
+        {
+          "id": "TC-PAT-1009",
+          "severity": "P1",
+          "scenario": "API list response contains only documented attachment fields — no internal DB IDs or file paths",
+          "steps": "1. Authenticate and call GET /api/v1/projects/PROJ-1/attachments/.\n2. Inspect each item in the response.",
+          "expected": "Each item contains only: code, project_code, file_name, content_type, file_size, created_at, created_by. The file_path (storage URI) and database primary key are not included in the response."
+        },
+        {
+          "id": "TC-PAT-1010",
+          "severity": "P1",
+          "scenario": "A filename containing HTML or script tags is rendered as plain text in the table",
+          "steps": "1. Upload a file named '<script>alert(1)</script>.pdf'.\n2. Open the Attachments tab.\n3. Observe the File Name cell in the table.",
+          "expected": "The filename is displayed as the literal text '<script>alert(1)</script>.pdf'. No script is executed. The value is HTML-escaped in the table."
+        },
+        {
+          "id": "TC-PAT-1011",
+          "severity": "P2",
+          "scenario": "Attachment codes (PROJAT-N) in the API response do not expose sequential database IDs that allow enumeration",
+          "steps": "1. Create several attachments across different projects.\n2. Observe the code values returned in the API responses.",
+          "expected": "The codes are in the format PROJAT-N where N is an internal sequence. Direct numeric guessing of attachment codes across projects should not allow access — permission checks apply regardless of code knowledge."
+        }
+      ]
+    },
+    {
+      "id": "TC-PAT-1100",
+      "name": "Integration & Edge Cases",
+      "test_cases": [
+        {
+          "id": "TC-PAT-1101",
+          "severity": "P0",
+          "scenario": "Attachments from Project A are not shown when viewing Project B's Attachments tab",
+          "steps": "1. Upload files to Project A.\n2. Open a different project (Project B) and click the Attachments tab.",
+          "expected": "Only files belonging to Project B are shown. Project A's attachments are not visible."
+        },
+        {
+          "id": "TC-PAT-1102",
+          "severity": "P1",
+          "scenario": "Deleting a project removes all its attachments",
+          "steps": "1. Upload multiple files to a project.\n2. Delete the project.\n3. Check that the attachment records no longer exist.",
+          "expected": "All attachment records associated with the deleted project are removed. No orphaned attachment records remain."
+        },
+        {
+          "id": "TC-PAT-1103",
+          "severity": "P1",
+          "scenario": "An attachment uploaded by User A is visible to User B in the same project",
+          "steps": "1. Log in as User A and upload a file to a project.\n2. Log in as User B and open the same project's Attachments tab.",
+          "expected": "User B sees the attachment uploaded by User A. The 'Uploaded By' column shows User A's name."
+        },
+        {
+          "id": "TC-PAT-1104",
+          "severity": "P1",
+          "scenario": "The created_by field in the API response reflects the user who performed the upload",
+          "steps": "1. Log in as User A.\n2. Upload a file to a project.\n3. Retrieve the attachment via GET /api/v1/projects/PROJ-1/attachments/.",
+          "expected": "The created_by field in the response contains User A's details (name or email). It is not null or assigned to a different user."
+        },
+        {
+          "id": "TC-PAT-1105",
+          "severity": "P1",
+          "scenario": "Requesting attachments for a non-existent project code returns 404",
+          "steps": "1. Send GET /api/v1/projects/PROJ-999999/attachments/ as an authenticated user.",
+          "expected": "HTTP 404 Not Found is returned. No attachment data is returned."
+        },
+        {
+          "id": "TC-PAT-1106",
+          "severity": "P2",
+          "scenario": "A filename with unicode or emoji characters uploads, displays, and downloads correctly",
+          "steps": "1. Upload a file named '报告_2024.pdf' or '📊 Dashboard.xlsx'.\n2. View the Attachments tab.\n3. Download the attachment.",
+          "expected": "The unicode/emoji filename is stored, displayed correctly in the table, and the downloaded file retains the original filename without corruption."
+        },
+        {
+          "id": "TC-PAT-1107",
+          "severity": "P2",
+          "scenario": "Uploading a second file to a project refreshes the table without losing the first attachment",
+          "steps": "1. Upload 'first.pdf' to a project.\n2. Upload 'second.pdf' to the same project.\n3. Observe the table.",
+          "expected": "Both 'first.pdf' and 'second.pdf' appear in the table. The first upload is not removed or overwritten."
+        },
+        {
+          "id": "TC-PAT-1108",
+          "severity": "P2",
+          "scenario": "Rapid sequential uploads of different files do not produce race conditions or missing records",
+          "steps": "1. Quickly upload three files with different names to the same project in rapid succession.",
+          "expected": "All three uploads succeed. Three separate attachment rows appear in the table. No records are lost, merged, or duplicated."
+        },
+        {
+          "id": "TC-PAT-1109",
+          "severity": "P2",
+          "scenario": "A file with a very long name (up to 255 characters) uploads and displays correctly",
+          "steps": "1. Upload a file whose name is exactly 255 characters long (valid characters only).\n2. View the attachment in the table and attempt to download it.",
+          "expected": "The upload succeeds. The full filename is stored. The table displays the name (possibly truncated visually). The download uses the original full filename."
+        },
+        {
+          "id": "TC-PAT-1110",
+          "severity": "P2",
+          "scenario": "The attachments list API returns attachments in newest-first order by default",
+          "steps": "1. Upload 'first.pdf', then 'second.pdf', then 'third.pdf' to a project.\n2. Call GET /api/v1/projects/PROJ-1/attachments/ and inspect the response order.",
+          "expected": "The data array is ordered: third.pdf, second.pdf, first.pdf — most recently uploaded first."
+        },
+        {
+          "id": "TC-PAT-1111",
+          "severity": "P3",
+          "scenario": "An attachment's audit metadata (created_at, file_size, content_type) is accurate in the API response",
+          "steps": "1. Upload a known file (e.g. a 512 KB PDF).\n2. Call GET /api/v1/projects/PROJ-1/attachments/ and inspect the response for that record.",
+          "expected": "The response shows a non-null created_at timestamp, file_size matching the actual file size in bytes, and content_type matching the file's MIME type."
+        },
+        {
+          "id": "TC-PAT-1112",
+          "severity": "P3",
+          "scenario": "Sorting the attachment list API by an invalid field name falls back to the default order",
+          "steps": "1. Call GET /api/v1/projects/PROJ-1/attachments/?sort=invalid_field&order_by=ASC.",
+          "expected": "The response returns HTTP 200 with attachments in the default newest-first order. No 400 or 500 error is raised for the unrecognised sort field."
+        }
+      ]
+    }
+  ]
+}

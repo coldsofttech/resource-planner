@@ -54,6 +54,9 @@ export const UI_URLS = {
   sprints: {
     list: () => "/sprints/",
     detail: (code) => `/sprints/${code}/`,
+    forecast: (code) => `/sprints/${code}/forecast/`,
+    forecastImportDetail: (sprintCode, importCode) =>
+      `/sprints/${sprintCode}/forecast/${importCode}/`,
   },
   programmes: {
     list: () => "/programmes/",
@@ -66,6 +69,10 @@ export const UI_URLS = {
   },
   projectTypes: {
     list: () => "/projects/types/",
+  },
+  recharges: {
+    types: () => "/recharges/types/",
+    detail: (code) => `/recharges/types/${code}/`,
   },
   projectStatuses: {
     list: () => "/projects/statuses/",
@@ -128,6 +135,10 @@ export const API_URLS = {
     }),
     adminExportSpecs: () => ({ method: "GET", href: `${API_BASE}users/export/specs/` }),
     adminExport: () => ({ method: "GET", href: `${API_BASE}users/export/` }),
+    search: (q) => ({
+      method: "GET",
+      href: `${API_BASE}users/search/?q=${encodeURIComponent(q || "")}`,
+    }),
   },
   teams: {
     list: () => ({ method: "GET", href: `${API_BASE}teams/` }),
@@ -355,10 +366,133 @@ export const API_URLS = {
     import: () => ({ method: "POST", href: `${API_BASE}sprints/import/` }),
     exportSpecs: () => ({ method: "GET", href: `${API_BASE}sprints/export/specs/` }),
     export: () => ({ method: "GET", href: `${API_BASE}sprints/export/` }),
+    forecastTemplate: (sprintCode) => ({
+      method: "GET",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/template/`,
+    }),
+    forecastUpload: (sprintCode, teamCode) => ({
+      method: "POST",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/${teamCode}/upload/`,
+    }),
+    forecastImports: (sprintCode, teamCode) => ({
+      method: "GET",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/${teamCode}/imports/`,
+    }),
+    forecastImportDetail: (sprintCode, importCode) => ({
+      method: "GET",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/${importCode}/`,
+    }),
+    forecastImportRows: (sprintCode, importCode) => ({
+      method: "GET",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/${importCode}/rows/`,
+    }),
+    forecastImportRowCreate: (sprintCode, importCode) => ({
+      method: "POST",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/${importCode}/rows/`,
+    }),
+    forecastImportRowUpdate: (sprintCode, importCode, rowCode) => ({
+      method: "PATCH",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/${importCode}/rows/${rowCode}/`,
+    }),
+    forecastImportRowDelete: (sprintCode, importCode, rowCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/${importCode}/rows/${rowCode}/`,
+    }),
+    forecastImportReview: (sprintCode, importCode) => ({
+      method: "POST",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/${importCode}/review/`,
+    }),
+    forecastImportConfirm: (sprintCode, importCode) => ({
+      method: "POST",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/${importCode}/confirm/`,
+    }),
+    actualsTemplate: (sprintCode) => ({
+      method: "GET",
+      href: `${API_BASE}sprints/${sprintCode}/actuals/template/`,
+    }),
+    actualsUpload: (sprintCode, teamCode) => ({
+      method: "POST",
+      href: `${API_BASE}sprints/${sprintCode}/actuals/${teamCode}/upload/`,
+    }),
   },
   projectSizes: {
     get: () => ({ method: "GET", href: `${API_BASE}projects/sizes/` }),
     update: () => ({ method: "PATCH", href: `${API_BASE}projects/sizes/` }),
+  },
+  projectBudgets: {
+    list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/budgets/` }),
+    create: (code) => ({ method: "POST", href: `${API_BASE}projects/${code}/budgets/` }),
+    detail: (code, budgetCode) => ({
+      method: "GET",
+      href: `${API_BASE}projects/${code}/budgets/${budgetCode}/`,
+    }),
+    update: (code, budgetCode) => ({
+      method: "PATCH",
+      href: `${API_BASE}projects/${code}/budgets/${budgetCode}/`,
+    }),
+    delete: (code, budgetCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}projects/${code}/budgets/${budgetCode}/`,
+    }),
+    history: (code, budgetCode) => ({
+      method: "GET",
+      href: `${API_BASE}projects/${code}/budgets/${budgetCode}/history/`,
+    }),
+    lifetime: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/budgets/lifetime/` }),
+    exportSpecs: () => ({ method: "GET", href: `${API_BASE}projects/budgets/export/specs/` }),
+    export: () => ({ method: "GET", href: `${API_BASE}projects/budgets/export/` }),
+  },
+  rechargeTypes: {
+    list: () => ({ method: "GET", href: `${API_BASE}recharges/types/` }),
+    create: () => ({ method: "POST", href: `${API_BASE}recharges/types/` }),
+    stats: () => ({ method: "GET", href: `${API_BASE}recharges/types/stats/` }),
+    options: () => ({ method: "GET", href: `${API_BASE}recharges/types/options/` }),
+    detail: (code) => ({ method: "GET", href: `${API_BASE}recharges/types/${code}/` }),
+    update: (code) => ({ method: "PATCH", href: `${API_BASE}recharges/types/${code}/` }),
+    delete: (code) => ({ method: "DELETE", href: `${API_BASE}recharges/types/${code}/` }),
+    activate: (code) => ({
+      method: "POST",
+      href: `${API_BASE}recharges/types/${code}/activate/`,
+    }),
+    deactivate: (code) => ({
+      method: "POST",
+      href: `${API_BASE}recharges/types/${code}/deactivate/`,
+    }),
+    importSpecs: () => ({ method: "GET", href: `${API_BASE}recharges/types/import/specs/` }),
+    importSample: () => ({ method: "GET", href: `${API_BASE}recharges/types/import/sample/` }),
+    import: () => ({ method: "POST", href: `${API_BASE}recharges/types/import/` }),
+    exportSpecs: () => ({ method: "GET", href: `${API_BASE}recharges/types/export/specs/` }),
+    export: () => ({ method: "GET", href: `${API_BASE}recharges/types/export/` }),
+  },
+  projectTypeMappings: {
+    list: (rc) => ({ method: "GET", href: `${API_BASE}recharges/types/${rc}/mappings/` }),
+    create: (rc) => ({ method: "POST", href: `${API_BASE}recharges/types/${rc}/mappings/` }),
+    detail: (rc, id) => ({
+      method: "GET",
+      href: `${API_BASE}recharges/types/${rc}/mappings/${id}/`,
+    }),
+    update: (rc, id) => ({
+      method: "PATCH",
+      href: `${API_BASE}recharges/types/${rc}/mappings/${id}/`,
+    }),
+    delete: (rc, id) => ({
+      method: "DELETE",
+      href: `${API_BASE}recharges/types/${rc}/mappings/${id}/`,
+    }),
+    importSpecs: (rc) => ({
+      method: "GET",
+      href: `${API_BASE}recharges/types/${rc}/mappings/import/specs/`,
+    }),
+    importSample: (rc) => ({
+      method: "GET",
+      href: `${API_BASE}recharges/types/${rc}/mappings/import/sample/`,
+    }),
+    import: (rc) => ({ method: "POST", href: `${API_BASE}recharges/types/${rc}/mappings/import/` }),
+    exportSpecs: (rc) => ({
+      method: "GET",
+      href: `${API_BASE}recharges/types/${rc}/mappings/export/specs/`,
+    }),
+    export: (rc) => ({ method: "GET", href: `${API_BASE}recharges/types/${rc}/mappings/export/` }),
   },
   projectTypes: {
     list: () => ({ method: "GET", href: `${API_BASE}projects/types/` }),
@@ -531,6 +665,38 @@ export const API_URLS = {
       href: `${API_BASE}projects/${code}/followers/${followerCode}/`,
     }),
   },
+  projectComments: {
+    list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/comments/` }),
+    create: (code) => ({ method: "POST", href: `${API_BASE}projects/${code}/comments/` }),
+    update: (code, commentCode) => ({
+      method: "PATCH",
+      href: `${API_BASE}projects/${code}/comments/${commentCode}/`,
+    }),
+    delete: (code, commentCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}projects/${code}/comments/${commentCode}/`,
+    }),
+    pin: (code, commentCode) => ({
+      method: "POST",
+      href: `${API_BASE}projects/${code}/comments/${commentCode}/pin/`,
+    }),
+    unpin: (code, commentCode) => ({
+      method: "POST",
+      href: `${API_BASE}projects/${code}/comments/${commentCode}/unpin/`,
+    }),
+  },
+  projectContacts: {
+    list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/contacts/` }),
+    create: (code) => ({ method: "POST", href: `${API_BASE}projects/${code}/contacts/` }),
+    update: (code, contactCode) => ({
+      method: "PATCH",
+      href: `${API_BASE}projects/${code}/contacts/${contactCode}/`,
+    }),
+    delete: (code, contactCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}projects/${code}/contacts/${contactCode}/`,
+    }),
+  },
   projectTags: {
     list: (projectCode) => ({ method: "GET", href: `${API_BASE}projects/${projectCode}/tags/` }),
     create: (projectCode) => ({ method: "POST", href: `${API_BASE}projects/${projectCode}/tags/` }),
@@ -559,8 +725,32 @@ export const API_URLS = {
       href: `${API_BASE}projects/${code}/estimates/${estCode}/history/`,
     }),
   },
+  projectLinks: {
+    list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/links/` }),
+    create: (code) => ({ method: "POST", href: `${API_BASE}projects/${code}/links/` }),
+    update: (code, linkCode) => ({
+      method: "PATCH",
+      href: `${API_BASE}projects/${code}/links/${linkCode}/`,
+    }),
+    delete: (code, linkCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}projects/${code}/links/${linkCode}/`,
+    }),
+  },
+  projectAttachments: {
+    list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/attachments/` }),
+    upload: (code) => ({ method: "POST", href: `${API_BASE}projects/${code}/attachments/` }),
+    delete: (code, attachmentCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}projects/${code}/attachments/${attachmentCode}/`,
+    }),
+    download: (code, attachmentCode) =>
+      `${API_BASE}projects/${code}/attachments/${attachmentCode}/download/`,
+  },
   projectLabels: {
     list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/labels/` }),
+    options: () => ({ method: "GET", href: `${API_BASE}projects/labels/options/` }),
+
     create: (code) => ({ method: "POST", href: `${API_BASE}projects/${code}/labels/` }),
     suggest: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/labels/suggest/` }),
     detail: (code, labelCode) => ({

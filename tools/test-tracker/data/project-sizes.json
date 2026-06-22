@@ -19,21 +19,21 @@
           "severity": "P0",
           "scenario": "Unauthenticated user is redirected from the Project Sizes page",
           "steps": "1. Open /projects/sizes/ without being logged in.",
-          "expected": "The browser redirects to the login page. The Project Sizes configuration screen is not displayed."
+          "expected": "The browser redirects to the login page. Neither the T-Shirt Configuration panel nor the Budget Configuration panel is displayed."
         },
         {
           "id": "TC-PSZ-102",
           "severity": "P0",
-          "scenario": "User with 'configurations.change_configuration' permission sees editable fields and Save button",
+          "scenario": "User with 'configurations.change_configuration' permission sees editable fields and both Save buttons",
           "steps": "1. Log in as a user with 'configurations.change_configuration' permission.\n2. Navigate to Projects / Configurations > Project Sizes.",
-          "expected": "Each of the four editable tier cards (XS, S, M, L) shows a number input field labelled 'Max Amount (£)'. A 'Save Changes' button is visible at the bottom of the page."
+          "expected": "Each of the four editable tier cards (XS, S, M, L) in the T-Shirt Configuration panel shows a number input labelled 'Max Amount (£)'. A 'Save Changes' button is visible at the bottom of that panel. The Budget Configuration panel shows editable percentage fields for Budget Risk Threshold and all five size variance cards. A second 'Save Changes' button is visible at the bottom of the Budget Configuration panel."
         },
         {
           "id": "TC-PSZ-103",
           "severity": "P1",
-          "scenario": "User without 'configurations.change_configuration' permission sees read-only values and no Save button",
+          "scenario": "User without 'configurations.change_configuration' permission sees read-only values and no Save buttons",
           "steps": "1. Log in as a user without 'configurations.change_configuration' permission.\n2. Navigate to Projects / Configurations > Project Sizes.",
-          "expected": "Each tier card shows a read-only view field (not an editable input). The 'Save Changes' button is not present on the page."
+          "expected": "Both panels are visible but all fields show read-only view values, not editable inputs. Neither 'Save Changes' button is present anywhere on the page."
         },
         {
           "id": "TC-PSZ-104",
@@ -45,9 +45,16 @@
         {
           "id": "TC-PSZ-105",
           "severity": "P1",
-          "scenario": "User without change permission cannot update thresholds via the API directly",
-          "steps": "1. Log in as a user without 'configurations.change_configuration' permission.\n2. Send a PATCH request to /api/v1/projects/sizes/ with a valid payload.",
+          "scenario": "User without change permission cannot update T-shirt thresholds via the API directly",
+          "steps": "1. Log in as a user without 'configurations.change_configuration' permission.\n2. Send an authenticated PATCH request to /api/v1/projects/sizes/ with a valid T-shirt size payload.",
           "expected": "The API returns HTTP 403 Forbidden. No configuration values are updated."
+        },
+        {
+          "id": "TC-PSZ-106",
+          "severity": "P1",
+          "scenario": "User without change permission cannot update budget configuration via the API directly",
+          "steps": "1. Log in as a user without 'configurations.change_configuration' permission.\n2. Send an authenticated PATCH request to /api/v1/projects/sizes/ with a budget config payload (budget_risk_threshold, variance fields).",
+          "expected": "The API returns HTTP 403 Forbidden. No budget configuration values are updated."
         }
       ]
     },
@@ -58,51 +65,79 @@
         {
           "id": "TC-PSZ-201",
           "severity": "P0",
-          "scenario": "Project Sizes page renders five tier cards: XS, S, M, L, and XL",
+          "scenario": "Page renders two section panels: 'Project T-Shirt Configuration' and 'Project Budget Configuration'",
           "steps": "1. Log in with configuration change permission.\n2. Navigate to /projects/sizes/.",
-          "expected": "Five tier cards are displayed in a row. Each card shows a coloured badge (XS = grey, S = blue, M = green, L = amber, XL = red/danger) with its full name (X-Small, Small, Medium, Large, X-Large)."
+          "expected": "Two distinct section panels are visible, each with a labelled title. The first is titled 'Project T-Shirt Configuration' containing five tier cards. The second is titled 'Project Budget Configuration' containing the risk threshold field and five variance cards. A visible gap separates the two panels."
         },
         {
           "id": "TC-PSZ-202",
           "severity": "P0",
-          "scenario": "Current threshold values are loaded into the input fields on page load via the API",
-          "steps": "1. Navigate to /projects/sizes/.\n2. Wait for the page to finish loading.\n3. Observe the Max Amount fields in the XS, S, M, and L cards.",
-          "expected": "Each editable number field is populated with the current configured value (not blank). The values match what GET /api/v1/projects/sizes/ returns."
+          "scenario": "Current configuration values are loaded into all input fields on page load",
+          "steps": "1. Navigate to /projects/sizes/.\n2. Wait for the page to finish loading.\n3. Observe the Max Amount fields in the T-Shirt panel and the percentage fields in the Budget panel.",
+          "expected": "All editable fields are populated with the current configured values — not blank. The values match what GET /api/v1/projects/sizes/ returns for both size thresholds and budget configuration fields."
         },
         {
           "id": "TC-PSZ-203",
           "severity": "P1",
-          "scenario": "Out-of-the-box default values are XS=20,000 / S=60,000 / M=200,000 / L=500,000",
+          "scenario": "Out-of-the-box default values are correct for both T-shirt thresholds and budget configuration",
           "steps": "1. On a fresh instance with no custom configuration, navigate to /projects/sizes/.",
-          "expected": "The four input fields show the default values: XS Max = 20000, S Max = 60000, M Max = 200000, L Max = 500000."
+          "expected": "T-Shirt panel defaults: XS Max = 20,000 / S Max = 60,000 / M Max = 200,000 / L Max = 500,000. Budget panel defaults: Budget Risk Threshold = 10.0% / XS Variance = 0.5% / S Variance = 0.5% / M Variance = 0.5% / L Variance = 1.0% / XL Variance = 1.0%."
         },
         {
           "id": "TC-PSZ-204",
           "severity": "P1",
-          "scenario": "Range hints are displayed beneath the input fields on page load reflecting loaded values",
+          "scenario": "Range hints are displayed in the T-Shirt panel on load reflecting current threshold values",
           "steps": "1. Navigate to /projects/sizes/ with default configuration in place.",
           "expected": "XS range shows 'Up to £20,000'. S range shows '£20,001 — £60,000'. M range shows '£60,001 — £200,000'. L range shows '£200,001 — £500,000'. XL range shows '£500,001 and above'."
         },
         {
           "id": "TC-PSZ-205",
           "severity": "P1",
-          "scenario": "XL tier card is visually distinct (dashed border) and contains no editable input",
-          "steps": "1. Navigate to /projects/sizes/.\n2. Observe the XL card.",
+          "scenario": "XL tier card in the T-Shirt panel is visually distinct and contains no editable input",
+          "steps": "1. Navigate to /projects/sizes/.\n2. Observe the XL card in the T-Shirt Configuration panel.",
           "expected": "The XL card has a dashed border and reduced opacity. It contains no number input or edit field. An italicised label reads 'Automatically derived from L max'."
         },
         {
           "id": "TC-PSZ-206",
           "severity": "P2",
-          "scenario": "XL range hint updates to reflect the current L max value on page load",
-          "steps": "1. Ensure L max is configured as 500000.\n2. Navigate to /projects/sizes/.",
+          "scenario": "XL range hint reflects the current L max value on page load",
+          "steps": "1. Ensure L max is configured as 500,000.\n2. Navigate to /projects/sizes/.",
           "expected": "The XL range shows '£500,001 and above', derived from the current L max value."
         },
         {
           "id": "TC-PSZ-207",
           "severity": "P2",
-          "scenario": "Badge colours match the size category conventions used in the Estimates table",
-          "steps": "1. Navigate to /projects/sizes/ and observe the tier badge colours.\n2. Navigate to a project's Estimates tab and observe the Size column badge colours.",
-          "expected": "The badge colours are identical on both screens: XS = neutral grey, S = blue/info, M = green/success, L = amber/warning, XL = red/danger."
+          "scenario": "Badge colours in both panels match the size category conventions used across the application",
+          "steps": "1. Navigate to /projects/sizes/ and observe the tier badge colours in both panels.\n2. Navigate to a project's Estimates tab and observe the Size column badge colours.",
+          "expected": "Badge colours are identical across both the T-Shirt and Budget panels and match other size badges in the app: XS = neutral grey, S = blue/info, M = green/success, L = amber/warning, XL = red/danger."
+        },
+        {
+          "id": "TC-PSZ-208",
+          "severity": "P0",
+          "scenario": "Budget Configuration panel contains the Budget Risk Threshold field with a hint below it",
+          "steps": "1. Navigate to /projects/sizes/.\n2. Scroll to the 'Project Budget Configuration' panel.",
+          "expected": "A percentage input field labelled 'Budget Risk Threshold (%)' is visible. Directly below it (with a small gap) is a hint text explaining: 'Percentage band for risk classification. Above +threshold = GREEN, within ±threshold = AMBER, below −threshold = RED.'"
+        },
+        {
+          "id": "TC-PSZ-209",
+          "severity": "P0",
+          "scenario": "Budget Configuration panel shows five size tier cards (XS, S, M, L, XL) each with a Budget Variance field",
+          "steps": "1. Navigate to /projects/sizes/.\n2. Scroll to the Budget Configuration panel and observe the variance row.",
+          "expected": "Five tier cards are displayed, one for each size (XS, S, M, L, XL), using the same badge colours as the T-Shirt panel. Each card contains a percentage field labelled 'Budget Variance (%)'."
+        },
+        {
+          "id": "TC-PSZ-210",
+          "severity": "P1",
+          "scenario": "Budget percentage fields are populated with current configured values on page load",
+          "steps": "1. Navigate to /projects/sizes/.\n2. Observe the Budget Risk Threshold and all five Budget Variance fields.",
+          "expected": "Each percentage field shows the currently configured value. No field is blank after the page loads. Values are consistent with what the GET /api/v1/projects/sizes/ API returns."
+        },
+        {
+          "id": "TC-PSZ-211",
+          "severity": "P2",
+          "scenario": "The two section panels are visually separated by a clear vertical gap",
+          "steps": "1. Navigate to /projects/sizes/ on a desktop browser.\n2. Observe the space between the bottom of the T-Shirt Configuration panel and the top of the Budget Configuration panel.",
+          "expected": "A clear visual gap separates the two panels. They are not merged or directly adjacent without spacing. The gap makes it obvious these are two independent configuration groups."
         }
       ]
     },
@@ -113,16 +148,16 @@
         {
           "id": "TC-PSZ-301",
           "severity": "P1",
-          "scenario": "Read-only user sees formatted currency values in view-field elements",
-          "steps": "1. Log in as a user without 'configurations.change_configuration' permission.\n2. Navigate to /projects/sizes/.",
-          "expected": "Each tier card (XS, S, M, L) displays the current max amount as formatted currency text (e.g. '£20,000'). The values are not in editable input fields."
+          "scenario": "Read-only user sees formatted currency values in the T-Shirt panel",
+          "steps": "1. Log in as a user without 'configurations.change_configuration' permission.\n2. Navigate to /projects/sizes/ and observe the T-Shirt Configuration panel.",
+          "expected": "Each tier card (XS, S, M, L) displays the current max amount as formatted currency text (e.g. '£20,000'). The values are in read-only view fields, not editable number inputs."
         },
         {
           "id": "TC-PSZ-302",
           "severity": "P2",
-          "scenario": "Range hints are visible to read-only users and reflect the current configuration",
+          "scenario": "Range hints are visible to read-only users and reflect the current T-Shirt configuration",
           "steps": "1. Log in as a read-only user.\n2. Navigate to /projects/sizes/.",
-          "expected": "All five range hints (XS, S, M, L, XL) are visible and display the correct ranges based on the current configuration. The ranges are identical to what an admin user would see."
+          "expected": "All five range hints (XS, S, M, L, XL) in the T-Shirt panel are visible and display the correct ranges based on the current configuration."
         },
         {
           "id": "TC-PSZ-303",
@@ -130,12 +165,26 @@
           "scenario": "Read-only users can view the XL card and its derived range without any controls",
           "steps": "1. Log in as a read-only user.\n2. Navigate to /projects/sizes/ and observe the XL card.",
           "expected": "The XL card is visible with its dashed border, shows the derived range (e.g. '£500,001 and above'), and the 'Automatically derived from L max' label. No editable control or save button is present."
+        },
+        {
+          "id": "TC-PSZ-304",
+          "severity": "P1",
+          "scenario": "Read-only user sees percentage values as view-fields in the Budget Configuration panel",
+          "steps": "1. Log in as a user without 'configurations.change_configuration' permission.\n2. Navigate to /projects/sizes/ and scroll to the Budget Configuration panel.",
+          "expected": "The Budget Risk Threshold and all five Budget Variance fields are shown as read-only text values (e.g. '10.0%', '0.5%'), not as editable percentage inputs. The hint text below the risk threshold field remains visible."
+        },
+        {
+          "id": "TC-PSZ-305",
+          "severity": "P1",
+          "scenario": "No Save buttons are visible to read-only users in either panel",
+          "steps": "1. Log in as a user without 'configurations.change_configuration' permission.\n2. Navigate to /projects/sizes/ and inspect both panels.",
+          "expected": "No 'Save Changes' button is present in the T-Shirt Configuration panel or the Budget Configuration panel. The page is fully read-only."
         }
       ]
     },
     {
       "id": "TC-PSZ-400",
-      "name": "Editing Thresholds",
+      "name": "T-Shirt Configuration — Editing",
       "test_cases": [
         {
           "id": "TC-PSZ-401",
@@ -161,44 +210,113 @@
         {
           "id": "TC-PSZ-404",
           "severity": "P0",
-          "scenario": "Clicking Save Changes with valid ascending values saves all four thresholds",
-          "steps": "1. Set XS=10000, S=50000, M=150000, L=400000.\n2. Click the 'Save Changes' button.",
-          "expected": "The API receives the updated values. A success toast appears ('Project size thresholds updated successfully.'). The range hints update to reflect the saved values."
+          "scenario": "Clicking Save Changes in the T-Shirt panel with valid ascending values saves all four thresholds",
+          "steps": "1. Set XS=10000, S=50000, M=150000, L=400000.\n2. Click the 'Save Changes' button in the T-Shirt Configuration panel.",
+          "expected": "The API receives the updated size values. A success toast appears ('Project size thresholds updated successfully.'). The range hints update to reflect the saved values. The Budget Configuration panel is unaffected."
         },
         {
           "id": "TC-PSZ-405",
           "severity": "P0",
-          "scenario": "Success toast is displayed after a successful save",
-          "steps": "1. Enter valid ascending values.\n2. Click 'Save Changes'.",
+          "scenario": "Success toast is displayed after saving T-shirt thresholds",
+          "steps": "1. Enter valid ascending size values.\n2. Click 'Save Changes' in the T-Shirt Configuration panel.",
           "expected": "A green success toast with the message 'Project size thresholds updated successfully.' appears near the top of the screen and auto-dismisses."
         },
         {
           "id": "TC-PSZ-406",
           "severity": "P1",
-          "scenario": "Save Changes button shows 'Saving…' and is disabled while the API request is in-flight",
-          "steps": "1. Enter valid values.\n2. Click 'Save Changes' on a slow connection.\n3. Observe the button state before the response arrives.",
-          "expected": "The button label changes to 'Saving…' and is disabled while the request is pending. Once the response arrives, the button is re-enabled."
+          "scenario": "T-Shirt Save Changes button shows 'Saving…' and is disabled while the API request is in-flight",
+          "steps": "1. Enter valid values in the T-Shirt panel.\n2. Click 'Save Changes' on a slow connection.\n3. Observe the button state before the response arrives.",
+          "expected": "The 'Save Changes' button in the T-Shirt panel changes label to 'Saving…' and is disabled while the request is pending. The Budget Configuration panel and its button are unaffected."
         },
         {
           "id": "TC-PSZ-407",
           "severity": "P1",
-          "scenario": "Save button is restored to its original state after a successful save",
-          "steps": "1. Enter valid values and click Save.\n2. Wait for the success response.",
-          "expected": "After the success toast appears, the Save Changes button is restored to its default label and enabled state."
+          "scenario": "T-Shirt Save Changes button is restored to its original state after a successful save",
+          "steps": "1. Enter valid size values and click Save Changes in the T-Shirt panel.\n2. Wait for the success response.",
+          "expected": "After the success toast appears, the 'Save Changes' button in the T-Shirt panel is restored to its default label and enabled state."
         },
         {
           "id": "TC-PSZ-408",
           "severity": "P1",
-          "scenario": "Save button is restored after a server-side error",
-          "steps": "1. Simulate or trigger an API error (e.g. using dev tools to block the request).\n2. Click Save.\n3. Observe the button after the error response.",
-          "expected": "An error toast is shown. The Save Changes button is restored to its enabled state, allowing the user to try again."
+          "scenario": "T-Shirt Save Changes button is restored after a server-side error",
+          "steps": "1. Simulate an API error (e.g. using dev tools to block the request).\n2. Click Save Changes in the T-Shirt panel.\n3. Observe the button after the error response.",
+          "expected": "An error toast is shown. The 'Save Changes' button in the T-Shirt panel is restored to its enabled state, allowing the user to try again."
         },
         {
           "id": "TC-PSZ-409",
           "severity": "P2",
-          "scenario": "Saved values are reflected in the input fields and range hints after a page refresh",
-          "steps": "1. Save new threshold values.\n2. Refresh the browser page.\n3. Observe the input fields and range hints.",
+          "scenario": "Saved T-shirt values are reflected in the input fields and range hints after a page refresh",
+          "steps": "1. Save new threshold values in the T-Shirt panel.\n2. Refresh the browser page.\n3. Observe the input fields and range hints.",
           "expected": "The input fields show the previously saved values. The range hints are consistent with those values."
+        }
+      ]
+    },
+    {
+      "id": "TC-PSZ-450",
+      "name": "Budget Configuration — Editing",
+      "test_cases": [
+        {
+          "id": "TC-PSZ-451",
+          "severity": "P0",
+          "scenario": "Entering a valid Budget Risk Threshold and clicking Save Changes in the Budget panel saves the value",
+          "steps": "1. Navigate to /projects/sizes/.\n2. In the Budget Configuration panel, change the Budget Risk Threshold field to '15'.\n3. Click the 'Save Changes' button in the Budget Configuration panel.",
+          "expected": "The API receives budget_risk_threshold = 15.0. A success toast appears ('Budget configuration updated successfully.'). The Budget Risk Threshold field retains the value '15'."
+        },
+        {
+          "id": "TC-PSZ-452",
+          "severity": "P0",
+          "scenario": "Entering valid budget variance values for all five tiers and clicking Save saves them all",
+          "steps": "1. Navigate to /projects/sizes/.\n2. Set XS Variance = 0.5, S Variance = 0.5, M Variance = 0.75, L Variance = 1.0, XL Variance = 1.5.\n3. Click 'Save Changes' in the Budget Configuration panel.",
+          "expected": "All five variance values are sent to the API. A success toast appears. The percentage fields retain the entered values after the save completes."
+        },
+        {
+          "id": "TC-PSZ-453",
+          "severity": "P0",
+          "scenario": "Budget Configuration save is fully independent from T-Shirt Configuration save",
+          "steps": "1. Change only the Budget Risk Threshold in the Budget panel.\n2. Click 'Save Changes' in the Budget Configuration panel.\n3. Navigate back to the page and observe the T-Shirt fields.",
+          "expected": "Only budget configuration values are updated. The T-shirt threshold values (XS, S, M, L max amounts) are unchanged. The T-Shirt Configuration panel is not affected by using the Budget panel's Save button."
+        },
+        {
+          "id": "TC-PSZ-454",
+          "severity": "P1",
+          "scenario": "Budget Save Changes button shows 'Saving…' and is disabled during the API request",
+          "steps": "1. Enter valid budget config values.\n2. Click the 'Save Changes' button in the Budget Configuration panel on a slow connection.\n3. Observe the button state before the response arrives.",
+          "expected": "The 'Save Changes' button in the Budget panel changes label to 'Saving…' and is disabled while the request is pending. The T-Shirt panel's Save button is unaffected."
+        },
+        {
+          "id": "TC-PSZ-455",
+          "severity": "P0",
+          "scenario": "Success toast displays 'Budget configuration updated successfully.' after a budget save",
+          "steps": "1. Enter valid values in the Budget Configuration panel.\n2. Click 'Save Changes'.",
+          "expected": "A green success toast with the message 'Budget configuration updated successfully.' appears near the top of the screen and auto-dismisses."
+        },
+        {
+          "id": "TC-PSZ-456",
+          "severity": "P1",
+          "scenario": "Budget Save Changes button is restored to its default state after a successful save",
+          "steps": "1. Enter valid budget config values and click Save Changes in the Budget panel.\n2. Wait for the success response.",
+          "expected": "After the success toast appears, the 'Save Changes' button in the Budget Configuration panel is restored to its original label and enabled state."
+        },
+        {
+          "id": "TC-PSZ-457",
+          "severity": "P1",
+          "scenario": "Budget Save Changes button is restored and user can retry after a server-side error",
+          "steps": "1. Simulate an API error (e.g. block the request in dev tools).\n2. Click Save Changes in the Budget Configuration panel.\n3. Observe the button after the error response.",
+          "expected": "An error toast is shown. The 'Save Changes' button in the Budget panel is re-enabled so the user can attempt to save again."
+        },
+        {
+          "id": "TC-PSZ-458",
+          "severity": "P1",
+          "scenario": "Saved budget configuration values persist after a full page refresh",
+          "steps": "1. Update and save Budget Risk Threshold = 12.5 and all variance values.\n2. Refresh the browser page.\n3. Observe the Budget Configuration panel fields.",
+          "expected": "All budget fields (risk threshold and five variance fields) show the values that were saved before the refresh. No values revert to defaults."
+        },
+        {
+          "id": "TC-PSZ-459",
+          "severity": "P2",
+          "scenario": "Hint text below Budget Risk Threshold explains the GREEN / AMBER / RED classification",
+          "steps": "1. Navigate to /projects/sizes/.\n2. Observe the text below the Budget Risk Threshold percentage field.",
+          "expected": "A hint text is visible below the field (with a small gap above it) reading: 'Percentage band for risk classification. Above +threshold = GREEN, within ±threshold = AMBER, below −threshold = RED.' The hint is readable in both light and dark mode."
         }
       ]
     },
@@ -209,56 +327,56 @@
         {
           "id": "TC-PSZ-501",
           "severity": "P0",
-          "scenario": "Leaving any of the four required fields empty and clicking Save shows a validation error",
-          "steps": "1. Clear the M Max field so it is empty.\n2. Click 'Save Changes'.",
+          "scenario": "Leaving any required T-shirt field empty and clicking Save shows a validation error",
+          "steps": "1. Clear the M Max field so it is empty.\n2. Click 'Save Changes' in the T-Shirt Configuration panel.",
           "expected": "The M Max field shows an inline validation error indicating the field is required. The API is not called. No changes are saved."
         },
         {
           "id": "TC-PSZ-502",
           "severity": "P0",
           "scenario": "Setting XS ≥ S and clicking Save shows an error toast before the API call",
-          "steps": "1. Set XS Max = 60000 and S Max = 50000.\n2. Click 'Save Changes'.",
+          "steps": "1. Set XS Max = 60000 and S Max = 50000.\n2. Click 'Save Changes' in the T-Shirt panel.",
           "expected": "An error toast appears: 'Amounts must be in ascending order: XS < S < M < L.' The API is not called. No values are saved."
         },
         {
           "id": "TC-PSZ-503",
           "severity": "P0",
           "scenario": "Setting S ≥ M and clicking Save shows an error toast before the API call",
-          "steps": "1. Set S Max = 200000 and M Max = 150000.\n2. Click 'Save Changes'.",
+          "steps": "1. Set S Max = 200000 and M Max = 150000.\n2. Click 'Save Changes' in the T-Shirt panel.",
           "expected": "An error toast appears: 'Amounts must be in ascending order: XS < S < M < L.' The API is not called."
         },
         {
           "id": "TC-PSZ-504",
           "severity": "P0",
           "scenario": "Setting M ≥ L and clicking Save shows an error toast before the API call",
-          "steps": "1. Set M Max = 500000 and L Max = 400000.\n2. Click 'Save Changes'.",
+          "steps": "1. Set M Max = 500000 and L Max = 400000.\n2. Click 'Save Changes' in the T-Shirt panel.",
           "expected": "An error toast appears: 'Amounts must be in ascending order: XS < S < M < L.' The API is not called."
         },
         {
           "id": "TC-PSZ-505",
           "severity": "P1",
-          "scenario": "Setting equal values across adjacent tiers is rejected",
-          "steps": "1. Set XS Max = 50000 and S Max = 50000 (equal values).\n2. Click 'Save Changes'.",
+          "scenario": "Setting equal values across adjacent T-shirt tiers is rejected",
+          "steps": "1. Set XS Max = 50000 and S Max = 50000 (equal values).\n2. Click 'Save Changes' in the T-Shirt panel.",
           "expected": "An error is shown indicating the values must be strictly increasing. Equal values across tiers are not accepted."
         },
         {
           "id": "TC-PSZ-506",
           "severity": "P1",
-          "scenario": "Entering zero in any field is rejected on save",
-          "steps": "1. Change the XS Max field to 0.\n2. Click 'Save Changes'.",
+          "scenario": "Entering zero in any T-shirt field is rejected on save",
+          "steps": "1. Change the XS Max field to 0.\n2. Click 'Save Changes' in the T-Shirt panel.",
           "expected": "A validation error is shown on the XS Max field. The form is not submitted. All amounts must be at least 1."
         },
         {
           "id": "TC-PSZ-507",
           "severity": "P1",
-          "scenario": "Entering a negative value in any field is rejected on save",
-          "steps": "1. Change the L Max field to -1.\n2. Click 'Save Changes'.",
+          "scenario": "Entering a negative value in any T-shirt field is rejected on save",
+          "steps": "1. Change the L Max field to -1.\n2. Click 'Save Changes' in the T-Shirt panel.",
           "expected": "A validation error is shown. The form is not submitted. Negative amounts are not allowed."
         },
         {
           "id": "TC-PSZ-508",
           "severity": "P2",
-          "scenario": "Entering non-numeric text in a number field is rejected by the field component",
+          "scenario": "Entering non-numeric text in a T-shirt number field is rejected by the field component",
           "steps": "1. Attempt to type 'abc' in the S Max number input field.",
           "expected": "The number field does not accept non-numeric characters. The value remains empty or unchanged."
         },
@@ -272,9 +390,65 @@
         {
           "id": "TC-PSZ-510",
           "severity": "P2",
-          "scenario": "Validation errors are cleared when the user corrects the invalid fields and saves",
-          "steps": "1. Enter out-of-order values and trigger a validation error toast.\n2. Correct the values so they are in ascending order.\n3. Click Save again.",
+          "scenario": "T-shirt validation errors are cleared when the user corrects the invalid fields and saves again",
+          "steps": "1. Enter out-of-order values and trigger a validation error toast.\n2. Correct the values so they are in ascending order.\n3. Click Save Changes in the T-Shirt panel again.",
           "expected": "The error toast no longer appears. The valid values are submitted and saved successfully."
+        },
+        {
+          "id": "TC-PSZ-511",
+          "severity": "P0",
+          "scenario": "Leaving Budget Risk Threshold empty and clicking Save in the Budget panel shows a validation error",
+          "steps": "1. Clear the Budget Risk Threshold field completely.\n2. Click 'Save Changes' in the Budget Configuration panel.",
+          "expected": "An inline validation error is shown on the Budget Risk Threshold field indicating it is required. The API is not called. No budget values are saved."
+        },
+        {
+          "id": "TC-PSZ-512",
+          "severity": "P1",
+          "scenario": "Entering a negative Budget Risk Threshold is rejected on save",
+          "steps": "1. Enter -5 in the Budget Risk Threshold field.\n2. Click 'Save Changes' in the Budget Configuration panel.",
+          "expected": "A validation error is shown on the Budget Risk Threshold field. The form is not submitted. The threshold must be 0 or greater."
+        },
+        {
+          "id": "TC-PSZ-513",
+          "severity": "P0",
+          "scenario": "Leaving any Budget Variance field empty and clicking Save shows a validation error",
+          "steps": "1. Clear the M Budget Variance field completely.\n2. Click 'Save Changes' in the Budget Configuration panel.",
+          "expected": "An inline validation error is shown on the M Budget Variance field. The API is not called."
+        },
+        {
+          "id": "TC-PSZ-514",
+          "severity": "P1",
+          "scenario": "Entering a negative value in any Budget Variance field is rejected on save",
+          "steps": "1. Enter -0.5 in the XL Budget Variance field.\n2. Click 'Save Changes' in the Budget Configuration panel.",
+          "expected": "A validation error is shown on the XL Budget Variance field. The form is not submitted. Variance values must be 0 or greater."
+        },
+        {
+          "id": "TC-PSZ-515",
+          "severity": "P2",
+          "scenario": "Entering zero (0%) as a Budget Variance value is accepted as valid",
+          "steps": "1. Set all five Budget Variance fields to 0.\n2. Click 'Save Changes' in the Budget Configuration panel.",
+          "expected": "The values are accepted and saved without error. Zero variance means no tolerance — budgets must be exactly on target to show as GREEN."
+        },
+        {
+          "id": "TC-PSZ-516",
+          "severity": "P2",
+          "scenario": "Non-numeric input is rejected by the percentage field component in the Budget panel",
+          "steps": "1. Attempt to type 'xyz' in the Budget Risk Threshold percentage field.",
+          "expected": "The percentage field does not accept non-numeric characters. The field value remains empty or unchanged."
+        },
+        {
+          "id": "TC-PSZ-517",
+          "severity": "P2",
+          "scenario": "Backend rejects a negative budget_risk_threshold via API with HTTP 400",
+          "steps": "1. Send a PATCH request to /api/v1/projects/sizes/ with budget_risk_threshold = -1.0.",
+          "expected": "The API returns HTTP 400 Bad Request. The budget_risk_threshold field error indicates the value must be 0 or greater. No configuration is updated."
+        },
+        {
+          "id": "TC-PSZ-518",
+          "severity": "P2",
+          "scenario": "A budget-only PATCH payload (no T-shirt fields) is accepted and saves successfully",
+          "steps": "1. Send a PATCH request to /api/v1/projects/sizes/ containing only budget_risk_threshold and variance fields, with no xs_max_amount, s_max_amount, m_max_amount, or l_max_amount.",
+          "expected": "The API returns HTTP 200. Only the budget configuration fields are updated. The T-shirt threshold values remain unchanged in the response."
         }
       ]
     },
@@ -285,58 +459,58 @@
         {
           "id": "TC-PSZ-601",
           "severity": "P2",
-          "scenario": "Project Sizes page loads and renders within an acceptable time",
-          "steps": "1. Navigate to /projects/sizes/ on a stable network connection.\n2. Measure the time from navigation start to all tier card values visible.",
-          "expected": "The page fully renders with all five tier cards and populated input values within 2 seconds."
+          "scenario": "Project Sizes page loads and renders both panels within an acceptable time",
+          "steps": "1. Navigate to /projects/sizes/ on a stable network connection.\n2. Measure the time from navigation start to all tier card values and budget fields being visible.",
+          "expected": "Both panels fully render with all tier cards and budget fields populated within 2 seconds."
         },
         {
           "id": "TC-PSZ-602",
           "severity": "P2",
-          "scenario": "Values are populated in the input fields promptly after page load",
-          "steps": "1. Open /projects/sizes/.\n2. Observe whether input fields show values or remain blank during load.",
-          "expected": "The input fields populate with the current configuration values within 1 second of the page load. Fields do not remain blank for a noticeable period."
+          "scenario": "Values are populated in all input fields promptly after page load",
+          "steps": "1. Open /projects/sizes/.\n2. Observe whether T-shirt number fields and budget percentage fields show values or remain blank during load.",
+          "expected": "All editable fields (T-shirt max amounts and budget percentages) populate with current values within 1 second. No field remains visibly blank for a noticeable period."
         },
         {
           "id": "TC-PSZ-603",
           "severity": "P2",
-          "scenario": "On mobile viewport (≤767px) the tier cards stack into a single-column layout",
-          "steps": "1. Open /projects/sizes/ on a mobile device or in a browser emulator set to ≤767px width.",
-          "expected": "All five tier cards stack vertically in a single column. No card is clipped or overlaps another. All inputs, range hints, and badge labels remain readable."
+          "scenario": "On mobile viewport (≤767px) both panels and all tier cards stack into a single-column layout",
+          "steps": "1. Open /projects/sizes/ on a mobile device or browser emulator set to ≤767px width.",
+          "expected": "All T-shirt tier cards stack vertically in a single column in the first panel. All budget variance tier cards stack vertically in a single column in the second panel. No card is clipped or overlaps another. The Budget Risk Threshold field and hint text are readable above the variance cards."
         },
         {
           "id": "TC-PSZ-604",
           "severity": "P2",
-          "scenario": "On tablet viewport (768px–1024px) the tier cards display in a 2-column grid",
+          "scenario": "On tablet viewport (768px–1024px) tier cards in both panels display in a 2-column grid",
           "steps": "1. Open /projects/sizes/ at a viewport width of approximately 900px.",
-          "expected": "Tier cards arrange into two columns per row. All content within each card is fully visible. The Save button is reachable by scrolling."
+          "expected": "Tier cards in both the T-Shirt and Budget panels arrange into two columns per row. Content within each card is fully visible. Both Save buttons are reachable by scrolling."
         },
         {
           "id": "TC-PSZ-605",
           "severity": "P2",
-          "scenario": "On desktop viewport (≥1200px) all five tier cards appear side-by-side in a single row",
+          "scenario": "On desktop viewport (≥1200px) all tier cards in both panels appear side-by-side in a single row",
           "steps": "1. Open /projects/sizes/ on a desktop browser at full width.",
-          "expected": "All five tier cards (XS, S, M, L, XL) are displayed side-by-side in one row. No wrapping occurs. All cards are equal height."
+          "expected": "All five T-shirt tier cards appear side-by-side in one row in the first panel. All five budget variance tier cards appear side-by-side in one row in the second panel. No wrapping occurs in either panel."
         },
         {
           "id": "TC-PSZ-606",
           "severity": "P2",
-          "scenario": "All interactive elements are keyboard-navigable",
-          "steps": "1. Navigate to /projects/sizes/ and use Tab to move through the focusable elements.\n2. Tab into each Max Amount field and use keyboard input to change the value.\n3. Tab to the Save Changes button and press Enter.",
-          "expected": "Tab focus moves through all four editable fields and the Save button in a logical order. Each element shows a visible focus ring. The Save action is triggered by pressing Enter on the button."
+          "scenario": "All interactive elements across both panels are keyboard-navigable",
+          "steps": "1. Navigate to /projects/sizes/ and use Tab to move through all focusable elements.\n2. Tab through the four T-shirt Max Amount fields, the T-Shirt Save button, the Budget Risk Threshold field, all five budget variance fields, and the Budget Save button.\n3. Trigger each Save using Enter or Space.",
+          "expected": "Tab focus moves through all fields and both Save buttons in a logical top-to-bottom, left-to-right order. Each element shows a visible focus ring. Both Save actions can be triggered by keyboard."
         },
         {
           "id": "TC-PSZ-607",
           "severity": "P2",
-          "scenario": "Page renders correctly in dark mode without readability issues",
+          "scenario": "Both panels render correctly in dark mode without readability issues",
           "steps": "1. Toggle the application to dark mode using the theme toggle.\n2. Navigate to /projects/sizes/.",
-          "expected": "All tier cards, badges, input fields, range hints, and the Save button render correctly in dark mode. Text is readable. No invisible elements or harsh contrast issues."
+          "expected": "Both panels, all tier cards, badges, input fields, percentage fields, range hints, hint text, and Save buttons render correctly in dark mode. All text is readable with no invisible elements or harsh contrast."
         },
         {
           "id": "TC-PSZ-608",
           "severity": "P3",
           "scenario": "Size badge colours pass WCAG AA colour contrast requirements",
-          "steps": "1. On /projects/sizes/, inspect the five tier badge elements (XS, S, M, L, XL) using an accessibility checker.\n2. Measure the contrast ratio of badge text against badge background for each.",
-          "expected": "Each badge passes WCAG AA with a contrast ratio of at least 4.5:1 for normal-sized text."
+          "steps": "1. On /projects/sizes/, inspect the five tier badge elements (XS, S, M, L, XL) in both panels using an accessibility checker.\n2. Measure the contrast ratio of badge text against badge background.",
+          "expected": "Each badge in both panels passes WCAG AA with a contrast ratio of at least 4.5:1 for normal-sized text."
         },
         {
           "id": "TC-PSZ-609",
@@ -344,6 +518,27 @@
           "scenario": "Error messages shown to the user do not expose internal implementation details",
           "steps": "1. Trigger a server-side error (e.g. by blocking the API request in dev tools).\n2. Observe the error toast or feedback shown to the user.",
           "expected": "The error message is user-friendly (e.g. 'Failed to save. Please try again.'). No stack trace, field names from the server payload, or internal error codes are visible."
+        },
+        {
+          "id": "TC-PSZ-610",
+          "severity": "P2",
+          "scenario": "Budget Risk Threshold hint field is readable and clearly associated with the percentage field above it",
+          "steps": "1. Navigate to /projects/sizes/ and focus on the Budget Risk Threshold area.\n2. Observe the spacing and visual relationship between the percentage field and the hint text beneath it.",
+          "expected": "The hint text has a visible gap between it and the percentage field (not directly touching). It is visually connected to the field it describes, not to the variance cards below. Font size and colour make it legible without being dominant."
+        },
+        {
+          "id": "TC-PSZ-611",
+          "severity": "P2",
+          "scenario": "The Budget Configuration panel Save Changes button is always accessible without horizontal scrolling",
+          "steps": "1. Open /projects/sizes/ on each of: mobile (≤767px), tablet (~900px), and desktop (≥1200px).\n2. Scroll to the bottom of the Budget Configuration panel.",
+          "expected": "The Save Changes button in the Budget panel is fully visible and tappable/clickable at every viewport width without horizontal scroll."
+        },
+        {
+          "id": "TC-PSZ-612",
+          "severity": "P3",
+          "scenario": "Both section panels maintain equal card heights within each row on wide viewports",
+          "steps": "1. Open /projects/sizes/ at full desktop width.\n2. Observe the five T-shirt cards and the five budget variance cards separately.",
+          "expected": "Within each row, all tier cards have equal height. Cards with a percentage field and a card with the 'Automatically derived from L max' label (XL T-shirt card) do not create noticeable height misalignments."
         }
       ]
     },
@@ -356,13 +551,13 @@
           "severity": "P0",
           "scenario": "Unauthenticated GET request to the sizes API returns 401",
           "steps": "1. Send a GET request to /api/v1/projects/sizes/ without an Authorization header.",
-          "expected": "HTTP 401 Unauthorized is returned. No configuration data is included in the response."
+          "expected": "HTTP 401 Unauthorized is returned. No configuration data — neither T-shirt thresholds nor budget values — is included in the response."
         },
         {
           "id": "TC-PSZ-702",
           "severity": "P0",
           "scenario": "Unauthenticated PATCH request to the sizes API returns 401",
-          "steps": "1. Send a PATCH request to /api/v1/projects/sizes/ with a valid payload but no Authorization header.",
+          "steps": "1. Send a PATCH request to /api/v1/projects/sizes/ with any valid payload but no Authorization header.",
           "expected": "HTTP 401 Unauthorized is returned. No configuration values are updated."
         },
         {
@@ -370,7 +565,7 @@
           "severity": "P1",
           "scenario": "Authenticated user without change_configuration permission receives 403 on PATCH",
           "steps": "1. Log in as a user who does not have 'configurations.change_configuration'.\n2. Send an authenticated PATCH request to /api/v1/projects/sizes/ with valid values.",
-          "expected": "HTTP 403 Forbidden is returned. No configuration values are changed."
+          "expected": "HTTP 403 Forbidden is returned. No configuration values — T-shirt or budget — are changed."
         },
         {
           "id": "TC-PSZ-704",
@@ -382,9 +577,16 @@
         {
           "id": "TC-PSZ-705",
           "severity": "P1",
-          "scenario": "API response does not expose sensitive configuration fields beyond the four size thresholds",
+          "scenario": "API GET response contains the expected T-shirt and budget configuration fields and nothing else sensitive",
           "steps": "1. Authenticate and call GET /api/v1/projects/sizes/.\n2. Inspect the response body.",
-          "expected": "The response contains only xs_max_amount, s_max_amount, m_max_amount, and l_max_amount. No other configuration fields, secrets, or internal metadata are included."
+          "expected": "The response data contains exactly: xs_max_amount, s_max_amount, m_max_amount, l_max_amount, budget_risk_threshold, xs_budget_variance, s_budget_variance, m_budget_variance, l_budget_variance, xl_budget_variance. No secrets, internal IDs, other configuration codes, or stack details are included."
+        },
+        {
+          "id": "TC-PSZ-706",
+          "severity": "P2",
+          "scenario": "Budget configuration values in the API response are plain numeric values with no sensitive information",
+          "steps": "1. Authenticate as an admin and call GET /api/v1/projects/sizes/.\n2. Inspect the budget_risk_threshold and variance fields in the response.",
+          "expected": "All budget fields contain non-negative numeric values. No private keys, tokens, hashes, or encoded strings appear in place of the numeric values."
         }
       ]
     },
@@ -395,58 +597,107 @@
         {
           "id": "TC-PSZ-801",
           "severity": "P0",
-          "scenario": "Updating thresholds on the Project Sizes screen affects the Size badge in the Estimates table",
-          "steps": "1. On the Project Sizes screen, change M Max to 100000 and L Max to 250000.\n2. Save the changes.\n3. Navigate to a project's Estimates tab and find an estimate with a total cost of, for example, £120,000.",
-          "expected": "The estimate's Size badge now reflects the updated tier classification based on the new thresholds. An estimate previously shown as 'M' may now show as 'L' depending on the new boundaries."
+          "scenario": "Updating T-shirt thresholds affects the Size badge shown in the Estimates table",
+          "steps": "1. On the Project Sizes screen, change M Max to 100000 and L Max to 250000.\n2. Save the T-Shirt changes.\n3. Navigate to a project's Estimates tab and find an estimate with a total cost of e.g. £120,000.",
+          "expected": "The estimate's Size badge reflects the updated tier classification based on the new thresholds. An estimate previously shown as 'M' may now show as 'L' depending on the new boundaries."
         },
         {
           "id": "TC-PSZ-802",
           "severity": "P1",
-          "scenario": "Saved configuration persists after a full page refresh",
-          "steps": "1. Update and save new threshold values on /projects/sizes/.\n2. Refresh the browser page.\n3. Observe the input fields.",
+          "scenario": "Saved T-shirt configuration persists after a full page refresh",
+          "steps": "1. Update and save new T-shirt threshold values.\n2. Refresh the browser page.\n3. Observe the T-Shirt input fields.",
           "expected": "The input fields show the values that were saved before the refresh. The configuration is not reset to defaults on reload."
         },
         {
           "id": "TC-PSZ-803",
           "severity": "P1",
           "scenario": "Configuration change by one user is reflected when another user loads the page",
-          "steps": "1. User A updates and saves new thresholds.\n2. User B (logged in on a different browser session) navigates to /projects/sizes/.",
-          "expected": "User B sees the same threshold values that User A just saved. The configuration is shared globally across all users."
+          "steps": "1. User A updates and saves new thresholds (T-shirt or budget).\n2. User B (logged in on a different browser session) navigates to /projects/sizes/.",
+          "expected": "User B sees the same values that User A just saved. Configuration is shared globally across all users."
         },
         {
           "id": "TC-PSZ-804",
           "severity": "P2",
-          "scenario": "Minimum valid values (1, 2, 3, 4) are accepted and saved",
-          "steps": "1. Set XS Max = 1, S Max = 2, M Max = 3, L Max = 4.\n2. Click Save Changes.",
+          "scenario": "Minimum valid T-shirt values (1, 2, 3, 4) are accepted and saved",
+          "steps": "1. Set XS Max = 1, S Max = 2, M Max = 3, L Max = 4.\n2. Click Save Changes in the T-Shirt panel.",
           "expected": "The values are accepted and saved without error. The range hints display the correct ranges for these minimal thresholds."
         },
         {
           "id": "TC-PSZ-805",
           "severity": "P2",
-          "scenario": "Very large threshold values are accepted and displayed correctly",
+          "scenario": "Very large T-shirt threshold values are accepted and displayed correctly",
           "steps": "1. Set L Max to a very large number (e.g. 999999999).\n2. Ensure XS < S < M < L and save.",
           "expected": "The value is accepted and saved. The L range hint and XL derived range display the large numbers formatted as readable currency without overflow."
         },
         {
           "id": "TC-PSZ-806",
-          "severity": "P2",
-          "scenario": "GET endpoint always returns exactly the four threshold fields",
+          "severity": "P1",
+          "scenario": "GET endpoint always returns all ten configuration fields — four T-shirt thresholds and six budget fields",
           "steps": "1. Call GET /api/v1/projects/sizes/ as an authenticated user.",
-          "expected": "The response data object contains exactly four fields: xs_max_amount, s_max_amount, m_max_amount, l_max_amount. No fields are missing from the response even if they have not been explicitly configured."
+          "expected": "The response data object contains all ten fields: xs_max_amount, s_max_amount, m_max_amount, l_max_amount, budget_risk_threshold, xs_budget_variance, s_budget_variance, m_budget_variance, l_budget_variance, xl_budget_variance. No field is missing, even on a fresh instance."
         },
         {
           "id": "TC-PSZ-807",
           "severity": "P2",
-          "scenario": "Range hints show '—' when a field is cleared during editing before Save",
+          "scenario": "T-shirt range hints show '—' when a field is cleared during editing before Save",
           "steps": "1. Navigate to /projects/sizes/.\n2. Clear the S Max input field completely (leaving it blank).",
           "expected": "The S range hint and the M range hint both update to show '—' because the boundary value is undefined. The XL range and XS range retain their valid hints."
         },
         {
           "id": "TC-PSZ-808",
           "severity": "P3",
-          "scenario": "Rapidly changing a field value updates the range hint in real time without lag",
+          "scenario": "Rapidly changing a T-shirt field value updates the range hint in real time without lag",
           "steps": "1. Navigate to /projects/sizes/.\n2. Click into the M Max field and quickly type several different values in sequence.",
           "expected": "The M range hint and the adjacent L range hint update in real time after each keystroke with no perceptible lag or stale values shown."
+        },
+        {
+          "id": "TC-PSZ-809",
+          "severity": "P1",
+          "scenario": "Updating the Budget Risk Threshold affects the risk colour shown on Project Budget records",
+          "steps": "1. Set Budget Risk Threshold to 5% and save.\n2. Navigate to a project with an existing budget record where remaining budget is near the threshold boundary.\n3. Observe the risk badge colour on that budget record.",
+          "expected": "The risk badge colour (GREEN, AMBER, or RED) on the project budget record reflects the updated threshold. A budget that was previously AMBER may shift to GREEN or RED depending on how the threshold changed."
+        },
+        {
+          "id": "TC-PSZ-810",
+          "severity": "P1",
+          "scenario": "Updating a per-size Budget Variance affects the on-budget accuracy status for estimates of that size",
+          "steps": "1. Set M Budget Variance to 2.0% and save.\n2. Navigate to a project with an M-sized estimate where the estimate cost is within 2% of the allocated budget.\n3. Observe the budget status for that estimate.",
+          "expected": "The budget status reflects the updated variance threshold for M-sized projects. Estimates within 2% of their budget should now be treated as within tolerance."
+        },
+        {
+          "id": "TC-PSZ-811",
+          "severity": "P2",
+          "scenario": "Budget config changes by one user are immediately reflected for all other users on next page load",
+          "steps": "1. User A updates and saves the Budget Risk Threshold to 20%.\n2. User B navigates to /projects/sizes/ in a separate browser session.",
+          "expected": "User B sees Budget Risk Threshold = 20% in the Budget Configuration panel. The change is globally visible without requiring a server restart."
+        },
+        {
+          "id": "TC-PSZ-812",
+          "severity": "P2",
+          "scenario": "Very small budget variance value (e.g. 0.01%) is accepted and saved",
+          "steps": "1. Set the XS Budget Variance to 0.01.\n2. Click Save Changes in the Budget Configuration panel.",
+          "expected": "The value 0.01% is accepted and saved without error. The field retains the value after save."
+        },
+        {
+          "id": "TC-PSZ-813",
+          "severity": "P2",
+          "scenario": "Budget Risk Threshold of 0% is accepted and saved",
+          "steps": "1. Set Budget Risk Threshold to 0.\n2. Click Save Changes in the Budget Configuration panel.",
+          "expected": "The value 0% is accepted and saved. A threshold of 0% means the GREEN zone collapses — any deviation immediately classifies as AMBER or RED."
+        },
+        {
+          "id": "TC-PSZ-814",
+          "severity": "P1",
+          "scenario": "T-shirt and budget configurations can be saved independently in either order without interference",
+          "steps": "1. Update a T-shirt threshold (e.g. XS Max) and click Save Changes in the T-Shirt panel.\n2. Then update a budget variance (e.g. M Variance) and click Save Changes in the Budget panel.\n3. Reload the page and observe both panels.",
+          "expected": "Both changes are persisted independently. The T-shirt threshold retains its updated value and the budget variance retains its updated value. Neither save operation overwrites the other."
+        },
+        {
+          "id": "TC-PSZ-815",
+          "severity": "P3",
+          "scenario": "Very large budget risk threshold value (e.g. 999%) is accepted by the API without error",
+          "steps": "1. Send a PATCH request to /api/v1/projects/sizes/ with budget_risk_threshold = 999.0.",
+          "expected": "The API returns HTTP 200. The value is saved. The GET endpoint returns 999.0 for budget_risk_threshold. No overflow or formatting error occurs."
         }
       ]
     }

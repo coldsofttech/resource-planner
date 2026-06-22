@@ -54,6 +54,7 @@ urlpatterns = [
     path("", include("apps.projects.urls")),
     path("", include("apps.business_units.urls")),
     path("", include("apps.tags.urls")),
+    path("", include("apps.recharges.urls")),
     path("", include("apps.how_to.urls")),
     path("api/v1/", include("apps.setup.api_urls")),
     path("api/v1/", include("apps.meta.api_urls")),
@@ -74,4 +75,5 @@ urlpatterns = [
     path("api/v1/", include("apps.projects.api_urls")),
     path("api/v1/", include("apps.business_units.api_urls")),
     path("api/v1/", include("apps.tags.api_urls")),
+    path("api/v1/", include("apps.recharges.api_urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

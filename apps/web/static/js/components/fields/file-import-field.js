@@ -61,6 +61,7 @@ class FileImportField extends BaseField {
       "accept",
       "max-size",
       "multiple",
+      "simple-view",
       "icon",
       "drop-label",
       "browse-label",
@@ -129,9 +130,35 @@ class FileImportField extends BaseField {
   _buildHTML() {
     const acceptAttr = this._accept ? ` accept="${this._esc(this._accept)}"` : "";
     const multipleAttr = this._multiple ? " multiple" : "";
-    const subText = this._subText
-      ? `<div class="rp-mono mt-2" style="font-size:11px;color:var(--rp-text-subtle)">${this._esc(this._subText)}</div>`
-      : "";
+    const isSimple = this.hasAttribute("simple-view");
+
+    const dropZoneHTML = isSimple
+      ? `<div
+            class="rp-drop"
+            data-drop-zone
+            role="button"
+            tabindex="0"
+            aria-label="${this._esc(this._dropLabel)}"
+            style="flex-direction:row;padding:0.45rem 0.75rem;gap:0.5rem;min-height:0;justify-content:flex-start;align-items:center;border-style:dashed;"
+          >
+            <i class="bi ${this._esc(this._icon)}" aria-hidden="true" style="font-size:1rem;flex-shrink:0;opacity:0.6;"></i>
+            <span style="font-size:0.875rem;color:var(--rp-text-subtle);">
+              <a class="rp-link" href="#" data-browse-link>${this._esc(this._browseLabel)}</a>
+              <span>&nbsp;or drag &amp; drop</span>
+            </span>
+          </div>`
+      : `<div
+            class="rp-drop"
+            data-drop-zone
+            role="button"
+            tabindex="0"
+            aria-label="${this._esc(this._dropLabel)}"
+          >
+            <i class="bi ${this._esc(this._icon)}" aria-hidden="true"></i>
+            <div style="font-weight:600;color:var(--rp-text)">${this._esc(this._dropLabel)}</div>
+            <div>or <a class="rp-link" href="#" data-browse-link>${this._esc(this._browseLabel)}</a></div>
+            ${this._subText ? `<div class="rp-mono mt-2" style="font-size:11px;color:var(--rp-text-subtle)">${this._esc(this._subText)}</div>` : ""}
+          </div>`;
 
     return `
       <div class="rp-field">
@@ -145,19 +172,8 @@ class FileImportField extends BaseField {
           aria-hidden="true"
           ${acceptAttr}${multipleAttr}
         />
-        <div
-          class="rp-drop"
-          data-drop-zone
-          role="button"
-          tabindex="0"
-          aria-label="${this._esc(this._dropLabel)}"
-        >
-          <i class="bi ${this._esc(this._icon)}" aria-hidden="true"></i>
-          <div style="font-weight:600;color:var(--rp-text)">${this._esc(this._dropLabel)}</div>
-          <div>or <a class="rp-link" href="#" data-browse-link>${this._esc(this._browseLabel)}</a></div>
-          ${subText}
-        </div>
-        <div class="d-flex flex-wrap gap-2 mt-3" data-file-tags hidden></div>
+        ${dropZoneHTML}
+        <div class="d-flex flex-wrap gap-2 mt-2" data-file-tags hidden></div>
         ${this._errorHTML()}
         ${this._hintHTML()}
       </div>
@@ -243,7 +259,12 @@ class FileImportField extends BaseField {
       .split(",")
       .map((s) => s.trim().toLowerCase())
       .some(
-        (p) => p === ext || p === mime || (p.endsWith("/*") && mime.startsWith(p.slice(0, -1))),
+        (p) =>
+          p === "*" ||
+          p === "*/*" ||
+          p === ext ||
+          p === mime ||
+          (p.endsWith("/*") && mime.startsWith(p.slice(0, -1))),
       );
   }
 

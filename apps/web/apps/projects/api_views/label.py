@@ -139,3 +139,16 @@ class ProjectLabelViewSet(BaseViewSet):
             data={"label": suggested},
             message="Label suggestion generated.",
         )
+
+    @extend_schema(
+        summary="List all project labels across all projects",
+        responses={200: OpenApiResponse(description="Global label options.")},
+    )
+    def options_global(self, request: Request):
+        """GET /projects/labels/options/"""
+        from apps.projects.selectors.label import get_all_labels_as_options
+
+        return self.response(
+            data=get_all_labels_as_options(),
+            message="Label options retrieved successfully.",
+        )

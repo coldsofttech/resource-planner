@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Recharge Types
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/recharge-types.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Recharges / Configurations
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Recharge Types
+{% endblock page_title %}
+{% block page_sub %}
+  Manage recharge types used to classify cost recharges across projects.
+{% endblock page_sub %}
+{% block page_actions %}
+  <secondary-button id="rp-recharge-types-import-btn" label="Import" prefix-icon="bi-upload" hidden></secondary-button>
+  <secondary-button id="rp-recharge-types-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+  <primary-button id="rp-recharge-types-add-btn" label="Add Recharge Type" prefix-icon="bi-plus-lg" hidden></primary-button>
+{% endblock page_actions %}
+{% block content %}
+  <list-view show-active-filters>
+  <filter-panel id="rp-recharge-types-filter-panel">
+  <search-field id="rp-recharge-types-search" name="search" placeholder="Search recharge types..." shortcut="/" show-label></search-field>
+  <is-active-field id="rp-recharge-types-status" name="is_active" value="true" show-label></is-active-field>
+  </filter-panel>
+  <data-table id="rp-recharge-types-table" url="/api/v1/recharges/types/" paginated page-size="25" row-template="renderRechargeTypesRow" empty-message="No recharge types found.">
+    <table-columns>
+      <table-column label="Recharge Type" key="name" sortable>
+      </table-column>
+      <table-column label="Code" key="code" mono width="160px" hide-mobile>
+      </table-column>
+      <table-column label="Description" key="description" hide-mobile>
+      </table-column>
+      <table-column label="Status" key="is_active">
+      </table-column>
+      <table-column label="Created" key="created_at" hide-mobile sortable>
+      </table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_recharge_type %}
+        <table-action icon="bi-pencil" label="Edit" event="rp:recharge-type:edit">
+        </table-action>
+        <table-action icon="bi-toggle-on" label="Toggle" event="rp:recharge-type:toggle" color-key="is_active">
+        </table-action>
+      {% endif %}
+      {% if can_delete_recharge_type %}
+        <table-action icon="bi-trash" label="Delete" event="rp:recharge-type:delete" danger>
+        </table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </list-view>
+  <!-- Create drawer -->
+  <drawer-modal id="rp-recharge-type-create-drawer" width="900">
+  <drawer-header eyebrow="New record" title="Create recharge type" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-new-recharge-type-name" col="col-12" label="Recharge Type Name" placeholder="e.g. BAU" required maxlength="50" show-counter></text-field>
+    <hint-field col="col-12">Name must be UPPER_SNAKE_CASE (e.g. PROJECT, BAU, HOLIDAY).</hint-field>
+    <text-field id="rp-new-recharge-type-description" col="col-12" cols="3" label="Description" placeholder="Optional description" maxlength="500"></text-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Create recharge type" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <!-- Edit drawer -->
+  <drawer-modal id="rp-recharge-type-edit-drawer" width="900">
+  <drawer-header eyebrow="Edit record" title="Edit recharge type" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-edit-recharge-type-name" col="col-12" label="Recharge Type Name" placeholder="e.g. BAU" required maxlength="50" show-counter></text-field>
+    <hint-field col="col-12">Name must be UPPER_SNAKE_CASE (e.g. PROJECT, BAU, HOLIDAY).</hint-field>
+    <text-field id="rp-edit-recharge-type-description" col="col-12" cols="3" label="Description" placeholder="Optional description" maxlength="500"></text-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+<delete-modal id="rp-recharge-type-delete-modal" action-label="Delete recharge type"></delete-modal>
+  <activate-modal id="rp-recharge-type-activate-modal"></activate-modal>
+  <deactivate-modal id="rp-recharge-type-deactivate-modal"></deactivate-modal>
+  <import-view id="rp-recharge-types-import-view" title="Import Recharge Types" eyebrow="Recharge Types"></import-view>
+  <export-view id="rp-recharge-types-export-view" title="Export Recharge Types" eyebrow="Recharge Types" active-filter-id="rp-recharge-types-filter-panel"></export-view>
+{% endblock content %}

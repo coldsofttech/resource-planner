@@ -39,6 +39,12 @@ urlpatterns = [
         UserMeViewSet.as_view({"post": "upload_avatar"}),
         name="users-me-avatar-upload",
     ),
+    # ── Search (typeahead / mention autocomplete) ─────────────────────────────
+    path(
+        "users/search/",
+        UserMeViewSet.as_view({"get": "search"}),
+        name="users-search",
+    ),
     # ── Options (timezones) ───────────────────────────────────────────────────
     path(
         "users/options/",

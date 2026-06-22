@@ -484,7 +484,7 @@ class ImportMixin:
         },
     )
     @action(detail=False, methods=["get"], url_path="import/specs")
-    def import_specs(self, request):
+    def import_specs(self, request, **kwargs):
         """GET /module/import/specs"""
         svc = self.import_service
         return self.response(
@@ -508,7 +508,7 @@ class ImportMixin:
         responses={200: OpenApiResponse(description="Sample CSV file attachment.")},
     )
     @action(detail=False, methods=["get"], url_path="import/sample")
-    def import_sample(self, request):
+    def import_sample(self, request, **kwargs):
         """GET /module/import/sample/"""
         buffer = io.StringIO()
         writer = csv.writer(buffer)
@@ -589,7 +589,7 @@ class ImportMixin:
         },
     )
     @action(detail=False, methods=["post"], url_path="import")
-    def import_bulk(self, request):
+    def import_bulk(self, request, **kwargs):
         """POST /module/import/"""
         uploaded_file = request.FILES.get("file")
         if not uploaded_file:

@@ -2,7 +2,7 @@ import os
 
 from pycore.crypto import fernet_decrypt
 
-from apps.configurations.converters import get_bool
+from apps.configurations.converters import get_bool, get_float
 from apps.configurations.defaults import CONFIGURATION_DEFAULTS
 from apps.configurations.models import Configuration
 
@@ -189,6 +189,10 @@ class Sprint:
     def get_sprint_point_price() -> int:
         return int(get_config_value("SPRINT_POINT_PRICE"))
 
+    @staticmethod
+    def get_hours_per_day() -> int:
+        return int(get_config_value("HOURS_PER_DAY"))
+
 
 class Project:
     @staticmethod
@@ -206,6 +210,30 @@ class Project:
     @staticmethod
     def get_size_l_max_amount() -> int:
         return int(get_config_value("PROJECT_SIZE_L_MAX_AMOUNT"))
+
+    @staticmethod
+    def get_budget_risk_threshold() -> float:
+        return get_float(get_config_value("PROJECT_BUDGET_RISK_THRESHOLD"), 10.0)
+
+    @staticmethod
+    def get_size_xs_budget_variance() -> float:
+        return get_float(get_config_value("PROJECT_SIZE_XS_BUDGET_VARIANCE"), 0.5)
+
+    @staticmethod
+    def get_size_s_budget_variance() -> float:
+        return get_float(get_config_value("PROJECT_SIZE_S_BUDGET_VARIANCE"), 0.5)
+
+    @staticmethod
+    def get_size_m_budget_variance() -> float:
+        return get_float(get_config_value("PROJECT_SIZE_M_BUDGET_VARIANCE"), 0.5)
+
+    @staticmethod
+    def get_size_l_budget_variance() -> float:
+        return get_float(get_config_value("PROJECT_SIZE_L_BUDGET_VARIANCE"), 1.0)
+
+    @staticmethod
+    def get_size_xl_budget_variance() -> float:
+        return get_float(get_config_value("PROJECT_SIZE_XL_BUDGET_VARIANCE"), 1.0)
 
 
 class AI:

@@ -1,0 +1,973 @@
+{
+  "module": {
+    "slug": "project-budgets",
+    "name": "Project Budgets",
+    "sort_order": 13,
+    "parent": {
+      "slug": "projects",
+      "name": "Projects",
+      "sort_order": 11
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-PBG-100",
+      "name": "Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-PBG-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user is redirected when accessing the project detail page",
+          "steps": "1. Open a project detail URL (e.g. /projects/PROJ-1/) without being logged in.\n2. Attempt to navigate to the Budgets tab.",
+          "expected": "The browser redirects to the login page. The Budgets tab and its data are not accessible."
+        },
+        {
+          "id": "TC-PBG-102",
+          "severity": "P1",
+          "scenario": "User with view permission sees the Budgets tab and table",
+          "steps": "1. Log in as a user with 'projects.view_projectbudget' permission.\n2. Open a project detail page.\n3. Click the Budgets tab.",
+          "expected": "The Budgets tab is visible. The budgets table loads showing columns: Financial Year, Allocated Budget, Refined Budget, Actual Budget, Remaining Budget, Estimate Version. The Lifetime Budget summary section is visible below the table."
+        },
+        {
+          "id": "TC-PBG-103",
+          "severity": "P1",
+          "scenario": "User without view permission does not see the Budgets tab",
+          "steps": "1. Log in as a user without 'projects.view_projectbudget' permission.\n2. Open a project detail page.",
+          "expected": "The Budgets tab is not visible in the project tab list."
+        },
+        {
+          "id": "TC-PBG-104",
+          "severity": "P1",
+          "scenario": "User with add permission sees the Add Budget button",
+          "steps": "1. Log in as a user with 'projects.add_projectbudget' permission.\n2. Open a project detail page.\n3. Click the Budgets tab.",
+          "expected": "An 'Add Budget' button is visible in the Budgets tab header area."
+        },
+        {
+          "id": "TC-PBG-105",
+          "severity": "P1",
+          "scenario": "User without add permission does not see the Add Budget button",
+          "steps": "1. Log in as a user without 'projects.add_projectbudget' permission.\n2. Open a project detail page.\n3. Click the Budgets tab.",
+          "expected": "No 'Add Budget' button is visible. The table is shown in read-only mode."
+        },
+        {
+          "id": "TC-PBG-106",
+          "severity": "P1",
+          "scenario": "User with change permission sees Edit action on budget rows",
+          "steps": "1. Log in as a user with 'projects.change_projectbudget' permission.\n2. Navigate to the Budgets tab on a project that has at least one budget.\n3. Observe the row actions.",
+          "expected": "Each budget row shows an Edit action."
+        },
+        {
+          "id": "TC-PBG-107",
+          "severity": "P1",
+          "scenario": "User without change permission does not see Edit action on budget rows",
+          "steps": "1. Log in as a user without 'projects.change_projectbudget' permission.\n2. Navigate to the Budgets tab on a project with budgets.",
+          "expected": "No Edit action is visible on any budget row. The table is read-only."
+        },
+        {
+          "id": "TC-PBG-108",
+          "severity": "P1",
+          "scenario": "User with delete permission sees Delete action on budget rows",
+          "steps": "1. Log in as a user with 'projects.delete_projectbudget' permission.\n2. Navigate to the Budgets tab on a project with at least one budget.\n3. Observe the row actions.",
+          "expected": "Each budget row shows a Delete action."
+        },
+        {
+          "id": "TC-PBG-109",
+          "severity": "P1",
+          "scenario": "User without delete permission does not see Delete action on budget rows",
+          "steps": "1. Log in as a user without 'projects.delete_projectbudget' permission.\n2. Navigate to the Budgets tab on a project with budgets.",
+          "expected": "No Delete action is visible on any budget row."
+        },
+        {
+          "id": "TC-PBG-110",
+          "severity": "P1",
+          "scenario": "User with export permission sees the Export button",
+          "steps": "1. Log in as a user with 'projects.export_projectbudget' permission.\n2. Navigate to the Budgets tab.",
+          "expected": "An Export button is visible in the tab header area."
+        },
+        {
+          "id": "TC-PBG-111",
+          "severity": "P1",
+          "scenario": "User without export permission does not see the Export button",
+          "steps": "1. Log in as a user without 'projects.export_projectbudget' permission.\n2. Navigate to the Budgets tab.",
+          "expected": "No Export button is visible in the Budgets tab."
+        }
+      ]
+    },
+    {
+      "id": "TC-PBG-200",
+      "name": "Budgets Tab — List & Browse",
+      "test_cases": [
+        {
+          "id": "TC-PBG-201",
+          "severity": "P0",
+          "scenario": "Budgets tab renders the data table with correct column headers",
+          "steps": "1. Log in as a user with view permission.\n2. Open a project detail page.\n3. Click the Budgets tab.",
+          "expected": "The table displays columns: Financial Year, Allocated Budget, Refined Budget, Actual Budget, Remaining Budget, Estimate Version. The table loads without errors."
+        },
+        {
+          "id": "TC-PBG-202",
+          "severity": "P1",
+          "scenario": "Budgets are listed in most-recent financial year first order by default",
+          "steps": "1. Navigate to the Budgets tab on a project that has budgets for multiple financial years.\n2. Observe the row order.",
+          "expected": "The budget with the most recent financial year (latest start date) appears at the top. Older financial years appear below in descending order."
+        },
+        {
+          "id": "TC-PBG-203",
+          "severity": "P1",
+          "scenario": "Financial Year column shows the long FY label (e.g. FY2024-2025)",
+          "steps": "1. Navigate to the Budgets tab on a project with at least one budget.\n2. Observe the Financial Year column.",
+          "expected": "The Financial Year column displays the human-readable FY label (e.g. 'FY2024-2025') rather than a code or date."
+        },
+        {
+          "id": "TC-PBG-204",
+          "severity": "P1",
+          "scenario": "Currency values are formatted correctly in the table",
+          "steps": "1. Create a budget with Allocated Budget = 100000 and Refined Budget = 90000.\n2. Navigate to the Budgets tab.",
+          "expected": "The Allocated Budget and Refined Budget columns display formatted currency values (e.g. £100,000.00 and £90,000.00)."
+        },
+        {
+          "id": "TC-PBG-205",
+          "severity": "P1",
+          "scenario": "Actual Budget and Remaining Budget columns reflect computed values",
+          "steps": "1. Navigate to the Budgets tab on a project that has resource plan actuals linked to a budget.\n2. Observe the Actual Budget and Remaining Budget columns.",
+          "expected": "Actual Budget shows the sum of actual resource plan costs. Remaining Budget shows Allocated Budget minus Actual Budget. Both values are formatted as currency."
+        },
+        {
+          "id": "TC-PBG-206",
+          "severity": "P2",
+          "scenario": "Estimate Version column shows the version label when an estimate is linked",
+          "steps": "1. Create a budget with an estimate version linked.\n2. Navigate to the Budgets tab.",
+          "expected": "The Estimate Version column shows the linked estimate's version label (e.g. 'v1'). If no estimate is linked, the column shows a dash or is empty."
+        },
+        {
+          "id": "TC-PBG-207",
+          "severity": "P1",
+          "scenario": "Empty state is shown when a project has no budgets",
+          "steps": "1. Open a project that has no budgets.\n2. Navigate to the Budgets tab.",
+          "expected": "An empty state message is displayed in the table area, indicating no budgets exist yet. The Lifetime Budget summary section shows zero totals."
+        },
+        {
+          "id": "TC-PBG-208",
+          "severity": "P1",
+          "scenario": "Table automatically refreshes after a create, edit, or delete action",
+          "steps": "1. Navigate to the Budgets tab.\n2. Create a new budget and observe the table.\n3. Edit an existing budget and observe the table.\n4. Delete a budget and observe the table.",
+          "expected": "After each action, the table immediately reflects the updated data without requiring a manual page refresh."
+        },
+        {
+          "id": "TC-PBG-209",
+          "severity": "P2",
+          "scenario": "Lifetime Budget summary section is visible below the budgets table",
+          "steps": "1. Navigate to the Budgets tab on a project with at least one budget.",
+          "expected": "A 'Lifetime Budget' section panel is visible below the budgets table. It displays: Total Allocated, Total Refined, Total Actual, Total Estimate Cost, Total Remaining, and a Risk indicator."
+        },
+        {
+          "id": "TC-PBG-210",
+          "severity": "P2",
+          "scenario": "Clicking a budget row opens the view drawer (if implemented) or does nothing unexpected",
+          "steps": "1. Navigate to the Budgets tab with at least one budget row.\n2. Click on a budget row (not on an action button).",
+          "expected": "Either a view/detail drawer opens showing the budget details, or no unintended navigation occurs. No JavaScript errors appear in the console."
+        }
+      ]
+    },
+    {
+      "id": "TC-PBG-300",
+      "name": "Create Budget",
+      "test_cases": [
+        {
+          "id": "TC-PBG-301",
+          "severity": "P0",
+          "scenario": "Add Budget drawer opens when the button is clicked",
+          "steps": "1. Navigate to the Budgets tab on a project detail page.\n2. Click the 'Add Budget' button.",
+          "expected": "The Add Budget drawer slides in from the right. The Financial Year dropdown, Allocated Budget field, and optional fields (Refined Budget, Estimate Version, Note) are visible. No validation errors are shown."
+        },
+        {
+          "id": "TC-PBG-302",
+          "severity": "P0",
+          "scenario": "New budget is created successfully with required fields only",
+          "steps": "1. Open the Add Budget drawer.\n2. Select a Financial Year from the dropdown.\n3. Enter a valid Allocated Budget (e.g. 100000).\n4. Click the submit button.",
+          "expected": "The drawer closes. A success toast appears ('A new budget has been added.' or similar). The new budget appears in the table with the correct Financial Year label and Allocated Budget value."
+        },
+        {
+          "id": "TC-PBG-303",
+          "severity": "P1",
+          "scenario": "New budget is created with all optional fields filled",
+          "steps": "1. Open the Add Budget drawer.\n2. Select a Financial Year.\n3. Enter Allocated Budget = 100000.\n4. Enter Refined Budget = 90000.\n5. Select an Estimate Version.\n6. Enter a Note ('Initial allocation for FY2025').\n7. Click the submit button.",
+          "expected": "The drawer closes with a success toast. The new budget row appears in the table showing all entered values. The note is saved and visible in the history."
+        },
+        {
+          "id": "TC-PBG-304",
+          "severity": "P1",
+          "scenario": "Financial Year dropdown lists only available financial years",
+          "steps": "1. Open the Add Budget drawer.\n2. Click the Financial Year dropdown.",
+          "expected": "The dropdown lists financial years configured in the system (e.g. FY2024-2025, FY2025-2026). The list is not empty if financial years are configured. Each entry shows the long FY label."
+        },
+        {
+          "id": "TC-PBG-305",
+          "severity": "P0",
+          "scenario": "Creating a budget for a financial year that already has a budget for this project shows a conflict error",
+          "steps": "1. Ensure a budget already exists for this project and FY2024-2025.\n2. Open the Add Budget drawer.\n3. Select FY2024-2025 as the Financial Year.\n4. Enter an Allocated Budget.\n5. Click submit.",
+          "expected": "An error toast or inline error appears indicating a budget for this project and financial year already exists. No duplicate budget is created. The drawer remains open."
+        },
+        {
+          "id": "TC-PBG-306",
+          "severity": "P1",
+          "scenario": "Create drawer resets and closes on successful submission",
+          "steps": "1. Open the Add Budget drawer.\n2. Fill in all fields.\n3. Submit successfully.",
+          "expected": "The drawer closes. All form fields are cleared. The next time the drawer is opened, all fields start empty with no residual data."
+        },
+        {
+          "id": "TC-PBG-307",
+          "severity": "P1",
+          "scenario": "Submit button shows a loading state during budget creation",
+          "steps": "1. Open the Add Budget drawer.\n2. Fill in required fields.\n3. Click the submit button.",
+          "expected": "The submit button shows 'Creating…' and is disabled while the API request is in progress. The button is re-enabled once the response is received."
+        },
+        {
+          "id": "TC-PBG-308",
+          "severity": "P1",
+          "scenario": "Create button remains disabled if required fields are missing",
+          "steps": "1. Open the Add Budget drawer.\n2. Leave Financial Year empty.\n3. Observe the submit button state.",
+          "expected": "The submit button is disabled or triggers validation errors when clicked. No API call is made until required fields are provided."
+        },
+        {
+          "id": "TC-PBG-309",
+          "severity": "P2",
+          "scenario": "Note entered at creation time is recorded in the budget history",
+          "steps": "1. Open the Add Budget drawer.\n2. Enter Financial Year, Allocated Budget, and a Note.\n3. Submit.\n4. Click the History action on the new budget row.",
+          "expected": "The history panel or drawer shows the CREATED action entry with the note text that was entered during creation."
+        },
+        {
+          "id": "TC-PBG-310",
+          "severity": "P2",
+          "scenario": "Cancelling the Add Budget drawer discards all input",
+          "steps": "1. Open the Add Budget drawer.\n2. Fill in Financial Year and Allocated Budget.\n3. Close or cancel the drawer without submitting.",
+          "expected": "The drawer closes. No budget is added to the table. The entered values are not saved."
+        }
+      ]
+    },
+    {
+      "id": "TC-PBG-400",
+      "name": "Edit Budget",
+      "test_cases": [
+        {
+          "id": "TC-PBG-401",
+          "severity": "P0",
+          "scenario": "Edit drawer opens with pre-populated values from the selected budget",
+          "steps": "1. Navigate to the Budgets tab.\n2. Click the Edit action on a budget row.",
+          "expected": "The Edit Budget drawer opens. The Financial Year is shown (read-only or populated), and the Allocated Budget, Refined Budget, Estimate Version, and Note fields are populated with the current values."
+        },
+        {
+          "id": "TC-PBG-402",
+          "severity": "P0",
+          "scenario": "Allocated Budget can be updated and change is reflected in the table",
+          "steps": "1. Open the Edit drawer for a budget.\n2. Change the Allocated Budget to a new value (e.g. 150000).\n3. Submit.",
+          "expected": "The drawer closes with a success toast. The Allocated Budget column in the table shows the updated value."
+        },
+        {
+          "id": "TC-PBG-403",
+          "severity": "P1",
+          "scenario": "Refined Budget can be added during an edit",
+          "steps": "1. Open the Edit drawer for a budget with no Refined Budget set.\n2. Enter a Refined Budget value.\n3. Submit.",
+          "expected": "The drawer closes with a success toast. The Refined Budget column in the table shows the new value."
+        },
+        {
+          "id": "TC-PBG-404",
+          "severity": "P1",
+          "scenario": "Refined Budget can be cleared by removing its value",
+          "steps": "1. Open the Edit drawer for a budget that has a Refined Budget set.\n2. Clear the Refined Budget field.\n3. Submit.",
+          "expected": "The drawer closes with a success toast. The Refined Budget column shows blank or a dash, indicating it has been cleared."
+        },
+        {
+          "id": "TC-PBG-405",
+          "severity": "P1",
+          "scenario": "Estimate Version can be linked during an edit",
+          "steps": "1. Open the Edit drawer for a budget that has no Estimate Version.\n2. Select an Estimate Version from the dropdown.\n3. Submit.",
+          "expected": "The drawer closes with a success toast. The Estimate Version column in the table shows the selected version label."
+        },
+        {
+          "id": "TC-PBG-406",
+          "severity": "P1",
+          "scenario": "Estimate Version can be removed (unlinked) during an edit",
+          "steps": "1. Open the Edit drawer for a budget that has an Estimate Version linked.\n2. Clear the Estimate Version field.\n3. Submit.",
+          "expected": "The drawer closes with a success toast. The Estimate Version column shows blank or a dash."
+        },
+        {
+          "id": "TC-PBG-407",
+          "severity": "P1",
+          "scenario": "Note can be updated during an edit",
+          "steps": "1. Open the Edit drawer for a budget.\n2. Update the Note field to 'Revised Q2 allocation'.\n3. Submit.",
+          "expected": "The drawer closes with a success toast. The updated note is reflected in the budget's history."
+        },
+        {
+          "id": "TC-PBG-408",
+          "severity": "P1",
+          "scenario": "Edit records a history entry for each update",
+          "steps": "1. Click the Edit action on a budget.\n2. Update the Allocated Budget.\n3. Submit.\n4. View the budget's history.",
+          "expected": "A new UPDATED history entry is recorded showing the previous and new Allocated Budget values, the change date, and the user who made the change."
+        },
+        {
+          "id": "TC-PBG-409",
+          "severity": "P1",
+          "scenario": "Cancelling the Edit drawer discards changes",
+          "steps": "1. Open the Edit drawer for a budget.\n2. Change the Allocated Budget.\n3. Close or cancel the drawer without submitting.",
+          "expected": "The drawer closes. The budget table row retains the original Allocated Budget value."
+        },
+        {
+          "id": "TC-PBG-410",
+          "severity": "P1",
+          "scenario": "Submit button shows a loading state while the PATCH request is in-flight",
+          "steps": "1. Open the Edit drawer.\n2. Make a change.\n3. Click submit on a slow connection and observe the button before the response arrives.",
+          "expected": "The submit button is disabled and shows 'Saving…' while the API call is pending. The button is restored once the response is received."
+        },
+        {
+          "id": "TC-PBG-411",
+          "severity": "P2",
+          "scenario": "Financial Year field is not editable in the Edit drawer",
+          "steps": "1. Open the Edit drawer for a budget.\n2. Observe the Financial Year field.",
+          "expected": "The Financial Year field is read-only and cannot be changed. To change a budget's financial year, the budget must be deleted and recreated."
+        }
+      ]
+    },
+    {
+      "id": "TC-PBG-500",
+      "name": "Delete Budget",
+      "test_cases": [
+        {
+          "id": "TC-PBG-501",
+          "severity": "P0",
+          "scenario": "Delete modal opens with correct financial year label when Delete action is triggered",
+          "steps": "1. Navigate to the Budgets tab.\n2. Click the Delete action on a budget row.",
+          "expected": "A delete confirmation modal opens. The modal title or body includes the financial year label of the budget (e.g. 'Delete FY2024-2025 budget?')."
+        },
+        {
+          "id": "TC-PBG-502",
+          "severity": "P0",
+          "scenario": "Delete confirmation requires typing the budget identifier exactly",
+          "steps": "1. Open the delete modal for a budget.\n2. Leave the confirmation input empty.\n3. Attempt to click the delete button.",
+          "expected": "The delete button is disabled until the user types the required confirmation value in the confirmation input."
+        },
+        {
+          "id": "TC-PBG-503",
+          "severity": "P0",
+          "scenario": "Confirming deletion removes the budget from the table",
+          "steps": "1. Open the delete modal for a budget.\n2. Type the required confirmation value.\n3. Click the Delete button.",
+          "expected": "The modal closes. The budget is removed from the table. A success toast appears. The Lifetime Budget summary updates to reflect the removed budget."
+        },
+        {
+          "id": "TC-PBG-504",
+          "severity": "P1",
+          "scenario": "Deleting a budget removes it from the financial year dropdown for this project",
+          "steps": "1. Delete the budget for FY2024-2025 on a project.\n2. Open the Add Budget drawer.\n3. Check the Financial Year dropdown.",
+          "expected": "FY2024-2025 is now available again in the Financial Year dropdown (since the uniqueness constraint is lifted after deletion)."
+        },
+        {
+          "id": "TC-PBG-505",
+          "severity": "P1",
+          "scenario": "Cancelling the delete modal leaves the budget intact",
+          "steps": "1. Click the Delete action on a budget row.\n2. Click Cancel in the confirmation modal without confirming.",
+          "expected": "The modal closes. The budget remains in the table with its data unchanged."
+        },
+        {
+          "id": "TC-PBG-506",
+          "severity": "P1",
+          "scenario": "Deleting a budget does not affect other budgets on the same project",
+          "steps": "1. A project has budgets for FY2024-2025 and FY2025-2026.\n2. Delete the FY2024-2025 budget.",
+          "expected": "Only the FY2024-2025 budget is removed. The FY2025-2026 budget remains in the table unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-PBG-600",
+      "name": "Budget Status History",
+      "test_cases": [
+        {
+          "id": "TC-PBG-601",
+          "severity": "P0",
+          "scenario": "History action on a budget row opens the history panel or drawer",
+          "steps": "1. Navigate to the Budgets tab on a project with at least one budget.\n2. Click the History action on a budget row.",
+          "expected": "A history panel or drawer opens showing the budget's change history. The history is displayed in reverse-chronological order (most recent first)."
+        },
+        {
+          "id": "TC-PBG-602",
+          "severity": "P0",
+          "scenario": "History shows the CREATED entry after initial budget creation",
+          "steps": "1. Create a new budget.\n2. View its history immediately.",
+          "expected": "The history shows one entry: action = CREATED, with the initial Allocated Budget value recorded as the new value, date of creation, and the user who created it."
+        },
+        {
+          "id": "TC-PBG-603",
+          "severity": "P1",
+          "scenario": "History shows an UPDATED entry after each edit",
+          "steps": "1. Edit an existing budget (change the Allocated Budget).\n2. View the budget's history.",
+          "expected": "A new UPDATED history entry appears at the top of the list showing: the previous Allocated Budget value, the new Allocated Budget value, the date of the change, and the user who made the change."
+        },
+        {
+          "id": "TC-PBG-604",
+          "severity": "P1",
+          "scenario": "History shows Estimate Version changes when an estimate is linked or unlinked",
+          "steps": "1. Edit a budget to link an Estimate Version.\n2. View the budget's history.",
+          "expected": "The UPDATED history entry shows the previous Estimate Version (null or previous version) and the new Estimate Version that was linked."
+        },
+        {
+          "id": "TC-PBG-605",
+          "severity": "P1",
+          "scenario": "History shows note changes when the note is updated",
+          "steps": "1. Edit a budget and enter a note.\n2. View the budget's history.",
+          "expected": "The history entry for this update includes the note text, or a dedicated notes field showing what was written."
+        },
+        {
+          "id": "TC-PBG-606",
+          "severity": "P2",
+          "scenario": "History shows date and actor email for each entry",
+          "steps": "1. Make several edits to a budget as different users.\n2. View the history.",
+          "expected": "Each history entry shows the date of the change and the email address (or name) of the user who performed the change."
+        },
+        {
+          "id": "TC-PBG-607",
+          "severity": "P2",
+          "scenario": "Empty state is shown when a budget has no history (edge case)",
+          "steps": "1. Open the history panel for a budget that has no recorded history entries (possible if history was not created).",
+          "expected": "An empty state message is displayed indicating no history is available for this budget."
+        },
+        {
+          "id": "TC-PBG-608",
+          "severity": "P2",
+          "scenario": "History entries show Total Cost changes when an Estimate Version changes",
+          "steps": "1. Link an estimate to a budget and view the history.\n2. Unlink the estimate and view the history.",
+          "expected": "History entries reflect the change in Total Cost (estimate cost) when the Estimate Version changes — showing previous and new total cost values."
+        }
+      ]
+    },
+    {
+      "id": "TC-PBG-700",
+      "name": "Lifetime Budget Summary",
+      "test_cases": [
+        {
+          "id": "TC-PBG-701",
+          "severity": "P0",
+          "scenario": "Lifetime Budget section renders as a card/panel below the budgets table",
+          "steps": "1. Navigate to the Budgets tab on any project.",
+          "expected": "A 'Lifetime Budget' section panel is visible below the budgets table. It is styled as a card/section header, not a table row. The section title reads 'Lifetime Budget'."
+        },
+        {
+          "id": "TC-PBG-702",
+          "severity": "P0",
+          "scenario": "Lifetime Budget section shows zero totals when a project has no budgets",
+          "steps": "1. Navigate to the Budgets tab on a project with no budgets.",
+          "expected": "The Lifetime Budget section shows: Total Allocated = £0.00 (or 0), Total Refined = — (null/none), Total Actual = £0.00, Total Estimate Cost = — (null/none), Total Remaining = — (null/none), Risk = — (null/none)."
+        },
+        {
+          "id": "TC-PBG-703",
+          "severity": "P0",
+          "scenario": "Total Allocated sums all budget allocated values across financial years",
+          "steps": "1. Create two budgets for the same project: FY2024-2025 with £100,000 and FY2025-2026 with £200,000.\n2. Observe the Lifetime Budget section.",
+          "expected": "Total Allocated shows £300,000 (or 300000.00) — the sum of both allocated budgets."
+        },
+        {
+          "id": "TC-PBG-704",
+          "severity": "P1",
+          "scenario": "Total Refined shows null/dash when no budgets have a refined budget set",
+          "steps": "1. Create a budget with only Allocated Budget (no Refined Budget).\n2. Observe the Lifetime Budget section.",
+          "expected": "Total Refined shows a dash, 'N/A', or is blank — indicating no refined budget data."
+        },
+        {
+          "id": "TC-PBG-705",
+          "severity": "P1",
+          "scenario": "Total Refined aggregates all refined budget values when set",
+          "steps": "1. Create two budgets: FY2024-2025 with Refined Budget £90,000 and FY2025-2026 with Refined Budget £180,000.\n2. Observe the Lifetime Budget section.",
+          "expected": "Total Refined shows £270,000 — the sum of both refined budgets."
+        },
+        {
+          "id": "TC-PBG-706",
+          "severity": "P1",
+          "scenario": "Risk indicator shows GREEN when actual costs are well within budget",
+          "steps": "1. Create a budget with a high Allocated Budget and link an estimate with a low Total Cost.\n2. Observe the Risk indicator in the Lifetime Budget section.",
+          "expected": "The Risk indicator shows 'GREEN' (or a green badge/icon) when the total estimate cost is significantly below the total allocated budget."
+        },
+        {
+          "id": "TC-PBG-707",
+          "severity": "P1",
+          "scenario": "Risk indicator shows AMBER when estimate costs are approaching budget",
+          "steps": "1. Create a budget where the linked estimate's total cost is close to (but not exceeding) the allocated budget.\n2. Observe the Risk indicator.",
+          "expected": "The Risk indicator shows 'AMBER' (or an amber/warning badge) when estimate costs are approaching the budget threshold."
+        },
+        {
+          "id": "TC-PBG-708",
+          "severity": "P1",
+          "scenario": "Risk indicator shows RED when estimate costs exceed the budget",
+          "steps": "1. Create a budget where the linked estimate's total cost exceeds the allocated budget.\n2. Observe the Risk indicator.",
+          "expected": "The Risk indicator shows 'RED' (or a red/danger badge) when estimate costs exceed the allocated budget."
+        },
+        {
+          "id": "TC-PBG-709",
+          "severity": "P1",
+          "scenario": "Risk indicator shows null/dash when no estimates are linked to any budget",
+          "steps": "1. Create budgets with no Estimate Version linked.\n2. Observe the Risk indicator in the Lifetime Budget section.",
+          "expected": "The Risk indicator shows a dash, 'N/A', or is blank — as risk cannot be computed without estimate cost data."
+        },
+        {
+          "id": "TC-PBG-710",
+          "severity": "P1",
+          "scenario": "Lifetime Budget section updates immediately after a budget is created or edited",
+          "steps": "1. Note the current totals in the Lifetime Budget section.\n2. Create a new budget (e.g. £50,000).\n3. Observe the Lifetime Budget section.",
+          "expected": "The Total Allocated in the Lifetime Budget section increases by the new budget's allocated amount without requiring a page refresh."
+        },
+        {
+          "id": "TC-PBG-711",
+          "severity": "P1",
+          "scenario": "Lifetime Budget section updates after a budget is deleted",
+          "steps": "1. Note the current Total Allocated in the Lifetime Budget section.\n2. Delete one budget.\n3. Observe the Lifetime Budget section.",
+          "expected": "The Total Allocated decreases by the deleted budget's allocated amount. Other totals also recalculate accordingly."
+        }
+      ]
+    },
+    {
+      "id": "TC-PBG-800",
+      "name": "Export",
+      "test_cases": [
+        {
+          "id": "TC-PBG-801",
+          "severity": "P0",
+          "scenario": "Export specs endpoint returns the list of available export columns",
+          "steps": "1. As an authenticated user with export permission, access the export specs for a project's budgets.\n2. Inspect the response.",
+          "expected": "The response returns HTTP 200 with a 'columns' key containing a list of available export fields including: code, project, financial_year, allocated_budget, refined_budget, actual_budget, estimate_version, remaining_budget, note, created_at, created_by, updated_at, updated_by. Each entry includes a human-readable label and a default flag."
+        },
+        {
+          "id": "TC-PBG-802",
+          "severity": "P0",
+          "scenario": "CSV export downloads a file containing budget data",
+          "steps": "1. With at least one budget existing, click the Export button in the Budgets tab.\n2. Select CSV format.\n3. Confirm the export.",
+          "expected": "A CSV file is downloaded named 'project_budgets_export*.csv'. The file contains a header row and one data row per budget. The file is parseable as valid CSV."
+        },
+        {
+          "id": "TC-PBG-803",
+          "severity": "P1",
+          "scenario": "Default CSV export includes the standard set of columns",
+          "steps": "1. Export budgets as CSV with no custom field selection.",
+          "expected": "The CSV header row includes the default columns: Code, Project, Financial Year, Allocated Budget (£), Refined Budget (£), Actual Budget (£), Estimate Version, Remaining Budget (£), Created On."
+        },
+        {
+          "id": "TC-PBG-804",
+          "severity": "P1",
+          "scenario": "XLSX export downloads a valid spreadsheet",
+          "steps": "1. Click Export and select XLSX format.\n2. Download and open the file.",
+          "expected": "An XLSX file is downloaded. The file opens in a spreadsheet application. The header row has styled formatting. Data rows contain budget records."
+        },
+        {
+          "id": "TC-PBG-805",
+          "severity": "P1",
+          "scenario": "PDF export downloads a valid PDF document",
+          "steps": "1. Click Export and select PDF format.\n2. Download and open the file.",
+          "expected": "A PDF file is downloaded. The file opens in a PDF viewer. It contains the export title 'Project Budgets' and budget data rows."
+        },
+        {
+          "id": "TC-PBG-806",
+          "severity": "P2",
+          "scenario": "JSON export downloads valid JSON containing budget records",
+          "steps": "1. Click Export and select JSON format.\n2. Download and inspect the file.",
+          "expected": "A JSON file is downloaded. The content is valid JSON containing an array of budget objects with field keys matching the selected export fields."
+        },
+        {
+          "id": "TC-PBG-807",
+          "severity": "P2",
+          "scenario": "Export with project filter returns only budgets for that project",
+          "steps": "1. Export budgets with a project_code filter applied.\n2. Inspect the exported file.",
+          "expected": "Only budgets belonging to the specified project appear in the exported file. Budgets from other projects are excluded."
+        },
+        {
+          "id": "TC-PBG-808",
+          "severity": "P1",
+          "scenario": "Unauthenticated user cannot access the export endpoint",
+          "steps": "1. Without logging in, call the export endpoint for a project's budgets directly.",
+          "expected": "The API returns HTTP 401 Unauthorized. No file is returned."
+        },
+        {
+          "id": "TC-PBG-809",
+          "severity": "P1",
+          "scenario": "User without export permission receives 403 when calling the export endpoint",
+          "steps": "1. Log in as a user without 'projects.export_projectbudget' permission.\n2. Attempt to call the export or export specs endpoint directly.",
+          "expected": "The API returns HTTP 403 Forbidden. No data is returned."
+        }
+      ]
+    },
+    {
+      "id": "TC-PBG-900",
+      "name": "Validation",
+      "test_cases": [
+        {
+          "id": "TC-PBG-901",
+          "severity": "P0",
+          "scenario": "Financial Year is required — submitting without it shows a validation error",
+          "steps": "1. Open the Add Budget drawer.\n2. Enter an Allocated Budget.\n3. Leave Financial Year empty (unselected).\n4. Click Submit.",
+          "expected": "A validation error is shown on the Financial Year field. The form is not submitted. No budget is created."
+        },
+        {
+          "id": "TC-PBG-902",
+          "severity": "P0",
+          "scenario": "Allocated Budget is required — submitting without it shows a validation error",
+          "steps": "1. Open the Add Budget drawer.\n2. Select a Financial Year.\n3. Leave Allocated Budget empty.\n4. Click Submit.",
+          "expected": "A validation error is shown on the Allocated Budget field. The form is not submitted. No budget is created."
+        },
+        {
+          "id": "TC-PBG-903",
+          "severity": "P1",
+          "scenario": "Allocated Budget must be a positive numeric value",
+          "steps": "1. Open the Add Budget drawer.\n2. Enter a negative value (e.g. -50000) in the Allocated Budget field.\n3. Select a Financial Year.\n4. Click Submit.",
+          "expected": "A validation error is shown indicating the Allocated Budget must be a positive number. The budget is not created."
+        },
+        {
+          "id": "TC-PBG-904",
+          "severity": "P1",
+          "scenario": "Allocated Budget must be numeric — non-numeric input is rejected",
+          "steps": "1. Open the Add Budget drawer.\n2. Enter 'abc' in the Allocated Budget field.\n3. Click Submit.",
+          "expected": "A validation error is shown. The budget is not created."
+        },
+        {
+          "id": "TC-PBG-905",
+          "severity": "P1",
+          "scenario": "Refined Budget must be a positive numeric value when provided",
+          "steps": "1. Open the Add Budget drawer.\n2. Select a Financial Year and enter Allocated Budget.\n3. Enter a negative value in Refined Budget.\n4. Click Submit.",
+          "expected": "A validation error is shown on the Refined Budget field. The budget is not created."
+        },
+        {
+          "id": "TC-PBG-906",
+          "severity": "P0",
+          "scenario": "Duplicate budget for the same project and financial year is rejected with a 409 error",
+          "steps": "1. Create a budget for Project A and FY2024-2025.\n2. Attempt to create another budget for the same Project A and FY2024-2025 via the API directly.",
+          "expected": "The API returns HTTP 409 Conflict with an error message indicating a budget for this project and financial year already exists. No duplicate budget is created."
+        },
+        {
+          "id": "TC-PBG-907",
+          "severity": "P1",
+          "scenario": "Providing an invalid financial year code in the API returns 404",
+          "steps": "1. Send a POST request to create a budget with a financial_year_code that does not exist.",
+          "expected": "The API returns HTTP 404 Not Found. No budget is created."
+        },
+        {
+          "id": "TC-PBG-908",
+          "severity": "P1",
+          "scenario": "Providing an invalid estimate version code in the API returns 404",
+          "steps": "1. Send a POST request to create a budget with an estimate_version_code that does not exist.",
+          "expected": "The API returns HTTP 404 Not Found. No budget is created."
+        },
+        {
+          "id": "TC-PBG-909",
+          "severity": "P2",
+          "scenario": "Very large Allocated Budget value is accepted and stored correctly",
+          "steps": "1. Enter a very large value (e.g. 999999999) in the Allocated Budget field.\n2. Submit.",
+          "expected": "The budget is created successfully. The value is stored and displayed correctly without overflow."
+        }
+      ]
+    },
+    {
+      "id": "TC-PBG-1000",
+      "name": "Non-Functional — Performance, Accessibility, Responsiveness",
+      "test_cases": [
+        {
+          "id": "TC-PBG-1001",
+          "severity": "P2",
+          "scenario": "Budgets tab loads within an acceptable time on a stable connection",
+          "steps": "1. Navigate to the Budgets tab on a project with up to 20 budget records.\n2. Measure the time from tab click to table data rendered.",
+          "expected": "The table data loads and renders within 2 seconds under normal network conditions."
+        },
+        {
+          "id": "TC-PBG-1002",
+          "severity": "P2",
+          "scenario": "Lifetime Budget summary loads alongside the table without blocking",
+          "steps": "1. Navigate to the Budgets tab.\n2. Observe when the Lifetime Budget section renders.",
+          "expected": "The Lifetime Budget summary section renders within 2 seconds of the tab loading. It does not block the table from displaying."
+        },
+        {
+          "id": "TC-PBG-1003",
+          "severity": "P2",
+          "scenario": "All interactive elements in the Budgets tab are keyboard-navigable",
+          "steps": "1. Navigate to the Budgets tab using only the keyboard (Tab, Enter, Space, Arrow keys).\n2. Try to open the Add Budget drawer, fill in the form, and submit.",
+          "expected": "All buttons, form fields, dropdowns, and the submit button are reachable and operable using the keyboard alone. Focus is visible at all times."
+        },
+        {
+          "id": "TC-PBG-1004",
+          "severity": "P2",
+          "scenario": "Financial Year dropdown is keyboard-accessible",
+          "steps": "1. Open the Add Budget drawer using the keyboard.\n2. Navigate to the Financial Year dropdown using Tab.\n3. Open and select an option using keyboard keys.",
+          "expected": "The Financial Year dropdown can be opened with Enter or Space and navigated with arrow keys. A selection can be confirmed with Enter."
+        },
+        {
+          "id": "TC-PBG-1005",
+          "severity": "P2",
+          "scenario": "Error messages do not expose internal exception or stack trace details",
+          "steps": "1. Trigger an API error (e.g. submit a duplicate budget or an invalid payload).\n2. Observe the error toast or inline error message.",
+          "expected": "The error message is user-friendly (e.g. 'A budget for this financial year already exists.' or 'Failed to save budget. Please try again.'). No stack trace, internal field names, or system details are visible."
+        },
+        {
+          "id": "TC-PBG-1006",
+          "severity": "P2",
+          "scenario": "Budgets tab and drawers are usable in dark mode",
+          "steps": "1. Toggle the application to dark mode using the theme toggle.\n2. Navigate to the Budgets tab.\n3. Open the Add Budget and Edit Budget drawers.",
+          "expected": "All text, badges, table rows, drawers, and the Lifetime Budget section render correctly in dark mode. No unreadable text or invisible UI elements."
+        },
+        {
+          "id": "TC-PBG-1007",
+          "severity": "P3",
+          "scenario": "Risk indicator badges pass WCAG AA colour contrast requirements",
+          "steps": "1. View the Lifetime Budget section with GREEN, AMBER, and RED risk indicators.\n2. Check the contrast ratio of badge text against badge background.",
+          "expected": "Each risk badge's text colour has a contrast ratio of at least 4.5:1 against its background colour, meeting WCAG AA standards."
+        },
+        {
+          "id": "TC-PBG-1008",
+          "severity": "P2",
+          "scenario": "Submit buttons in drawers show busy state and cannot be double-submitted",
+          "steps": "1. Open the Add Budget drawer.\n2. Fill in required fields.\n3. Quickly click the submit button multiple times.",
+          "expected": "Only one API request is made. The button is disabled after the first click, preventing duplicate submissions."
+        }
+      ]
+    },
+    {
+      "id": "TC-PBG-1100",
+      "name": "Desktop",
+      "test_cases": [
+        {
+          "id": "TC-PBG-1101",
+          "severity": "P1",
+          "scenario": "Budgets table is clearly laid out on a desktop viewport",
+          "steps": "1. Open the Budgets tab on a desktop browser (≥1200px wide).\n2. Observe the table columns.",
+          "expected": "All columns (Financial Year, Allocated Budget, Refined Budget, Actual Budget, Remaining Budget, Estimate Version) are clearly visible. Column headers are readable. Row action buttons are accessible and not clipped."
+        },
+        {
+          "id": "TC-PBG-1102",
+          "severity": "P1",
+          "scenario": "Add Budget drawer is fully visible and usable on a desktop browser",
+          "steps": "1. Open the Add Budget drawer on a desktop browser.",
+          "expected": "The drawer slides in from the right. The Financial Year dropdown, Allocated Budget field, Refined Budget field, Estimate Version field, Note field, and submit/cancel buttons are all fully visible without scrolling."
+        },
+        {
+          "id": "TC-PBG-1103",
+          "severity": "P1",
+          "scenario": "Edit Budget drawer is pre-populated and fully usable on a desktop browser",
+          "steps": "1. Click the Edit action on a budget row on a desktop browser.\n2. Observe the edit drawer.",
+          "expected": "The edit drawer opens with current values filled in. All fields and the save button are visible and usable."
+        },
+        {
+          "id": "TC-PBG-1104",
+          "severity": "P1",
+          "scenario": "Lifetime Budget section is clearly visible on a desktop viewport",
+          "steps": "1. Open the Budgets tab on a desktop browser.\n2. Scroll to the Lifetime Budget section.",
+          "expected": "The Lifetime Budget section is clearly visible as a card/panel. All summary fields (Total Allocated, Total Refined, Total Actual, Total Estimate Cost, Total Remaining, Risk) are readable and well-spaced."
+        },
+        {
+          "id": "TC-PBG-1105",
+          "severity": "P2",
+          "scenario": "Delete confirmation modal is centred and fully visible on a desktop browser",
+          "steps": "1. Click the Delete action on a desktop browser.",
+          "expected": "The confirmation modal appears centred on the screen. The budget identifier, confirmation message, confirmation input, and confirm/cancel buttons are all visible without scrolling."
+        },
+        {
+          "id": "TC-PBG-1106",
+          "severity": "P2",
+          "scenario": "Large currency values display without breaking the table layout on desktop",
+          "steps": "1. Create a budget with a very large Allocated Budget (e.g. £999,999,999).\n2. View the Budgets table on a desktop browser.",
+          "expected": "The large currency value is displayed without overflowing into adjacent columns. The column layout remains intact."
+        }
+      ]
+    },
+    {
+      "id": "TC-PBG-1200",
+      "name": "Mobile",
+      "test_cases": [
+        {
+          "id": "TC-PBG-1201",
+          "severity": "P1",
+          "scenario": "Budgets tab is reachable and readable on a mobile device",
+          "steps": "1. Open a project detail page on a mobile device (≤767px).\n2. Tap the Budgets tab.",
+          "expected": "The Budgets tab is visible in the tab bar (possibly in a scrollable tab row). The budgets table renders within the viewport. Columns are accessible by scrolling horizontally."
+        },
+        {
+          "id": "TC-PBG-1202",
+          "severity": "P1",
+          "scenario": "Add Budget button is tappable on mobile",
+          "steps": "1. Open the Budgets tab on a mobile device.\n2. Tap the 'Add Budget' button.",
+          "expected": "The button registers the tap. The Add Budget drawer opens without requiring precise clicking."
+        },
+        {
+          "id": "TC-PBG-1203",
+          "severity": "P2",
+          "scenario": "Add Budget drawer is usable on mobile — fields and submit button are accessible",
+          "steps": "1. Open the Add Budget drawer on a mobile device.\n2. Tap the Financial Year dropdown and select an option.\n3. Tap the Allocated Budget field and enter a value.\n4. Tap the submit button.",
+          "expected": "The drawer fills or covers most of the screen. All fields are tappable and the soft keyboard appears on focus. The submit button is reachable by scrolling if needed."
+        },
+        {
+          "id": "TC-PBG-1204",
+          "severity": "P2",
+          "scenario": "Lifetime Budget section is readable on mobile",
+          "steps": "1. Open the Budgets tab on a mobile device.\n2. Scroll to the Lifetime Budget section.",
+          "expected": "The Lifetime Budget section renders within the mobile viewport. All summary fields are readable. Currency values do not overflow their containers."
+        },
+        {
+          "id": "TC-PBG-1205",
+          "severity": "P2",
+          "scenario": "Row action buttons (Edit, Delete, History) are accessible and tappable on mobile",
+          "steps": "1. Open the Budgets tab on a mobile device with a user who has change permission.\n2. Tap the action menu on a budget row.",
+          "expected": "Edit, Delete, and History actions are accessible via a tap-friendly overflow menu or directly on the row. Each action is large enough to tap without mis-tapping."
+        },
+        {
+          "id": "TC-PBG-1206",
+          "severity": "P3",
+          "scenario": "Delete confirmation modal is readable and dismissible on mobile",
+          "steps": "1. Tap the Delete action on mobile.\n2. Observe the confirmation modal.",
+          "expected": "The modal is fully visible within the mobile viewport. The confirmation input and confirm/cancel buttons are reachable without scrolling or zooming."
+        }
+      ]
+    },
+    {
+      "id": "TC-PBG-1300",
+      "name": "Security",
+      "test_cases": [
+        {
+          "id": "TC-PBG-1301",
+          "severity": "P0",
+          "scenario": "Unauthenticated GET to the budgets list API returns 401",
+          "steps": "1. Send a GET request to /api/v1/projects/{code}/budgets/ without an Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned. No budget data is included in the response."
+        },
+        {
+          "id": "TC-PBG-1302",
+          "severity": "P0",
+          "scenario": "Unauthenticated POST to create a budget returns 401",
+          "steps": "1. Send a POST request to /api/v1/projects/{code}/budgets/ without an Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned. No budget is created."
+        },
+        {
+          "id": "TC-PBG-1303",
+          "severity": "P0",
+          "scenario": "Unauthenticated access to the lifetime budget summary endpoint returns 401",
+          "steps": "1. Send a GET request to /api/v1/projects/{code}/budgets/lifetime/ without an Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned. No summary data is returned."
+        },
+        {
+          "id": "TC-PBG-1304",
+          "severity": "P0",
+          "scenario": "Unauthenticated export endpoint call returns 401",
+          "steps": "1. Send a GET request to the budget export endpoint without an Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned. No file is returned."
+        },
+        {
+          "id": "TC-PBG-1305",
+          "severity": "P1",
+          "scenario": "User without add permission receives 403 when calling the create budget API",
+          "steps": "1. Log in as a user without 'projects.add_projectbudget' permission.\n2. Send an authenticated POST to /api/v1/projects/{code}/budgets/ with a valid payload.",
+          "expected": "HTTP 403 Forbidden is returned. No budget is created."
+        },
+        {
+          "id": "TC-PBG-1306",
+          "severity": "P1",
+          "scenario": "User without change permission receives 403 when calling the update budget API",
+          "steps": "1. Log in as a user without 'projects.change_projectbudget' permission.\n2. Send an authenticated PATCH request to /api/v1/projects/{code}/budgets/{budget_code}/.",
+          "expected": "HTTP 403 Forbidden is returned. The budget is not modified."
+        },
+        {
+          "id": "TC-PBG-1307",
+          "severity": "P1",
+          "scenario": "User without delete permission receives 403 when calling the delete budget API",
+          "steps": "1. Log in as a user without 'projects.delete_projectbudget' permission.\n2. Send an authenticated DELETE request to /api/v1/projects/{code}/budgets/{budget_code}/.",
+          "expected": "HTTP 403 Forbidden is returned. The budget is not deleted."
+        },
+        {
+          "id": "TC-PBG-1308",
+          "severity": "P1",
+          "scenario": "User cannot access budgets from a different project by manipulating the project code in the URL",
+          "steps": "1. Log in as a user who has access to Project A but not Project B.\n2. Replace Project A's code with Project B's code in the budgets API URL.\n3. Attempt to list budgets.",
+          "expected": "The API returns an appropriate error (404 or 403). No budgets from Project B are returned."
+        },
+        {
+          "id": "TC-PBG-1309",
+          "severity": "P1",
+          "scenario": "CSRF token is required for budget mutation requests from the browser",
+          "steps": "1. From a browser, attempt to POST to the budget create endpoint without including a valid X-CSRFToken header.",
+          "expected": "The API rejects the request with 403 Forbidden or equivalent CSRF error. No budget is created."
+        },
+        {
+          "id": "TC-PBG-1310",
+          "severity": "P2",
+          "scenario": "API response does not expose any unexpected internal fields beyond the documented schema",
+          "steps": "1. Authenticate and call GET /api/v1/projects/{code}/budgets/.\n2. Inspect each item in the response.",
+          "expected": "Each item contains only the documented fields (code, project, financial_year, allocated_budget, refined_budget, actual_budget, estimate_version, remaining_budget, risk, note, created_at, created_by, updated_at, updated_by). No internal database IDs or undocumented fields are exposed."
+        }
+      ]
+    },
+    {
+      "id": "TC-PBG-1400",
+      "name": "Edge Cases & Integration",
+      "test_cases": [
+        {
+          "id": "TC-PBG-1401",
+          "severity": "P0",
+          "scenario": "A project can have at most one budget per financial year",
+          "steps": "1. Create a budget for Project A and FY2024-2025.\n2. Attempt to create a second budget for the same project and financial year via the UI.\n3. Observe the result.",
+          "expected": "The second creation attempt is rejected. A conflict error is shown in the UI. The table still shows only one budget for FY2024-2025 on Project A."
+        },
+        {
+          "id": "TC-PBG-1402",
+          "severity": "P1",
+          "scenario": "Two different projects can each have a budget for the same financial year",
+          "steps": "1. Create a budget for Project A and FY2024-2025.\n2. Create a budget for Project B and FY2024-2025.",
+          "expected": "Both budgets are created successfully. The uniqueness constraint applies per project, not globally. Each project shows its own FY2024-2025 budget."
+        },
+        {
+          "id": "TC-PBG-1403",
+          "severity": "P1",
+          "scenario": "Budget history is not accessible after the budget is deleted",
+          "steps": "1. Create a budget and make several edits to accumulate history.\n2. Delete the budget.\n3. Attempt to access the history endpoint for the deleted budget code.",
+          "expected": "The API returns 404 Not Found for the deleted budget code. History entries are no longer accessible."
+        },
+        {
+          "id": "TC-PBG-1404",
+          "severity": "P1",
+          "scenario": "Budgets table data and Lifetime Budget summary remain accurate after a hard browser refresh",
+          "steps": "1. Create and edit several budgets.\n2. Refresh the browser page (F5 / hard reload).\n3. Navigate back to the Budgets tab.",
+          "expected": "All budgets retain their correct values after the page refresh. The Lifetime Budget section shows the same totals as before the refresh."
+        },
+        {
+          "id": "TC-PBG-1405",
+          "severity": "P2",
+          "scenario": "Requesting the lifetime budget for a non-existent project code returns 404",
+          "steps": "1. Send an authenticated GET request to /api/v1/projects/PROJ-DOES-NOT-EXIST/budgets/lifetime/.",
+          "expected": "HTTP 404 Not Found is returned. No summary data is returned."
+        },
+        {
+          "id": "TC-PBG-1406",
+          "severity": "P2",
+          "scenario": "Budget with zero Allocated Budget (£0) can be created and displays correctly",
+          "steps": "1. Open the Add Budget drawer.\n2. Enter 0 in the Allocated Budget field.\n3. Select a Financial Year.\n4. Submit.",
+          "expected": "The budget is created (if the backend allows zero). The Allocated Budget column shows £0.00. The Lifetime Budget section reflects the zero value. If zero is disallowed, a validation error is shown."
+        },
+        {
+          "id": "TC-PBG-1407",
+          "severity": "P2",
+          "scenario": "Note field with special characters (quotes, ampersands, HTML tags) is stored and displayed safely",
+          "steps": "1. Create a budget with a note containing: Research & Dev — \"Phase 1\" <b>test</b>.\n2. View the history for the budget.",
+          "expected": "The note is stored exactly as entered. It is displayed as plain text in the history panel — no HTML executes. Special characters appear correctly without entity encoding visible to the user."
+        },
+        {
+          "id": "TC-PBG-1408",
+          "severity": "P2",
+          "scenario": "Switching away from the Budgets tab and back does not cause duplicate API calls",
+          "steps": "1. Click the Budgets tab — data loads.\n2. Click a different tab (e.g. General).\n3. Click the Budgets tab again.\n4. Observe network requests.",
+          "expected": "The budgets data is re-loaded as expected on the second activation. No duplicate in-flight requests occur. The UI remains consistent."
+        },
+        {
+          "id": "TC-PBG-1409",
+          "severity": "P2",
+          "scenario": "Lifetime Budget Risk updates correctly when an Estimate Version is linked via Edit",
+          "steps": "1. Create a budget with £100,000 Allocated Budget and no Estimate Version.\n2. Note that Risk is shown as null/dash.\n3. Edit the budget and link an Estimate Version with a total cost of £120,000 (exceeding budget).\n4. Observe the Lifetime Budget Risk indicator.",
+          "expected": "After linking the estimate, the Risk indicator changes to RED. The Lifetime Budget section reflects the updated risk without a page refresh."
+        },
+        {
+          "id": "TC-PBG-1410",
+          "severity": "P3",
+          "scenario": "Budget created by one user is visible to all other authenticated users with view permission",
+          "steps": "1. User A creates a budget on a project.\n2. User B (different session) opens the same project's Budgets tab.",
+          "expected": "User B sees the budget created by User A in the table. The created_by field reflects User A."
+        }
+      ]
+    }
+  ]
+}

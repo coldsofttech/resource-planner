@@ -31,6 +31,8 @@ from apps.projects.models import (
     ProjectSubStatus,
     ProjectType,
 )
+from apps.sprints import selectors as sprint_selectors
+from apps.sprints.models import Sprint
 from apps.teams.models import Team
 
 
@@ -80,6 +82,10 @@ class ProjectService(AuditableService, FilterableQueryService):
             else None,
             "efforts_issued": project.efforts_issued,
             "run_cost_applies": project.run_cost_applies,
+            "sprint_started_in_code": project.sprint_started_in_id
+            and project.sprint_started_in.code,
+            "sprint_completed_in_code": project.sprint_completed_in_id
+            and project.sprint_completed_in.code,
         }
 
     def get(self, code: str, *args, **kwargs) -> Project:
@@ -157,6 +163,16 @@ class ProjectService(AuditableService, FilterableQueryService):
                 resource="Team", lookup_field="code", lookup_value=code
             ) from exc
 
+    def _resolve_sprint(self, code: str | None) -> Sprint | None:
+        if not code:
+            return None
+        obj = sprint_selectors.get_sprint_by_code(code)
+        if obj is None:
+            raise NotFoundException(
+                resource="Sprint", lookup_field="code", lookup_value=code
+            )
+        return obj
+
     def _record_status_history(
         self,
         project: Project,
@@ -195,6 +211,8 @@ class ProjectService(AuditableService, FilterableQueryService):
         commitment_date=None,
         efforts_issued: bool = False,
         run_cost_applies: bool = False,
+        sprint_started_in_code: str | None = None,
+        sprint_completed_in_code: str | None = None,
     ) -> Project:
         if selectors.project_name_exists(name):
             raise AlreadyExistsException(
@@ -206,6 +224,8 @@ class ProjectService(AuditableService, FilterableQueryService):
         status = self._resolve_status(status_code)
         sub_status = self._resolve_sub_status(sub_status_code)
         assigned_team = self._resolve_team(assigned_team_code)
+        sprint_started_in = self._resolve_sprint(sprint_started_in_code)
+        sprint_completed_in = self._resolve_sprint(sprint_completed_in_code)
 
         obj = Project.objects.create(
             name=name,
@@ -224,6 +244,8 @@ class ProjectService(AuditableService, FilterableQueryService):
             commitment_date=commitment_date,
             efforts_issued=efforts_issued,
             run_cost_applies=run_cost_applies,
+            sprint_started_in=sprint_started_in,
+            sprint_completed_in=sprint_completed_in,
             created_by=self.user,
             updated_by=self.user,
         )
@@ -304,6 +326,18 @@ class ProjectService(AuditableService, FilterableQueryService):
             if field in kwargs:
                 setattr(obj, field, kwargs[field])
                 update_fields.append(field)
+
+        if "sprint_started_in_code" in kwargs:
+            obj.sprint_started_in = self._resolve_sprint(
+                kwargs["sprint_started_in_code"]
+            )
+            update_fields.append("sprint_started_in")
+
+        if "sprint_completed_in_code" in kwargs:
+            obj.sprint_completed_in = self._resolve_sprint(
+                kwargs["sprint_completed_in_code"]
+            )
+            update_fields.append("sprint_completed_in")
 
         obj.updated_by = self.user
         obj.save(update_fields=update_fields)

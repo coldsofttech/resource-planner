@@ -143,9 +143,10 @@ class ProjectBudgetService(AuditableService, FilterableQueryService):
 
         if selectors.budget_exists_for_project_and_fy(project, financial_year):
             raise AlreadyExistsException(
-                resource="ProjectBudget",
-                lookup_field="project + financial_year",
-                lookup_value=f"{project_code} + {financial_year_code}",
+                detail=(
+                    f"A budget for project '{project_code}' and financial year "
+                    f"'{financial_year_code}' already exists."
+                )
             )
 
         estimate_version = (
@@ -261,6 +262,10 @@ class ProjectBudgetService(AuditableService, FilterableQueryService):
     def history(self, code: str):
         obj = self.get(code)
         return selectors.get_budget_status_history(obj)
+
+    def lifetime(self, project_code: str) -> dict:
+        project = _get_project(project_code)
+        return selectors.get_lifetime_budget_summary(project)
 
 
 class ProjectBudgetExportService(ExportService):

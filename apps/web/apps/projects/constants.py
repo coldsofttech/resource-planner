@@ -41,3 +41,8 @@ class ProjectEstimateAction(models.TextChoices):
 class ProjectBudgetAction(models.TextChoices):
     CREATED = "CREATED", "Created"
     UPDATED = "UPDATED", "Updated"
+
+
+class ContactRole(models.TextChoices):
+    PROJECT = "project", "Project"
+    FINANCE = "finance", "Finance"

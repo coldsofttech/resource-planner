@@ -1,8 +1,25 @@
+from .attachment import (
+    get_attachment_by_code,
+    get_attachments_for_project,
+    project_attachment_filename_exists,
+)
 from .budget import (
     budget_exists_for_project_and_fy,
     get_budget_by_code,
     get_budget_status_history,
     get_budgets_for_project,
+    get_lifetime_budget_summary,
+)
+from .comment import (
+    get_all_project_comments,
+    get_pinned_project_comments_count,
+    get_project_comment_by_code,
+)
+from .contact import (
+    get_all_project_contacts,
+    get_contact_by_name_and_email,
+    get_project_contact_by_code,
+    project_contact_exists,
 )
 from .estimate import (
     get_estimate_by_code,
@@ -16,12 +33,18 @@ from .follower import (
     project_follower_exists,
 )
 from .label import (
+    get_all_labels_as_options,
     get_all_project_labels,
     get_all_system_labels,
     get_project_default_label,
     get_project_label_by_code,
     get_sibling_labels,
     project_label_exists,
+)
+from .link import (
+    get_link_by_code,
+    get_links_for_project,
+    project_link_title_exists,
 )
 from .programme import (
     get_active_programmes,
@@ -101,11 +124,13 @@ __all__ = [
     "get_budget_by_code",
     "get_budgets_for_project",
     "budget_exists_for_project_and_fy",
+    "get_lifetime_budget_summary",
     "get_budget_status_history",
     "get_estimate_by_code",
     "get_estimate_status_history",
     "get_estimates_for_project",
     "get_next_version",
+    "get_all_labels_as_options",
     "get_all_project_labels",
     "get_all_system_labels",
     "get_sibling_labels",
@@ -115,7 +140,20 @@ __all__ = [
     "get_all_project_tags",
     "get_project_tag_by_code",
     "project_tag_exists",
+    "get_all_project_comments",
+    "get_pinned_project_comments_count",
+    "get_project_comment_by_code",
+    "get_all_project_contacts",
+    "get_project_contact_by_code",
+    "project_contact_exists",
+    "get_contact_by_name_and_email",
     "get_all_project_followers",
     "get_project_follower_by_code",
     "project_follower_exists",
+    "get_attachment_by_code",
+    "get_attachments_for_project",
+    "project_attachment_filename_exists",
+    "get_link_by_code",
+    "get_links_for_project",
+    "project_link_title_exists",
 ]

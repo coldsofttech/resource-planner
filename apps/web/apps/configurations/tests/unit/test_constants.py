@@ -79,6 +79,12 @@ class ModuleValuesTest(SimpleTestCase):
     def test_sprints_value(self):
         self.assertEqual(Module.SPRINTS, "sprints")
 
+    def test_users_value(self):
+        self.assertEqual(Module.USERS, "users")
+
+    def test_projects_value(self):
+        self.assertEqual(Module.PROJECTS, "projects")
+
 
 # ── Module labels ──────────────────────────────────────────────────────────────
 
@@ -107,6 +113,12 @@ class ModuleLabelsTest(SimpleTestCase):
 
     def test_sprints_label(self):
         self.assertEqual(Module.SPRINTS.label, "Sprints")
+
+    def test_users_label(self):
+        self.assertEqual(Module.USERS.label, "Users")
+
+    def test_projects_label(self):
+        self.assertEqual(Module.PROJECTS.label, "Projects")
 
 
 # ── Module.choices ─────────────────────────────────────────────────────────────

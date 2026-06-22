@@ -1,9 +1,20 @@
+from apps.projects.serializers.attachment import ProjectAttachmentSerializer
 from apps.projects.serializers.budget import (
     ProjectBudgetCreateSerializer,
     ProjectBudgetDetailSerializer,
+    ProjectBudgetLifetimeSerializer,
     ProjectBudgetListSerializer,
     ProjectBudgetStatusHistorySerializer,
     ProjectBudgetUpdateSerializer,
+)
+from apps.projects.serializers.comment import (
+    ProjectCommentCreateSerializer,
+    ProjectCommentSerializer,
+    ProjectCommentUpdateSerializer,
+)
+from apps.projects.serializers.contact import (
+    ProjectContactCreateSerializer,
+    ProjectContactSerializer,
 )
 from apps.projects.serializers.estimate import (
     ProjectEstimateCreateSerializer,
@@ -21,6 +32,11 @@ from apps.projects.serializers.label import (
     ProjectLabelCreateSerializer,
     ProjectLabelSerializer,
     ProjectLabelUpdateSerializer,
+)
+from apps.projects.serializers.link import (
+    ProjectLinkCreateSerializer,
+    ProjectLinkSerializer,
+    ProjectLinkUpdateSerializer,
 )
 from apps.projects.serializers.programme import (
     ProgrammeCreateSerializer,
@@ -66,6 +82,7 @@ __all__ = [
     "ProgrammeUpdateSerializer",
     "ProjectBudgetCreateSerializer",
     "ProjectBudgetDetailSerializer",
+    "ProjectBudgetLifetimeSerializer",
     "ProjectBudgetListSerializer",
     "ProjectBudgetStatusHistorySerializer",
     "ProjectBudgetUpdateSerializer",
@@ -78,9 +95,18 @@ __all__ = [
     "ProjectEstimateListSerializer",
     "ProjectEstimateStatusHistorySerializer",
     "ProjectEstimateUpdateSerializer",
+    "ProjectCommentSerializer",
+    "ProjectCommentCreateSerializer",
+    "ProjectCommentUpdateSerializer",
+    "ProjectContactSerializer",
+    "ProjectContactCreateSerializer",
     "ProjectFollowerCreateSerializer",
     "ProjectFollowerListSerializer",
     "ProjectFollowerUpdateSerializer",
+    "ProjectAttachmentSerializer",
+    "ProjectLinkCreateSerializer",
+    "ProjectLinkSerializer",
+    "ProjectLinkUpdateSerializer",
     "ProjectLabelCreateSerializer",
     "ProjectLabelSerializer",
     "ProjectLabelUpdateSerializer",

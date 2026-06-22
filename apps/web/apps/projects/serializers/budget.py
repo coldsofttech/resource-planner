@@ -11,9 +11,16 @@ from apps.core.serializers import (
 from apps.projects.models import ProjectBudget, ProjectBudgetStatusHistory
 
 
+class _BudgetRiskSerializer(serializers.Serializer):
+    color = serializers.CharField(read_only=True)
+    display = serializers.CharField(read_only=True)
+    short = serializers.CharField(read_only=True)
+    percentage = serializers.CharField(read_only=True)
+
+
 class _FinancialYearInlineSerializer(serializers.Serializer):
     code = serializers.CharField(read_only=True)
-    name = serializers.CharField(read_only=True)
+    name = serializers.CharField(source="long_fy", read_only=True)
 
 
 class _EstimateVersionInlineSerializer(serializers.Serializer):
@@ -36,6 +43,7 @@ class ProjectBudgetListSerializer(ListMixin, CodeSerializer):
     actual_budget = serializers.FloatField(read_only=True)
     remaining_budget = serializers.FloatField(read_only=True, allow_null=True)
     estimate_version = _EstimateVersionInlineSerializer(read_only=True, allow_null=True)
+    risk = _BudgetRiskSerializer(read_only=True, allow_null=True)
     created_at = serializers.DateTimeField(read_only=True)
     created_by = UserMiniSerializer(read_only=True, allow_null=True)
     updated_at = serializers.DateTimeField(read_only=True)
@@ -53,6 +61,7 @@ class ProjectBudgetListSerializer(ListMixin, CodeSerializer):
             "actual_budget",
             "remaining_budget",
             "estimate_version",
+            "risk",
             "created_at",
             "created_by",
             "updated_at",
@@ -74,6 +83,7 @@ class ProjectBudgetDetailSerializer(ReadMixin, AuditableSerializer):
     actual_budget = serializers.FloatField(read_only=True)
     remaining_budget = serializers.FloatField(read_only=True, allow_null=True)
     estimate_version = _EstimateVersionInlineSerializer(read_only=True, allow_null=True)
+    risk = _BudgetRiskSerializer(read_only=True, allow_null=True)
     note = serializers.CharField(read_only=True)
 
     class Meta(AuditableSerializer.Meta):
@@ -88,6 +98,7 @@ class ProjectBudgetDetailSerializer(ReadMixin, AuditableSerializer):
             "actual_budget",
             "remaining_budget",
             "estimate_version",
+            "risk",
             "note",
             "created_at",
             "created_by",
@@ -149,3 +160,15 @@ class ProjectBudgetStatusHistorySerializer(serializers.ModelSerializer):
             "changed_on",
             "changed_by",
         ]
+
+
+class ProjectBudgetLifetimeSerializer(serializers.Serializer):
+    project_code = serializers.CharField(read_only=True)
+    project_name = serializers.CharField(read_only=True)
+    budget_count = serializers.IntegerField(read_only=True)
+    total_allocated_budget = serializers.FloatField(read_only=True)
+    total_refined_budget = serializers.FloatField(read_only=True, allow_null=True)
+    total_actual_budget = serializers.FloatField(read_only=True)
+    total_estimate_cost = serializers.FloatField(read_only=True, allow_null=True)
+    total_remaining_budget = serializers.FloatField(read_only=True, allow_null=True)
+    risk = _BudgetRiskSerializer(read_only=True, allow_null=True)

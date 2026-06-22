@@ -1,0 +1,654 @@
+{
+  "module": {
+    "slug": "project-links",
+    "name": "Project Links",
+    "sort_order": 4,
+    "parent": {
+      "slug": "projects",
+      "name": "Projects",
+      "sort_order": 2
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-PLK-100",
+      "name": "Access & Permissions",
+      "test_cases": [
+        {
+          "id": "TC-PLK-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user cannot access the Links tab on a project detail page",
+          "steps": "1. Open a project detail URL (e.g. /projects/PROJ-1/) without being logged in.",
+          "expected": "The browser redirects to the login page. The Links tab and its content are not accessible."
+        },
+        {
+          "id": "TC-PLK-102",
+          "severity": "P1",
+          "scenario": "Links tab is visible to all authenticated users regardless of permissions",
+          "steps": "1. Log in as any authenticated user.\n2. Open any project detail page.\n3. Observe the tab bar.",
+          "expected": "The 'Links' tab (with a link icon) is visible in the project tab bar. The tab can be clicked and the Links panel is displayed."
+        },
+        {
+          "id": "TC-PLK-103",
+          "severity": "P1",
+          "scenario": "Add Link button is only visible to users with 'projects.add_projectlink' permission",
+          "steps": "1. Log in as a user with 'projects.add_projectlink' permission.\n2. Open a project detail page and click the Links tab.",
+          "expected": "An 'Add Link' button is visible above the links table."
+        },
+        {
+          "id": "TC-PLK-104",
+          "severity": "P1",
+          "scenario": "Add Link button is not visible to users without 'projects.add_projectlink'",
+          "steps": "1. Log in as a user without 'projects.add_projectlink' permission.\n2. Open a project detail page and click the Links tab.",
+          "expected": "No 'Add Link' button is visible. The links table is shown in read-only mode."
+        },
+        {
+          "id": "TC-PLK-105",
+          "severity": "P1",
+          "scenario": "Edit and Delete row actions are only visible to users with 'projects.change_projectlink'",
+          "steps": "1. Log in as a user with 'projects.change_projectlink' permission.\n2. Open the Links tab on a project that has at least one link.\n3. Observe the row action controls.",
+          "expected": "Each table row shows an Edit action and a Delete action."
+        },
+        {
+          "id": "TC-PLK-106",
+          "severity": "P1",
+          "scenario": "Edit and Delete row actions are not present for users without 'projects.change_projectlink'",
+          "steps": "1. Log in as a user without 'projects.change_projectlink' permission.\n2. Open the Links tab on a project with links.",
+          "expected": "No edit or delete controls are visible in the table rows. Rows are read-only."
+        },
+        {
+          "id": "TC-PLK-107",
+          "severity": "P1",
+          "scenario": "Unauthenticated POST to the links API returns 401",
+          "steps": "1. Send a POST request to /api/v1/projects/PROJ-1/links/ without an Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned. No link is created."
+        },
+        {
+          "id": "TC-PLK-108",
+          "severity": "P1",
+          "scenario": "Authenticated user without 'projects.add_projectlink' receives 403 on POST",
+          "steps": "1. Log in as a user without 'projects.add_projectlink'.\n2. Send an authenticated POST request to /api/v1/projects/PROJ-1/links/ with a valid payload.",
+          "expected": "HTTP 403 Forbidden is returned. No link is created."
+        },
+        {
+          "id": "TC-PLK-109",
+          "severity": "P1",
+          "scenario": "Authenticated user without 'projects.change_projectlink' receives 403 on PATCH",
+          "steps": "1. Log in as a user without 'projects.change_projectlink'.\n2. Send an authenticated PATCH request to /api/v1/projects/PROJ-1/links/PROJLNK-1/ with a valid payload.",
+          "expected": "HTTP 403 Forbidden is returned. The link is not modified."
+        },
+        {
+          "id": "TC-PLK-110",
+          "severity": "P1",
+          "scenario": "Authenticated user without 'projects.delete_projectlink' receives 403 on DELETE",
+          "steps": "1. Log in as a user without 'projects.delete_projectlink'.\n2. Send an authenticated DELETE request to /api/v1/projects/PROJ-1/links/PROJLNK-1/.",
+          "expected": "HTTP 403 Forbidden is returned. The link is not deleted."
+        }
+      ]
+    },
+    {
+      "id": "TC-PLK-200",
+      "name": "Viewing Links",
+      "test_cases": [
+        {
+          "id": "TC-PLK-201",
+          "severity": "P0",
+          "scenario": "Links tab shows all links for the project in a data table",
+          "steps": "1. Open a project that has two or more links.\n2. Click the Links tab.",
+          "expected": "All links for the project are shown in the data table. Each row displays the link title and its URL as a clickable anchor."
+        },
+        {
+          "id": "TC-PLK-202",
+          "severity": "P1",
+          "scenario": "Empty state message is shown when a project has no links",
+          "steps": "1. Open a project that has no links.\n2. Click the Links tab.",
+          "expected": "The table shows an empty-state message (e.g. 'No links found.'). No rows are displayed."
+        },
+        {
+          "id": "TC-PLK-203",
+          "severity": "P1",
+          "scenario": "Links are displayed in alphabetical order by title",
+          "steps": "1. Add three links with titles 'Zebra', 'Alpha', and 'Mango' to a project.\n2. Open the Links tab.",
+          "expected": "The table rows appear in the order: Alpha, Mango, Zebra — sorted alphabetically by title."
+        },
+        {
+          "id": "TC-PLK-204",
+          "severity": "P1",
+          "scenario": "The URL column renders the URL as a clickable link opening in a new tab",
+          "steps": "1. Open the Links tab on a project with at least one link.\n2. Click the URL displayed in the table row.",
+          "expected": "A new browser tab opens navigating to the linked URL. The original page remains open."
+        },
+        {
+          "id": "TC-PLK-205",
+          "severity": "P2",
+          "scenario": "Links tab data is loaded lazily — the API is not called until the tab is first activated",
+          "steps": "1. Open a project detail page (defaulting to the General tab).\n2. Check network requests.\n3. Click the Links tab.\n4. Check network requests again.",
+          "expected": "No API call to /api/v1/projects/.../links/ is made when the page first loads. The call is made only when the Links tab is clicked for the first time."
+        },
+        {
+          "id": "TC-PLK-206",
+          "severity": "P2",
+          "scenario": "Switching away from the Links tab and back does not reload the data from the API",
+          "steps": "1. Click the Links tab — data loads.\n2. Click a different tab (e.g. General).\n3. Click the Links tab again.",
+          "expected": "The previously loaded links are shown immediately. No additional API request is made on the second activation of the Links tab."
+        },
+        {
+          "id": "TC-PLK-207",
+          "severity": "P2",
+          "scenario": "The project_code field in the API response matches the project being viewed",
+          "steps": "1. Open a project with code PROJ-5.\n2. Click the Links tab.\n3. Inspect the API response for /api/v1/projects/PROJ-5/links/.",
+          "expected": "Every item in the response has 'project_code': 'PROJ-5'. No links from other projects are included."
+        }
+      ]
+    },
+    {
+      "id": "TC-PLK-300",
+      "name": "Adding a Link",
+      "test_cases": [
+        {
+          "id": "TC-PLK-301",
+          "severity": "P0",
+          "scenario": "Clicking 'Add Link' opens the create drawer",
+          "steps": "1. Open the Links tab on a project.\n2. Click the 'Add Link' button.",
+          "expected": "A slide-in drawer opens with a 'Title' text field and a 'URL' website field, and a primary action button to save."
+        },
+        {
+          "id": "TC-PLK-302",
+          "severity": "P0",
+          "scenario": "Submitting a valid title and URL creates the link and refreshes the table",
+          "steps": "1. Open the Add Link drawer.\n2. Enter 'Project Wiki' in the Title field.\n3. Enter 'https://wiki.example.com' in the URL field.\n4. Click the save button.",
+          "expected": "The drawer closes. A success toast appears. 'Project Wiki' appears as a new row in the links table with the provided URL."
+        },
+        {
+          "id": "TC-PLK-303",
+          "severity": "P0",
+          "scenario": "Title field is required — saving without a title shows a validation error",
+          "steps": "1. Open the Add Link drawer.\n2. Leave the Title field empty.\n3. Enter a valid URL.\n4. Click the save button.",
+          "expected": "A validation error appears on the Title field. The drawer remains open. No API call is made. No link is created."
+        },
+        {
+          "id": "TC-PLK-304",
+          "severity": "P0",
+          "scenario": "URL field is required — saving without a URL shows a validation error",
+          "steps": "1. Open the Add Link drawer.\n2. Enter a title.\n3. Leave the URL field empty.\n4. Click the save button.",
+          "expected": "A validation error appears on the URL field. The drawer remains open. No API call is made. No link is created."
+        },
+        {
+          "id": "TC-PLK-305",
+          "severity": "P0",
+          "scenario": "Entering an invalid URL format shows a validation error",
+          "steps": "1. Open the Add Link drawer.\n2. Enter 'Project Docs' in the Title field.\n3. Enter 'not-a-url' in the URL field.\n4. Click the save button.",
+          "expected": "A validation error appears on the URL field ('Enter a valid URL.' or similar). The drawer remains open. No link is created."
+        },
+        {
+          "id": "TC-PLK-306",
+          "severity": "P1",
+          "scenario": "Title field enforces a maximum length of 200 characters",
+          "steps": "1. Open the Add Link drawer.\n2. Enter a title exceeding 200 characters.\n3. Click the save button.",
+          "expected": "A validation error appears on the Title field indicating the maximum length has been exceeded. The link is not created."
+        },
+        {
+          "id": "TC-PLK-307",
+          "severity": "P1",
+          "scenario": "Duplicate title on the same project is rejected with a clear error message",
+          "steps": "1. Add a link with title 'Jira Board' to a project.\n2. Open the Add Link drawer again.\n3. Enter 'Jira Board' in the Title field with a different URL.\n4. Click the save button.",
+          "expected": "An error toast or inline error appears indicating a link with this title already exists for this project. The drawer remains open. No duplicate link is created."
+        },
+        {
+          "id": "TC-PLK-308",
+          "severity": "P1",
+          "scenario": "Cancelling the Add Link drawer discards all input",
+          "steps": "1. Open the Add Link drawer.\n2. Enter a title and URL.\n3. Close or cancel the drawer.",
+          "expected": "The drawer closes. No link is added to the table. The entered values are not saved."
+        },
+        {
+          "id": "TC-PLK-309",
+          "severity": "P1",
+          "scenario": "Save button shows a loading/busy state while the API request is in-flight",
+          "steps": "1. Open the Add Link drawer.\n2. Enter a valid title and URL.\n3. Click the save button on a slow connection and observe the button before a response arrives.",
+          "expected": "The save button becomes disabled and shows a loading indicator (e.g. 'Saving…'). It cannot be clicked again while the request is pending."
+        },
+        {
+          "id": "TC-PLK-310",
+          "severity": "P2",
+          "scenario": "Same title can be used on a different project without error",
+          "steps": "1. Add a link titled 'Design Specs' to Project A.\n2. Open Project B's Links tab.\n3. Add a link titled 'Design Specs' to Project B.",
+          "expected": "The link is created successfully on Project B. The title uniqueness constraint applies per project only."
+        },
+        {
+          "id": "TC-PLK-311",
+          "severity": "P2",
+          "scenario": "Re-opening the Add Link drawer after a successful creation shows a blank form",
+          "steps": "1. Create a link via the drawer.\n2. Click 'Add Link' again to open the drawer.",
+          "expected": "The Title and URL fields are empty. The form is reset and ready for a new entry."
+        },
+        {
+          "id": "TC-PLK-312",
+          "severity": "P2",
+          "scenario": "Server-side error during creation shows an error toast and keeps the drawer open",
+          "steps": "1. Open the Add Link drawer with valid data.\n2. Simulate a server error (e.g. block the API request in dev tools).\n3. Click save.",
+          "expected": "An error toast appears. The save button is restored to its enabled state. The drawer remains open with the entered values intact so the user can retry."
+        }
+      ]
+    },
+    {
+      "id": "TC-PLK-400",
+      "name": "Editing a Link",
+      "test_cases": [
+        {
+          "id": "TC-PLK-401",
+          "severity": "P0",
+          "scenario": "Clicking the Edit action on a row opens the edit drawer pre-populated with current values",
+          "steps": "1. Open the Links tab on a project with at least one link.\n2. Click the Edit action on a row.",
+          "expected": "A slide-in edit drawer opens. The Title field shows the link's current title. The URL field shows the link's current URL."
+        },
+        {
+          "id": "TC-PLK-402",
+          "severity": "P0",
+          "scenario": "Submitting valid changes updates the link and refreshes the table",
+          "steps": "1. Open the edit drawer for a link.\n2. Change the Title to 'Updated Title'.\n3. Click the save button.",
+          "expected": "The drawer closes. A success toast appears. The table row is updated with 'Updated Title'."
+        },
+        {
+          "id": "TC-PLK-403",
+          "severity": "P1",
+          "scenario": "Updating the URL to a new valid URL saves successfully",
+          "steps": "1. Open the edit drawer for a link.\n2. Change the URL to 'https://new-destination.com'.\n3. Click save.",
+          "expected": "The drawer closes. The table row now shows the new URL as a clickable link."
+        },
+        {
+          "id": "TC-PLK-404",
+          "severity": "P1",
+          "scenario": "Keeping the same title in the edit drawer does not trigger a duplicate error",
+          "steps": "1. Open the edit drawer for a link.\n2. Do not change the Title.\n3. Change the URL.\n4. Click save.",
+          "expected": "The link is updated without any duplicate title error. Only the URL changes."
+        },
+        {
+          "id": "TC-PLK-405",
+          "severity": "P1",
+          "scenario": "Changing a title to one already used by another link on the same project is rejected",
+          "steps": "1. A project has two links: 'Wiki' and 'Jira'.\n2. Open the edit drawer for 'Wiki'.\n3. Change the title to 'Jira'.\n4. Click save.",
+          "expected": "An error is returned indicating the title 'Jira' already exists for this project. The link is not updated."
+        },
+        {
+          "id": "TC-PLK-406",
+          "severity": "P1",
+          "scenario": "Entering an invalid URL in the edit drawer shows a validation error",
+          "steps": "1. Open the edit drawer for a link.\n2. Change the URL to 'plaintext' (no protocol).\n3. Click save.",
+          "expected": "A validation error appears on the URL field. The drawer remains open. The link is not updated."
+        },
+        {
+          "id": "TC-PLK-407",
+          "severity": "P1",
+          "scenario": "Cancelling the edit drawer discards changes",
+          "steps": "1. Open the edit drawer for a link.\n2. Modify the title.\n3. Close or cancel the drawer.",
+          "expected": "The drawer closes. The table still shows the original title. No changes were saved."
+        },
+        {
+          "id": "TC-PLK-408",
+          "severity": "P2",
+          "scenario": "Save button shows a busy state while the PATCH request is in-flight",
+          "steps": "1. Open the edit drawer.\n2. Make a change and click save on a slow connection.\n3. Observe the save button before the response arrives.",
+          "expected": "The save button becomes disabled and shows a loading indicator while the request is pending."
+        },
+        {
+          "id": "TC-PLK-409",
+          "severity": "P2",
+          "scenario": "Submitting the edit drawer with no changes made still completes without error",
+          "steps": "1. Open the edit drawer for a link.\n2. Click save immediately without changing any field.",
+          "expected": "The drawer closes with a success response. The link values remain unchanged in the table."
+        },
+        {
+          "id": "TC-PLK-410",
+          "severity": "P2",
+          "scenario": "Server-side error during update shows an error toast and keeps the drawer open",
+          "steps": "1. Open the edit drawer with a valid change.\n2. Block the API request in dev tools.\n3. Click save.",
+          "expected": "An error toast appears. The save button is restored. The drawer remains open with the modified values intact."
+        }
+      ]
+    },
+    {
+      "id": "TC-PLK-500",
+      "name": "Deleting a Link",
+      "test_cases": [
+        {
+          "id": "TC-PLK-501",
+          "severity": "P0",
+          "scenario": "Clicking the Delete action opens a confirmation modal",
+          "steps": "1. Open the Links tab on a project with at least one link.\n2. Click the Delete action on a row.",
+          "expected": "A confirmation modal opens showing the link title and asking the user to confirm deletion. A typed-confirmation field or a confirm button is present."
+        },
+        {
+          "id": "TC-PLK-502",
+          "severity": "P0",
+          "scenario": "Confirming deletion removes the link and refreshes the table",
+          "steps": "1. Click the Delete action on a link row.\n2. Confirm the deletion in the modal.",
+          "expected": "The modal closes. A success toast appears. The deleted link no longer appears in the table. If it was the only link, the empty-state message is shown."
+        },
+        {
+          "id": "TC-PLK-503",
+          "severity": "P1",
+          "scenario": "Dismissing the confirmation modal does not delete the link",
+          "steps": "1. Click the Delete action on a link row.\n2. Cancel or close the confirmation modal without confirming.",
+          "expected": "The modal closes. The link remains in the table unchanged."
+        },
+        {
+          "id": "TC-PLK-504",
+          "severity": "P1",
+          "scenario": "Attempting to delete a link that was already removed (concurrent session) returns a 404 error",
+          "steps": "1. Open the delete confirmation modal for a link.\n2. In a separate session, delete the same link.\n3. Confirm deletion in the first session.",
+          "expected": "An error toast is shown indicating the link was not found. The table refreshes and the link is not present."
+        },
+        {
+          "id": "TC-PLK-505",
+          "severity": "P2",
+          "scenario": "Deleting a link does not affect other links on the same project",
+          "steps": "1. A project has three links: A, B, and C.\n2. Delete link B.",
+          "expected": "Links A and C remain in the table. Only link B is removed."
+        }
+      ]
+    },
+    {
+      "id": "TC-PLK-600",
+      "name": "URL Behaviour",
+      "test_cases": [
+        {
+          "id": "TC-PLK-601",
+          "severity": "P0",
+          "scenario": "URL without a valid scheme (http/https) is rejected on creation",
+          "steps": "1. Open the Add Link drawer.\n2. Enter 'example.com' (no protocol) in the URL field.\n3. Click save.",
+          "expected": "A validation error appears on the URL field. The link is not created."
+        },
+        {
+          "id": "TC-PLK-602",
+          "severity": "P1",
+          "scenario": "URL with 'http://' scheme is accepted and stored",
+          "steps": "1. Open the Add Link drawer.\n2. Enter a URL beginning with 'http://' (e.g. 'http://intranet.example.com').\n3. Click save.",
+          "expected": "The link is created and the URL is stored as entered. The link is clickable in the table."
+        },
+        {
+          "id": "TC-PLK-603",
+          "severity": "P1",
+          "scenario": "URL with 'https://' scheme is accepted and stored",
+          "steps": "1. Open the Add Link drawer.\n2. Enter a URL beginning with 'https://' (e.g. 'https://secure.example.com/path').\n3. Click save.",
+          "expected": "The link is created. The full URL (including path) is shown in the table and opens correctly."
+        },
+        {
+          "id": "TC-PLK-604",
+          "severity": "P1",
+          "scenario": "URL in the table row opens in a new browser tab with rel='noopener noreferrer'",
+          "steps": "1. View a link row in the Links table.\n2. Inspect the anchor element for the URL.\n3. Click the link.",
+          "expected": "The link has target='_blank' and rel='noopener noreferrer'. Clicking it opens the URL in a new tab without navigating away from the project detail page."
+        },
+        {
+          "id": "TC-PLK-605",
+          "severity": "P1",
+          "scenario": "URL containing query parameters and fragments is accepted and displayed correctly",
+          "steps": "1. Add a link with URL 'https://example.com/page?tab=overview#section-2'.\n2. View the row in the Links tab.",
+          "expected": "The full URL including query parameters and fragment is stored and displayed without truncation. Clicking it navigates to the full URL."
+        },
+        {
+          "id": "TC-PLK-606",
+          "severity": "P2",
+          "scenario": "A very long URL (up to 500 characters) is accepted and stored in full",
+          "steps": "1. Construct a valid URL that is exactly 500 characters long (e.g. https://example.com/ followed by a long path).\n2. Add it as a link URL.\n3. Save.",
+          "expected": "The link is created successfully. The URL is stored in full. The display may truncate visually but the full URL is accessible on click."
+        },
+        {
+          "id": "TC-PLK-607",
+          "severity": "P2",
+          "scenario": "A URL exceeding 500 characters is rejected by the API",
+          "steps": "1. Send a POST to /api/v1/projects/PROJ-1/links/ with a URL field longer than 500 characters.",
+          "expected": "HTTP 400 Bad Request is returned. The link is not created."
+        }
+      ]
+    },
+    {
+      "id": "TC-PLK-700",
+      "name": "Non-Functional — Performance",
+      "test_cases": [
+        {
+          "id": "TC-PLK-701",
+          "severity": "P2",
+          "scenario": "Links tab loads and renders all links within an acceptable time",
+          "steps": "1. Open a project with 20+ links.\n2. Click the Links tab.\n3. Measure the time from tab click to all rows being visible.",
+          "expected": "The links table renders with all rows within 2 seconds on a standard connection. No loading spinner persists beyond that time."
+        },
+        {
+          "id": "TC-PLK-702",
+          "severity": "P2",
+          "scenario": "Create and edit drawers open instantly without delay",
+          "steps": "1. Click 'Add Link'.\n2. Measure the time until the drawer is fully open and the fields are focusable.",
+          "expected": "The drawer opens within 300ms. There is no perceptible delay before the Title field can be focused and typed into."
+        },
+        {
+          "id": "TC-PLK-703",
+          "severity": "P3",
+          "scenario": "Table with a large number of links (50+) does not cause visible rendering lag",
+          "steps": "1. Create 50 or more links on a single project.\n2. Open the Links tab.",
+          "expected": "The table renders all links without visible lag, scroll jank, or browser performance warnings. Pagination handles the display if a page limit is applied."
+        }
+      ]
+    },
+    {
+      "id": "TC-PLK-800",
+      "name": "Desktop",
+      "test_cases": [
+        {
+          "id": "TC-PLK-801",
+          "severity": "P1",
+          "scenario": "Links table is clearly laid out on a desktop viewport",
+          "steps": "1. Open the Links tab on a desktop browser (≥1200px wide).\n2. Observe the table columns.",
+          "expected": "The Title and URL columns are clearly visible. Column headers are readable. Row action buttons are accessible and not clipped."
+        },
+        {
+          "id": "TC-PLK-802",
+          "severity": "P1",
+          "scenario": "Create drawer is fully visible and usable on a desktop browser",
+          "steps": "1. Open the Add Link drawer on a desktop browser.",
+          "expected": "The drawer slides in from the right. The Title field, URL field, and save/cancel buttons are all fully visible without scrolling."
+        },
+        {
+          "id": "TC-PLK-803",
+          "severity": "P1",
+          "scenario": "Edit drawer is pre-populated and fully usable on a desktop browser",
+          "steps": "1. Click the Edit action on a link row on a desktop browser.\n2. Observe the edit drawer.",
+          "expected": "The edit drawer opens with the current values filled in. Both fields and the save button are visible and usable."
+        },
+        {
+          "id": "TC-PLK-804",
+          "severity": "P2",
+          "scenario": "Delete confirmation modal is centred and fully visible on a desktop browser",
+          "steps": "1. Click the Delete action on a desktop browser.",
+          "expected": "The confirmation modal appears centred on the screen. The link title, confirmation message, and confirm/cancel buttons are all visible without scrolling."
+        },
+        {
+          "id": "TC-PLK-805",
+          "severity": "P2",
+          "scenario": "Long link titles are displayed without breaking the table layout on desktop",
+          "steps": "1. Add a link with a title that is 200 characters long.\n2. View it in the Links table on a desktop browser.",
+          "expected": "The title is displayed without overflowing into adjacent columns. The row height adjusts or the text truncates with an ellipsis."
+        }
+      ]
+    },
+    {
+      "id": "TC-PLK-900",
+      "name": "Mobile",
+      "test_cases": [
+        {
+          "id": "TC-PLK-901",
+          "severity": "P1",
+          "scenario": "Links tab is reachable and readable on a mobile device",
+          "steps": "1. Open a project detail page on a mobile device (≤767px).\n2. Tap the Links tab.",
+          "expected": "The Links tab is visible in the tab bar (possibly in a scrollable tab row). The links table renders within the viewport without horizontal overflow."
+        },
+        {
+          "id": "TC-PLK-902",
+          "severity": "P1",
+          "scenario": "Add Link button is tappable on mobile",
+          "steps": "1. Open the Links tab on a mobile device.\n2. Tap the 'Add Link' button.",
+          "expected": "The button registers the tap. The Add Link drawer opens without requiring precise clicking."
+        },
+        {
+          "id": "TC-PLK-903",
+          "severity": "P2",
+          "scenario": "Create drawer is usable on mobile — fields and save button are accessible",
+          "steps": "1. Open the Add Link drawer on a mobile device.\n2. Tap the Title field and type a title.\n3. Tap the URL field and type a URL.\n4. Tap the save button.",
+          "expected": "The drawer fills the screen or most of it. Both fields are tappable and the soft keyboard appears on focus. The save button is reachable by scrolling if needed."
+        },
+        {
+          "id": "TC-PLK-904",
+          "severity": "P2",
+          "scenario": "URL in the links table is tappable and opens in the mobile browser",
+          "steps": "1. Open the Links tab on a mobile device.\n2. Tap the URL in a table row.",
+          "expected": "The URL opens in a new tab or in the system browser. The original project detail page remains accessible."
+        },
+        {
+          "id": "TC-PLK-905",
+          "severity": "P2",
+          "scenario": "Row action buttons (Edit, Delete) are accessible and tappable on mobile",
+          "steps": "1. Open the Links tab on a mobile device with a user who has change permission.\n2. Tap the action menu or row actions on a link row.",
+          "expected": "Edit and Delete actions are accessible via a tap-friendly overflow menu or directly on the row. Each action is large enough to tap without mis-tapping."
+        },
+        {
+          "id": "TC-PLK-906",
+          "severity": "P3",
+          "scenario": "Delete confirmation modal is readable and dismissible on mobile",
+          "steps": "1. Tap the Delete action on mobile.\n2. Observe the confirmation modal.",
+          "expected": "The modal is fully visible within the mobile viewport. The confirm and cancel buttons are reachable without scrolling or zooming."
+        }
+      ]
+    },
+    {
+      "id": "TC-PLK-1000",
+      "name": "Security",
+      "test_cases": [
+        {
+          "id": "TC-PLK-1001",
+          "severity": "P0",
+          "scenario": "Unauthenticated GET to the links list API returns 401",
+          "steps": "1. Send a GET request to /api/v1/projects/PROJ-1/links/ without any Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned. No link data is included in the response."
+        },
+        {
+          "id": "TC-PLK-1002",
+          "severity": "P0",
+          "scenario": "Unauthenticated GET to a single link resource returns 401",
+          "steps": "1. Send a GET request to /api/v1/projects/PROJ-1/links/PROJLNK-1/ without any Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned."
+        },
+        {
+          "id": "TC-PLK-1003",
+          "severity": "P0",
+          "scenario": "Unauthenticated POST to the links API returns 401",
+          "steps": "1. Send a POST request to /api/v1/projects/PROJ-1/links/ with a valid payload but no Authorization header.",
+          "expected": "HTTP 401 Unauthorized is returned. No link is created."
+        },
+        {
+          "id": "TC-PLK-1004",
+          "severity": "P1",
+          "scenario": "CSRF token is required for mutating requests from the browser",
+          "steps": "1. From a browser, attempt a POST to /api/v1/projects/PROJ-1/links/ without including a valid X-CSRFToken header.",
+          "expected": "The API rejects the request. No link is created."
+        },
+        {
+          "id": "TC-PLK-1005",
+          "severity": "P1",
+          "scenario": "API response does not expose any fields beyond the documented link schema",
+          "steps": "1. Authenticate and call GET /api/v1/projects/PROJ-1/links/.\n2. Inspect each item in the response.",
+          "expected": "Each item contains only: code, project_code, title, url, created_at, created_by, updated_at, updated_by. No internal fields, database IDs, or sensitive metadata are exposed."
+        },
+        {
+          "id": "TC-PLK-1006",
+          "severity": "P1",
+          "scenario": "A link from Project A cannot be retrieved via Project B's URL namespace",
+          "steps": "1. Create a link PROJLNK-99 under Project A (PROJ-1).\n2. Send GET /api/v1/projects/PROJ-2/links/PROJLNK-99/ as an authenticated user.",
+          "expected": "HTTP 404 Not Found is returned. The link is not accessible outside its owning project's URL namespace."
+        },
+        {
+          "id": "TC-PLK-1007",
+          "severity": "P2",
+          "scenario": "JavaScript-injected title value is rendered safely and does not execute as a script",
+          "steps": "1. Create a link with the title: <script>alert('xss')</script>.\n2. Open the Links tab.\n3. Observe the table row and any drawers that display the title.",
+          "expected": "The title is rendered as plain text. No script is executed. The value is HTML-escaped wherever it appears in the UI."
+        }
+      ]
+    },
+    {
+      "id": "TC-PLK-1100",
+      "name": "Integration & Edge Cases",
+      "test_cases": [
+        {
+          "id": "TC-PLK-1101",
+          "severity": "P0",
+          "scenario": "Links from Project A do not appear when viewing the Links tab on Project B",
+          "steps": "1. Add links to Project A.\n2. Open a different project (Project B) and click the Links tab.",
+          "expected": "Only links belonging to Project B are shown. Project A's links are not visible."
+        },
+        {
+          "id": "TC-PLK-1102",
+          "severity": "P1",
+          "scenario": "Deleting a project removes all its links without error",
+          "steps": "1. Add multiple links to a project.\n2. Delete the project.",
+          "expected": "All links associated with the deleted project are also removed. No orphaned link records remain in the database."
+        },
+        {
+          "id": "TC-PLK-1103",
+          "severity": "P1",
+          "scenario": "A link created by one user is visible to all other authenticated users",
+          "steps": "1. User A creates a link on a project.\n2. User B (different session) opens the same project's Links tab.",
+          "expected": "User B sees the link created by User A in the table."
+        },
+        {
+          "id": "TC-PLK-1104",
+          "severity": "P1",
+          "scenario": "The created_by and updated_by fields in the API response reflect the acting user",
+          "steps": "1. Log in as User A.\n2. Create a link on a project.\n3. Log in as User B.\n4. Edit the link.\n5. Retrieve the link via GET.",
+          "expected": "The created_by field shows User A. The updated_by field shows User B."
+        },
+        {
+          "id": "TC-PLK-1105",
+          "severity": "P2",
+          "scenario": "Requesting links for a non-existent project code returns 404",
+          "steps": "1. Send GET /api/v1/projects/PROJ-999999/links/ as an authenticated user.",
+          "expected": "HTTP 404 Not Found is returned. No data is returned."
+        },
+        {
+          "id": "TC-PLK-1106",
+          "severity": "P2",
+          "scenario": "A title with special characters (e.g. ampersand, quotes) is stored and displayed correctly",
+          "steps": "1. Add a link with title 'Research & Dev — \"Phase 1\"'.\n2. View the link in the table.\n3. Open the edit drawer.",
+          "expected": "The title is stored exactly as entered and displayed without HTML entity escaping being visible to the user. The edit drawer shows the original characters."
+        },
+        {
+          "id": "TC-PLK-1107",
+          "severity": "P2",
+          "scenario": "A title at exactly 200 characters is accepted and stored in full",
+          "steps": "1. Add a link with a title that is exactly 200 characters long.\n2. Save and view the row.",
+          "expected": "The link is created without a validation error. The full 200-character title is stored and retrievable via the API."
+        },
+        {
+          "id": "TC-PLK-1108",
+          "severity": "P2",
+          "scenario": "API list endpoint returns links in alphabetical title order",
+          "steps": "1. Add links with titles 'Zebra', 'Alpha', and 'Mango' to a project via the API.\n2. Call GET /api/v1/projects/PROJ-1/links/ and inspect the response order.",
+          "expected": "The response data array is ordered: Alpha, Mango, Zebra — alphabetically by title."
+        },
+        {
+          "id": "TC-PLK-1109",
+          "severity": "P2",
+          "scenario": "A link's audit metadata (created_at, updated_at) is returned in the API response",
+          "steps": "1. Create a link.\n2. Call GET /api/v1/projects/PROJ-1/links/PROJLNK-1/.\n3. Inspect the response.",
+          "expected": "The response includes non-null created_at and updated_at timestamps. After an edit, updated_at is later than created_at."
+        },
+        {
+          "id": "TC-PLK-1110",
+          "severity": "P3",
+          "scenario": "Rapid successive link creations do not cause race conditions or duplicate entries",
+          "steps": "1. Quickly submit two POST requests for links with different titles to the same project in rapid succession.",
+          "expected": "Both links are created independently and appear in the table. No errors occur. No records are lost or duplicated."
+        }
+      ]
+    }
+  ]
+}

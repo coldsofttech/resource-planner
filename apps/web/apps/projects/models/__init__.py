@@ -1,9 +1,13 @@
 from apps.projects.constants import ProjectBudgetAction, ProjectEstimateAction
 
+from .attachment import ProjectAttachment
 from .budget import ProjectBudget, ProjectBudgetStatusHistory
+from .comment import ProjectComment
+from .contact import ProjectContact
 from .estimate import ProjectEstimate, ProjectEstimateStatusHistory
 from .follower import ProjectFollower
 from .label import ProjectLabel
+from .link import ProjectLink
 from .programme import Programme
 from .project import Project, ProjectCollaborator
 from .project_code import ProjectCode, ProjectCodeHistory
@@ -22,7 +26,11 @@ __all__ = [
     "ProjectCode",
     "ProjectCodeHistory",
     "ProjectLabel",
+    "ProjectAttachment",
+    "ProjectLink",
     "ProjectTag",
+    "ProjectComment",
+    "ProjectContact",
     "ProjectFollower",
     "ProjectEstimate",
     "ProjectEstimateAction",
