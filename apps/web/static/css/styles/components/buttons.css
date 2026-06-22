@@ -145,8 +145,16 @@
   --b-bg-h: oklch(0.62 0.15 150);
 }
 
+.rp-btn-success {
+  --b-bg: var(--rp-success);
+  --b-fg: #fff;
+  --b-bd: var(--rp-success);
+  --b-bg-h: oklch(0.52 0.15 150);
+}
+
 [data-theme="dark"] .rp-btn-engine,
-[data-theme="dark"] .rp-btn-activate {
+[data-theme="dark"] .rp-btn-activate,
+[data-theme="dark"] .rp-btn-success {
   --b-fg: #0b0f12;
 }
 
@@ -215,7 +223,8 @@
 primary-button.w-100 > button,
 secondary-button.w-100 > button,
 muted-button.w-100 > button,
-engine-button.w-100 > button {
+engine-button.w-100 > button,
+success-button.w-100 > button {
   width: 100%;
 }
 

@@ -48,6 +48,16 @@ Muted / tertiary button styled with `rp-btn-muted`. Used for non-destructive sec
 
 ---
 
+## `<success-button>`
+
+Success-styled button (`rp-btn-success`). Used for confirm, approve, or complete actions.
+
+```html
+<success-button label="Confirm" prefix-icon="bi-check2"></success-button>
+```
+
+---
+
 ## `<engine-button>`
 
 Engine-styled button (`rp-btn-engine`). Used for prominent utility / processing actions.
