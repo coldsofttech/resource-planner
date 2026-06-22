@@ -22,11 +22,16 @@ let pendingLabelDeletions = [];
 let currentEstimates = [];
 let estimatesLoaded = false;
 let pendingEstimateRow = null;
+let budgetsLoaded = false;
+let pendingBudgetRow = null;
+let loadedBudgets = [];
 let _pendingEditApprovePayload = null;
 let linksLoaded = false;
 let pendingLinkRow = null;
 let attachmentsLoaded = false;
 let pendingAttachmentRow = null;
+let pendingContactRow = null;
+let contactsLoaded = false;
 
 function setView(id, val) {
   const el = document.getElementById(id);
@@ -40,6 +45,61 @@ function statusBadgeClass(name) {
     return "rp-badge rp-badge-soft rp-badge-success";
   if (n.includes("hold")) return "rp-badge rp-badge-soft rp-badge-warning";
   return "rp-badge rp-badge-soft";
+}
+
+function statusIsInProgress(name) {
+  return (name || "").toLowerCase().includes("progress");
+}
+
+function statusIsCompleted(name) {
+  return (name || "").toLowerCase().includes("complet");
+}
+
+function updateSprintFieldVisibility(statusName) {
+  const startedWrapper = document.getElementById("rp-edit-project-sprint-started-in-wrapper");
+  const completedWrapper = document.getElementById("rp-edit-project-sprint-completed-in-wrapper");
+  const showStarted = statusIsInProgress(statusName);
+  const showCompleted = statusIsCompleted(statusName);
+
+  const startedField = document.getElementById("rp-edit-project-sprint-started-in");
+  const completedField = document.getElementById("rp-edit-project-sprint-completed-in");
+
+  if (startedWrapper) {
+    // Keep visible if status is IN_PROGRESS (required) or a value is already set (optional)
+    const hasValue = !!startedField?.value;
+    startedWrapper.hidden = !showStarted && !hasValue;
+    if (startedField) {
+      if (showStarted) {
+        startedField.setAttribute("required", "");
+      } else {
+        startedField.removeAttribute("required");
+        if (!hasValue) startedField.value = "";
+      }
+      if (hasValue) {
+        startedField.setAttribute("unassign", "");
+      } else {
+        startedField.removeAttribute("unassign");
+      }
+    }
+  }
+  if (completedWrapper) {
+    // Keep visible if status is COMPLETED (required) or a value is already set (optional)
+    const hasValue = !!completedField?.value;
+    completedWrapper.hidden = !showCompleted && !hasValue;
+    if (completedField) {
+      if (showCompleted) {
+        completedField.setAttribute("required", "");
+      } else {
+        completedField.removeAttribute("required");
+        if (!hasValue) completedField.value = "";
+      }
+      if (hasValue) {
+        completedField.setAttribute("unassign", "");
+      } else {
+        completedField.removeAttribute("unassign");
+      }
+    }
+  }
 }
 
 function confidenceBadgeClass(value) {
@@ -335,6 +395,26 @@ async function loadProjectDetails() {
       currentProject.end_date ? formatDate(currentProject.end_date) : "—",
     );
 
+    // Sprint started in — visible whenever a value is recorded
+    const sprintStartedViewEl = document.getElementById("rp-project-detail-sprint-started-in");
+    if (sprintStartedViewEl) {
+      const show = !!currentProject.sprint_started_in_name;
+      sprintStartedViewEl.hidden = !show;
+      if (show) {
+        sprintStartedViewEl.value = currentProject.sprint_started_in_name;
+      }
+    }
+
+    // Sprint completed in — visible whenever a value is recorded
+    const sprintCompletedViewEl = document.getElementById("rp-project-detail-sprint-completed-in");
+    if (sprintCompletedViewEl) {
+      const show = !!currentProject.sprint_completed_in_name;
+      sprintCompletedViewEl.hidden = !show;
+      if (show) {
+        sprintCompletedViewEl.value = currentProject.sprint_completed_in_name;
+      }
+    }
+
     // Meta
     setView(
       "rp-project-detail-created-at",
@@ -384,6 +464,13 @@ async function loadProjectDetails() {
     if (editBtn) editBtn.removeAttribute("disabled");
 
     updateFollowButton(currentProject.is_following);
+
+    // Wire comments panel
+    const commentsPanel = document.getElementById("rp-project-comments-panel");
+    if (commentsPanel) {
+      const { href } = API_URLS.projectComments.list(projectCode);
+      commentsPanel.setAttribute("comments-url", href);
+    }
   } catch {
     toast({
       type: "error",
@@ -430,6 +517,13 @@ function openEditDrawer() {
 
   const endField = document.getElementById("rp-edit-project-end-date");
   if (endField) endField.value = currentProject.end_date || "";
+
+  const sprintStartedField = document.getElementById("rp-edit-project-sprint-started-in");
+  if (sprintStartedField) sprintStartedField.value = currentProject.sprint_started_in_code || "";
+  const sprintCompletedField = document.getElementById("rp-edit-project-sprint-completed-in");
+  if (sprintCompletedField)
+    sprintCompletedField.value = currentProject.sprint_completed_in_code || "";
+  updateSprintFieldVisibility(currentProject.status_name || "");
 
   const descField = document.getElementById("rp-edit-project-description");
   if (descField) descField.value = currentProject.description || "";
@@ -494,6 +588,21 @@ function initEditDrawer() {
     ["rp-edit-project-name", "rp-edit-project-type", "rp-edit-project-status"].forEach((id) => {
       document.getElementById(id)?.dispatchEvent(new Event("rp:validate", { bubbles: false }));
     });
+
+    // Validate sprint fields only when they are required (i.e. visible)
+    const startedWrapper = document.getElementById("rp-edit-project-sprint-started-in-wrapper");
+    const completedWrapper = document.getElementById("rp-edit-project-sprint-completed-in-wrapper");
+    if (startedWrapper && !startedWrapper.hidden) {
+      document
+        .getElementById("rp-edit-project-sprint-started-in")
+        ?.dispatchEvent(new Event("rp:validate", { bubbles: false }));
+    }
+    if (completedWrapper && !completedWrapper.hidden) {
+      document
+        .getElementById("rp-edit-project-sprint-completed-in")
+        ?.dispatchEvent(new Event("rp:validate", { bubbles: false }));
+    }
+
     return !drawer.querySelector("[data-rp-error]:not([hidden])");
   }
 
@@ -501,7 +610,20 @@ function initEditDrawer() {
     document.getElementById("rp-edit-project-type")?.refresh?.();
     document.getElementById("rp-edit-project-programme")?.refresh?.();
     document.getElementById("rp-edit-project-status")?.refresh?.();
+    document.getElementById("rp-edit-project-sprint-started-in")?.refresh?.();
+    document.getElementById("rp-edit-project-sprint-completed-in")?.refresh?.();
   });
+
+  // Update sprint field visibility when the status changes
+  const statusFieldEl = document.getElementById("rp-edit-project-status");
+  if (statusFieldEl) {
+    statusFieldEl.addEventListener("change", () => {
+      const opt = (statusFieldEl._initialOptions || []).find(
+        (o) => o.value === statusFieldEl.value,
+      );
+      updateSprintFieldVisibility(opt?.label ?? "");
+    });
+  }
 
   // Re-sync collaborator options whenever the assigned team changes
   const assignedTeamField = document.getElementById("rp-edit-project-assigned-team");
@@ -568,6 +690,11 @@ function initEditDrawer() {
       }
     }
 
+    const sprintStartedInCode =
+      document.getElementById("rp-edit-project-sprint-started-in")?.value || null;
+    const sprintCompletedInCode =
+      document.getElementById("rp-edit-project-sprint-completed-in")?.value || null;
+
     const payload = {
       name,
       project_type_code: projectTypeCode,
@@ -584,6 +711,8 @@ function initEditDrawer() {
       run_cost_applies: runCostApplies,
       assigned_team_code: assignedTeamCode || null,
       project_code_value: projectCodeValue || null,
+      sprint_started_in_code: sprintStartedInCode,
+      sprint_completed_in_code: sprintCompletedInCode,
     };
 
     const { href, method } = API_URLS.projects.update(projectCode);
@@ -1486,6 +1615,410 @@ function initEstimatesTab() {
   initAdvanceFlow(table);
 }
 
+function budgetRiskClass(color) {
+  switch (color) {
+    case "GREEN":
+      return "rp-badge rp-badge-success";
+    case "AMBER":
+      return "rp-badge rp-badge-soft rp-badge-warning";
+    case "RED":
+      return "rp-badge rp-badge-soft rp-badge-danger";
+    default:
+      return "rp-badge rp-badge-soft";
+  }
+}
+
+window.renderProjectBudgetRow = function renderProjectBudgetRow(row) {
+  const fyName = esc(row.financial_year?.name ?? "");
+  const allocated = esc(formatCurrency(parseFloat(row.allocated_budget ?? 0)));
+  const refined =
+    row.refined_budget != null ? esc(formatCurrency(parseFloat(row.refined_budget))) : "—";
+  const estimateCost =
+    row.estimate_version?.total_cost != null
+      ? esc(formatCurrency(row.estimate_version.total_cost))
+      : "—";
+  const remaining = row.remaining_budget != null ? esc(formatCurrency(row.remaining_budget)) : "—";
+  const riskPct = esc(row.risk?.percentage ?? "—");
+  const riskShort = esc(row.risk?.short ?? "—");
+  const riskClass = budgetRiskClass(row.risk?.color);
+  return (
+    `<td>${fyName}</td>` +
+    `<td class="text-end">${allocated}</td>` +
+    `<td class="text-end">${refined}</td>` +
+    `<td class="text-end">${estimateCost}</td>` +
+    `<td class="text-end">${remaining}</td>` +
+    `<td class="text-end rp-fs-12">${riskPct}</td>` +
+    `<td><span class="${riskClass}">${riskShort}</span></td>`
+  );
+};
+
+async function loadBudgetLifetime() {
+  try {
+    const { href, method } = API_URLS.projectBudgets.lifetime(projectCode);
+    const resp = await apiFetch(href, { method });
+    const d = resp?.data ?? {};
+
+    const allocatedEl = document.getElementById("rp-budget-lifetime-allocated-val");
+    const estimateEl = document.getElementById("rp-budget-lifetime-estimate-val");
+    const remainingEl = document.getElementById("rp-budget-lifetime-remaining-val");
+    const riskBadge = document.getElementById("rp-budget-lifetime-risk-badge");
+
+    if (allocatedEl) allocatedEl.textContent = formatCurrency(d.total_actual_budget ?? 0);
+    if (estimateEl)
+      estimateEl.textContent =
+        d.total_estimate_cost != null ? formatCurrency(d.total_estimate_cost) : "—";
+    if (remainingEl)
+      remainingEl.textContent =
+        d.total_remaining_budget != null ? formatCurrency(d.total_remaining_budget) : "—";
+
+    if (riskBadge) {
+      if (d.risk) {
+        riskBadge.textContent = d.risk.short ?? "—";
+        riskBadge.className = budgetRiskClass(d.risk.color);
+        riskBadge.hidden = false;
+      } else {
+        riskBadge.hidden = true;
+      }
+    }
+  } catch {
+    // ignore
+  }
+}
+
+async function loadBudgetHistory(budgetCode) {
+  const container = document.getElementById("rp-budget-history-list");
+  if (!container) return;
+
+  if (!budgetCode) {
+    container.empty("Select a financial year to view its history.");
+    return;
+  }
+
+  container.loading();
+
+  const actionIcons = {
+    CREATED: "bi-plus-circle-fill",
+    UPDATED: "bi-pencil-fill",
+  };
+  const actionIconColors = {
+    CREATED: "accent",
+    UPDATED: "muted",
+  };
+
+  try {
+    const { href, method } = API_URLS.projectBudgets.history(projectCode, budgetCode);
+    const resp = await apiFetch(href, { method });
+    const rows = resp?.data ?? [];
+
+    if (!rows.length) {
+      container.empty("No history available.");
+      return;
+    }
+
+    const items = rows.map((row, idx) => {
+      const isLast = idx === rows.length - 1;
+      const dateStr = row.changed_on ? formatDate(row.changed_on) : "";
+      const byStr = row.changed_by?.email ? ` · ${row.changed_by.email}` : "";
+
+      const parts = [];
+      if (row.action === "CREATED") {
+        if (row.new_allocated_budget != null)
+          parts.push(`Allocated: ${formatCurrency(parseFloat(row.new_allocated_budget))}`);
+        if (row.new_refined_budget != null)
+          parts.push(`Refined: ${formatCurrency(parseFloat(row.new_refined_budget))}`);
+        if (row.new_estimate_version)
+          parts.push(`Estimate: ${row.new_estimate_version.version_display}`);
+      } else {
+        const pa =
+          row.previous_allocated_budget != null
+            ? formatCurrency(parseFloat(row.previous_allocated_budget))
+            : "—";
+        const na =
+          row.new_allocated_budget != null
+            ? formatCurrency(parseFloat(row.new_allocated_budget))
+            : "—";
+        if (pa !== na) parts.push(`Allocated: ${pa} → ${na}`);
+
+        const pr =
+          row.previous_refined_budget != null
+            ? formatCurrency(parseFloat(row.previous_refined_budget))
+            : "—";
+        const nr =
+          row.new_refined_budget != null ? formatCurrency(parseFloat(row.new_refined_budget)) : "—";
+        if (pr !== nr) parts.push(`Refined: ${pr} → ${nr}`);
+
+        const pe = row.previous_estimate_version?.version_display ?? "—";
+        const ne = row.new_estimate_version?.version_display ?? "—";
+        if (pe !== ne) parts.push(`Estimate: ${pe} → ${ne}`);
+      }
+
+      const item = document.createElement("history-item");
+      item.setAttribute("label", row.action.charAt(0) + row.action.slice(1).toLowerCase());
+      item.setAttribute("icon", actionIcons[row.action] ?? "bi-circle-fill");
+      item.setAttribute("icon-color", actionIconColors[row.action] ?? "muted");
+      if (parts.length) item.setAttribute("status", parts.join(" · "));
+      if (row.note) item.setAttribute("note", row.note);
+      item.setAttribute("meta", dateStr + byStr);
+      if (!isLast) item.setAttribute("connector", "");
+      return item;
+    });
+
+    container.setItems(items);
+  } catch {
+    container.error();
+  }
+}
+
+async function loadBudgetEstimateOptions(targetPickerId) {
+  const picker = document.getElementById(targetPickerId);
+  if (!picker) return;
+  try {
+    const { href, method } = API_URLS.projectEstimates.list(projectCode);
+    const resp = await apiFetch(`${href}?page_size=100`, { method });
+    const rows = resp?.data?.results ?? [];
+    picker._initialOptions = [
+      { id: "", label: "— None —", value: "", selected: false, disabled: false },
+      ...rows.map((est) => ({
+        id: "",
+        label: `${est.version_display} (${formatCurrency(est.total_cost ?? 0)})`,
+        value: est.code,
+        selected: false,
+        disabled: false,
+      })),
+    ];
+    picker._doRender();
+  } catch {
+    // ignore
+  }
+}
+
+function openEditBudgetDrawer(row) {
+  const drawer = document.getElementById("rp-budget-edit-drawer");
+  if (!drawer) return;
+  pendingBudgetRow = row;
+  drawer.setTitle(row.financial_year?.name ?? "Edit Budget");
+
+  const allocField = document.getElementById("rp-edit-budget-allocated");
+  const refinedField = document.getElementById("rp-edit-budget-refined");
+  const noteField = document.getElementById("rp-edit-budget-note");
+
+  if (allocField) allocField.value = row.allocated_budget ?? "";
+  if (refinedField) refinedField.value = row.refined_budget ?? "";
+  if (noteField) noteField.value = "";
+
+  drawer.querySelectorAll("[data-rp-error]:not([hidden])").forEach((el) => {
+    el.hidden = true;
+  });
+
+  loadBudgetEstimateOptions("rp-edit-budget-estimate").then(() => {
+    const estimatePicker = document.getElementById("rp-edit-budget-estimate");
+    if (estimatePicker && row.estimate_version?.code) {
+      estimatePicker.value = row.estimate_version.code;
+    } else if (estimatePicker) {
+      estimatePicker.value = "";
+    }
+  });
+
+  drawer.show();
+}
+
+function initBudgetsTab() {
+  const table = document.getElementById("rp-budgets-table");
+  const baseUrl = API_URLS.projectBudgets.list(projectCode).href;
+
+  const activateTab = () => {
+    if (!budgetsLoaded) {
+      budgetsLoaded = true;
+      if (table) table.setAttribute("url", baseUrl);
+    } else {
+      table?.refresh();
+    }
+    loadBudgetLifetime();
+  };
+
+  const tabPanel = document.querySelector("tab-panel");
+  if (tabPanel) {
+    if (tabPanel.activeTab === "budgets") activateTab();
+    tabPanel.addEventListener("rp:tab-change", (e) => {
+      if (e.detail.tab === "budgets") activateTab();
+    });
+  }
+
+  if (table) {
+    table.addEventListener("rp:data:loaded", (e) => {
+      loadedBudgets = e.detail.rows ?? [];
+      const fyPicker = document.getElementById("rp-budget-fy-picker");
+      if (fyPicker) {
+        fyPicker._initialOptions = [
+          { id: "", label: "— Select a year —", value: "", selected: false, disabled: false },
+          ...loadedBudgets.map((b) => ({
+            id: b.financial_year?.code ?? "",
+            label: b.financial_year?.name ?? "",
+            value: b.financial_year?.code ?? "",
+            selected: false,
+            disabled: false,
+          })),
+        ];
+        if (typeof fyPicker._doRender === "function") fyPicker._doRender();
+        fyPicker.value = "";
+      }
+    });
+
+    table.addEventListener("rp:budget:edit", (e) => openEditBudgetDrawer(e.detail.row));
+
+    table.addEventListener("rp:budget:delete", (e) => {
+      pendingBudgetRow = e.detail.row;
+      const modal = document.getElementById("rp-budget-delete-modal");
+      if (!modal) return;
+      const fyName = pendingBudgetRow.financial_year?.name ?? "this budget";
+      modal.setAttribute("title", `Delete budget for ${fyName}?`);
+      modal.setAttribute("body", "This will permanently remove this budget and all its history.");
+      modal.setAttribute("confirm-value", fyName);
+      modal.show();
+    });
+  }
+
+  const fyPicker = document.getElementById("rp-budget-fy-picker");
+  if (fyPicker) {
+    fyPicker.addEventListener("change", () => {
+      const fyCode = fyPicker.value;
+      if (!fyCode) {
+        loadBudgetHistory(null);
+        return;
+      }
+      const budget = loadedBudgets.find((b) => b.financial_year?.code === fyCode);
+      loadBudgetHistory(budget?.code ?? null);
+    });
+  }
+
+  const createBtn = document.getElementById("rp-budget-create-btn");
+  const createDrawer = document.getElementById("rp-budget-create-drawer");
+  if (createBtn && createDrawer) {
+    createBtn.addEventListener("click", () => {
+      ["rp-new-budget-allocated", "rp-new-budget-refined", "rp-new-budget-note"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.value = "";
+      });
+      const fyField = document.getElementById("rp-new-budget-fy");
+      if (fyField) fyField.value = "";
+      createDrawer.querySelectorAll("[data-rp-error]:not([hidden])").forEach((el) => {
+        el.hidden = true;
+      });
+      loadBudgetEstimateOptions("rp-new-budget-estimate");
+      createDrawer.show();
+    });
+
+    createDrawer.addEventListener("rp:footer-primary", async () => {
+      const fyField = document.getElementById("rp-new-budget-fy");
+      const allocField = document.getElementById("rp-new-budget-allocated");
+      [fyField, allocField].forEach((f) =>
+        f?.dispatchEvent(new Event("rp:validate", { bubbles: false })),
+      );
+      if (createDrawer.querySelector("[data-rp-error]:not([hidden])")) return;
+
+      const fyCode = fyField?.value?.trim() ?? "";
+      const allocated = allocField?.value?.trim() ?? "";
+      if (!fyCode || !allocated) return;
+
+      const submitBtn = createDrawer.querySelector("[data-footer-primary]");
+      const snap = snapshotButton(submitBtn);
+      setBusyButton(submitBtn, "Creating…");
+
+      const payload = {
+        financial_year_code: fyCode,
+        allocated_budget: parseFloat(allocated),
+        refined_budget: document.getElementById("rp-new-budget-refined")?.value?.trim() || null,
+        estimate_version_code:
+          document.getElementById("rp-new-budget-estimate")?.value?.trim() || null,
+        note: document.getElementById("rp-new-budget-note")?.value?.trim() || "",
+      };
+
+      try {
+        const { href, method } = API_URLS.projectBudgets.create(projectCode);
+        await apiFetch(href, { method, body: JSON.stringify(payload) });
+        restoreButton(submitBtn, snap);
+        createDrawer.hide();
+        table?.refresh();
+        loadBudgetLifetime();
+        toast({
+          type: "success",
+          title: "Budget added",
+          message: "The budget has been created successfully.",
+        });
+      } catch (err) {
+        restoreButton(submitBtn, snap);
+        const msg = err?.data?.message ?? "Failed to create budget. Please try again.";
+        toast({ type: "error", title: "Error", message: msg });
+      }
+    });
+  }
+
+  const editDrawer = document.getElementById("rp-budget-edit-drawer");
+  if (editDrawer) {
+    editDrawer.addEventListener("rp:footer-primary", async () => {
+      if (!pendingBudgetRow) return;
+
+      const allocField = document.getElementById("rp-edit-budget-allocated");
+      if (allocField) allocField.dispatchEvent(new Event("rp:validate", { bubbles: false }));
+      if (editDrawer.querySelector("[data-rp-error]:not([hidden])")) return;
+
+      const submitBtn = editDrawer.querySelector("[data-footer-primary]");
+      const snap = snapshotButton(submitBtn);
+      setBusyButton(submitBtn, "Saving…");
+
+      const payload = {
+        allocated_budget: parseFloat(allocField?.value ?? "0"),
+        refined_budget: document.getElementById("rp-edit-budget-refined")?.value?.trim() || null,
+        estimate_version_code:
+          document.getElementById("rp-edit-budget-estimate")?.value?.trim() || null,
+        note: document.getElementById("rp-edit-budget-note")?.value?.trim() || "",
+      };
+
+      try {
+        const { href, method } = API_URLS.projectBudgets.update(projectCode, pendingBudgetRow.code);
+        await apiFetch(href, { method, body: JSON.stringify(payload) });
+        restoreButton(submitBtn, snap);
+        editDrawer.hide();
+        pendingBudgetRow = null;
+        table?.refresh();
+        loadBudgetLifetime();
+        toast({ type: "success", title: "Budget updated", message: "Changes have been saved." });
+      } catch (err) {
+        restoreButton(submitBtn, snap);
+        const msg = err?.data?.message ?? "Failed to update budget. Please try again.";
+        toast({ type: "error", title: "Error", message: msg });
+      }
+    });
+  }
+
+  const deleteModal = document.getElementById("rp-budget-delete-modal");
+  if (deleteModal) {
+    deleteModal.addEventListener("rp:delete", async () => {
+      if (!pendingBudgetRow) return;
+      const deleteBtn = deleteModal.querySelector("[data-delete-modal]");
+      deleteBtn?.setAttribute("disabled", "");
+      try {
+        const { href, method } = API_URLS.projectBudgets.delete(projectCode, pendingBudgetRow.code);
+        await apiFetch(href, { method });
+        deleteModal.hide();
+        const fyName = pendingBudgetRow.financial_year?.name ?? "Budget";
+        pendingBudgetRow = null;
+        table?.refresh();
+        loadBudgetLifetime();
+        toast({
+          type: "success",
+          title: "Budget deleted",
+          message: `Budget for "${fyName}" has been removed.`,
+        });
+      } catch (err) {
+        deleteBtn?.removeAttribute("disabled");
+        const msg = err?.data?.message ?? "Failed to delete budget. Please try again.";
+        toast({ type: "error", title: "Error", message: msg });
+      }
+    });
+  }
+}
+
 window.renderProjectLinkRow = function renderProjectLinkRow(row) {
   const urlDisplay = row.url ? row.url : "—";
   return (
@@ -1800,6 +2333,126 @@ function initAttachmentsTab() {
   }
 }
 
+window.renderProjectContactRow = function renderProjectContactRow(row) {
+  return (
+    `<td>${esc(row.contact_name ?? "")}</td>` +
+    `<td class="rp-hide-mobile">${esc(row.contact_email || "—")}</td>` +
+    `<td>${esc(row.role_display ?? row.role ?? "")}</td>`
+  );
+};
+
+function initContactsSection() {
+  const table = document.getElementById("rp-project-contacts-table");
+  const tabPanel = document.querySelector("tab-panel");
+
+  const activateContacts = () => {
+    if (!contactsLoaded) {
+      contactsLoaded = true;
+      if (table) table.setAttribute("url", API_URLS.projectContacts.list(projectCode).href);
+    } else {
+      table?.refresh();
+    }
+  };
+
+  if (tabPanel) {
+    if (tabPanel.activeTab === "operational") activateContacts();
+    tabPanel.addEventListener("rp:tab-change", (e) => {
+      if (e.detail.tab === "operational") activateContacts();
+    });
+  }
+
+  const addBtn = document.getElementById("rp-project-contact-add-btn");
+  const createDrawer = document.getElementById("rp-project-contact-create-drawer");
+  if (addBtn && createDrawer) {
+    addBtn.addEventListener("click", () => {
+      const nameField = document.getElementById("rp-new-contact-name");
+      const emailField = document.getElementById("rp-new-contact-email");
+      const roleField = document.getElementById("rp-new-contact-role");
+      if (nameField) nameField.value = "";
+      if (emailField) emailField.value = "";
+      if (roleField) roleField.value = "";
+      createDrawer.querySelectorAll("[data-rp-error]:not([hidden])").forEach((el) => {
+        el.hidden = true;
+      });
+      createDrawer.show();
+    });
+
+    createDrawer.addEventListener("rp:footer-primary", async () => {
+      const nameField = document.getElementById("rp-new-contact-name");
+      const emailField = document.getElementById("rp-new-contact-email");
+      const roleField = document.getElementById("rp-new-contact-role");
+
+      [nameField, roleField].forEach((f) =>
+        f?.dispatchEvent(new Event("rp:validate", { bubbles: false })),
+      );
+      if (createDrawer.querySelector("[data-rp-error]:not([hidden])")) return;
+
+      const name = nameField?.value?.trim() ?? "";
+      const email = emailField?.value?.trim() ?? "";
+      const role = roleField?.value ?? "";
+      if (!name || !role) return;
+
+      const submitBtn = createDrawer.querySelector("[data-footer-primary]");
+      const snap = snapshotButton(submitBtn);
+      setBusyButton(submitBtn, "Adding…");
+
+      try {
+        const { href, method } = API_URLS.projectContacts.create(projectCode);
+        await apiFetch(href, { method, body: JSON.stringify({ name, email, role }) });
+        restoreButton(submitBtn, snap);
+        createDrawer.hide();
+        table?.refresh();
+        toast({ type: "success", title: "Contact added", message: `"${name}" has been added.` });
+      } catch (err) {
+        restoreButton(submitBtn, snap);
+        const msg = err?.data?.error?.message ?? "Failed to add contact. Please try again.";
+        toast({ type: "error", title: "Error", message: msg });
+      }
+    });
+  }
+
+  const deleteModal = document.getElementById("rp-project-contact-delete-modal");
+  if (table && deleteModal) {
+    table.addEventListener("rp:contact:delete", (e) => {
+      pendingContactRow = e.detail.row;
+      deleteModal.setAttribute("title", `Remove "${pendingContactRow.contact_name}"?`);
+      deleteModal.setAttribute(
+        "body",
+        "This will remove the contact from this project. The contact record will be preserved.",
+      );
+      deleteModal.setAttribute("confirm-value", pendingContactRow.contact_name);
+      deleteModal.show();
+    });
+
+    deleteModal.addEventListener("rp:delete", async () => {
+      if (!pendingContactRow) return;
+      const deleteBtn = deleteModal.querySelector("[data-delete-modal]");
+      deleteBtn?.setAttribute("disabled", "");
+
+      try {
+        const { href, method } = API_URLS.projectContacts.delete(
+          projectCode,
+          pendingContactRow.code,
+        );
+        await apiFetch(href, { method });
+        deleteModal.hide();
+        const name = pendingContactRow.contact_name;
+        pendingContactRow = null;
+        table?.refresh();
+        toast({
+          type: "success",
+          title: "Contact removed",
+          message: `"${name}" has been removed.`,
+        });
+      } catch (err) {
+        deleteBtn?.removeAttribute("disabled");
+        const msg = err?.data?.error?.message ?? "Failed to remove contact. Please try again.";
+        toast({ type: "error", title: "Error", message: msg });
+      }
+    });
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   if (!projectCode) return;
   loadProjectDetails();
@@ -1810,7 +2463,9 @@ document.addEventListener("DOMContentLoaded", () => {
   initEditDrawer();
   initTagsSaveButton();
   initAddLabelModal();
+  initContactsSection();
   initEstimatesTab();
+  initBudgetsTab();
   initLinksTab();
   initAttachmentsTab();
 });
