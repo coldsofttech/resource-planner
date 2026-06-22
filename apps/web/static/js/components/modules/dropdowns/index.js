@@ -15,6 +15,7 @@ import "./project-tags-field.js";
 import "./project-status-field.js";
 import "./project-substatus-field.js";
 import "./project-type-field.js";
+import "./recharge-type-field.js";
 import "./role-field.js";
 import "./skills-field.js";
 import "./sprint-field.js";
