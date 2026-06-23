@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}" />
+    <link rel="alternate icon" href="{% static 'images/favicon.ico' %}" />
+    <title>{% block error_title %}Error{% endblock %} — Resource Planner</title>
+    <script src="{% static 'js/dist/theme-init.min.js' %}"></script>
+    <script type="module" src="{% static 'js/dist/components.min.js' %}"></script>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+          crossorigin="anonymous" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="{% static 'css/dist/styles.min.css' %}" />
+  </head>
+  <body class="rp-fp-page" data-screen-label="{% block error_title_plain %}Error{% endblock %}">
+    <div class="rp-auth-bar">
+      <div class="rp-logo" id="rp-app-logo" data-app-logo>RP</div>
+      <div>
+        <div class="rp-auth-bar-name" id="rp-app-name">Resource Planner</div>
+        <div class="rp-subtle rp-auth-bar-sub" id="rp-app-sub"></div>
+      </div>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <theme-toggle></theme-toggle>
+        {% if request.user and request.user.is_authenticated %}
+          <link-field href="/dashboard/" id="rp-error-back-link">
+            <icon-field icon="bi-arrow-left"></icon-field> Back to Dashboard
+          </link-field>
+        {% else %}
+          <link-field href="/login/" id="rp-error-back-link">
+            <icon-field icon="bi-arrow-left"></icon-field> Back to Sign in
+          </link-field>
+        {% endif %}
+      </div>
+    </div>
+    <div class="rp-fp-body">
+      <div class="rp-fp-card">
+        <div class="rp-card">
+          <div class="rp-card-body">
+            <div class="rp-fp-step-icon {% block error_icon_class %}rp-fp-step-icon--accent{% endblock %}">
+              <icon-field icon="{% block error_icon %}bi-exclamation-circle{% endblock %}"></icon-field>
+            </div>
+            <h1 class="rp-h2 mb-1">{% block error_heading %}An error occurred{% endblock %}</h1>
+            <p class="rp-muted mb-4">{% block error_message %}Something went wrong. Please try again.{% endblock %}</p>
+            <secondary-button id="rp-error-go-back-btn" label="Go back" prefix-icon="bi-arrow-left" class="rp-auth-submit"></secondary-button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        var btn = document.getElementById("rp-error-go-back-btn");
+        if (btn) btn.addEventListener("click", function () { history.back(); });
+      })();
+    </script>
+  </body>
+</html>
