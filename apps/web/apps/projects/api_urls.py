@@ -470,7 +470,7 @@ urlpatterns = [
     ),
     path(
         "projects/labels/options/",
-        ProjectLabelViewSet.as_view({"get": "options"}),
+        ProjectLabelViewSet.as_view({"get": "options_global"}),
         name="project-labels-options-global",
     ),
     path(
