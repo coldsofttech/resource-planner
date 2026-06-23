@@ -3,6 +3,7 @@ from __future__ import annotations
 from apps.sprints.models.capacity import Capacity
 from apps.sprints.models.sprint import Sprint
 from apps.sprints.models.sprint_data_import import SprintDataImport
+from apps.sprints.models.sprint_data_import_confirmed import SprintDataImportConfirmed
 from apps.sprints.models.sprint_data_import_review import SprintDataImportReview
 from apps.sprints.models.sprint_data_import_review_capacity_result import (
     SprintDataImportReviewCapacityResult,
@@ -19,6 +20,7 @@ __all__ = [
     "Sprint",
     "Capacity",
     "SprintDataImport",
+    "SprintDataImportConfirmed",
     "SprintDataImportRow",
     "SprintDataImportReview",
     "SprintDataImportReviewResult",

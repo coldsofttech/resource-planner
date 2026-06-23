@@ -1,7 +1,7 @@
 "use strict";
 
 import { esc, setBreadcrumbs } from "../../components/utils.js";
-import { apiFetch } from "../utils/utils.js";
+import { apiFetch, snapshotButton, setBusyButton, restoreButton } from "../utils/utils.js";
 import { toast } from "../utils/toast.js";
 import { API_URLS, UI_URLS } from "../main/urls.js";
 
@@ -307,6 +307,131 @@ function initDownloadTemplateButton() {
   });
 }
 
+async function openReviewCompleteDrawer(drawer) {
+  const loading = document.getElementById("rp-review-complete-loading");
+  const body = document.getElementById("rp-review-complete-body");
+  const incompleteSection = document.getElementById("rp-review-complete-incomplete");
+  const allOkSection = document.getElementById("rp-review-complete-all-ok");
+  const teamList = document.getElementById("rp-review-complete-team-list");
+  const overrideField = document.getElementById("rp-review-complete-override");
+  const notesField = document.getElementById("rp-review-complete-notes");
+  const submitBtn = drawer.querySelector("[data-footer-primary]");
+
+  // Reset to loading state
+  if (loading) loading.hidden = false;
+  if (body) body.hidden = true;
+  if (incompleteSection) incompleteSection.hidden = true;
+  if (allOkSection) allOkSection.hidden = true;
+  if (submitBtn) submitBtn.setAttribute("disabled", "");
+  if (overrideField) overrideField.dispatchEvent(new Event("rp:reset", { bubbles: false }));
+  if (notesField) {
+    notesField.value = "";
+    notesField.dispatchEvent(new Event("rp:reset", { bubbles: false }));
+  }
+
+  drawer.show();
+
+  try {
+    const { href, method } = API_URLS.teams.list();
+    const resp = await apiFetch(`${href}?is_active=true&page_size=100`, { method });
+    const teams = resp?.data?.results ?? [];
+
+    // Check each team's latest confirmed import status in parallel
+    const checks = await Promise.all(
+      teams.map(async (team) => {
+        try {
+          const { href: ih, method: im } = API_URLS.sprints.forecastImports(sprintCode, team.code);
+          const ir = await apiFetch(`${ih}?page_size=1`, { method: im });
+          const latest = ir?.data?.results?.[0] ?? null;
+          return { team, isConfirmed: latest?.status === "confirmed", hasImport: !!latest };
+        } catch {
+          return { team, isConfirmed: false, hasImport: false };
+        }
+      }),
+    );
+
+    const incompleteTeams = checks.filter((c) => !c.isConfirmed);
+
+    if (loading) loading.hidden = true;
+    if (body) body.hidden = false;
+
+    if (incompleteTeams.length > 0) {
+      if (teamList) {
+        teamList.innerHTML = incompleteTeams
+          .map(({ team, hasImport }) => {
+            const reason = hasImport ? "Not Confirmed" : "No Import";
+            const badgeCls = hasImport ? "rp-badge-info" : "rp-badge-warning";
+            return `<div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+              <div class="d-flex align-items-center gap-2">
+                <identicon-field name="${esc(team.name)}" variant="monogram" size="sm"></identicon-field>
+                <span class="fw-medium">${esc(team.name)}</span>
+              </div>
+              <span class="rp-badge rp-badge-soft ${esc(badgeCls)}">${reason}</span>
+            </div>`;
+          })
+          .join("");
+      }
+      if (incompleteSection) incompleteSection.hidden = false;
+    } else {
+      if (allOkSection) allOkSection.hidden = false;
+      if (submitBtn) submitBtn.removeAttribute("disabled");
+    }
+  } catch {
+    if (loading) loading.hidden = true;
+    if (body) body.hidden = false;
+    if (teamList)
+      teamList.innerHTML = `<p class="mb-0" style="color:var(--rp-danger)">Failed to load team statuses. Close and retry.</p>`;
+    if (incompleteSection) incompleteSection.hidden = false;
+  }
+}
+
+function initReviewCompleteButton() {
+  const btn = document.getElementById("rp-forecast-review-complete-btn");
+  const drawer = document.getElementById("rp-forecast-review-complete-drawer");
+  if (!btn || !drawer) return;
+
+  const overrideField = document.getElementById("rp-review-complete-override");
+  const submitBtn = drawer.querySelector("[data-footer-primary]");
+
+  btn.addEventListener("click", () => openReviewCompleteDrawer(drawer));
+
+  // Enable / disable the Complete button based on override checkbox state
+  if (overrideField && submitBtn) {
+    overrideField.addEventListener("change", () => {
+      if (overrideField.checked) {
+        submitBtn.removeAttribute("disabled");
+      } else {
+        submitBtn.setAttribute("disabled", "");
+      }
+    });
+  }
+
+  drawer.addEventListener("rp:footer-primary", async () => {
+    const notesField = document.getElementById("rp-review-complete-notes");
+    const submitBtn = drawer.querySelector("[data-footer-primary]");
+    const snap = snapshotButton(submitBtn);
+    setBusyButton(submitBtn, "Completing…");
+
+    const notes = notesField?.value?.trim() ?? "";
+    const override = overrideField?.checked ?? false;
+
+    try {
+      const { href, method } = API_URLS.sprints.forecastReviewComplete(sprintCode);
+      await apiFetch(href, { method, body: JSON.stringify({ notes, override }) });
+      drawer.hide();
+      toast({
+        type: "success",
+        title: "Review complete",
+        message: "Sprint forecast review has been marked complete.",
+      });
+    } catch (err) {
+      restoreButton(submitBtn, snap);
+      const msg = err?.data?.error?.message ?? "Failed to complete review. Please try again.";
+      toast({ type: "error", title: "Error", message: msg });
+    }
+  });
+}
+
 function initImportRowNavigation() {
   const container = document.getElementById("rp-forecast-teams-container");
   if (!container) return;
@@ -333,4 +458,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initImportActions();
   initImportRowNavigation();
   initDownloadTemplateButton();
+  initReviewCompleteButton();
 });

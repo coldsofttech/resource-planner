@@ -6,7 +6,7 @@ import sys
 
 from ..constants import RED, RESET, ROOT, WEB_DIR, YELLOW
 from ..core.cache import _needs_run, _record_run
-from ..core.env import _env_remove, _env_write
+from ..core.env import _env_remove, _env_write, _load_env_defaults
 from ..core.parallel import (
     _ANSI_RE,
     _run_cmd_buffered,
@@ -160,6 +160,19 @@ def runserver():
         print(f"{RED}\nPre-server tasks failed: {', '.join(failed)}{RESET}")
         pause()
         return
+
+    env_defaults = _load_env_defaults()
+    if env_defaults.get("DEBUG", "False").strip() != "True":
+        print("\nDEBUG=False — collecting static files...")
+        rc = run(
+            "python manage.py collectstatic --noinput --clear"
+            " --ignore=modules --ignore=components --ignore=styles",
+            cwd=WEB_DIR,
+        )
+        if rc != 0:
+            print(f"{RED}collectstatic failed — server not started{RESET}")
+            pause()
+            return
 
     # Each entry: (profile, label, [env_keys written by us that must be
     # removed on exit])

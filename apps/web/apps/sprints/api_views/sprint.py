@@ -424,10 +424,62 @@ class SprintViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
     )
     def capacity(self, request: Request, code=None):
         """GET /sprints/<code>/capacity/"""
+        search = request.query_params.get("search", "").strip()
+        import_code = request.query_params.get("import", "").strip()
+
+        # When an import code is provided, drive the response from that import's
+        # latest review capacity results rather than the sprint Capacity model.
+        # This populates allocated_days and capacity_status for the import view.
+        if import_code:
+            from apps.sprints.models.sprint_data_import_review import (
+                SprintDataImportReview,
+            )
+            from apps.sprints.models.sprint_data_import_review_capacity_result import (
+                SprintDataImportReviewCapacityResult,
+            )
+            from apps.sprints.selectors import get_import_by_code
+
+            record = get_import_by_code(import_code)
+            if record is not None:
+                latest_review = (
+                    SprintDataImportReview.objects.filter(import_record_id=record.pk)
+                    .order_by("-reviewed_at")
+                    .first()
+                )
+                if latest_review is not None:
+                    results = (
+                        SprintDataImportReviewCapacityResult.objects.filter(
+                            review=latest_review
+                        )
+                        .select_related("member")
+                        .order_by("member__first_name", "member__last_name")
+                    )
+                    if search:
+                        results = results.filter(
+                            Q(member__first_name__icontains=search)
+                            | Q(member__last_name__icontains=search)
+                            | Q(member__email__icontains=search)
+                        )
+                    data = [
+                        {
+                            "member": {
+                                "id": r.member_id,
+                                "email": r.member.email,
+                                "full_name": r.member.get_full_name() or r.member.email,
+                            },
+                            "net_capacity": r.net_capacity,
+                            "allocated_days": r.allocated_days,
+                            "capacity_status": r.status,
+                        }
+                        for r in results
+                    ]
+                    return self.response(
+                        data=data, message="Sprint capacity retrieved successfully."
+                    )
+
         svc = CapacityService(user=request.user)
         rows = svc.get_for_sprint(sprint_code=code)
 
-        search = request.query_params.get("search", "").strip()
         team_code = request.query_params.get("team", "").strip()
 
         if search:

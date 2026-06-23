@@ -13,6 +13,7 @@
   <span id="rp-forecast-title">Forecast</span>
 {% endblock page_title %}
 {% block page_actions %}
+  <success-button id="rp-forecast-review-complete-btn" label="Review Complete" prefix-icon="bi-check-circle-fill"></success-button>
   <primary-button id="rp-forecast-template-btn" label="Download Template" prefix-icon="bi-file-earmark-arrow-down"></primary-button>
 {% endblock page_actions %}
 {% block content %}
@@ -34,4 +35,29 @@
   {% if can_import_forecast %}
     <input type="file" id="rp-forecast-file-input" accept=".csv" hidden>
   {% endif %}
+  <drawer-modal id="rp-forecast-review-complete-drawer">
+    <drawer-header eyebrow="Sprint Forecast" title="Review Complete" no-sizes></drawer-header>
+    <drawer-panel>
+      <div id="rp-review-complete-loading" class="rp-empty-state" style="min-height:120px">
+        <span class="rp-empty-icon bi bi-hourglass-split"></span>
+        <p class="rp-empty-title">Checking team statuses…</p>
+      </div>
+      <div id="rp-review-complete-body" hidden>
+        <div id="rp-review-complete-incomplete" hidden>
+          <p class="mb-3" style="color:var(--rp-muted)">The following teams do not have a confirmed forecast import for this sprint:</p>
+          <div id="rp-review-complete-team-list" class="mb-3"></div>
+          <checkbox-field id="rp-review-complete-override" label="Override — mark complete despite unconfirmed teams"></checkbox-field>
+        </div>
+        <div id="rp-review-complete-all-ok" hidden>
+          <p class="mb-0" style="color:var(--rp-success)">
+            <i class="bi bi-check-circle-fill me-1"></i>All teams have confirmed forecast imports.
+          </p>
+        </div>
+        <div class="mt-3">
+          <text-field id="rp-review-complete-notes" cols="4" label="Notes" placeholder="Add a note or message…"></text-field>
+        </div>
+      </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Complete" primary-icon="bi-check-circle-fill" data-footer-primary></drawer-footer>
+  </drawer-modal>
 {% endblock content %}

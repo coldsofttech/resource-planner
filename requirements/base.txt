@@ -1,4 +1,5 @@
 django~=6.0.5
+whitenoise~=6.9
 djangorestframework~=3.17.1
 anthropic>=0.40
 boto3~=1.43.12

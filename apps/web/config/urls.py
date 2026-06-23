@@ -25,6 +25,13 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
+from apps.core.views import bad_request, page_not_found, permission_denied, server_error
+
+handler400 = bad_request
+handler403 = permission_denied
+handler404 = page_not_found
+handler500 = server_error
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
@@ -77,3 +84,11 @@ urlpatterns = [
     path("api/v1/", include("apps.tags.api_urls")),
     path("api/v1/", include("apps.recharges.api_urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG:
+    urlpatterns += [
+        path("_errors/400/", bad_request, name="test-400"),
+        path("_errors/403/", permission_denied, name="test-403"),
+        path("_errors/404/", page_not_found, name="test-404"),
+        path("_errors/500/", server_error, name="test-500"),
+    ]

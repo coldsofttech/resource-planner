@@ -98,6 +98,11 @@ urlpatterns = [
     ),
     # Sprint data import — Forecast
     path(
+        "sprints/<str:sprint_code>/forecast/review-complete/",
+        SprintDataImportForecastViewSet.as_view({"post": "forecast_review_complete"}),
+        name="sprint-forecast-review-complete",
+    ),
+    path(
         "sprints/<str:sprint_code>/forecast/template/",
         SprintDataImportForecastViewSet.as_view({"get": "download_template"}),
         name="sprint-forecast-template",

@@ -406,6 +406,10 @@ export const API_URLS = {
       method: "POST",
       href: `${API_BASE}sprints/${sprintCode}/forecast/${importCode}/confirm/`,
     }),
+    forecastReviewComplete: (sprintCode) => ({
+      method: "POST",
+      href: `${API_BASE}sprints/${sprintCode}/forecast/review-complete/`,
+    }),
     actualsTemplate: (sprintCode) => ({
       method: "GET",
       href: `${API_BASE}sprints/${sprintCode}/actuals/template/`,
@@ -656,6 +660,7 @@ export const API_URLS = {
       method: "DELETE",
       href: `${API_BASE}projects/${code}/collaborators/${teamCode}/`,
     }),
+    labelsOptions: () => ({ method: "GET", href: `${API_BASE}projects/labels/options/` }),
   },
   projectFollowers: {
     list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/followers/` }),
