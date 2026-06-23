@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 
 from pycore import DotEnv
@@ -179,13 +180,17 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # In production (DEBUG=False), WhiteNoise serves from STATIC_ROOT using a
 # manifest for cache-busting; collectstatic must be run before the server starts.
 WHITENOISE_AUTOREFRESH = DEBUG
+_TESTING = "pytest" in sys.modules
+
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
         "BACKEND": (
-            "whitenoise.storage.CompressedStaticFilesStorage"
+            "django.contrib.staticfiles.storage.StaticFilesStorage"
+            if _TESTING
+            else "whitenoise.storage.CompressedStaticFilesStorage"
             if DEBUG
             else "whitenoise.storage.CompressedManifestStaticFilesStorage"
         ),
