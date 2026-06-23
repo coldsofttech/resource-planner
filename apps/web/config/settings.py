@@ -31,10 +31,10 @@ from config import database, logging  # noqa: E402
 SECRET_KEY = "django-insecure-n@t4zu#yq!@jwml0)x1rtn87rnnpo_z@_mg6=$$tgsy-ry!h$k"  # nosec B105  # noqa: E501
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 # AppConfig.ready() will append the BASE_URL host after DB is available
-ALLOWED_HOSTS: list[str] = ["localhost", "127.0.0.1", "[::1]"]
+ALLOWED_HOSTS: list[str] = ["*"] if DEBUG else ["localhost", "127.0.0.1", "[::1]"]
 
 # Injected by scripts/dev/dev.py at runserver time for LAN access
 _dev_lan_ip = os.environ.get("DEV_LAN_IP", "").strip()
@@ -90,6 +90,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -171,6 +172,25 @@ USE_TZ = True
 
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# In development (DEBUG=True), Django's runserver serves static files directly
+# from STATICFILES_DIRS — no manifest or collectstatic required.
+# In production (DEBUG=False), WhiteNoise serves from STATIC_ROOT using a
+# manifest for cache-busting; collectstatic must be run before the server starts.
+WHITENOISE_AUTOREFRESH = DEBUG
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": (
+            "whitenoise.storage.CompressedStaticFilesStorage"
+            if DEBUG
+            else "whitenoise.storage.CompressedManifestStaticFilesStorage"
+        ),
+    },
+}
 
 # Media files (user uploads, avatars, etc.)
 MEDIA_URL = "/media/"
