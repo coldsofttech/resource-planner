@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 
@@ -123,12 +123,13 @@ def _serialize_import(record) -> dict:
 
 @extend_schema(tags=["Sprints"])
 class SprintDataImportForecastViewSet(BaseViewSet):
-    parser_classes = [MultiPartParser]
+    parser_classes = [MultiPartParser, JSONParser]
 
     def get_permissions(self):
         action_perms = {
             "upload": "sprints.import_forecast",
             "download_template": "sprints.import_forecast",
+            "forecast_review_complete": "sprints.review_complete",
         }
         perm = action_perms.get(self.action)
         if perm:
@@ -170,6 +171,33 @@ class SprintDataImportForecastViewSet(BaseViewSet):
         """GET /sprints/<sprint_code>/forecast/template/"""
         svc = SprintDataImportForecastService(user=request.user)
         return svc.get_template_response()
+
+    @extend_schema(
+        summary="Mark sprint forecast review complete and populate recharge details",
+        responses={
+            200: OpenApiResponse(description="Review marked complete."),
+            404: OpenApiResponse(description="Sprint not found."),
+        },
+    )
+    def forecast_review_complete(self, request: Request, sprint_code: str):
+        """POST /sprints/<sprint_code>/forecast/review-complete/"""
+        from apps.recharges.services import RechargeDetailService
+        from apps.sprints.selectors import get_sprint_by_code
+
+        sprint = get_sprint_by_code(sprint_code)
+        if sprint is None:
+            from apps.core.exceptions import NotFoundException
+
+            raise NotFoundException(
+                resource="Sprint", lookup_field="code", lookup_value=sprint_code
+            )
+
+        svc = RechargeDetailService(user=request.user)
+        count = svc.populate_from_sprint_forecast(sprint_id=sprint.pk)
+        return self.response(
+            data={"created": count},
+            message="Sprint forecast review marked complete.",
+        )
 
 
 @extend_schema(tags=["Sprints"])

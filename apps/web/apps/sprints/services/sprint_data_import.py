@@ -101,12 +101,15 @@ class BaseSprintDataImportService(ContextService):
         team = self._get_team(team_code)
         version = self._next_version(sprint.pk, team.pk)
 
-        # Supersede any active record for this sprint/team/type combo
+        # Supersede any active or previously confirmed record for this sprint/team/type
         SprintDataImport.objects.filter(
             sprint=sprint,
             team=team,
             import_type=self.IMPORT_TYPE,
-            status=SprintDataImportStatus.ACTIVE,
+            status__in=[
+                SprintDataImportStatus.ACTIVE,
+                SprintDataImportStatus.CONFIRMED,
+            ],
         ).update(status=SprintDataImportStatus.SUPERSEDED)
 
         record = SprintDataImport.objects.create(
@@ -433,7 +436,13 @@ class BaseSprintDataImportService(ContextService):
 
     @transaction.atomic
     def confirm(self, import_code: str, notes: str = ""):
+        from decimal import ROUND_HALF_UP, Decimal
+
+        from apps.configurations.selectors import Sprint as SprintConfig
         from apps.sprints.constants import ImportRowCheckStatus
+        from apps.sprints.models.sprint_data_import_confirmed import (
+            SprintDataImportConfirmed,
+        )
         from apps.sprints.models.sprint_data_import_review import SprintDataImportReview
         from apps.sprints.models.sprint_data_import_review_capacity_result import (
             SprintDataImportReviewCapacityResult,
@@ -494,6 +503,50 @@ class BaseSprintDataImportService(ContextService):
         record.status = SprintDataImportStatus.CONFIRMED
         record.updated_by = self.user
         record.save(update_fields=["status", "updated_by", "updated_at"])
+
+        # Replace all confirmed rows for this sprint/team/import_type with the
+        # effective values from the current import (latest version wins).
+        SprintDataImportConfirmed.objects.filter(
+            sprint=record.sprint,
+            team=record.team,
+            import_type=record.import_type,
+        ).delete()
+
+        hours_per_day = SprintConfig.get_hours_per_day()
+        per_day = (
+            Decimal(str(hours_per_day * 3_600)) if hours_per_day > 0 else Decimal("0")
+        )
+
+        rows = list(record.rows.filter(is_deleted=False).order_by("pk"))
+
+        def _days(efforts_str: str) -> Decimal:
+            try:
+                val = Decimal(str(efforts_str))
+            except Exception:
+                return Decimal("0")
+            if val <= 0 or per_day <= 0:
+                return Decimal("0")
+            return (val / per_day).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+        SprintDataImportConfirmed.objects.bulk_create(
+            [
+                SprintDataImportConfirmed(
+                    sprint=record.sprint,
+                    team=record.team,
+                    import_record=record,
+                    import_type=record.import_type,
+                    story_type=row.effective_story_type,
+                    jira_id=row.effective_jira_id,
+                    title=row.effective_title,
+                    assignee=row.effective_assignee,
+                    efforts=row.effective_efforts,
+                    days=_days(row.effective_efforts),
+                    label=row.effective_label,
+                    mapping=row.effective_mapping,
+                )
+                for row in rows
+            ]
+        )
 
         return completion
 

@@ -54,6 +54,7 @@ class SprintDataImport(CodeModel, AuditableModel):
             ("import_actuals", "Can upload actuals data for a sprint team"),
             ("review_forecast", "Can run review checks on a forecast import"),
             ("confirm_forecast", "Can confirm a reviewed forecast import"),
+            ("review_complete", "Can mark sprint forecast review complete"),
         ]
 
     def __str__(self) -> str:
