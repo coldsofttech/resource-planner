@@ -806,3 +806,89 @@ class RechargeDetailService:
 
         self._sync_recharges(sprint_id, "forecast")
         return count
+
+    def populate_from_sprint_actuals(self, sprint_id: int) -> int:
+        """
+        Delete existing actuals RechargeDetail entries for the sprint and
+        recreate them from the latest confirmed actuals SprintDataImport rows.
+        Aggregated Recharge records are synced afterwards.
+
+        Returns the number of RechargeDetail records created.
+        """
+        from decimal import ROUND_HALF_UP, Decimal
+
+        from apps.configurations.selectors import Sprint as SprintConfig
+        from apps.recharges.constants import RechargeType as RechargeTypeChoice
+        from apps.recharges.models import RechargeDetail
+        from apps.sprints.models import SprintDataImportConfirmed, SprintDataImportRow
+
+        RechargeDetail.objects.filter(
+            sprint_id=sprint_id, type=RechargeTypeChoice.ACTUAL
+        ).delete()
+
+        latest_import_ids = list(
+            SprintDataImportConfirmed.objects.filter(
+                sprint_id=sprint_id, import_type="actual"
+            )
+            .values_list("import_record_id", flat=True)
+            .distinct()
+        )
+        if not latest_import_ids:
+            self._sync_recharges(sprint_id, "actual")
+            return 0
+
+        hours_per_day = SprintConfig.get_hours_per_day()
+        per_day = (
+            Decimal(str(hours_per_day * 3_600)) if hours_per_day > 0 else Decimal("0")
+        )
+        point_price = Decimal(str(SprintConfig.get_sprint_point_price()))
+
+        def _days(efforts_str: str) -> Decimal:
+            try:
+                val = Decimal(str(efforts_str))
+            except Exception:
+                return Decimal("0")
+            if val <= 0 or per_day <= 0:
+                return Decimal("0")
+            return (val / per_day).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+        rows = (
+            SprintDataImportRow.objects.select_related(
+                "import_record__team",
+                "assignee_code",
+                "assignee_code_override",
+                "label_code__project__programme",
+                "label_code_override__project__programme",
+            )
+            .filter(import_record_id__in=latest_import_ids, is_deleted=False)
+            .order_by("import_record_id", "pk")
+        )
+
+        count = 0
+        for row in rows:
+            assignee = row.effective_assignee_code
+            label = row.effective_label_code
+            project = label.project if label is not None else None
+            programme = project.programme if project is not None else None
+
+            detail = RechargeDetail(
+                sprint_id=sprint_id,
+                team=row.import_record.team,
+                assignee=assignee,
+                programme=programme,
+                project=project,
+                label=label,
+                type=RechargeTypeChoice.ACTUAL,
+                jira_id=row.effective_jira_id or "",
+                title=row.effective_title or "",
+                total_days=_days(row.effective_efforts),
+                total_cost=_days(row.effective_efforts) * point_price,
+                import_record=row.import_record,
+                created_by=self.user,
+                updated_by=self.user,
+            )
+            detail.save()
+            count += 1
+
+        self._sync_recharges(sprint_id, "actual")
+        return count

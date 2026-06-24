@@ -41,3 +41,17 @@ class SprintForecastView(ProtectedView):
 
 class SprintForecastImportDetailView(ProtectedView):
     template_name = "sprints/forecast_import_detail.html"
+
+
+class SprintActualsView(ProtectedView):
+    template_name = "sprints/actuals.html"
+
+    def get_context_data(self, **kwargs: object) -> dict[str, object]:
+        ctx = super().get_context_data(**kwargs)
+        perms = get_user_permissions(self.request.user)
+        ctx["can_import_actuals"] = "sprints.import_actuals" in perms
+        return ctx
+
+
+class SprintActualsImportDetailView(ProtectedView):
+    template_name = "sprints/actuals_import_detail.html"

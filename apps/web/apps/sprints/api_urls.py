@@ -1,6 +1,7 @@
 from django.urls import path
 
 from apps.sprints.api_views import (
+    SprintDataImportActualRowViewSet,
     SprintDataImportActualViewSet,
     SprintDataImportForecastViewSet,
     SprintDataImportRowViewSet,
@@ -147,6 +148,11 @@ urlpatterns = [
     ),
     # Sprint data import — Actuals
     path(
+        "sprints/<str:sprint_code>/actuals/review-complete/",
+        SprintDataImportActualViewSet.as_view({"post": "actuals_review_complete"}),
+        name="sprint-actuals-review-complete",
+    ),
+    path(
         "sprints/<str:sprint_code>/actuals/template/",
         SprintDataImportActualViewSet.as_view({"get": "download_template"}),
         name="sprint-actuals-template",
@@ -160,5 +166,35 @@ urlpatterns = [
         "sprints/<str:sprint_code>/actuals/<str:team_code>/imports/",
         SprintDataImportActualViewSet.as_view({"get": "list_imports"}),
         name="sprint-actuals-imports",
+    ),
+    # Sprint data import — Actuals row management
+    path(
+        "sprints/<str:sprint_code>/actuals/<str:import_code>/",
+        SprintDataImportActualRowViewSet.as_view({"get": "retrieve_import"}),
+        name="sprint-actuals-import-detail",
+    ),
+    path(
+        "sprints/<str:sprint_code>/actuals/<str:import_code>/rows/",
+        SprintDataImportActualRowViewSet.as_view(
+            {"get": "list_rows", "post": "create_row"}
+        ),
+        name="sprint-actuals-import-rows",
+    ),
+    path(
+        "sprints/<str:sprint_code>/actuals/<str:import_code>/rows/<str:row_code>/",
+        SprintDataImportActualRowViewSet.as_view(
+            {"patch": "update_row", "delete": "delete_row"}
+        ),
+        name="sprint-actuals-import-row-detail",
+    ),
+    path(
+        "sprints/<str:sprint_code>/actuals/<str:import_code>/review/",
+        SprintDataImportActualRowViewSet.as_view({"post": "review_import"}),
+        name="sprint-actuals-import-review",
+    ),
+    path(
+        "sprints/<str:sprint_code>/actuals/<str:import_code>/confirm/",
+        SprintDataImportActualRowViewSet.as_view({"post": "confirm_import"}),
+        name="sprint-actuals-import-confirm",
     ),
 ]

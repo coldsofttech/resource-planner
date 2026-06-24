@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Sprint Actuals
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/sprints.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Planning
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <span id="rp-actuals-title">Actuals</span>
+{% endblock page_title %}
+{% block page_actions %}
+  <success-button id="rp-actuals-review-complete-btn" label="Review Complete" prefix-icon="bi-check-circle-fill"></success-button>
+  <primary-button id="rp-actuals-template-btn" label="Download Template" prefix-icon="bi-file-earmark-arrow-down"></primary-button>
+{% endblock page_actions %}
+{% block content %}
+  <div class="row g-4">
+    <div class="col-12">
+      <section-panel>
+        <panel-title>Teams</panel-title>
+        <panel-body>
+          <div id="rp-actuals-teams-container">
+            <div id="rp-actuals-teams-loading" class="rp-empty-state">
+              <span class="rp-empty-icon bi bi-hourglass-split"></span>
+              <p class="rp-empty-title">Loading teams…</p>
+            </div>
+          </div>
+        </panel-body>
+      </section-panel>
+    </div>
+  </div>
+  {% if can_import_actuals %}
+    <input type="file" id="rp-actuals-file-input" accept=".csv" hidden>
+  {% endif %}
+  <drawer-modal id="rp-actuals-review-complete-drawer" width="900">
+    <drawer-header eyebrow="Sprint Actuals" title="Review Complete" no-sizes></drawer-header>
+    <drawer-panel>
+      <div id="rp-actuals-review-complete-loading" class="rp-empty-state" style="min-height:120px">
+        <span class="rp-empty-icon bi bi-hourglass-split"></span>
+        <p class="rp-empty-title">Checking team statuses…</p>
+      </div>
+      <div id="rp-actuals-review-complete-body" hidden>
+        <div id="rp-actuals-review-complete-incomplete" hidden>
+          <p class="mb-3" style="color:var(--rp-muted)">The following teams do not have a confirmed actuals import for this sprint:</p>
+          <div id="rp-actuals-review-complete-team-list" class="mb-3"></div>
+          <checkbox-field id="rp-actuals-review-complete-override" label="Override — mark complete despite unconfirmed teams"></checkbox-field>
+        </div>
+        <div id="rp-actuals-review-complete-all-ok" hidden>
+          <p class="mb-0" style="color:var(--rp-success)">
+            <i class="bi bi-check-circle-fill me-1"></i>All teams have confirmed actuals imports.
+          </p>
+        </div>
+        <div class="mt-3">
+          <text-field id="rp-actuals-review-complete-notes" cols="4" label="Notes" placeholder="Add a note or message…"></text-field>
+        </div>
+      </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Complete" primary-icon="bi-check-circle-fill" data-footer-primary></drawer-footer>
+  </drawer-modal>
+{% endblock content %}

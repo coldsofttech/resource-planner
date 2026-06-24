@@ -57,6 +57,9 @@ export const UI_URLS = {
     forecast: (code) => `/sprints/${code}/forecast/`,
     forecastImportDetail: (sprintCode, importCode) =>
       `/sprints/${sprintCode}/forecast/${importCode}/`,
+    actuals: (code) => `/sprints/${code}/actuals/`,
+    actualsImportDetail: (sprintCode, importCode) =>
+      `/sprints/${sprintCode}/actuals/${importCode}/`,
   },
   programmes: {
     list: () => "/programmes/",
@@ -417,6 +420,42 @@ export const API_URLS = {
     actualsUpload: (sprintCode, teamCode) => ({
       method: "POST",
       href: `${API_BASE}sprints/${sprintCode}/actuals/${teamCode}/upload/`,
+    }),
+    actualsImports: (sprintCode, teamCode) => ({
+      method: "GET",
+      href: `${API_BASE}sprints/${sprintCode}/actuals/${teamCode}/imports/`,
+    }),
+    actualsImportDetail: (sprintCode, importCode) => ({
+      method: "GET",
+      href: `${API_BASE}sprints/${sprintCode}/actuals/${importCode}/`,
+    }),
+    actualsImportRows: (sprintCode, importCode) => ({
+      method: "GET",
+      href: `${API_BASE}sprints/${sprintCode}/actuals/${importCode}/rows/`,
+    }),
+    actualsImportRowCreate: (sprintCode, importCode) => ({
+      method: "POST",
+      href: `${API_BASE}sprints/${sprintCode}/actuals/${importCode}/rows/`,
+    }),
+    actualsImportRowUpdate: (sprintCode, importCode, rowCode) => ({
+      method: "PATCH",
+      href: `${API_BASE}sprints/${sprintCode}/actuals/${importCode}/rows/${rowCode}/`,
+    }),
+    actualsImportRowDelete: (sprintCode, importCode, rowCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}sprints/${sprintCode}/actuals/${importCode}/rows/${rowCode}/`,
+    }),
+    actualsImportReview: (sprintCode, importCode) => ({
+      method: "POST",
+      href: `${API_BASE}sprints/${sprintCode}/actuals/${importCode}/review/`,
+    }),
+    actualsImportConfirm: (sprintCode, importCode) => ({
+      method: "POST",
+      href: `${API_BASE}sprints/${sprintCode}/actuals/${importCode}/confirm/`,
+    }),
+    actualsReviewComplete: (sprintCode) => ({
+      method: "POST",
+      href: `${API_BASE}sprints/${sprintCode}/actuals/review-complete/`,
     }),
   },
   projectSizes: {

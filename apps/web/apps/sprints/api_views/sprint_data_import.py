@@ -405,12 +405,13 @@ class SprintDataImportRowViewSet(BaseViewSet):
 
 @extend_schema(tags=["Sprints"])
 class SprintDataImportActualViewSet(BaseViewSet):
-    parser_classes = [MultiPartParser]
+    parser_classes = [MultiPartParser, JSONParser]
 
     def get_permissions(self):
         action_perms = {
             "upload": "sprints.import_actuals",
             "download_template": "sprints.import_actuals",
+            "actuals_review_complete": "sprints.review_complete",
         }
         perm = action_perms.get(self.action)
         if perm:
@@ -452,3 +453,228 @@ class SprintDataImportActualViewSet(BaseViewSet):
         """GET /sprints/<sprint_code>/actuals/template/"""
         svc = SprintDataImportActualService(user=request.user)
         return svc.get_template_response()
+
+    @extend_schema(
+        summary="Mark sprint actuals review complete and populate recharge details",
+        responses={
+            200: OpenApiResponse(description="Review marked complete."),
+            404: OpenApiResponse(description="Sprint not found."),
+        },
+    )
+    def actuals_review_complete(self, request: Request, sprint_code: str):
+        """POST /sprints/<sprint_code>/actuals/review-complete/"""
+        from apps.recharges.services import RechargeDetailService
+        from apps.sprints.selectors import get_sprint_by_code
+
+        sprint = get_sprint_by_code(sprint_code)
+        if sprint is None:
+            raise NotFoundException(
+                resource="Sprint", lookup_field="code", lookup_value=sprint_code
+            )
+
+        svc = RechargeDetailService(user=request.user)
+        count = svc.populate_from_sprint_actuals(sprint_id=sprint.pk)
+        return self.response(
+            data={"created": count},
+            message="Sprint actuals review marked complete.",
+        )
+
+
+@extend_schema(tags=["Sprints"])
+class SprintDataImportActualRowViewSet(BaseViewSet):
+    def get_permissions(self):
+        action_perms = {
+            "review_import": "sprints.review_forecast",
+            "confirm_import": "sprints.confirm_forecast",
+        }
+        perm = action_perms.get(self.action)
+        if perm:
+            return [IsAuthenticated(), HasPermission(perm)]
+        return [IsAuthenticated()]
+
+    @extend_schema(
+        summary="Retrieve an actuals import record",
+        responses={200: OpenApiResponse(description="Import detail.")},
+    )
+    def retrieve_import(self, request: Request, sprint_code: str, import_code: str):
+        """GET /sprints/<sprint_code>/actuals/<import_code>/"""
+        record = get_import_by_code(import_code)
+        if record is None:
+            raise NotFoundException(
+                resource="SprintDataImport",
+                lookup_field="code",
+                lookup_value=import_code,
+            )
+        from apps.sprints.constants import SprintDataImportStatus
+
+        return self.response(
+            data={
+                "code": record.code,
+                "version_number": record.version_number,
+                "file_name": record.file_name,
+                "status": record.status,
+                "sprint_code": record.sprint.code if record.sprint else None,
+                "sprint_name": record.sprint.name if record.sprint else None,
+                "team_code": record.team.code if record.team else None,
+                "team_name": record.team.name if record.team else None,
+                "has_review": get_has_review_for_import(record.pk),
+                "is_confirmed": record.status == SprintDataImportStatus.CONFIRMED,
+            }
+        )
+
+    def list_rows(self, request: Request, sprint_code: str, import_code: str):
+        """GET /sprints/<sprint_code>/actuals/<import_code>/rows/"""
+        record = get_import_by_code(import_code)
+        if record is None:
+            raise NotFoundException(
+                resource="SprintDataImport",
+                lookup_field="code",
+                lookup_value=import_code,
+            )
+        qs = get_rows_for_import(record.pk)
+
+        check_type = request.query_params.get("check_type", "").strip()
+        if check_type:
+            from apps.sprints.constants import ImportRowCheck
+
+            if check_type in ImportRowCheck.ALL:
+                failing_ids = get_failing_row_ids_for_check(record.pk, check_type)
+                qs = qs.filter(pk__in=failing_ids)
+
+        sort_key = request.query_params.get("sort", "").strip()
+        sort_dir = request.query_params.get("order_by", "ASC").upper()
+        if sort_key in _ROW_SORT_FIELDS:
+            from django.db.models import Case, FloatField, Value, When
+            from django.db.models.functions import Cast
+
+            if sort_key == "days":
+                qs = qs.annotate(
+                    _efforts_num=Case(
+                        When(
+                            efforts_override__isnull=False,
+                            then=Case(
+                                When(efforts_override="", then=Value(0.0)),
+                                default=Cast(
+                                    "efforts_override", output_field=FloatField()
+                                ),
+                                output_field=FloatField(),
+                            ),
+                        ),
+                        When(efforts="", then=Value(0.0)),
+                        default=Cast("efforts", output_field=FloatField()),
+                        output_field=FloatField(),
+                    )
+                )
+                order_field = "_efforts_num"
+            else:
+                order_field = sort_key
+            prefix = "-" if sort_dir == "DESC" else ""
+            qs = qs.order_by(f"{prefix}{order_field}")
+
+        page, page_size = self.get_pagination_params(request)
+        result = paginate_queryset(qs, page, page_size)
+        return self.response(
+            data={
+                "results": [_serialize_row(r) for r in result.results],
+                "pagination": {
+                    "total_count": result.pagination.total_count,
+                    "total_pages": result.pagination.total_pages,
+                    "current_page": result.pagination.current_page,
+                    "page_size": result.pagination.page_size,
+                    "has_next": result.pagination.has_next,
+                    "has_previous": result.pagination.has_previous,
+                },
+            }
+        )
+
+    def create_row(self, request: Request, sprint_code: str, import_code: str):
+        """POST /sprints/<sprint_code>/actuals/<import_code>/rows/"""
+        data = request.data
+        svc = SprintDataImportActualService(user=request.user)
+        row = svc.create_row(
+            import_code=import_code,
+            story_type=(data.get("story_type") or "").strip(),
+            jira_id=(data.get("jira_id") or "").strip(),
+            title=(data.get("title") or "").strip(),
+            assignee_code_str=(data.get("assignee_code") or "").strip(),
+            efforts=(data.get("efforts") or "").strip(),
+            sprint_code_str=(data.get("sprint_code") or "").strip(),
+            label_code_str=(data.get("label_code") or "").strip(),
+            mapping_code_str=(data.get("mapping_code") or "").strip(),
+        )
+        row = get_rows_for_import(row.import_record_id).get(pk=row.pk)
+        return self.response(
+            data=_serialize_row(row),
+            message="Row created successfully.",
+            status_code=status.HTTP_201_CREATED,
+        )
+
+    def delete_row(
+        self, request: Request, sprint_code: str, import_code: str, row_code: str
+    ):
+        """DELETE /sprints/<sprint_code>/actuals/<import_code>/rows/<row_code>/"""
+        svc = SprintDataImportActualService(user=request.user)
+        svc.delete_row(row_code=row_code)
+        return self.response(
+            message="Row deleted successfully.", status_code=status.HTTP_200_OK
+        )
+
+    def update_row(
+        self, request: Request, sprint_code: str, import_code: str, row_code: str
+    ):
+        """PATCH /sprints/<sprint_code>/actuals/<import_code>/rows/<row_code>/"""
+        data = request.data
+        svc = SprintDataImportActualService(user=request.user)
+        row = svc.update_row(
+            row_code=row_code,
+            story_type=(data.get("story_type") or "").strip(),
+            jira_id=(data.get("jira_id") or "").strip(),
+            title=(data.get("title") or "").strip(),
+            assignee_code_str=(data.get("assignee_code") or "").strip(),
+            efforts=(data.get("efforts") or "").strip(),
+            sprint_code_str=(data.get("sprint_code") or "").strip(),
+            label_code_str=(data.get("label_code") or "").strip(),
+            mapping_code_str=(data.get("mapping_code") or "").strip(),
+        )
+        row = get_rows_for_import(row.import_record_id).get(pk=row.pk)
+        return self.response(
+            data=_serialize_row(row),
+            message="Row updated successfully.",
+        )
+
+    def review_import(self, request: Request, sprint_code: str, import_code: str):
+        """POST /sprints/<sprint_code>/actuals/<import_code>/review/"""
+        from apps.sprints.constants import ImportRowCheckStatus
+        from apps.sprints.models.sprint_data_import_review_capacity_result import (
+            SprintDataImportReviewCapacityResult,
+        )
+
+        svc = SprintDataImportActualService(user=request.user)
+        review, row_results = svc.review(import_code=import_code)
+        has_row_errors = any(
+            not all(checks.values()) for checks in row_results.values()
+        )
+        has_capacity_errors = SprintDataImportReviewCapacityResult.objects.filter(
+            review=review, status=ImportRowCheckStatus.FAIL
+        ).exists()
+        return self.response(
+            data={
+                "review_code": review.code,
+                "results": row_results,
+                "has_errors": has_row_errors or has_capacity_errors,
+            }
+        )
+
+    def confirm_import(self, request: Request, sprint_code: str, import_code: str):
+        """POST /sprints/<sprint_code>/actuals/<import_code>/confirm/"""
+        notes = (request.data.get("notes") or "").strip()
+        svc = SprintDataImportActualService(user=request.user)
+        completion = svc.confirm(import_code=import_code, notes=notes)
+        return self.response(
+            data={
+                "import_type": completion.import_type,
+                "completed_at": completion.completed_at.isoformat(),
+                "override_applied": completion.override_applied,
+            },
+            message="Import confirmed successfully.",
+        )

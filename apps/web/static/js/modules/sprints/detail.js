@@ -209,6 +209,14 @@ function initForecastButton() {
   });
 }
 
+function initActualsButton() {
+  const btn = document.getElementById("rp-sprint-actuals-btn");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    window.location.href = UI_URLS.sprints.actuals(sprintCode);
+  });
+}
+
 function initRebuildButton() {
   const btn = document.getElementById("rp-sprint-rebuild-btn");
   if (!btn) return;
@@ -239,6 +247,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!sprintCode) return;
   loadSprintDetails();
   initForecastButton();
+  initActualsButton();
   initRebuildButton();
 
   const table = document.getElementById("rp-sprint-capacity-table");
