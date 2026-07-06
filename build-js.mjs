@@ -1,6 +1,7 @@
 import esbuild from "esbuild";
 
 const esmModules = [
+  "ai-config",
   "auth",
   "business-units",
   "emp-types",
@@ -9,19 +10,30 @@ const esmModules = [
   "leaves",
   "locations",
   "main",
+  "notifications",
+  "onboarding",
+  "products",
+  "project-demands",
   "programmes",
+  "resource-plans",
   "project-sizes",
   "project-statuses",
   "project-types",
   "projects",
+  "recharge-email-review",
   "recharge-types",
+  "recharges",
+  "reports",
   "roles",
+  "security-config",
   "setup",
   "skills",
   "sprints",
   "teams",
+  "to-do",
   "users",
   "utils",
+  "wins",
 ];
 
 const buildConfigs = [

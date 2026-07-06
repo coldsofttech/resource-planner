@@ -1,3 +1,6 @@
+import { apiFetch } from "./utils.js";
+import { API_URLS } from "../main/urls.js";
+
 const TYPE_CLASS = { info: "info", success: "success", warning: "warning", error: "danger" };
 const TYPE_ICON = {
   info: "bi-info-circle-fill",
@@ -5,6 +8,29 @@ const TYPE_ICON = {
   warning: "bi-exclamation-triangle-fill",
   error: "bi-x-circle-fill",
 };
+
+// Maps toast type -> notifications backend notification_type. Errors persist as
+// "error" so the notifications panel/list can render the same danger styling.
+const NOTIFICATION_TYPE = { info: "info", success: "success", warning: "warning", error: "error" };
+
+async function persistNotification({ type, title, message, category, link }) {
+  try {
+    const { href, method } = API_URLS.notifications.create();
+    await apiFetch(href, {
+      method,
+      body: JSON.stringify({
+        title: title || message || "Notification",
+        body: message || "",
+        category,
+        notification_type: NOTIFICATION_TYPE[type] ?? "info",
+        link,
+      }),
+    });
+    window.dispatchEvent(new CustomEvent("rp:notification-created"));
+  } catch {
+    // Persistence is best-effort — the toast itself already informed the user.
+  }
+}
 
 function esc(str) {
   return String(str ?? "")
@@ -42,6 +68,9 @@ export function toast({
   persistent = false,
   position = "top-right",
   mini = false,
+  persist = false,
+  category = "general",
+  link = "",
 } = {}) {
   const host = getOrCreateHost(position);
   const typeClass = TYPE_CLASS[type] ?? "info";
@@ -90,6 +119,10 @@ export function toast({
 
   if (!persistent) {
     setTimeout(() => dismiss(toast, host), duration);
+  }
+
+  if (persist) {
+    persistNotification({ type, title, message, category, link });
   }
 
   return { dismiss: () => dismiss(toast, host) };
