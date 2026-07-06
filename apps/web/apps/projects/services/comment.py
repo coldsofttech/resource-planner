@@ -6,9 +6,12 @@ from django.db import transaction
 
 from apps.audit.services import AuditService
 from apps.comments.models import Comment, CommentMention
+from apps.comments.services import create_todo_for_mention
 from apps.core.exceptions import NotFoundException, ValidationException
 from apps.core.services import AuditableService
 from apps.core.types import PaginatedResult, Pagination
+from apps.notifications.constants import NotificationCategory
+from apps.notifications.services import NotificationService
 from apps.projects import selectors
 from apps.projects.models import Project, ProjectComment
 from apps.users.models import User
@@ -45,12 +48,56 @@ class ProjectCommentService(AuditableService):
             )
         )
 
-    def _sync_mentions(self, comment: Comment, mention_codes: list[str]) -> None:
+    def _sync_mentions(
+        self, comment: Comment, mention_codes: list[str], *, project: Project
+    ) -> None:
+        existing_user_ids = set(comment.mentions.values_list("user_id", flat=True))
         comment.mentions.all().delete()
         users = self._resolve_mentioned_users(mention_codes)
         if users:
             CommentMention.objects.bulk_create(
                 [CommentMention(comment=comment, user=user) for user in users]
+            )
+        self._notify_new_mentions(comment, users, existing_user_ids, project)
+
+    def _actor_label(self) -> str:
+        if self.user is None:
+            return "Someone"
+        return self.user.get_full_name() or getattr(self.user, "email", "") or "Someone"
+
+    def _notify_new_mentions(
+        self,
+        comment: Comment,
+        users: list[User],
+        existing_user_ids: set[int],
+        project: Project,
+    ) -> None:
+        actor_id = getattr(self.user, "pk", None)
+        new_users = [
+            u for u in users if u.pk not in existing_user_ids and u.pk != actor_id
+        ]
+        if not new_users:
+            return
+
+        link = f"/projects/{project.code}/"
+        notification_service = NotificationService(user=self.user)
+        for mentioned_user in new_users:
+            notification_service.create(
+                user=mentioned_user,
+                title=f"You were mentioned in {project.name}",
+                body=(
+                    f"{self._actor_label()} mentioned you in a comment on "
+                    f'"{project.name}".'
+                ),
+                category=NotificationCategory.MENTION,
+                link=link,
+            )
+            create_todo_for_mention(
+                actor=self.user,
+                mentioned_user=mentioned_user,
+                comment=comment,
+                link=link,
+                context_label=project.name,
             )
 
     def get(self, code: str) -> ProjectComment:
@@ -98,7 +145,7 @@ class ProjectCommentService(AuditableService):
             updated_by=self.user,
         )
         if mentions:
-            self._sync_mentions(comment_obj, mentions)
+            self._sync_mentions(comment_obj, mentions, project=project)
         obj = ProjectComment.objects.create(
             project=project,
             comment=comment_obj,
@@ -135,7 +182,7 @@ class ProjectCommentService(AuditableService):
             )
 
         if mentions is not None:
-            self._sync_mentions(comment_obj, mentions)
+            self._sync_mentions(comment_obj, mentions, project=obj.project)
 
         obj.updated_by = self.user
         obj.save(update_fields=["updated_by", "updated_at"])
