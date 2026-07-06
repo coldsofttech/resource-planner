@@ -11,17 +11,22 @@ import { TextField } from "./text-field.js";
  *   eye-icon   – boolean; when present, adds a show/hide password toggle button
  *   prefix-icon – boolean; when present, adds a key icon (bi-key) to the left of the input
  *   strength   – boolean; when present, enables the 4-segment strength meter and enforces
- *                strong-password validation (12+ chars, upper, lower, digit, symbol)
+ *                strong-password validation (12+ chars, upper, lower, digit, symbol by default)
+ *   dynamic-policy    – boolean; when present alongside `strength`, replaces the fixed
+ *                        12+/mixed-case default with the policy below (server-configured,
+ *                        rendered as attributes by the Django view)
+ *   min-length        – number; minimum length when `dynamic-policy` is set (default 1)
+ *   require-uppercase – boolean; require an uppercase letter when `dynamic-policy` is set
+ *   require-lowercase – boolean; require a lowercase letter when `dynamic-policy` is set
+ *   require-digit     – boolean; require a digit when `dynamic-policy` is set
+ *   require-special   – boolean; require a symbol when `dynamic-policy` is set
  *
  * Public API:
  *   field.strength  – getter: current strength score 0–4 (derived from live value)
  *
  * Validation (when `strength` attribute is present):
- *   - minimum 12 characters
- *   - at least one uppercase letter
- *   - at least one lowercase letter
- *   - at least one digit
- *   - at least one symbol
+ *   - minimum length (12, unless `dynamic-policy` overrides it)
+ *   - uppercase / lowercase / digit / symbol, per the active policy
  */
 export class PasswordField extends TextField {
   get _autocomplete() {
@@ -50,10 +55,36 @@ export class PasswordField extends TextField {
     return this.hasAttribute("strength");
   }
 
+  get _dynamicPolicy() {
+    return this.hasAttribute("dynamic-policy");
+  }
+
+  get _minLength() {
+    if (!this._dynamicPolicy) return 12;
+    const v = parseInt(this.getAttribute("min-length"), 10);
+    return Number.isFinite(v) && v > 0 ? v : 1;
+  }
+
+  get _requireUppercase() {
+    return this._dynamicPolicy ? this.hasAttribute("require-uppercase") : true;
+  }
+
+  get _requireLowercase() {
+    return this._dynamicPolicy ? this.hasAttribute("require-lowercase") : true;
+  }
+
+  get _requireDigit() {
+    return this._dynamicPolicy ? this.hasAttribute("require-digit") : true;
+  }
+
+  get _requireSpecial() {
+    return this._dynamicPolicy ? this.hasAttribute("require-special") : true;
+  }
+
   get _strength() {
     const v = this._value;
     let s = 0;
-    if (v.length >= 12) s++;
+    if (v.length >= this._minLength) s++;
     if (/[A-Z]/.test(v) && /[a-z]/.test(v)) s++;
     if (/\d/.test(v)) s++;
     if (/[^A-Za-z0-9]/.test(v)) s++;
@@ -65,22 +96,25 @@ export class PasswordField extends TextField {
   }
 
   get _strengthLabel() {
-    return (
-      { 1: "Weak", 2: "Fair", 3: "Good", 4: "Strong · 12+ chars, mixed case, number, symbol." }[
-        this._strength
-      ] || ""
-    );
+    return { 1: "Weak", 2: "Fair", 3: "Good", 4: "Strong" }[this._strength] || "";
   }
 
   _validate() {
     if (this._required && !this._value.trim()) return "Password is required.";
     if (this._showStrength && this._value) {
       const v = this._value;
-      if (v.length < 12) return "Password must be at least 12 characters.";
-      if (!/[A-Z]/.test(v)) return "Must contain at least one uppercase letter.";
-      if (!/[a-z]/.test(v)) return "Must contain at least one lowercase letter.";
-      if (!/\d/.test(v)) return "Must contain at least one number.";
-      if (!/[^A-Za-z0-9]/.test(v)) return "Must contain at least one symbol.";
+      const minLength = this._minLength;
+      if (v.length < minLength) return `Password must be at least ${minLength} characters.`;
+      if (this._requireUppercase && !/[A-Z]/.test(v)) {
+        return "Must contain at least one uppercase letter.";
+      }
+      if (this._requireLowercase && !/[a-z]/.test(v)) {
+        return "Must contain at least one lowercase letter.";
+      }
+      if (this._requireDigit && !/\d/.test(v)) return "Must contain at least one number.";
+      if (this._requireSpecial && !/[^A-Za-z0-9]/.test(v)) {
+        return "Must contain at least one symbol.";
+      }
     }
     return "";
   }

@@ -88,6 +88,10 @@ class Auth:
             Auth.get_auth_mode() == AuthMode.CLASSIC and Auth.get_allow_registration()
         )
 
+    @staticmethod
+    def get_session_timeout_minutes() -> int:
+        return int(get_config_value("SESSION_TIMEOUT_MINUTES"))
+
 
 class Infra:
     @staticmethod
@@ -268,3 +272,33 @@ class AI:
     @staticmethod
     def get_bedrock_iam_secret() -> str:
         return get_config_value("AI_BEDROCK_IAM_SECRET")
+
+
+class PasswordPolicy:
+    @staticmethod
+    def get_rotation_days() -> int:
+        return int(get_config_value("PASSWORD_ROTATION_DAYS"))
+
+    @staticmethod
+    def get_min_length() -> int:
+        return int(get_config_value("PASSWORD_MIN_LENGTH"))
+
+    @staticmethod
+    def require_uppercase() -> bool:
+        return get_bool(get_config_value("PASSWORD_REQUIRE_UPPERCASE"), False)
+
+    @staticmethod
+    def require_lowercase() -> bool:
+        return get_bool(get_config_value("PASSWORD_REQUIRE_LOWERCASE"), False)
+
+    @staticmethod
+    def require_digits() -> bool:
+        return get_bool(get_config_value("PASSWORD_REQUIRE_DIGITS"), False)
+
+    @staticmethod
+    def require_special() -> bool:
+        return get_bool(get_config_value("PASSWORD_REQUIRE_SPECIAL"), False)
+
+    @staticmethod
+    def get_history_count() -> int:
+        return int(get_config_value("PASSWORD_HISTORY_COUNT"))

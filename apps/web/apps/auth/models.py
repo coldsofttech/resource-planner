@@ -53,3 +53,18 @@ class UserToken(TimeStampedModel):
     @classmethod
     def generate_key(cls) -> str:
         return secrets.token_urlsafe(48)
+
+
+class PasswordHistory(TimeStampedModel):
+    """Stores retired password hashes so PASSWORD_HISTORY_COUNT can block reuse."""
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="password_history",
+    )
+    password_hash = models.CharField(max_length=128)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name_plural = "Password histories"

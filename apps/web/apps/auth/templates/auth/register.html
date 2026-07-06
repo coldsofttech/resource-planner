@@ -50,7 +50,7 @@
               <first-name-field id="rp-register-first-name" name="first_name" col="col-md-6" required autocomplete="given-name"></first-name-field>
               <last-name-field id="rp-register-last-name" name="last_name" col="col-md-6" required autocomplete="family-name"></last-name-field>
               <email-field id="rp-register-email" name="email" col="col-12" required prefix-icon autocomplete="email"></email-field>
-              <password-field id="rp-register-password" name="password" label="Password" col="col-12" required prefix-icon eye-icon strength autocomplete="new-password"></password-field>
+              <password-field id="rp-register-password" name="password" label="Password" col="col-12" required prefix-icon eye-icon strength dynamic-policy min-length="{{ pwd_min_length }}" {% if pwd_require_uppercase %}require-uppercase{% endif %} {% if pwd_require_lowercase %}require-lowercase{% endif %} {% if pwd_require_digits %}require-digit{% endif %} {% if pwd_require_special %}require-special{% endif %} autocomplete="new-password"></password-field>
               <confirm-password-field id="rp-register-confirm-password" name="confirm_password" label="Confirm password" col="col-12" required prefix-icon eye-icon password-field-id="rp-register-password" autocomplete="new-password"></confirm-password-field>
             </div>
             <primary-button id="rp-register-btn" label="Create account" prefix-icon="bi-person-check" type="submit" class="rp-auth-submit mt-2"></primary-button>

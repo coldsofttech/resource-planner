@@ -44,6 +44,11 @@ urlpatterns = [
         name="auth-me",
     ),
     path(
+        "auth/force-change-password/",
+        AuthViewSet.as_view({"post": "force_change_password"}),
+        name="auth-force-change-password",
+    ),
+    path(
         "auth/set-password/",
         SetPasswordViewSet.as_view({"post": "set_password"}),
         name="auth-set-password",

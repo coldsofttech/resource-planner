@@ -6,6 +6,7 @@ from datetime import timedelta
 
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
+from django.contrib.auth.hashers import check_password
 from django.contrib.auth.password_validation import (
     validate_password as _validate_password,
 )
@@ -60,6 +61,8 @@ class AuthService(ContextService):
                 "Your account has been deactivated. Contact your administrator."
             )
 
+        PasswordPolicyService.flag_rotation_if_due(user)
+
         auth_login(self.request, user)
         logger.info("User '%s' signed in via classic auth.", email)
         return user
@@ -91,6 +94,15 @@ class AuthService(ContextService):
             "sso_provider_name": sso_provider_name,
         }
 
+    def force_change_password(self, new_password: str) -> None:
+        """Set a new password for the current session user without requiring
+        their current password — used only when profile.must_change_password
+        is set (e.g. overdue password rotation)."""
+        user = self.user
+        PasswordPolicyService.validate_new_password(new_password, user=user)
+        PasswordPolicyService.apply_new_password(user, new_password)
+        logger.info("Forced password change completed for '%s'.", user.email)
+
 
 class UserTokenService(ContextService):
     def create_token(self, user):
@@ -106,13 +118,162 @@ class UserTokenService(ContextService):
             UserToken.objects.filter(key=auth[1]).update(is_active=False)
 
 
+class PasswordPolicyService:
+    """Config-driven password complexity, reuse, and rotation enforcement.
+
+    Applies whenever the target user is a superuser or AUTH_MODE=classic,
+    matching the classic-auth-only scope of the PASSWORD_* configurations.
+    """
+
+    @staticmethod
+    def _applies_to(user) -> bool:
+        from apps.auth.constants import AuthMode
+        from apps.configurations.selectors import Auth
+
+        if user is None:
+            return True
+        return bool(user.is_superuser) or Auth.get_auth_mode() == AuthMode.CLASSIC
+
+    @staticmethod
+    def validate_new_password(new_password: str, *, user=None) -> None:
+        """Raise ValidationException if new_password violates the password policy."""
+        from apps.configurations.selectors import PasswordPolicy
+
+        try:
+            _validate_password(new_password, user)
+        except DjangoValidationError as exc:
+            msg = (
+                exc.messages[0]
+                if exc.messages
+                else "Password does not meet requirements."
+            )
+            raise ValidationException(msg) from exc
+
+        if not PasswordPolicyService._applies_to(user):
+            return
+
+        min_length = PasswordPolicy.get_min_length()
+        if len(new_password) < min_length:
+            raise ValidationException(
+                f"Password must be at least {min_length} characters long."
+            )
+        if PasswordPolicy.require_uppercase() and not re.search(r"[A-Z]", new_password):
+            raise ValidationException(
+                "Password must contain at least one uppercase letter."
+            )
+        if PasswordPolicy.require_lowercase() and not re.search(r"[a-z]", new_password):
+            raise ValidationException(
+                "Password must contain at least one lowercase letter."
+            )
+        if PasswordPolicy.require_digits() and not re.search(r"[0-9]", new_password):
+            raise ValidationException("Password must contain at least one digit.")
+        if PasswordPolicy.require_special() and not re.search(
+            r"[^A-Za-z0-9]", new_password
+        ):
+            raise ValidationException(
+                "Password must contain at least one special character."
+            )
+
+        if user is None or not user.pk:
+            return
+
+        if user.has_usable_password() and user.check_password(new_password):
+            raise ValidationException(
+                "New password must be different from your current password."
+            )
+
+        history_count = PasswordPolicy.get_history_count()
+        if history_count > 0:
+            from apps.auth.models import PasswordHistory
+
+            recent = PasswordHistory.objects.filter(user=user).order_by("-created_at")[
+                :history_count
+            ]
+            for entry in recent:
+                if check_password(new_password, entry.password_hash):
+                    raise ValidationException(
+                        f"New password must not match any of your last "
+                        f"{history_count} password(s)."
+                    )
+
+    @staticmethod
+    def apply_new_password(user, new_password: str) -> None:
+        """Set new_password, record history, and clear rotation/must-change flags."""
+        from apps.auth.models import PasswordHistory
+        from apps.configurations.selectors import PasswordPolicy
+
+        old_hash = user.password if user.has_usable_password() else ""
+        user.set_password(new_password)
+        user.save(update_fields=["password"])
+
+        history_count = PasswordPolicy.get_history_count()
+        if old_hash and history_count > 0:
+            PasswordHistory.objects.create(user=user, password_hash=old_hash)
+            stale_ids = list(
+                PasswordHistory.objects.filter(user=user)
+                .order_by("-created_at")
+                .values_list("pk", flat=True)[history_count:]
+            )
+            if stale_ids:
+                PasswordHistory.objects.filter(pk__in=stale_ids).delete()
+
+        profile = getattr(user, "profile", None)
+        if profile is not None:
+            profile.password_last_changed = timezone.now()
+            profile.must_change_password = False
+            profile.save(
+                update_fields=[
+                    "password_last_changed",
+                    "must_change_password",
+                    "updated_at",
+                ]
+            )
+
+    @staticmethod
+    def is_rotation_due(user) -> bool:
+        from apps.configurations.selectors import PasswordPolicy
+
+        if not PasswordPolicyService._applies_to(user):
+            return False
+
+        rotation_days = PasswordPolicy.get_rotation_days()
+        if rotation_days <= 0:
+            return False
+
+        profile = getattr(user, "profile", None)
+        last_changed = getattr(profile, "password_last_changed", None) or getattr(
+            user, "date_joined", None
+        )
+        if last_changed is None:
+            return False
+
+        return timezone.now() - last_changed >= timedelta(days=rotation_days)
+
+    @staticmethod
+    def flag_rotation_if_due(user) -> None:
+        """Set profile.must_change_password when the configured rotation is overdue."""
+        profile = getattr(user, "profile", None)
+        if profile is None or profile.must_change_password:
+            return
+
+        if PasswordPolicyService.is_rotation_due(user):
+            profile.must_change_password = True
+            profile.save(update_fields=["must_change_password", "updated_at"])
+
+
 class RegisterService(ContextService):
     def register(self, *, first_name: str, last_name: str, email: str, password: str):
         from apps.configurations.selectors import Auth
+        from apps.users.models import User
         from apps.users.services import BaseUserService
 
         if not Auth.is_self_registration_allowed():
             raise PermissionException("Registration is not available.")
+
+        transient_user = User(
+            username=email, email=email, first_name=first_name, last_name=last_name
+        )
+        PasswordPolicyService.validate_new_password(password, user=transient_user)
 
         return BaseUserService()._create_user(
             first_name=first_name,
@@ -191,32 +352,17 @@ class ForgotPasswordService(ContextService):
         return self._find_token(email, code) is not None
 
     def reset_password(self, email: str, code: str, new_password: str) -> None:
-        """Verify the code, reject if same as current, then set the new password."""
+        """Verify the code, reject if same/reused, then set the new password."""
         token = self._find_token(email, code)
         if token is None:
             raise ValidationException("Invalid or expired reset code.")
 
-        if token.user.check_password(new_password):
-            raise ValidationException(
-                "New password must be different from your current password."
-            )
-
-        try:
-            _validate_password(new_password, token.user)
-        except DjangoValidationError as exc:
-            msg = (
-                exc.messages[0]
-                if exc.messages
-                else "Password does not meet requirements."
-            )
-            raise ValidationException(msg) from exc
+        PasswordPolicyService.validate_new_password(new_password, user=token.user)
 
         token.is_used = True
         token.save(update_fields=["is_used", "updated_at"])
 
-        user = token.user
-        user.set_password(new_password)
-        user.save(update_fields=["password"])
+        PasswordPolicyService.apply_new_password(token.user, new_password)
         logger.info("Password reset successfully for '%s'.", email)
 
 
@@ -284,23 +430,10 @@ class AdminPasswordResetService:
             raise ValidationException("Invalid or expired reset link.")
 
         user = token.user
-        try:
-            _validate_password(new_password, user)
-        except DjangoValidationError as exc:
-            msg = (
-                exc.messages[0]
-                if exc.messages
-                else "Password does not meet requirements."
-            )
-            raise ValidationException(msg) from exc
+        PasswordPolicyService.validate_new_password(new_password, user=user)
 
         token.is_used = True
         token.save(update_fields=["is_used", "updated_at"])
 
-        user.set_password(new_password)
-        profile = getattr(user, "profile", None)
-        if profile is not None:
-            profile.must_change_password = False
-            profile.save(update_fields=["must_change_password", "updated_at"])
-        user.save(update_fields=["password"])
+        PasswordPolicyService.apply_new_password(user, new_password)
         logger.info("Admin-initiated password reset completed for '%s'.", user.email)

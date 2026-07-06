@@ -62,6 +62,103 @@ _AUTH_DEFAULTS = {
         "is_admin": False,
         "module": "auth",
     },
+    "SESSION_TIMEOUT_MINUTES": {
+        "label": "Session Timeout (minutes)",
+        "value": "10",
+        "description": (
+            "Number of minutes of inactivity after which a signed-in session "
+            "expires and the user must sign in again. Set to 0 to disable "
+            "session expiry and use the browser's default session lifetime."
+        ),
+        "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "security",
+    },
+}
+
+
+_SECURITY_PASSWORD_DEFAULTS = {
+    "PASSWORD_ROTATION_DAYS": {
+        "label": "Password Rotation Period (days)",
+        "value": "90",
+        "description": (
+            "Number of days after which classic-mode users are forced to change "
+            "their password on next login. Set to 0 to disable password rotation. "
+            "Default: 90 days."
+        ),
+        "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "security_password",
+    },
+    "PASSWORD_MIN_LENGTH": {
+        "label": "Password Minimum Length",
+        "value": "8",
+        "description": (
+            "Minimum number of characters required for user passwords. "
+            "Applies to registration, password change, and admin-created accounts."
+        ),
+        "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "security_password",
+    },
+    "PASSWORD_REQUIRE_UPPERCASE": {
+        "label": "Require Uppercase Letter",
+        "value": "false",
+        "description": (
+            "When true, passwords must contain at least one uppercase letter (A-Z)."
+        ),
+        "data_type": "boolean",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "security_password",
+    },
+    "PASSWORD_REQUIRE_LOWERCASE": {
+        "label": "Require Lowercase Letter",
+        "value": "false",
+        "description": (
+            "When true, passwords must contain at least one lowercase letter (a-z)."
+        ),
+        "data_type": "boolean",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "security_password",
+    },
+    "PASSWORD_REQUIRE_DIGITS": {
+        "label": "Require Digit",
+        "value": "false",
+        "description": ("When true, passwords must contain at least one digit (0-9)."),
+        "data_type": "boolean",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "security_password",
+    },
+    "PASSWORD_REQUIRE_SPECIAL": {
+        "label": "Require Special Character",
+        "value": "false",
+        "description": (
+            "When true, passwords must contain at least one special character "
+            "(!@#$%^&*...)."
+        ),
+        "data_type": "boolean",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "security_password",
+    },
+    "PASSWORD_HISTORY_COUNT": {
+        "label": "Password History Count",
+        "value": "3",
+        "description": (
+            "Number of previous passwords a user cannot reuse when changing their "
+            "password. Set to 0 to disable the history check. Default: 3."
+        ),
+        "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "security_password",
+    },
 }
 
 _INFRA_DEFAULTS = {
@@ -591,4 +688,5 @@ CONFIGURATION_DEFAULTS = {
     **_USERS_DEFAULTS,
     **_PROJECT_DEFAULTS,
     **_AI_DEFAULTS,
+    **_SECURITY_PASSWORD_DEFAULTS,
 }

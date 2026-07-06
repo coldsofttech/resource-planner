@@ -19,3 +19,7 @@ class Module(models.TextChoices):
     SPRINTS = "sprints", "Sprints"
     USERS = "users", "Users"
     PROJECTS = "projects", "Projects"
+    AI = "ai", "AI"
+    SECURITY = "security", "Security"
+    SECURITY_PASSWORD = "security_password", "Security - Password"
+    WINS = "wins", "Wins"

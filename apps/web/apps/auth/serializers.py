@@ -1,5 +1,3 @@
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
 from apps.core.serializers import BaseSerializer, WriteMixin
@@ -21,18 +19,14 @@ class ForgotPasswordVerifySerializer(WriteMixin, BaseSerializer):
 
 
 class RegisterSerializer(WriteMixin, BaseSerializer):
+    """Structural validation only — password strength is enforced by
+    PasswordPolicyService in the service layer, since it is config-driven."""
+
     first_name = serializers.CharField(min_length=1, max_length=150)
     last_name = serializers.CharField(min_length=1, max_length=150)
     email = serializers.EmailField()
-    password = serializers.CharField(min_length=12)
-    confirm_password = serializers.CharField(min_length=12)
-
-    def validate_password(self, value):
-        try:
-            validate_password(value)
-        except DjangoValidationError as exc:
-            raise serializers.ValidationError(list(exc.messages)) from exc
-        return value
+    password = serializers.CharField(min_length=1)
+    confirm_password = serializers.CharField(min_length=1)
 
     def validate(self, attrs):
         if attrs["password"] != attrs["confirm_password"]:
@@ -43,17 +37,13 @@ class RegisterSerializer(WriteMixin, BaseSerializer):
 
 
 class ForgotPasswordResetSerializer(WriteMixin, BaseSerializer):
+    """Structural validation only — password strength is enforced by
+    PasswordPolicyService in the service layer, since it is config-driven."""
+
     email = serializers.EmailField()
     code = serializers.CharField(min_length=6, max_length=6)
-    new_password = serializers.CharField(min_length=12)
-    confirm_password = serializers.CharField(min_length=12)
-
-    def validate_new_password(self, value):
-        try:
-            validate_password(value)
-        except DjangoValidationError as exc:
-            raise serializers.ValidationError(list(exc.messages)) from exc
-        return value
+    new_password = serializers.CharField(min_length=1)
+    confirm_password = serializers.CharField(min_length=1)
 
     def validate(self, attrs):
         if attrs["new_password"] != attrs["confirm_password"]:
@@ -64,16 +54,27 @@ class ForgotPasswordResetSerializer(WriteMixin, BaseSerializer):
 
 
 class SetPasswordSerializer(WriteMixin, BaseSerializer):
-    token = serializers.CharField(min_length=1)
-    new_password = serializers.CharField(min_length=12)
-    confirm_password = serializers.CharField(min_length=12)
+    """Structural validation only — password strength is enforced by
+    PasswordPolicyService in the service layer, since it is config-driven."""
 
-    def validate_new_password(self, value):
-        try:
-            validate_password(value)
-        except DjangoValidationError as exc:
-            raise serializers.ValidationError(list(exc.messages)) from exc
-        return value
+    token = serializers.CharField(min_length=1)
+    new_password = serializers.CharField(min_length=1)
+    confirm_password = serializers.CharField(min_length=1)
+
+    def validate(self, attrs):
+        if attrs["new_password"] != attrs["confirm_password"]:
+            raise serializers.ValidationError(
+                {"confirm_password": "Passwords do not match."}
+            )
+        return attrs
+
+
+class ForceChangePasswordSerializer(WriteMixin, BaseSerializer):
+    """Structural validation only — password strength is enforced by
+    PasswordPolicyService in the service layer, since it is config-driven."""
+
+    new_password = serializers.CharField(min_length=1)
+    confirm_password = serializers.CharField(min_length=1)
 
     def validate(self, attrs):
         if attrs["new_password"] != attrs["confirm_password"]:

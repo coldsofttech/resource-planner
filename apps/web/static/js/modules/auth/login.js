@@ -75,7 +75,10 @@ function initLoginForm() {
         skipAuth401Redirect: true,
       });
       if (json?.success) {
-        window.location.href = json.data?.redirect ?? "/";
+        const params = new URLSearchParams(window.location.search);
+        const next = params.get("next");
+        const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : null;
+        window.location.href = safeNext ?? json.data?.redirect ?? "/";
       } else {
         setFormError(json?.message ?? "Sign in failed. Please try again.");
         restoreButton(submitEl, snap);
@@ -232,4 +235,23 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   initLoginForm();
   showCookieBannerIfNeeded();
+  initOnboardingStats();
 });
+
+function initOnboardingStats() {
+  const statEls = document.querySelectorAll("[data-stat]");
+  if (!statEls.length) return;
+
+  const { href, method } = API_URLS.onboarding.stats();
+  apiFetch(href, { method })
+    .then((json) => {
+      const data = json?.data ?? json ?? {};
+      statEls.forEach((el) => {
+        const key = el.getAttribute("data-stat");
+        if (key && data[key] !== undefined) {
+          el.textContent = data[key];
+        }
+      });
+    })
+    .catch(() => {});
+}

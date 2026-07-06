@@ -1,7 +1,13 @@
 from django.shortcuts import redirect
 from django.urls import path
 
-from apps.auth.views import ForgotPasswordView, LoginView, RegisterView, SetPasswordView
+from apps.auth.views import (
+    ForceChangePasswordView,
+    ForgotPasswordView,
+    LoginView,
+    RegisterView,
+    SetPasswordView,
+)
 
 
 def _root_redirect(request):
@@ -16,4 +22,9 @@ urlpatterns = [
     path("login/", LoginView.as_view(), name="login"),
     path("forgot-password/", ForgotPasswordView.as_view(), name="forgot-password"),
     path("register/", RegisterView.as_view(), name="register"),
+    path(
+        "change-password-required/",
+        ForceChangePasswordView.as_view(),
+        name="force-change-password",
+    ),
 ]

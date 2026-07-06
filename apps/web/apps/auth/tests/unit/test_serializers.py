@@ -191,25 +191,9 @@ class ForgotPasswordResetSerializerTest(SimpleTestCase):
         self.assertFalse(s.is_valid())
         self.assertIn("confirm_password", s.errors)
 
-    def test_new_password_shorter_than_12_fails(self):
-        s = ForgotPasswordResetSerializer(
-            data={
-                **VALID_RESET,
-                "new_password": "Short1!",
-                "confirm_password": "Short1!",
-            }
-        )
-        self.assertFalse(s.is_valid())
-
-    def test_numeric_only_password_fails_django_validator(self):
-        s = ForgotPasswordResetSerializer(
-            data={
-                **VALID_RESET,
-                "new_password": "123456789012",
-                "confirm_password": "123456789012",
-            }
-        )
-        self.assertFalse(s.is_valid())
+    # Password strength (length, complexity, history) is config-driven and
+    # enforced by PasswordPolicyService in the service layer, not here —
+    # this serializer only validates structure (non-empty, matching confirm).
 
     def test_mismatched_passwords_fails(self):
         s = ForgotPasswordResetSerializer(
@@ -282,25 +266,9 @@ class RegisterSerializerValidationTest(SimpleTestCase):
         self.assertFalse(s.is_valid())
         self.assertIn("password", s.errors)
 
-    def test_password_shorter_than_12_fails(self):
-        s = RegisterSerializer(
-            data={
-                **VALID_REGISTER,
-                "password": "Short1!",
-                "confirm_password": "Short1!",
-            }
-        )
-        self.assertFalse(s.is_valid())
-
-    def test_numeric_only_password_fails_django_validator(self):
-        s = RegisterSerializer(
-            data={
-                **VALID_REGISTER,
-                "password": "123456789012",
-                "confirm_password": "123456789012",
-            }
-        )
-        self.assertFalse(s.is_valid())
+    # Password strength (length, complexity, history) is config-driven and
+    # enforced by PasswordPolicyService in the service layer, not here —
+    # this serializer only validates structure (non-empty, matching confirm).
 
     def test_missing_confirm_password_fails(self):
         data = {**VALID_REGISTER}

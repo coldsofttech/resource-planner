@@ -8,6 +8,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 
 from apps.auth.serializers import (
+    ForceChangePasswordSerializer,
     ForgotPasswordRequestSerializer,
     ForgotPasswordResetSerializer,
     ForgotPasswordVerifySerializer,
@@ -33,11 +34,16 @@ class AuthViewSet(BaseViewSet):
     authentication_classes: list[type] = []
     permission_classes = [AllowAny]
 
+    _AUTHENTICATED_ACTIONS = ("me", "force_change_password")
+
     def get_authenticators(self):
         # action_map is set before dispatch; self.action is set after
         # initialize_request. Use action_map here to avoid AttributeError
         # during request initialization.
-        if "me" in getattr(self, "action_map", {}).values():
+        if any(
+            a in getattr(self, "action_map", {}).values()
+            for a in self._AUTHENTICATED_ACTIONS
+        ):
             from rest_framework.authentication import SessionAuthentication
 
             from apps.auth.authentication import BearerTokenAuthentication
@@ -46,7 +52,10 @@ class AuthViewSet(BaseViewSet):
         return []
 
     def get_permissions(self):
-        if "me" in getattr(self, "action_map", {}).values():
+        if any(
+            a in getattr(self, "action_map", {}).values()
+            for a in self._AUTHENTICATED_ACTIONS
+        ):
             from rest_framework.permissions import IsAuthenticated
 
             return [IsAuthenticated()]
@@ -134,6 +143,39 @@ class AuthViewSet(BaseViewSet):
         data = self._auth_service().get_me()
         serializer = MeSerializer(data)
         return self.response(data=serializer.data)
+
+    @extend_schema(
+        summary="Force-change password",
+        description=(
+            "Sets a new password for the currently signed-in user without "
+            "requiring their current password. Used when the account is "
+            "flagged for a mandatory password change (e.g. overdue rotation)."
+        ),
+        request=ForceChangePasswordSerializer,
+        responses={
+            200: OpenApiResponse(description="Password changed successfully."),
+            400: OpenApiResponse(description="Passwords do not match."),
+            401: OpenApiResponse(description="Authentication required."),
+            422: OpenApiResponse(description="New password does not meet policy."),
+        },
+        tags=["Authentication"],
+    )
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="force-change-password",
+        url_name="force-change-password",
+    )
+    def force_change_password(self, request: Request):
+        """POST /auth/force-change-password/"""
+        serializer = ForceChangePasswordSerializer(
+            data=request.data, context=self.get_serializer_context()
+        )
+        serializer.is_valid(raise_exception=True)
+        self._auth_service().force_change_password(
+            serializer.validated_data["new_password"]
+        )
+        return self.response(message="Password changed successfully.")
 
 
 @extend_schema(tags=["Authentication: Classic"])
