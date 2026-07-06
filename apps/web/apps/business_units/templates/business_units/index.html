@@ -84,25 +84,6 @@
   </drawer-panel>
   <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"> </drawer-footer>
   </drawer-modal>
-  <!-- View drawer -->
-  <drawer-modal id="rp-business-unit-view-drawer" width="900">
-  <drawer-header eyebrow="Business Unit" title="Business Unit" no-sizes>
-  <identicon-field id="rp-view-business-unit-identicon" size="lg"></identicon-field>
-  </drawer-header>
-  <drawer-panel>
-  <view-field id="rp-view-business-unit-name" label="Name"></view-field>
-  <view-field id="rp-view-business-unit-short-name" label="Short Name" code></view-field>
-  <view-field id="rp-view-business-unit-code" label="Code" code></view-field>
-  <view-field id="rp-view-business-unit-status" label="Status"></view-field>
-  <view-field id="rp-view-business-unit-created" label="Created" meta></view-field>
-  <view-field id="rp-view-business-unit-created-by" label="Created by" meta></view-field>
-  </drawer-panel>
-  {% if can_change_businessunit %}
-    <drawer-footer close="Close" primary="Edit business unit" primary-icon="bi-pencil"> </drawer-footer>
-  {% else %}
-    <drawer-footer close="Close"> </drawer-footer>
-  {% endif %}
-  </drawer-modal>
   <delete-modal id="rp-business-unit-delete-modal" action-label="Delete business unit"></delete-modal>
   <activate-modal id="rp-business-unit-activate-modal"></activate-modal>
   <deactivate-modal id="rp-business-unit-deactivate-modal"></deactivate-modal>

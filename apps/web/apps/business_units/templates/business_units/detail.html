@@ -14,7 +14,7 @@
 {% endblock page_title %}
 {% block content %}
   <div class="row g-4">
-    <div class="col-lg-5">
+    <div class="col-lg-4">
       <section-panel>
         <panel-body>
           <view-field id="rp-bu-detail-name" label="Name"></view-field>
@@ -23,6 +23,32 @@
           <view-field id="rp-bu-detail-status" label="Status"></view-field>
           <view-field id="rp-bu-detail-created" label="Created" meta></view-field>
           <view-field id="rp-bu-detail-created-by" label="Created by" meta></view-field>
+        </panel-body>
+      </section-panel>
+    </div>
+    <div id="rp-bu-products-col" class="col-lg-8" hidden>
+      <section-panel>
+        <panel-title>Products</panel-title>
+        <panel-body>
+          <data-table id="rp-bu-products-table"
+                      url="/api/v1/products/?bu={{ bu_code }}"
+                      paginated
+                      page-size="25"
+                      row-template="renderBuProductsRow"
+                      empty-message="No products assigned to this business unit.">
+            <table-columns>
+              <table-column width="44px">
+              </table-column>
+              <table-column label="Name" key="name" sortable>
+              </table-column>
+              <table-column label="Code" key="code" mono width="130px" hide-mobile>
+              </table-column>
+              <table-column label="Short Name" key="short_name" hide-mobile>
+              </table-column>
+              <table-column label="Status" key="is_active">
+              </table-column>
+            </table-columns>
+          </data-table>
         </panel-body>
       </section-panel>
     </div>

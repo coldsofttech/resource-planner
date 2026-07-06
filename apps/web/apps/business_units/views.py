@@ -14,3 +14,14 @@ class BusinessUnitListView(ProtectedView):
         ctx["can_import_businessunit"] = "business_units.import_businessunit" in perms
         ctx["can_export_businessunit"] = "business_units.export_businessunit" in perms
         return ctx
+
+
+class BusinessUnitDetailView(ProtectedView):
+    template_name = "business_units/detail.html"
+
+    def get_context_data(self, **kwargs: object) -> dict[str, object]:
+        ctx = super().get_context_data(**kwargs)
+        ctx["bu_code"] = self.kwargs["code"]
+        perms = get_user_permissions(self.request.user)
+        ctx["can_change_businessunit"] = "business_units.change_businessunit" in perms
+        return ctx

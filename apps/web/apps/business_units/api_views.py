@@ -1,9 +1,10 @@
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 
+from apps.auth.authentication import BearerTokenAuthentication
 from apps.business_units.serializers import (
     BusinessUnitCreateSerializer,
     BusinessUnitDetailSerializer,
@@ -68,7 +69,16 @@ class BusinessUnitViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet
     def get_import_sample_row(self):
         return ["Finance", "FIN", "true"]
 
+    def get_authenticators(self):
+        if "options" in getattr(self, "action_map", {}).values():
+            return []
+        from rest_framework.authentication import SessionAuthentication
+
+        return [BearerTokenAuthentication(), SessionAuthentication()]
+
     def get_permissions(self):
+        if self.action == "options":
+            return [AllowAny()]
         action_perms = {
             "list": "business_units.view_businessunit",
             "retrieve": "business_units.view_businessunit",
@@ -78,7 +88,6 @@ class BusinessUnitViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet
             "activate": "business_units.change_businessunit",
             "deactivate": "business_units.change_businessunit",
             "statistics": "business_units.view_businessunit",
-            "options": "business_units.view_businessunit",
             "import_specs": "business_units.import_businessunit",
             "import_sample": "business_units.import_businessunit",
             "import_bulk": "business_units.import_businessunit",
