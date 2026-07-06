@@ -54,3 +54,17 @@ history-panel,
 history-items {
   display: block;
 }
+.rp-card-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+.rp-card-link:hover,
+.rp-card-link:focus-visible {
+  box-shadow: var(--rp-shadow-md);
+  transform: translateY(-1px);
+  color: inherit;
+}

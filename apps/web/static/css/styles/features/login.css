@@ -164,15 +164,18 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #fff;
-  font-weight: 600;
-  font-size: 13px;
-  text-decoration: none;
   border: 1px solid rgba(255, 255, 255, 0.25);
   padding: 6px 12px;
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.08);
   transition: background 0.12s;
+}
+
+.rp-auth-onboard-cta a {
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: none;
 }
 
 .rp-auth-onboard-cta:hover {
@@ -238,6 +241,10 @@
 .rp-fp-card {
   width: 100%;
   max-width: 440px;
+}
+
+.rp-fp-card--lg {
+  max-width: 680px;
 }
 
 @media (max-width: 600px) {

@@ -722,6 +722,14 @@ textarea.rp-input {
   color: var(--rp-text-muted);
   text-align: center;
 }
+.rp-ms-group-header {
+  padding: 8px 12px 4px;
+  font-size: var(--rp-fs-12);
+  font-weight: 600;
+  color: var(--rp-text-muted);
+  pointer-events: none;
+  user-select: none;
+}
 
 /* ── Searchable combobox (dropdown-field[searchable]) ────────────────────── */
 

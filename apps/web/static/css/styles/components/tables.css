@@ -66,6 +66,15 @@ data-table {
   cursor: grab;
 }
 
+.rp-table .rp-table-expand-cell {
+  width: 40px;
+  text-align: center;
+}
+.rp-table-detail-row td {
+  background: var(--rp-bg-sunken);
+  padding: 12px 16px;
+}
+
 .rp-table .rp-cell-icon {
   width: 32px;
   height: 28px;
@@ -185,6 +194,43 @@ data-table {
 .rp-table-more-wrap {
   position: relative;
   display: inline-block;
+}
+
+/* actions-fixable (sticky actions column on the right) */
+.rp-table--actions-fixable thead th[data-rp-actions-fixed],
+.rp-table--actions-fixable tbody td[data-rp-actions-fixed] {
+  position: sticky;
+  right: 0;
+}
+.rp-table--actions-fixable thead th[data-rp-actions-fixed] {
+  z-index: 3;
+  background: var(--rp-bg-sunken);
+  box-shadow: -2px 0 6px rgba(0, 0, 0, 0.06);
+}
+.rp-table--actions-fixable tbody td[data-rp-actions-fixed] {
+  z-index: 1;
+  background: var(--rp-surface);
+  box-shadow: -2px 0 6px rgba(0, 0, 0, 0.06);
+}
+.rp-table--actions-fixable tbody tr:hover td[data-rp-actions-fixed] {
+  background: var(--rp-surface-hover);
+}
+
+/* Fixable (sticky first N columns) */
+.rp-table--fixable thead th[data-rp-fixed] {
+  z-index: 3;
+}
+.rp-table--fixable tbody td[data-rp-fixed] {
+  position: sticky;
+  z-index: 1;
+  background: var(--rp-surface);
+}
+.rp-table--fixable tbody tr:hover td[data-rp-fixed] {
+  background: var(--rp-surface-hover);
+}
+.rp-table--fixable thead th[data-rp-fixed-last],
+.rp-table--fixable tbody td[data-rp-fixed-last] {
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.06);
 }
 
 @media (max-width: 640px) {
