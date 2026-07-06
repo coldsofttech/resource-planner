@@ -6,6 +6,7 @@ from apps.configurations.tests.factories import mark_setup_complete
 from apps.core.exceptions import NotFoundException, ValidationException
 from apps.sprints.constants import SprintDataImportStatus, SprintDataImportType
 from apps.sprints.models import SprintDataImport, SprintDataImportRow
+from apps.sprints.models.sprint_data_import_review import SprintDataImportReview
 from apps.sprints.services.sprint_data_import import SprintDataImportActualService
 from apps.sprints.tests.factories import FakeCsvFile, make_sprint
 from apps.teams.tests.factories import make_team
@@ -283,21 +284,24 @@ class ActualServiceReviewTest(TestCase):
             file=_valid_csv(),
         )
 
-    def test_review_returns_dict_with_expected_keys(self):
-        result = self.svc.review(
+    def test_review_returns_review_and_row_results(self):
+        review, row_results = self.svc.review(
             import_code=self.import_record.code,
             sprint_code=self.sprint.code,
         )
-        for key in ("review_code", "results", "has_errors"):
-            self.assertIn(key, result)
+        self.assertTrue(review.code)
+        self.assertIsInstance(row_results, dict)
 
-    def test_review_sets_has_review_on_import(self):
+    def test_review_creates_review_record_for_import(self):
         self.svc.review(
             import_code=self.import_record.code,
             sprint_code=self.sprint.code,
         )
-        self.import_record.refresh_from_db()
-        self.assertTrue(self.import_record.has_review)
+        self.assertTrue(
+            SprintDataImportReview.objects.filter(
+                import_record=self.import_record
+            ).exists()
+        )
 
     def test_review_raises_not_found_for_unknown_import(self):
         with self.assertRaises(NotFoundException):

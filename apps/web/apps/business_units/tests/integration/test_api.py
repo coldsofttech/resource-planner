@@ -115,9 +115,10 @@ class BusinessUnitOptionsAPITest(TestCase):
         make_business_unit("Finance", "FIN", is_active=True)
         make_business_unit("Inactive", "INA", is_active=False)
 
-    def test_unauthenticated_returns_401(self):
+    def test_unauthenticated_returns_200(self):
+        # Public: consumed by the unauthenticated project-onboarding portal.
         response = self.client.get(OPTIONS_URL)
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 200)
 
     def test_returns_only_active_units(self):
         self.client.force_authenticate(user=self.user)

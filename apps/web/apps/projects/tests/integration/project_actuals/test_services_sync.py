@@ -126,7 +126,7 @@ class RebuildFyBasicTest(TestCase):
         self.assertEqual(record.prev_fy_actuals, Decimal("0"))
 
     def test_rebuild_excludes_terminal_projects(self):
-        terminal_status = make_project_status(name="Completed", is_terminal=True)
+        terminal_status = make_project_status(name="Terminal Status", is_terminal=True)
         terminal_project = make_project(name="Terminal Project", status=terminal_status)
         make_sprint_actual(terminal_project, self.sprint, total_cost="9000")
         make_sprint_actual(self.project, self.sprint, total_cost="1000")

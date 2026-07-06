@@ -21,6 +21,12 @@ class ActionValuesTest(SimpleTestCase):
     def test_deactivate_value(self):
         self.assertEqual(Action.DEACTIVATE, "deactivate")
 
+    def test_restore_value(self):
+        self.assertEqual(Action.RESTORE, "restore")
+
+    def test_lock_value(self):
+        self.assertEqual(Action.LOCK, "lock")
+
 
 # ── Action labels ──────────────────────────────────────────────────────────────
 
@@ -41,13 +47,19 @@ class ActionLabelsTest(SimpleTestCase):
     def test_deactivate_label(self):
         self.assertEqual(Action.DEACTIVATE.label, "Deactivate")
 
+    def test_restore_label(self):
+        self.assertEqual(Action.RESTORE.label, "Restore")
+
+    def test_lock_label(self):
+        self.assertEqual(Action.LOCK.label, "Lock")
+
 
 # ── Action.choices ─────────────────────────────────────────────────────────────
 
 
 class ActionChoicesTest(SimpleTestCase):
-    def test_choices_has_six_entries(self):
-        self.assertEqual(len(Action.choices), 6)
+    def test_choices_has_eight_entries(self):
+        self.assertEqual(len(Action.choices), 8)
 
     def test_choices_contains_create(self):
         values = [v for v, _ in Action.choices]
@@ -68,3 +80,11 @@ class ActionChoicesTest(SimpleTestCase):
     def test_choices_contains_deactivate(self):
         values = [v for v, _ in Action.choices]
         self.assertIn("deactivate", values)
+
+    def test_choices_contains_restore(self):
+        values = [v for v, _ in Action.choices]
+        self.assertIn("restore", values)
+
+    def test_choices_contains_lock(self):
+        values = [v for v, _ in Action.choices]
+        self.assertIn("lock", values)

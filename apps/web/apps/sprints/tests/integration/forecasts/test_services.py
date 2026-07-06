@@ -272,10 +272,10 @@ class ForecastServiceReviewTest(TestCase):
             file=_valid_csv(),
         )
 
-    def test_review_returns_dict_with_expected_keys(self):
-        result = self.svc.review(import_code=self.import_record.code)
-        for key in ("review_code", "results", "has_errors"):
-            self.assertIn(key, result)
+    def test_review_returns_review_and_row_results(self):
+        review, row_results = self.svc.review(import_code=self.import_record.code)
+        self.assertTrue(review.code)
+        self.assertIsInstance(row_results, dict)
 
     def test_review_creates_review_record(self):
         self.svc.review(import_code=self.import_record.code)
@@ -313,25 +313,26 @@ class ForecastServiceConfirmTest(TestCase):
         self.svc.review(import_code=self.import_record.code)
         self.svc.confirm(
             import_code=self.import_record.code,
-            notes="",
+            notes="override",
         )
         self.import_record.refresh_from_db()
         self.assertEqual(self.import_record.status, SprintDataImportStatus.CONFIRMED)
 
-    def test_confirm_returns_dict_with_expected_keys(self):
+    def test_confirm_returns_review_complete_record(self):
         self.svc.review(import_code=self.import_record.code)
         result = self.svc.confirm(
             import_code=self.import_record.code,
-            notes="",
+            notes="override",
         )
-        for key in ("import_type", "completed_at", "override_applied"):
-            self.assertIn(key, result)
+        self.assertEqual(result.import_type, SprintDataImportType.FORECAST)
+        self.assertIsNotNone(result.completed_at)
+        self.assertTrue(result.override_applied)
 
     def test_confirm_creates_sprint_data_import_confirmed_records(self):
         self.svc.review(import_code=self.import_record.code)
         self.svc.confirm(
             import_code=self.import_record.code,
-            notes="",
+            notes="override",
         )
         self.assertTrue(
             SprintDataImportConfirmed.objects.filter(
@@ -348,7 +349,7 @@ class ForecastServiceConfirmTest(TestCase):
 
     def test_second_upload_and_confirm_supersedes_first_confirmed(self):
         self.svc.review(import_code=self.import_record.code)
-        self.svc.confirm(import_code=self.import_record.code, notes="")
+        self.svc.confirm(import_code=self.import_record.code, notes="override")
 
         second = self.svc.upload(
             sprint_code=self.sprint.code,
@@ -356,7 +357,7 @@ class ForecastServiceConfirmTest(TestCase):
             file=_valid_csv(),
         )
         self.svc.review(import_code=second.code)
-        self.svc.confirm(import_code=second.code, notes="")
+        self.svc.confirm(import_code=second.code, notes="override")
 
         self.import_record.refresh_from_db()
         self.assertEqual(self.import_record.status, SprintDataImportStatus.SUPERSEDED)

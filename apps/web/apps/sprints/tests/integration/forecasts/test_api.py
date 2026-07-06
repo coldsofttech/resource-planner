@@ -604,32 +604,38 @@ class ForecastConfirmTest(TestCase):
 
     def test_confirm_after_review_returns_200(self):
         self.client.post(self.review_url)
-        response = self.client.post(self.confirm_url, {"notes": ""}, format="json")
+        response = self.client.post(
+            self.confirm_url, {"notes": "override"}, format="json"
+        )
         self.assertEqual(response.status_code, 200)
 
     def test_confirm_response_has_expected_fields(self):
         self.client.post(self.review_url)
-        response = self.client.post(self.confirm_url, {"notes": ""}, format="json")
+        response = self.client.post(
+            self.confirm_url, {"notes": "override"}, format="json"
+        )
         data = response.data["data"]
         for field in ("import_type", "completed_at", "override_applied"):
             self.assertIn(field, data)
 
     def test_confirmed_import_type_is_forecast(self):
         self.client.post(self.review_url)
-        response = self.client.post(self.confirm_url, {"notes": ""}, format="json")
+        response = self.client.post(
+            self.confirm_url, {"notes": "override"}, format="json"
+        )
         self.assertEqual(
             response.data["data"]["import_type"], SprintDataImportType.FORECAST
         )
 
     def test_import_status_becomes_confirmed(self):
         self.client.post(self.review_url)
-        self.client.post(self.confirm_url, {"notes": ""}, format="json")
+        self.client.post(self.confirm_url, {"notes": "override"}, format="json")
         record = SprintDataImport.objects.get(code=self.import_code)
         self.assertEqual(record.status, SprintDataImportStatus.CONFIRMED)
 
     def test_is_confirmed_true_after_confirm(self):
         self.client.post(self.review_url)
-        self.client.post(self.confirm_url, {"notes": ""}, format="json")
+        self.client.post(self.confirm_url, {"notes": "override"}, format="json")
         detail_url = FORECAST_IMPORT_DETAIL_URL.format(
             sprint=self.sprint.code, import_code=self.import_code
         )
