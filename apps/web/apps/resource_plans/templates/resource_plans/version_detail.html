@@ -1,0 +1,676 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Resource Plan Version
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/resource-plans.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Projects &rsaquo; Resource Plans &rsaquo; Versions
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <icon-field icon="bi-layers" size="lg"></icon-field>
+  <span id="rp-resource-plan-version-detail-title" class="ms-2">Version</span>
+{% endblock page_title %}
+{% block page_actions %}
+  {% if can_add_resource_plan_engine_job %}
+  <engine-button id="rp-run-engine-btn" label="Run Engine" prefix-icon="bi-play-fill"></engine-button>
+  {% endif %}
+  <primary-button id="rp-allocation-grid-btn" label="Allocation Grid" prefix-icon="bi-grid-3x3-gap"></primary-button>
+{% endblock page_actions %}
+{% block content %}
+  <tab-panel id="rp-resource-plan-version-tabs">
+  <tab-items>
+
+  <tab-item id="general" active>
+  <tab-header title="General" icon="bi-info-circle"></tab-header>
+  <tab-content>
+  <div class="row g-4 align-items-start">
+    <div class="col-12 col-md-7">
+      <section-panel class="mt-2">
+        <panel-title>Unmapped Projects</panel-title>
+        <panel-body>
+        <filter-panel id="rp-resource-plan-version-projects-filters" class="mb-3">
+          <search-field id="rp-resource-plan-version-projects-search" name="search" shortcut="/" placeholder="Search projects..." show-label></search-field>
+        </filter-panel>
+        <data-table id="rp-resource-plan-version-projects-table" row-template="renderUnmappedProjectRow" empty-message="No unmapped projects found.">
+          <table-columns>
+            <table-column label="Project" key="name"></table-column>
+          </table-columns>
+          <table-actions>
+            {% if can_add_resource_plan_version_project %}
+            <table-action icon="bi-plus-lg" label="Add" event="rp:version-project:add"></table-action>
+            {% endif %}
+          </table-actions>
+        </data-table>
+        </panel-body>
+      </section-panel>
+    </div>
+    <div class="col-12 col-md-5">
+      <section-panel class="mt-2">
+        <panel-title>Version Details</panel-title>
+        <panel-body>
+        <view-field id="rp-version-detail-plan" label="Resource Plan"></view-field>
+        <view-field id="rp-version-detail-version" label="Version" code></view-field>
+        <view-field id="rp-version-detail-status" label="Status"></view-field>
+        <view-field id="rp-version-detail-threshold" label="Threshold %"></view-field>
+        <view-field id="rp-version-detail-sprint-point-price" label="Sprint Point Price"></view-field>
+        <view-field id="rp-version-detail-cloned-from" label="Cloned From" hidden></view-field>
+        </panel-body>
+      </section-panel>
+      <section-panel class="mt-3">
+        <panel-title>Metadata</panel-title>
+        <panel-body>
+        <view-field id="rp-version-detail-created-at" label="Created" meta></view-field>
+        <view-field id="rp-version-detail-created-by" label="Created By" meta></view-field>
+        <view-field id="rp-version-detail-updated-at" label="Updated" meta></view-field>
+        <view-field id="rp-version-detail-updated-by" label="Updated By" meta></view-field>
+        </panel-body>
+      </section-panel>
+    </div>
+  </div>
+  </tab-content>
+  </tab-item>
+
+  <tab-item id="projects">
+  <tab-header title="Projects" icon="bi-kanban"></tab-header>
+  <tab-content>
+  <section-panel class="mt-2">
+    <panel-title>Configured Projects</panel-title>
+    <panel-body>
+    <filter-panel id="rp-resource-plan-version-configured-projects-filters" class="mb-3">
+      <search-field id="rp-resource-plan-version-configured-projects-search" name="search" shortcut="/" placeholder="Search projects..." show-label></search-field>
+      <programme-field id="rp-resource-plan-version-configured-projects-programme" name="programme" col="col-auto" show-label allow-all></programme-field>
+    </filter-panel>
+    <data-table id="rp-resource-plan-version-configured-projects-table" paginated page-size="25" row-template="renderConfiguredProjectRow" empty-message="No projects configured for this version.">
+      <table-columns>
+        <table-column width="52px"></table-column>
+        <table-column label="Project Name" key="project_name"></table-column>
+        <table-column label="Programme Name" key="programme_name" hide-mobile></table-column>
+        <table-column label="Basis" key="basis"></table-column>
+        <table-column label="Amount" key="basis_amount" numeric></table-column>
+        <table-column label="Days Required" key="days_required" numeric hide-mobile></table-column>
+        <table-column label="Priority" key="effective_priority" hide-mobile></table-column>
+        <table-column label="Confidence" key="effective_confidence" hide-mobile></table-column>
+      </table-columns>
+      <table-actions>
+        {% if can_view_resource_plan_version_team %}
+        <table-action icon="bi-people" label="Teams" event="rp:resource-plan-version-project:teams"></table-action>
+        {% endif %}
+        {% if can_view_resource_plan_version_project_budget_release %}
+        <table-action icon="bi-cash-coin" label="Budget Release" event="rp:resource-plan-version-project:budget-releases"></table-action>
+        {% endif %}
+        {% if can_change_resource_plan_version_project %}
+        <table-action icon="bi-sliders" label="Config" event="rp:resource-plan-version-project:config"></table-action>
+        <table-action icon="bi-arrow-repeat" label="Resync" event="rp:resource-plan-version-project:resync" hidden-key="resync_hidden"></table-action>
+        {% endif %}
+        {% if can_delete_resource_plan_version_project %}
+        <table-action icon="bi-trash" label="Delete" event="rp:resource-plan-version-project:delete" danger></table-action>
+        {% endif %}
+      </table-actions>
+    </data-table>
+    </panel-body>
+  </section-panel>
+  </tab-content>
+  </tab-item>
+
+  {% if can_view_resource_plan_engine_job %}
+  <tab-item id="jobs">
+  <tab-header title="Jobs" icon="bi-cpu"></tab-header>
+  <tab-content>
+  <section-panel class="mt-2">
+    <panel-title>Engine Job History</panel-title>
+    <panel-body>
+    <filter-panel id="rp-engine-jobs-filters" class="mb-3">
+      <dropdown-field id="rp-engine-jobs-mode-filter" name="mode" col="col-auto" label="Mode" show-label>
+        <values-list>
+          <value value="">All Modes</value>
+          <value value="validate">Validate</value>
+          <value value="full">Full</value>
+        </values-list>
+      </dropdown-field>
+    </filter-panel>
+    <data-table id="rp-engine-jobs-table" paginated page-size="20" expandable
+      row-template="renderEngineJobRow" detail-template="renderEngineJobSteps"
+      empty-message="No engine jobs have been run yet.">
+      <table-columns>
+        <table-column label="Mode" key="mode_display"></table-column>
+        <table-column label="Status" key="status_display"></table-column>
+        <table-column label="Version" key="version_number"></table-column>
+        <table-column label="Started" key="initiated_at"></table-column>
+        <table-column label="Duration" key="duration_milliseconds" numeric></table-column>
+        <table-column label="Result" key="result_summary"></table-column>
+      </table-columns>
+      <table-actions>
+        {% if can_view_resource_plan_engine_job %}
+        <table-action icon="bi-eye" label="View" event="rp:engine-job:view"></table-action>
+        {% endif %}
+        {% if can_delete_resource_plan_engine_job %}
+        <table-action icon="bi-trash" label="Delete" event="rp:engine-job:delete" danger></table-action>
+        {% endif %}
+      </table-actions>
+    </data-table>
+    </panel-body>
+  </section-panel>
+  </tab-content>
+  </tab-item>
+  {% endif %}
+
+  </tab-items>
+  </tab-panel>
+
+  {% if can_change_resource_plan_version_project %}
+  <resync-modal id="rp-resource-plan-version-project-resync-modal" action-label="Resync"></resync-modal>
+  {% endif %}
+  {% if can_delete_resource_plan_version_project %}
+  <delete-modal id="rp-resource-plan-version-project-delete-modal" action-label="Delete project"></delete-modal>
+  {% endif %}
+
+  {% if can_add_resource_plan_version_project %}
+  <drawer-modal id="rp-resource-plan-version-project-create-drawer" width="900">
+  <drawer-header eyebrow="Resource Plan Version" title="Add Project" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <dropdown-field id="rp-new-version-project-basis" col="col-12" label="Basis" placeholder="Select basis..." required show-label>
+      <values-list>
+        <value value="budget">Budget</value>
+        <value value="estimate">Estimate</value>
+        <value value="custom">Custom</value>
+      </values-list>
+    </dropdown-field>
+    <hint-field id="rp-new-version-project-budget-hint" col="col-12" type="info" hidden>
+      No budget configured for this project in the plan's financial year.
+    </hint-field>
+    <project-estimate-field id="rp-new-version-project-estimate" col="col-12" show-label hidden></project-estimate-field>
+    <hint-field id="rp-new-version-project-estimate-hint" col="col-12" type="info" hidden></hint-field>
+    <decimal-field id="rp-new-version-project-amount" col="col-12" label="Basis Amount (£)" min="0" hidden></decimal-field>
+    <priority-field id="rp-new-version-project-priority" col="col-12" inherit show-label></priority-field>
+    <confidence-field id="rp-new-version-project-confidence" col="col-12" inherit show-label></confidence-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Add Project" primary-icon="bi-plus-lg"></drawer-footer>
+  </drawer-modal>
+  {% endif %}
+
+  {% if can_change_resource_plan_version_project %}
+  <drawer-modal id="rp-resource-plan-version-project-edit-drawer" width="900">
+  <drawer-header eyebrow="Resource Plan Version" title="Edit Project" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <dropdown-field id="rp-edit-version-project-basis" col="col-12" label="Basis" placeholder="Select basis..." required show-label>
+      <values-list>
+        <value value="budget">Budget</value>
+        <value value="estimate">Estimate</value>
+        <value value="custom">Custom</value>
+      </values-list>
+    </dropdown-field>
+    <hint-field id="rp-edit-version-project-budget-hint" col="col-12" type="info" hidden>
+      No budget configured for this project in the plan's financial year.
+    </hint-field>
+    <project-estimate-field id="rp-edit-version-project-estimate" col="col-12" show-label hidden></project-estimate-field>
+    <hint-field id="rp-edit-version-project-estimate-hint" col="col-12" type="info" hidden></hint-field>
+    <decimal-field id="rp-edit-version-project-amount" col="col-12" label="Basis Amount (£)" min="0" hidden></decimal-field>
+    <priority-field id="rp-edit-version-project-priority" col="col-6" inherit show-label></priority-field>
+    <confidence-field id="rp-edit-version-project-confidence" col="col-6" inherit show-label></confidence-field>
+    <sprint-field id="rp-edit-version-project-start-sprint" col="col-6" label="Start Sprint" show-label unassign></sprint-field>
+    <sprint-field id="rp-edit-version-project-end-sprint" col="col-6" label="End Sprint" show-label unassign></sprint-field>
+    <toggle-field id="rp-edit-version-project-dates-strict" col="col-6" label="Dates Strict"></toggle-field>
+    <hint-field col="col-6" type="info">Enforce sprint boundaries strictly.</hint-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Close" primary="Save Config" primary-icon="bi-check-lg"></drawer-footer>
+  </drawer-modal>
+  {% endif %}
+
+  {% if can_view_resource_plan_version_project_budget_release %}
+  <drawer-modal id="rp-resource-plan-version-project-budget-releases-drawer" width="640">
+  <drawer-header eyebrow="Resource Plan Version" title="Budget Release" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <span class="fw-medium small">Releases</span>
+    {% if can_add_resource_plan_version_project_budget_release %}
+    <secondary-button id="rp-budget-releases-add-btn" label="Add Release" prefix-icon="bi-plus-lg"></secondary-button>
+    {% endif %}
+  </div>
+
+  {% if can_add_resource_plan_version_project_budget_release %}
+  <section-panel id="rp-budget-release-form" class="mb-3" hidden>
+  <panel-body>
+  <div class="row g-3">
+    <dropdown-field id="rp-budget-release-type" col="col-12" label="Release Type" show-label required placeholder="Select release type...">
+      <values-list>
+        <value value="sprint">Sprint</value>
+        <value value="month">Month</value>
+      </values-list>
+    </dropdown-field>
+    <hint-field id="rp-budget-release-type-locked-hint" col="col-12" type="info" hidden>
+      Delete all existing releases to change this project's release type.
+    </hint-field>
+    <sprint-field id="rp-budget-release-sprint" col="col-12" label="Sprint" show-label hidden></sprint-field>
+    <text-field id="rp-budget-release-month" col="col-12" label="Month" placeholder="YYYY-MM" hidden></text-field>
+    <decimal-field id="rp-budget-release-amount" col="col-12" label="Release Amount (£)" min="0" required></decimal-field>
+    <text-field id="rp-budget-release-notes" col="col-12" label="Notes" cols="2"></text-field>
+  </div>
+  <div class="d-flex justify-content-end gap-2 mt-2">
+    <muted-button id="rp-budget-release-form-cancel-btn" label="Cancel"></muted-button>
+    <primary-button id="rp-budget-release-form-submit-btn" label="Add" prefix-icon="bi-check-lg"></primary-button>
+  </div>
+  </panel-body>
+  </section-panel>
+  {% endif %}
+
+  <data-table id="rp-project-budget-releases-table" row-template="renderBudgetReleaseRow" empty-message="No budget releases added yet.">
+    <table-columns>
+      <table-column label="Release" key="release_label"></table-column>
+      <table-column label="Amount" key="amount" numeric></table-column>
+      <table-column label="Notes" key="notes" hide-mobile></table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_resource_plan_version_project_budget_release %}
+      <table-action icon="bi-pencil" label="Edit" event="rp:budget-release:edit"></table-action>
+      {% endif %}
+      {% if can_delete_resource_plan_version_project_budget_release %}
+      <table-action icon="bi-trash" label="Delete" event="rp:budget-release:delete" danger></table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </drawer-panel>
+  <drawer-footer close="Close"></drawer-footer>
+  </drawer-modal>
+  {% endif %}
+
+  {% if can_delete_resource_plan_version_project_budget_release %}
+  <delete-modal id="rp-resource-plan-version-project-budget-release-delete-modal" action-label="Delete budget release"></delete-modal>
+  {% endif %}
+
+  {% if can_view_resource_plan_version_team %}
+  <drawer-modal id="rp-resource-plan-version-teams-drawer" width="900">
+  <drawer-header eyebrow="Resource Plan Version" title="Teams Assignment" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="d-flex align-items-center justify-content-between mb-2">
+    <span id="rp-version-teams-summary" class="small" style="color:var(--rp-text-muted)"></span>
+    {% if can_add_resource_plan_version_team %}
+    <secondary-button id="rp-version-teams-add-btn" label="Add Team" prefix-icon="bi-plus-lg"></secondary-button>
+    {% endif %}
+  </div>
+
+  {% if can_add_resource_plan_version_team %}
+  <section-panel id="rp-version-team-add-form" class="mb-3" hidden>
+  <panel-body>
+  <div class="row g-3">
+    <team-field id="rp-new-version-team-team" col="col-12" show-label required></team-field>
+    <dropdown-field id="rp-new-version-team-allocation-type" col="col-12" label="Allocation Type" placeholder="Select allocation type..." required show-label>
+      <values-list>
+        <value value="percent">% of Basis Amount</value>
+        <value value="days">Days</value>
+        <value value="budget">Budget</value>
+      </values-list>
+    </dropdown-field>
+    <decimal-field id="rp-new-version-team-value" col="col-6" label="Value" min="0" required></decimal-field>
+    <number-field id="rp-new-version-team-order" col="col-6" label="Order" min="1" value="1"></number-field>
+  </div>
+  <div class="d-flex justify-content-end gap-2 mt-2">
+    <muted-button id="rp-version-team-add-cancel-btn" label="Cancel"></muted-button>
+    <primary-button id="rp-version-team-add-submit-btn" label="Add" prefix-icon="bi-check-lg"></primary-button>
+  </div>
+  </panel-body>
+  </section-panel>
+  {% endif %}
+
+  <div id="rp-version-teams-container"></div>
+  </drawer-panel>
+  <drawer-footer close="Close"></drawer-footer>
+  </drawer-modal>
+  {% endif %}
+
+  {% if can_delete_resource_plan_version_team %}
+  <delete-modal id="rp-resource-plan-version-team-delete-modal" action-label="Delete team"></delete-modal>
+  {% endif %}
+
+  {% if can_add_resource_plan_phase or can_change_resource_plan_phase %}
+  <drawer-modal id="rp-resource-plan-phase-drawer" width="640">
+  <drawer-header eyebrow="Team Allocation" title="Phase" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-phase-name" col="col-12" label="Name" required></text-field>
+    <sprint-field id="rp-phase-start-sprint" col="col-6" label="Start Sprint" show-label unassign></sprint-field>
+    <sprint-field id="rp-phase-end-sprint" col="col-6" label="End Sprint" show-label unassign></sprint-field>
+    <decimal-field id="rp-phase-max-days-per-sprint" col="col-6" label="Max Days per Sprint" min="0"
+      hint="Caps engineer days per sprint for this phase. Use Segments to distribute effort across sprints (e.g., Ramp Up or Ramp Down). Total Phase Effort = Team Allocation * Segment %."
+    ></decimal-field>
+    <number-field id="rp-phase-sequence-order" col="col-6" label="Order" min="1" value="1"></number-field>
+    <dropdown-field id="rp-phase-ramp-pattern" col="col-6" label="Ramp Pattern" show-label required>
+      <values-list>
+        <value value="flat">Flat</value>
+        <value value="ramp_up">Ramp Up</value>
+        <value value="ramp_down">Ramp Down</value>
+        <value value="ramp_up_down">Ramp Up Down</value>
+        <value value="ramp_up_steady">Ramp Up Steady</value>
+        <value value="steady_down">Steady Down</value>
+        <value value="stepped">Stepped</value>
+        <value value="custom">Custom</value>
+      </values-list>
+    </dropdown-field>
+    <dropdown-field id="rp-phase-split-mode" col="col-6" label="Split Mode" show-label required>
+      <values-list>
+        <value value="percent">Percent</value>
+        <value value="days">Days</value>
+        <value value="equal">Equal</value>
+        <value value="auto">Auto</value>
+      </values-list>
+    </dropdown-field>
+    <toggle-field id="rp-phase-allow-multiple-engineers" col="col-12" label="Allow Multiple Engineers"></toggle-field>
+    <text-field id="rp-phase-notes" col="col-12" label="Notes" cols="3"></text-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save Phase" primary-icon="bi-check-lg"></drawer-footer>
+  </drawer-modal>
+  {% endif %}
+
+  {% if can_delete_resource_plan_phase %}
+  <delete-modal id="rp-resource-plan-phase-delete-modal" action-label="Delete phase"></delete-modal>
+  {% endif %}
+
+  <drawer-modal id="rp-resource-plan-phase-segments-drawer" width="640">
+  <drawer-header eyebrow="Phase" title="Segments" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div class="d-flex gap-2">
+      <engine-button id="rp-segments-suggest-btn" label="Suggest" prefix-icon="bi-magic"></engine-button>
+      <secondary-button id="rp-segments-preview-ramp-btn" label="Preview Ramp" prefix-icon="bi-graph-up"></secondary-button>
+    </div>
+    {% if can_add_resource_plan_phase_segment %}
+    <secondary-button id="rp-segments-add-btn" label="Add Segment" prefix-icon="bi-plus-lg"></secondary-button>
+    {% endif %}
+  </div>
+
+  {% if can_add_resource_plan_phase_segment %}
+  <section-panel id="rp-segment-add-form" class="mb-3" hidden>
+  <panel-body>
+  <div class="row g-3">
+    <dropdown-field id="rp-new-segment-type" col="col-6" label="Segment Type" show-label required>
+      <values-list>
+        <value value="ramp">Ramp</value>
+        <value value="flat">Flat</value>
+      </values-list>
+    </dropdown-field>
+    <dropdown-field id="rp-new-segment-progression" col="col-6" label="Progression" show-label required>
+      <values-list>
+        <value value="linear">Linear</value>
+        <value value="exponential">Exponential</value>
+        <value value="logarithmic">Logarithmic</value>
+        <value value="stepped">Stepped</value>
+        <value value="flat">Flat</value>
+      </values-list>
+    </dropdown-field>
+    <decimal-field id="rp-new-segment-start-pct" col="col-6" label="Start %" min="0" max="100" required></decimal-field>
+    <decimal-field id="rp-new-segment-end-pct" col="col-6" label="End %" min="0" max="100" required></decimal-field>
+    <number-field id="rp-new-segment-duration" col="col-6" label="Duration (sprints)" min="1" required></number-field>
+    <number-field id="rp-new-segment-step-count" col="col-6" label="Step Count" min="1" hint="Only used with Stepped progression." hidden></number-field>
+  </div>
+  <div class="d-flex justify-content-end gap-2 mt-2">
+    <muted-button id="rp-segment-add-cancel-btn" label="Cancel"></muted-button>
+    <primary-button id="rp-segment-add-submit-btn" label="Add" prefix-icon="bi-check-lg"></primary-button>
+  </div>
+  </panel-body>
+  </section-panel>
+  {% endif %}
+
+  <data-table id="rp-phase-segments-table" row-template="renderSegmentRow" empty-message="No segments added yet.">
+    <table-columns>
+      <table-column label="Order" key="segment_order" numeric></table-column>
+      <table-column label="Type" key="segment_type"></table-column>
+      <table-column label="Start %" key="start_percentage" numeric></table-column>
+      <table-column label="End %" key="end_percentage" numeric></table-column>
+      <table-column label="Progression" key="progression"></table-column>
+      <table-column label="Duration" key="duration" numeric></table-column>
+      <table-column label="Steps" key="step_count" numeric></table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_delete_resource_plan_phase_segment %}
+      <table-action icon="bi-trash" label="Delete" event="rp:segment:delete" danger></table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </drawer-panel>
+  <drawer-footer close="Close"></drawer-footer>
+  </drawer-modal>
+
+  {% if can_delete_resource_plan_phase_segment %}
+  <delete-modal id="rp-resource-plan-phase-segment-delete-modal" action-label="Delete segment"></delete-modal>
+  {% endif %}
+
+  <drawer-modal id="rp-resource-plan-phase-dependencies-drawer" width="640">
+  <drawer-header eyebrow="Phase" title="Dependencies" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <span class="fw-medium small">Dependencies</span>
+    {% if can_add_resource_plan_phase_dependency %}
+    <secondary-button id="rp-dependencies-add-btn" label="Add Dependency" prefix-icon="bi-plus-lg"></secondary-button>
+    {% endif %}
+  </div>
+
+  {% if can_add_resource_plan_phase_dependency %}
+  <section-panel id="rp-dependency-form" class="mb-3" hidden>
+  <panel-body>
+  <div class="row g-3">
+    <predecessor-phase-field id="rp-dependency-predecessor" col="col-12" label="Predecessor Phase" show-label required></predecessor-phase-field>
+    <dropdown-field id="rp-dependency-type" col="col-6" label="Dependency Type" show-label required>
+      <values-list>
+        <value value="start_to_start">Start to Start</value>
+        <value value="finish_to_start">Finish to Start</value>
+        <value value="finish_to_finish">Finish to Finish</value>
+        <value value="start_to_finish">Start to Finish</value>
+      </values-list>
+    </dropdown-field>
+    <number-field id="rp-dependency-lag-sprints" col="col-6" label="Lag (sprints)" value="0"></number-field>
+  </div>
+  <div class="d-flex justify-content-end gap-2 mt-2">
+    <muted-button id="rp-dependency-form-cancel-btn" label="Cancel"></muted-button>
+    <primary-button id="rp-dependency-form-submit-btn" label="Add" prefix-icon="bi-check-lg"></primary-button>
+  </div>
+  </panel-body>
+  </section-panel>
+  {% endif %}
+
+  <data-table id="rp-phase-dependencies-table" row-template="renderDependencyRow" empty-message="No dependencies added yet.">
+    <table-columns>
+      <table-column label="Predecessor Phase" key="predecessor_phase_name"></table-column>
+      <table-column label="Project" key="predecessor_project_name"></table-column>
+      <table-column label="Team" key="predecessor_team_name"></table-column>
+      <table-column label="Type" key="dependency_type"></table-column>
+      <table-column label="Lag" key="lag_sprints" numeric></table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_resource_plan_phase_dependency %}
+      <table-action icon="bi-pencil" label="Edit" event="rp:dependency:edit"></table-action>
+      {% endif %}
+      {% if can_delete_resource_plan_phase_dependency %}
+      <table-action icon="bi-trash" label="Delete" event="rp:dependency:delete" danger></table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </drawer-panel>
+  <drawer-footer close="Close"></drawer-footer>
+  </drawer-modal>
+
+  {% if can_delete_resource_plan_phase_dependency %}
+  <delete-modal id="rp-resource-plan-phase-dependency-delete-modal" action-label="Delete dependency"></delete-modal>
+  {% endif %}
+
+  <drawer-modal id="rp-resource-plan-phase-pauses-drawer" width="640">
+  <drawer-header eyebrow="Phase" title="Pauses" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <span class="fw-medium small">Pauses</span>
+    {% if can_add_resource_plan_phase_pause %}
+    <secondary-button id="rp-pauses-add-btn" label="Add Pause" prefix-icon="bi-plus-lg"></secondary-button>
+    {% endif %}
+  </div>
+
+  {% if can_add_resource_plan_phase_pause %}
+  <section-panel id="rp-pause-form" class="mb-3" hidden>
+  <panel-body>
+  <div class="row g-3">
+    <sprint-field id="rp-pause-from" col="col-6" label="Pause From" show-label required></sprint-field>
+    <dropdown-field id="rp-pause-input-mode" col="col-6" label="Input Mode" show-label required>
+      <values-list>
+        <value value="sprint">Sprint</value>
+        <value value="count">Count</value>
+      </values-list>
+    </dropdown-field>
+    <sprint-field id="rp-pause-until-sprint" col="col-6" label="Pause Until Sprint" show-label hidden></sprint-field>
+    <number-field id="rp-pause-sprint-count" col="col-6" label="Pause Sprint Count" min="1" hidden></number-field>
+    <text-field id="rp-pause-notes" col="col-12" label="Notes" cols="2"></text-field>
+  </div>
+  <div class="d-flex justify-content-end gap-2 mt-2">
+    <muted-button id="rp-pause-form-cancel-btn" label="Cancel"></muted-button>
+    <primary-button id="rp-pause-form-submit-btn" label="Add" prefix-icon="bi-check-lg"></primary-button>
+  </div>
+  </panel-body>
+  </section-panel>
+  {% endif %}
+
+  <data-table id="rp-phase-pauses-table" row-template="renderPauseRow" empty-message="No pauses added yet.">
+    <table-columns>
+      <table-column label="Pause From" key="pause_from_name"></table-column>
+      <table-column label="Mode" key="input_mode"></table-column>
+      <table-column label="Resume Sprint" key="resume_sprint_name"></table-column>
+      <table-column label="Notes" key="notes" hide-mobile></table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_resource_plan_phase_pause %}
+      <table-action icon="bi-pencil" label="Edit" event="rp:pause:edit"></table-action>
+      {% endif %}
+      {% if can_delete_resource_plan_phase_pause %}
+      <table-action icon="bi-trash" label="Delete" event="rp:pause:delete" danger></table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </drawer-panel>
+  <drawer-footer close="Close"></drawer-footer>
+  </drawer-modal>
+
+  {% if can_delete_resource_plan_phase_pause %}
+  <delete-modal id="rp-resource-plan-phase-pause-delete-modal" action-label="Delete pause"></delete-modal>
+  {% endif %}
+
+  <drawer-modal id="rp-resource-plan-assignments-drawer" width="640">
+  <drawer-header eyebrow="Phase" title="Assignments" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <span class="fw-medium small">Assignments</span>
+    {% if can_add_resource_plan_assignment %}
+    <secondary-button id="rp-assignments-add-btn" label="Add Assignment" prefix-icon="bi-plus-lg"></secondary-button>
+    {% endif %}
+  </div>
+
+  {% if can_add_resource_plan_assignment %}
+  <section-panel id="rp-assignment-form" class="mb-3" hidden>
+  <panel-body>
+  <div class="row g-3">
+    <dropdown-field id="rp-assignment-type" col="col-12" label="Assignment Type" show-label required>
+      <values-list>
+        <value value="engineer">Engineer</value>
+        <value value="architect">Architect</value>
+        <value value="adhoc">Adhoc</value>
+        <value value="interim">Interim</value>
+      </values-list>
+    </dropdown-field>
+    <member-field id="rp-assignment-member" col="col-12" label="Member" show-label required></member-field>
+    <member-field id="rp-assignment-replaces-member" col="col-6" label="Replaces Member" show-label hidden></member-field>
+    <number-field id="rp-assignment-interim-sprint-count" col="col-6" label="Interim Sprint Count" min="1" hidden></number-field>
+    <decimal-field id="rp-assignment-split-value" col="col-6" label="Split Value" min="0" hidden></decimal-field>
+    <text-field id="rp-assignment-notes" col="col-12" label="Notes" cols="2"></text-field>
+  </div>
+  <div class="d-flex justify-content-end gap-2 mt-2">
+    <muted-button id="rp-assignment-form-cancel-btn" label="Cancel"></muted-button>
+    <primary-button id="rp-assignment-form-submit-btn" label="Add" prefix-icon="bi-check-lg"></primary-button>
+  </div>
+  </panel-body>
+  </section-panel>
+  {% endif %}
+
+  <data-table id="rp-phase-assignments-table" row-template="renderAssignmentRow" empty-message="No assignments added yet.">
+    <table-columns>
+      <table-column label="Member" key="member_name"></table-column>
+      <table-column label="Type" key="assignment_type"></table-column>
+      <table-column label="Split Value" key="split_value" numeric></table-column>
+      <table-column label="In Budget" key="includes_in_budget"></table-column>
+      <table-column label="Notes" key="notes" hide-mobile></table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_resource_plan_assignment %}
+      <table-action icon="bi-pencil" label="Edit" event="rp:assignment:edit"></table-action>
+      {% endif %}
+      {% if can_delete_resource_plan_assignment %}
+      <table-action icon="bi-trash" label="Delete" event="rp:assignment:delete" danger></table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </drawer-panel>
+  <drawer-footer close="Close"></drawer-footer>
+  </drawer-modal>
+
+  {% if can_delete_resource_plan_assignment %}
+  <delete-modal id="rp-resource-plan-assignment-delete-modal" action-label="Delete assignment"></delete-modal>
+  {% endif %}
+
+  {% if can_add_resource_plan_engine_job or can_view_resource_plan_engine_job %}
+  <drawer-modal id="rp-engine-job-drawer" width="900">
+  <drawer-header eyebrow="Resource Plan Version" title="Run Engine" no-sizes></drawer-header>
+  <drawer-panel>
+
+  <div id="rp-engine-job-form-view" class="row g-4">
+    <div class="col-12 col-md-7">
+      <radio-group-field id="rp-engine-job-mode" label="Run Mode">
+        <option-field value="validate" label="Validate Only" checked></option-field>
+        <option-field value="full" label="Full Run"></option-field>
+      </radio-group-field>
+      <checkbox-field id="rp-engine-job-include-current-sprint" label="Include Current Sprint" class="mt-3"></checkbox-field>
+      <hint-field col="col-12" type="info" class="mt-2">
+        When checked, the current (in-progress) sprint is included in capacity calculations.
+      </hint-field>
+      <engine-button id="rp-engine-job-run-btn" label="Run" prefix-icon="bi-play-fill" class="mt-3"></engine-button>
+    </div>
+    <div class="col-12 col-md-5">
+      <section-panel>
+        <panel-title>About this run</panel-title>
+        <panel-body>
+          <p class="small">The engine validates your plan configurations and (in full-run mode) generates capacity tables and allocations.</p>
+          <p class="small"><strong>Validate Only</strong> — checks for missing teams, phases, circular dependencies, and split inconsistencies. No data is written.</p>
+          <p class="small mb-0"><strong>Full Run</strong> — performs validation then generates placeholder leaves, capacity, and allocation data.</p>
+        </panel-body>
+      </section-panel>
+    </div>
+  </div>
+
+  <div id="rp-engine-job-progress-view" hidden>
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <span id="rp-engine-job-status-pill" class="rp-badge rp-badge-soft"></span>
+      <span id="rp-engine-job-status-text" class="small"></span>
+    </div>
+    <progress-bar id="rp-engine-job-progress-bar" percent="0"></progress-bar>
+    <div id="rp-engine-job-error-summary" class="small text-danger mt-2" hidden></div>
+    <div id="rp-engine-job-errors" class="mt-3"></div>
+  </div>
+
+  </drawer-panel>
+  <drawer-footer close="Close"></drawer-footer>
+  </drawer-modal>
+  {% endif %}
+
+  {% if can_delete_resource_plan_engine_job %}
+  <delete-modal id="rp-engine-job-delete-modal" action-label="Delete engine job"></delete-modal>
+  {% endif %}
+
+  {{ phase_permissions|json_script:"rp-phase-permissions" }}
+  {{ segment_permissions|json_script:"rp-segment-permissions" }}
+  {{ dependency_permissions|json_script:"rp-dependency-permissions" }}
+  {{ pause_permissions|json_script:"rp-pause-permissions" }}
+  {{ assignment_permissions|json_script:"rp-assignment-permissions" }}
+
+  <input type="hidden" id="rp-version-detail-plan-code" value="{{ plan_code }}">
+  <input type="hidden" id="rp-version-detail-version-number" value="{{ version }}">
+{% endblock content %}

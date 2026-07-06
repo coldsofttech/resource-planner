@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Placeholder Leaves
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/resource-plans.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Projects &rsaquo; Resource Plans &rsaquo; Versions &rsaquo; Allocation Grid &rsaquo; Placeholder Leaves
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <icon-field icon="bi-bookmark" size="lg"></icon-field>
+  <span class="ms-2">Placeholder Leaves</span>
+{% endblock page_title %}
+{% block page_actions %}
+  {% if can_add_placeholder_leave %}
+  <engine-button id="rp-placeholder-leaves-regenerate-btn" label="Regenerate" prefix-icon="bi-arrow-clockwise"></engine-button>
+  {% endif %}
+{% endblock page_actions %}
+{% block content %}
+  <list-view show-active-filters>
+  <filter-panel id="rp-placeholder-leaves-filter-panel">
+  <search-field id="rp-placeholder-leaves-search" name="search" placeholder="Search..." shortcut="/" show-label></search-field>
+  <team-field id="rp-placeholder-leaves-team" name="team" allow-all show-label></team-field>
+  <dropdown-field id="rp-placeholder-leaves-source" name="source" label="Source" show-label>
+    <values-list>
+      <value value="">All Sources</value>
+      <value value="auto">Auto</value>
+      <value value="manual">Manual</value>
+    </values-list>
+  </dropdown-field>
+  <member-field id="rp-placeholder-leaves-member" name="member" allow-all show-label></member-field>
+  <sprint-field id="rp-placeholder-leaves-sprint" name="sprint" allow-all show-label></sprint-field>
+  </filter-panel>
+  <data-table id="rp-placeholder-leaves-table" url="/api/v1/resource-plans/{{ plan_code }}/versions/v{{ version }}/placeholder-leaves/" paginated page-size="25" row-template="renderPlaceholderLeaveRow" empty-message="No placeholder leaves found.">
+    <table-columns>
+      <table-column width="52px"></table-column>
+      <table-column label="Member" key="member_name" sortable></table-column>
+      <table-column label="Sprint" key="sprint_name"></table-column>
+      <table-column label="Days" key="days" numeric></table-column>
+      <table-column label="Source" key="source_display"></table-column>
+      <table-column label="Notes" key="notes" hide-mobile></table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_placeholder_leave %}
+      <table-action icon="bi-pencil" label="Edit" event="rp:placeholder-leave:edit"></table-action>
+      {% endif %}
+      {% if can_delete_placeholder_leave %}
+      <table-action icon="bi-trash" label="Delete" event="rp:placeholder-leave:delete" danger></table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </list-view>
+
+  {% if can_change_placeholder_leave %}
+  <drawer-modal id="rp-placeholder-leave-edit-drawer" width="600">
+  <drawer-header eyebrow="Edit record" title="Edit Placeholder Leave" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <view-field id="rp-edit-placeholder-leave-member" col="col-12" label="Member"></view-field>
+    <view-field id="rp-edit-placeholder-leave-sprint" col="col-12" label="Sprint"></view-field>
+    <decimal-field id="rp-edit-placeholder-leave-days" col="col-12" label="Days" required min="0" step="0.5"></decimal-field>
+    <text-field id="rp-edit-placeholder-leave-notes" col="col-12" label="Notes" cols="3"></text-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  {% endif %}
+
+  {% if can_delete_placeholder_leave %}
+  <delete-modal id="rp-placeholder-leave-delete-modal" action-label="Delete"></delete-modal>
+  {% endif %}
+
+  {% if can_add_placeholder_leave %}
+  <form-modal id="rp-placeholder-leaves-regenerate-modal" title="Regenerate Placeholder Leaves" primary-label="Regenerate" primary-icon="bi-arrow-clockwise">
+    <div class="row g-3">
+      <checkbox-field id="rp-placeholder-leaves-regen-include-current" col="col-12" label="Include Current Sprint"></checkbox-field>
+      <checkbox-field id="rp-placeholder-leaves-regen-remove-overrides" col="col-12" label="Remove Manual Overrides"></checkbox-field>
+      <hint-field col="col-12" type="warning">
+        This regenerates all auto-generated placeholder leaves for this version. Manual edits are preserved unless "Remove Manual Overrides" is checked.
+      </hint-field>
+    </div>
+  </form-modal>
+  {% endif %}
+
+  <input type="hidden" id="rp-placeholder-leaves-plan-code" value="{{ plan_code }}">
+  <input type="hidden" id="rp-placeholder-leaves-version-number" value="{{ version }}">
+{% endblock content %}

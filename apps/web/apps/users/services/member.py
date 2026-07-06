@@ -32,7 +32,12 @@ class MembersService(FilterableQueryService):
         "user__first_name",
         "user__email",
         "joined_date",
+        "display_name",
+        "email",
     ]
+    _sort_field_map: dict[str, str] = {
+        "email": "user__email",
+    }
     default_ordering: list[str] = ["user__last_name", "user__first_name"]
     filter_active_by_default: bool = False
 
@@ -53,6 +58,17 @@ class MembersService(FilterableQueryService):
         if filters.get("team") or filters.get("skill"):
             qs = qs.distinct()
         return qs
+
+    def apply_ordering(self, qs, sorts):
+        from apps.core.types import SortParam
+
+        order_fields = []
+        for s in sorts:
+            if not isinstance(s, SortParam) or s.sort_by not in self.sortable_fields:
+                continue
+            field = self._sort_field_map.get(s.sort_by, s.sort_by)
+            order_fields.append(f"-{field}" if s.direction == "desc" else field)
+        return qs.order_by(*(order_fields or self.default_ordering))
 
     def get(self, code: str) -> UserProfile:
         from apps.core.exceptions import NotFoundException

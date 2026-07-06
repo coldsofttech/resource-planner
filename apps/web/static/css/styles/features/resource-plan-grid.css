@@ -1,0 +1,199 @@
+/* Allocation Grid (#182) — capacity legend, absence icons, and the
+   per-sprint grid table used by apps/web/static/js/modules/resource-plans/grid.js */
+
+.rp-grid-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--rp-s-16);
+  font-size: var(--rp-fs-13);
+  color: var(--rp-text-muted);
+  padding: var(--rp-s-8) var(--rp-s-12);
+}
+
+.rp-grid-legend-group {
+  display: flex;
+  align-items: center;
+  gap: var(--rp-s-8);
+  flex-wrap: wrap;
+}
+
+.rp-grid-legend-label {
+  font-weight: 600;
+  color: var(--rp-text);
+}
+
+.rp-grid-swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rp-s-4);
+  padding: 2px var(--rp-s-8);
+  border-radius: var(--rp-r-4);
+  font-size: var(--rp-fs-12);
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+/* Capacity buckets — also used to color Allocated Capacity cells.
+   The td.rp-grid-cell compound selectors are required to out-specificity
+   `.rp-table-detail-row td` (tables.css), which otherwise wins the cascade
+   since our detail tables render inside a data-table's expanded row. */
+.rp-cap-hi,
+td.rp-grid-cell.rp-cap-hi {
+  background: var(--rp-success);
+  color: var(--rp-text-on-accent);
+}
+
+.rp-cap-good,
+td.rp-grid-cell.rp-cap-good {
+  background: var(--rp-success-soft);
+  color: var(--rp-success-soft-text);
+}
+
+.rp-cap-mid,
+td.rp-grid-cell.rp-cap-mid {
+  background: var(--rp-warning);
+  color: var(--rp-text-on-accent);
+}
+
+.rp-cap-low,
+td.rp-grid-cell.rp-cap-low {
+  background: var(--rp-warning-soft);
+  color: var(--rp-warning-soft-text);
+}
+
+.rp-cap-crit,
+td.rp-grid-cell.rp-cap-crit {
+  background: var(--rp-danger-soft);
+  color: var(--rp-danger-soft-text);
+}
+
+.rp-cap-zero,
+td.rp-grid-cell.rp-cap-zero {
+  background: var(--rp-bg-sunken);
+  color: var(--rp-text-muted);
+}
+
+.rp-grid-absence-icon-holidays {
+  color: var(--rp-info);
+}
+
+.rp-grid-absence-icon-leave {
+  color: var(--rp-warning);
+}
+
+.rp-grid-absence-icon-placeholder {
+  color: var(--rp-accent);
+}
+
+/* Grid category header (collapsed row) */
+.rp-grid-category {
+  display: flex;
+  align-items: center;
+  gap: var(--rp-s-12);
+  padding: var(--rp-s-4) 0;
+}
+
+.rp-grid-category-title {
+  font-weight: 600;
+  color: var(--rp-text);
+}
+
+.rp-grid-category-subtitle {
+  color: var(--rp-text-muted);
+  font-size: var(--rp-fs-13);
+}
+
+/* Detail table rendered inside the expanded row */
+.rp-grid-detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--rp-fs-13);
+}
+
+.rp-grid-detail-table th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--rp-text-muted);
+  padding: var(--rp-s-8);
+  border-bottom: 1px solid var(--rp-border);
+  white-space: nowrap;
+}
+
+.rp-grid-detail-table td {
+  padding: var(--rp-s-8);
+  border-bottom: 1px solid var(--rp-divider);
+  white-space: nowrap;
+}
+
+.rp-grid-detail-table td.rp-grid-cell {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.rp-grid-empty-cell {
+  color: var(--rp-text-subtle);
+}
+
+/* Priority row tint on the Allocations detail table. The `tr.foo td` form
+   (not just `.foo`) is needed for the same specificity reason as the
+   capacity buckets above — plain <td> children have no color class of
+   their own to out-specificity `.rp-table-detail-row td`. */
+.rp-grid-priority-medium,
+tr.rp-grid-priority-medium td {
+  background: var(--rp-info-soft);
+}
+
+.rp-grid-priority-high,
+tr.rp-grid-priority-high td {
+  background: var(--rp-warning-soft);
+}
+
+.rp-grid-priority-very_high,
+tr.rp-grid-priority-very_high td {
+  background: var(--rp-danger-soft);
+}
+
+.rp-grid-confidence-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: var(--rp-s-4);
+}
+
+.rp-grid-confidence-low {
+  background: var(--rp-danger);
+}
+
+.rp-grid-confidence-medium {
+  background: var(--rp-warning);
+}
+
+.rp-grid-confidence-high {
+  background: var(--rp-success-soft);
+}
+
+.rp-grid-confidence-very_high {
+  background: var(--rp-success);
+}
+
+.rp-grid-allocation-set-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--rp-s-8);
+  padding: var(--rp-s-8) var(--rp-s-12);
+  border-radius: var(--rp-r-8);
+  font-size: var(--rp-fs-13);
+  flex: 1;
+}
+
+.rp-grid-allocation-set-hint.is-active {
+  background: var(--rp-info-soft);
+  color: var(--rp-info-soft-text);
+}
+
+.rp-grid-allocation-set-hint.is-superseded {
+  background: var(--rp-bg-sunken);
+  color: var(--rp-text-muted);
+}

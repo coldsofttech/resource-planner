@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Conflicts &amp; Manpower Requests
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/resource-plans.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Projects &rsaquo; Resource Plans &rsaquo; Versions &rsaquo; Allocation Grid &rsaquo; Conflicts
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <icon-field icon="bi-exclamation-triangle" size="lg"></icon-field>
+  <span class="ms-2">Conflicts &amp; Manpower Requests</span>
+{% endblock page_title %}
+{% block content %}
+
+  <section-panel class="mb-3">
+    <panel-body>
+      <div class="d-flex align-items-center flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-2">
+          <label for="rp-conflicts-allocation-set" class="fw-medium mb-0">Allocation Set:</label>
+          <span id="rp-conflicts-allocation-set-container"></span>
+        </div>
+      </div>
+    </panel-body>
+  </section-panel>
+
+  <div id="rp-conflicts-tabs-container">
+    <div id="rp-conflicts-tabs-loading" class="text-center text-muted py-5">
+      <div class="spinner-border" role="status"></div>
+      <p class="small mt-2 mb-0">Loading…</p>
+    </div>
+  </div>
+
+  {% if can_change_conflict %}
+  <form-modal id="rp-conflict-resolve-modal" title="Resolve Conflict" primary-label="Resolve" primary-icon="bi-check2">
+    <div id="rp-conflict-resolve-options-container"></div>
+    <text-field id="rp-conflict-resolve-notes" name="notes" label="Notes" cols="3" col="col-12"></text-field>
+  </form-modal>
+  {% endif %}
+
+  {% if can_change_manpower_request %}
+  <form-modal id="rp-manpower-hire-modal" title="Hire for Manpower Request" primary-label="Hire" primary-icon="bi-person-plus-fill">
+    <p class="small mb-0" style="color:var(--rp-text-muted)">
+      This creates a hire placeholder for this team, onboarding at the engine-suggested sprint. You can adjust the onboard sprint afterwards.
+    </p>
+  </form-modal>
+
+  <form-modal id="rp-manpower-rebalance-modal" title="Rebalance Manpower Request" primary-label="Rebalance" primary-icon="bi-arrow-left-right">
+    <text-field id="rp-manpower-rebalance-notes" name="notes" label="Notes" cols="3" col="col-12"></text-field>
+  </form-modal>
+
+  <form-modal id="rp-manpower-dismiss-modal" title="Dismiss Manpower Request" primary-label="Dismiss" primary-icon="bi-x-circle">
+    <text-field id="rp-manpower-dismiss-notes" name="notes" label="Notes" cols="3" col="col-12"></text-field>
+  </form-modal>
+  {% endif %}
+
+  <input type="hidden" id="rp-conflicts-plan-code" value="{{ plan_code }}">
+  <input type="hidden" id="rp-conflicts-version-number" value="{{ version }}">
+{% endblock content %}

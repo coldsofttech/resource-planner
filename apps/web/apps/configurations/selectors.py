@@ -197,6 +197,10 @@ class Sprint:
     def get_hours_per_day() -> int:
         return int(get_config_value("HOURS_PER_DAY"))
 
+    @staticmethod
+    def get_default_holidays_per_sprint() -> int:
+        return int(get_config_value("DEFAULT_HOLIDAYS_PER_SPRINT"))
+
 
 class Project:
     @staticmethod

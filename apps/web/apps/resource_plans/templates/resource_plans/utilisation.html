@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Utilisation
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/resource-plans.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Projects &rsaquo; Resource Plans &rsaquo; Versions &rsaquo; Allocation Grid &rsaquo; Utilisation
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <icon-field icon="bi-graph-up" size="lg"></icon-field>
+  <span class="ms-2">Utilisation</span>
+{% endblock page_title %}
+{% block content %}
+
+  <section-panel class="mb-3">
+    <panel-body>
+      <div class="row g-3 align-items-end">
+        <div class="col-auto">
+          <label for="rp-utilisation-allocation-set" class="fw-medium mb-1 d-block">Allocation Set</label>
+          <span id="rp-utilisation-allocation-set-container"></span>
+        </div>
+        <div class="col-auto">
+          <team-field id="rp-utilisation-team" name="team" allow-all show-label></team-field>
+        </div>
+        <div class="col-auto">
+          <employment-type-field id="rp-utilisation-employment-type" name="employment_type" allow-all show-label></employment-type-field>
+        </div>
+        <div class="col-auto">
+          <toggle-field id="rp-utilisation-include-placeholders" label="Include Auto Generated Engineer Placeholders"></toggle-field>
+        </div>
+      </div>
+    </panel-body>
+  </section-panel>
+
+  <div id="rp-utilisation-tabs-container">
+    <div id="rp-utilisation-tabs-loading" class="text-center text-muted py-5">
+      <div class="spinner-border" role="status"></div>
+      <p class="small mt-2 mb-0">Loading&hellip;</p>
+    </div>
+  </div>
+
+  <input type="hidden" id="rp-utilisation-plan-code" value="{{ plan_code }}">
+  <input type="hidden" id="rp-utilisation-version-number" value="{{ version }}">
+{% endblock content %}

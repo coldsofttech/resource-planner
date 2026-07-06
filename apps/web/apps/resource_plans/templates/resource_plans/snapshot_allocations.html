@@ -1,0 +1,20 @@
+{% extends "base.html" %} {% load static %} {% block title %} Snapshot Allocations {% endblock title %} {% block scripts
+%}
+<script type="module" src="{% static 'js/dist/resource-plans.min.js' %}"></script>
+{% endblock scripts %} {% block page_eyebrow %} Projects &rsaquo; Resource Plans &rsaquo; Versions &rsaquo; Snapshots
+&rsaquo; Allocations {% endblock page_eyebrow %} {% block page_title %}
+<icon-field icon="bi-table" size="lg"></icon-field>
+<span class="ms-2">Snapshot Allocations</span>
+{% endblock page_title %} {% block content %}
+
+<div id="rp-snapshot-allocations-container">
+  <div id="rp-snapshot-allocations-loading" class="text-center text-muted py-5">
+    <div class="spinner-border" role="status"></div>
+    <p class="small mt-2 mb-0">Loading&hellip;</p>
+  </div>
+</div>
+
+<input type="hidden" id="rp-snapshot-allocations-plan-code" value="{{ plan_code }}" />
+<input type="hidden" id="rp-snapshot-allocations-version-number" value="{{ version }}" />
+<input type="hidden" id="rp-snapshot-allocations-snapshot-code" value="{{ snapshot_code }}" />
+{% endblock content %}

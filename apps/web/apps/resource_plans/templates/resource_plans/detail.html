@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Resource Plan
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/resource-plans.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Projects &rsaquo; Resource Plans
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <identicon-field id="rp-resource-plan-header-identicon" variant="hexagon" no-border></identicon-field>
+  <span id="rp-resource-plan-detail-title" class="ms-2">Resource Plan</span>
+{% endblock page_title %}
+{% block content %}
+  <tab-panel id="rp-resource-plan-tabs">
+  <tab-items>
+
+  <tab-item id="general" active>
+  <tab-header title="General" icon="bi-info-circle"></tab-header>
+  <tab-content>
+  <div class="row g-4 align-items-start">
+    <div class="col-12 col-md-5">
+      <section-panel class="mt-2">
+        <panel-title>Plan Details</panel-title>
+        <panel-body>
+        <view-field id="rp-plan-detail-code" label="Code" code></view-field>
+        <view-field id="rp-plan-detail-name" label="Plan Name"></view-field>
+        <view-field id="rp-plan-detail-type" label="Plan Type"></view-field>
+        <view-field id="rp-plan-detail-fy" label="Financial Year"></view-field>
+        <view-field id="rp-plan-detail-scope-fy" label="Scope: Financial Year" hidden></view-field>
+        <view-field id="rp-plan-detail-scope-programme" label="Scope: Programme" hidden></view-field>
+        <view-field id="rp-plan-detail-scope-project" label="Scope: Project" hidden></view-field>
+        <view-field id="rp-plan-detail-scope-team" label="Scope: Team" hidden></view-field>
+        <view-field id="rp-plan-detail-description" label="Description" desc></view-field>
+        <view-field id="rp-plan-detail-status" label="Status"></view-field>
+        <view-field id="rp-plan-detail-cloned-from" label="Cloned From" hidden></view-field>
+        </panel-body>
+      </section-panel>
+      <section-panel class="mt-3">
+        <panel-title>Metadata</panel-title>
+        <panel-body>
+        <view-field id="rp-plan-detail-created-at" label="Created" meta></view-field>
+        <view-field id="rp-plan-detail-created-by" label="Created By" meta></view-field>
+        <view-field id="rp-plan-detail-updated-at" label="Updated" meta></view-field>
+        <view-field id="rp-plan-detail-updated-by" label="Updated By" meta></view-field>
+        </panel-body>
+      </section-panel>
+    </div>
+    <div class="col-12 col-md-7">
+      <section-panel class="mt-2">
+        <panel-title>Comments</panel-title>
+        <panel-body>
+        <comments-panel id="rp-resource-plan-comments-panel"></comments-panel>
+        </panel-body>
+      </section-panel>
+    </div>
+  </div>
+  </tab-content>
+  </tab-item>
+
+  <tab-item id="versions">
+  <tab-header title="Versions" icon="bi-layers"></tab-header>
+  <tab-content>
+  <div class="row g-4 align-items-start">
+    <div class="col-12 col-md-8">
+      <section-panel class="mt-2">
+        <panel-title>Versions</panel-title>
+        {% if can_add_resource_plan_version %}
+        <panel-actions>
+          <primary-button id="rp-resource-plan-versions-add-btn" label="Add Version" prefix-icon="bi-plus-lg" size="sm"></primary-button>
+        </panel-actions>
+        {% endif %}
+        <panel-body>
+        <data-table id="rp-resource-plan-versions-table" row-template="renderResourcePlanVersionRow" empty-message="No versions found.">
+          <table-columns>
+            <table-column label="Version" key="version" width="90px"></table-column>
+            <table-column label="Status" key="status"></table-column>
+            <table-column label="Threshold %" key="threshold_percentage" numeric width="130px"></table-column>
+            <table-column label="Created" key="created_at" hide-mobile></table-column>
+          </table-columns>
+          <table-actions>
+            {% if can_change_resource_plan_version %}
+            <table-action icon="bi-play-circle" label="Activate" event="rp:resource-plan-version:activate" hidden-key="rp_hide_activate"></table-action>
+            <table-action icon="bi-arrow-counterclockwise" label="Restore" event="rp:resource-plan-version:restore"></table-action>
+            {% endif %}
+            <table-action icon="bi-files" label="Clone" event="rp:resource-plan-version:clone"></table-action>
+            {% if can_change_resource_plan_version %}
+            <table-action icon="bi-lock" label="Lock" event="rp:resource-plan-version:lock" hidden-key="rp_hide_lock"></table-action>
+            {% endif %}
+            {% if can_delete_resource_plan_version %}
+            <table-action icon="bi-trash" label="Delete" event="rp:resource-plan-version:delete" hidden-key="rp_hide_delete" danger></table-action>
+            {% endif %}
+          </table-actions>
+        </data-table>
+        </panel-body>
+      </section-panel>
+    </div>
+    <div class="col-12 col-md-4">
+      <history-panel title="Version History" icon="bi-clock-history" class="mt-2">
+        <history-items id="rp-resource-plan-versions-history"></history-items>
+      </history-panel>
+    </div>
+  </div>
+  </tab-content>
+  </tab-item>
+
+  </tab-items>
+  </tab-panel>
+
+  {% if can_add_resource_plan_version %}
+  <drawer-modal id="rp-resource-plan-version-create-drawer" width="900">
+  <drawer-header eyebrow="Resource Plan" title="Add Version" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <decimal-field id="rp-new-version-threshold" col="col-12" label="Threshold %" min="0" max="100" required></decimal-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Add Version" primary-icon="bi-plus-lg"></drawer-footer>
+  </drawer-modal>
+  {% endif %}
+
+  {% if can_change_resource_plan_version %}
+  <activate-modal id="rp-resource-plan-version-activate-modal" action-label="Activate Version"></activate-modal>
+  <restore-modal id="rp-resource-plan-version-restore-modal" action-label="Restore Version"></restore-modal>
+  <lock-modal id="rp-resource-plan-version-lock-modal" action-label="Lock Version"></lock-modal>
+  {% endif %}
+  {% if can_delete_resource_plan_version %}
+  <delete-modal id="rp-resource-plan-version-delete-modal" action-label="Delete Version"></delete-modal>
+  {% endif %}
+
+  <input type="hidden" id="rp-resource-plan-code" value="{{ plan_code }}">
+{% endblock content %}

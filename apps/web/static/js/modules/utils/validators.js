@@ -15,6 +15,10 @@ export function isUrl(value) {
   }
 }
 
+export function isValidMonth(value) {
+  return /^\d{4}-(0[1-9]|1[0-2])$/.test(String(value).trim());
+}
+
 export function isMinLength(value, min) {
   return String(value).length >= min;
 }

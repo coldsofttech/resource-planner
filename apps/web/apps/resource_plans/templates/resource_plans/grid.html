@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Allocation Grid
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/resource-plans.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Projects &rsaquo; Resource Plans &rsaquo; Versions &rsaquo; Allocation Grid
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <icon-field icon="bi-grid-3x3-gap" size="lg"></icon-field>
+  <span class="ms-2">Allocation Grid</span>
+{% endblock page_title %}
+{% block page_actions %}
+  <delete-button id="rp-grid-conflicts-btn" label="Conflicts" prefix-icon="bi-exclamation-triangle"></delete-button>
+  <secondary-button id="rp-grid-utilisation-btn" label="Utilisation" prefix-icon="bi-graph-up"></secondary-button>
+  <secondary-button id="rp-grid-placeholder-leaves-btn" label="Placeholder Leaves" prefix-icon="bi-bookmark"></secondary-button>
+  <secondary-button id="rp-grid-snapshots-btn" label="Snapshots" prefix-icon="bi-camera"></secondary-button>
+  {% if can_add_resource_plan_engine_job %}
+  <engine-button id="rp-grid-run-engine-btn" label="Run Engine" prefix-icon="bi-play-fill"></engine-button>
+  {% endif %}
+{% endblock page_actions %}
+{% block content %}
+
+  <section-panel class="mb-3">
+    <panel-body>
+      <div class="d-flex align-items-center flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-2">
+          <label for="rp-grid-allocation-set" class="fw-medium mb-0">Allocation Set:</label>
+          <span id="rp-grid-allocation-set-container"></span>
+        </div>
+        {% if can_change_allocation_set %}
+        <activate-button id="rp-grid-activate-set-btn" label="Activate" prefix-icon="bi-toggle-on" hidden></activate-button>
+        {% endif %}
+        <div id="rp-grid-allocation-set-hint" class="rp-grid-allocation-set-hint" hidden></div>
+      </div>
+    </panel-body>
+  </section-panel>
+
+  <section-panel class="mb-3">
+    <panel-body>
+      <div class="rp-grid-legend">
+        <div class="rp-grid-legend-group">
+          <span class="rp-grid-legend-label">Capacity:</span>
+          <span class="rp-grid-swatch rp-cap-hi">&ge;10d</span>
+          <span class="rp-grid-swatch rp-cap-good">&gt;8d</span>
+          <span class="rp-grid-swatch rp-cap-mid">&gt;5d</span>
+          <span class="rp-grid-swatch rp-cap-low">&gt;3d</span>
+          <span class="rp-grid-swatch rp-cap-crit">&gt;0d</span>
+          <span class="rp-grid-swatch rp-cap-zero">0d</span>
+        </div>
+        <div class="rp-grid-legend-group">
+          <span class="rp-grid-legend-label">Absences:</span>
+          <span class="rp-grid-legend-group"><icon-field icon="bi-cup-hot-fill" class="rp-grid-absence-icon-holidays"></icon-field> Holidays</span>
+          <span class="rp-grid-legend-group"><icon-field icon="bi-person-x-fill" class="rp-grid-absence-icon-leave"></icon-field> Leave</span>
+          <span class="rp-grid-legend-group"><icon-field icon="bi-bookmark-fill" class="rp-grid-absence-icon-placeholder"></icon-field> Placeholder</span>
+        </div>
+      </div>
+    </panel-body>
+  </section-panel>
+
+  <div id="rp-grid-tabs-container">
+    <div id="rp-grid-tabs-loading" class="text-center text-muted py-5">
+      <div class="spinner-border" role="status"></div>
+      <p class="small mt-2 mb-0">Loading allocation grid…</p>
+    </div>
+  </div>
+
+  {% if can_add_resource_plan_engine_job or can_view_resource_plan_engine_job %}
+  <drawer-modal id="rp-grid-engine-job-drawer" width="900">
+  <drawer-header eyebrow="Resource Plan Version" title="Run Engine" no-sizes></drawer-header>
+  <drawer-panel>
+
+  <div id="rp-grid-engine-job-form-view" class="row g-4">
+    <div class="col-12 col-md-7">
+      <radio-group-field id="rp-grid-engine-job-mode" label="Run Mode">
+        <option-field value="validate" label="Validate Only" checked></option-field>
+        <option-field value="full" label="Full Run"></option-field>
+      </radio-group-field>
+      <checkbox-field id="rp-grid-engine-job-include-current-sprint" label="Include Current Sprint" class="mt-3"></checkbox-field>
+      <hint-field col="col-12" type="info" class="mt-2">
+        When checked, the current (in-progress) sprint is included in capacity calculations.
+      </hint-field>
+      <engine-button id="rp-grid-engine-job-run-btn" label="Run" prefix-icon="bi-play-fill" class="mt-3"></engine-button>
+    </div>
+    <div class="col-12 col-md-5">
+      <section-panel>
+        <panel-title>About this run</panel-title>
+        <panel-body>
+          <p class="small">The engine validates your plan configurations and (in full-run mode) generates capacity tables and allocations.</p>
+          <p class="small"><strong>Validate Only</strong> — checks for missing teams, phases, circular dependencies, and split inconsistencies. No data is written.</p>
+          <p class="small mb-0"><strong>Full Run</strong> — performs validation then generates placeholder leaves, capacity, and a new draft allocation set.</p>
+        </panel-body>
+      </section-panel>
+    </div>
+  </div>
+
+  <div id="rp-grid-engine-job-progress-view" hidden>
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <span id="rp-grid-engine-job-status-pill" class="rp-badge rp-badge-soft"></span>
+      <span id="rp-grid-engine-job-status-text" class="small"></span>
+    </div>
+    <progress-bar id="rp-grid-engine-job-progress-bar" percent="0"></progress-bar>
+    <div id="rp-grid-engine-job-error-summary" class="small text-danger mt-2" hidden></div>
+    <div id="rp-grid-engine-job-errors" class="mt-3"></div>
+  </div>
+
+  </drawer-panel>
+  <drawer-footer close="Close"></drawer-footer>
+  </drawer-modal>
+  {% endif %}
+
+  <input type="hidden" id="rp-grid-plan-code" value="{{ plan_code }}">
+  <input type="hidden" id="rp-grid-version-number" value="{{ version }}">
+{% endblock content %}

@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import datetime
+from decimal import Decimal
 
 from django.db.models import Count, QuerySet
 
 from apps.leaves.models import Leave, LeaveDayEntry
+from apps.users.models import User
 
 
 def get_all_leaves() -> QuerySet[Leave]:
@@ -87,3 +89,15 @@ def get_day_entries_for_member_in_range(
         .select_related("leave")
         .order_by("date")
     )
+
+
+def get_confirmed_leave_days_for_member_in_range(
+    member: User,
+    start_date: datetime.date,
+    end_date: datetime.date,
+) -> Decimal:
+    entries = get_day_entries_for_member_in_range(member.id, start_date, end_date)
+    total = Decimal("0")
+    for entry in entries:
+        total += Decimal("0.5") if entry.is_half_day else Decimal("1")
+    return total

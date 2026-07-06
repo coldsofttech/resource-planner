@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Resource Plans
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/resource-plans.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Projects
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Resource Plans
+{% endblock page_title %}
+{% block page_sub %}
+  Manage resource plans that govern capacity and workforce planning across your organisation.
+{% endblock page_sub %}
+{% block page_actions %}
+  {% if can_add_resource_plan %}
+    <primary-button id="rp-resource-plans-add-btn" label="Add Plan" prefix-icon="bi-plus-lg"></primary-button>
+  {% endif %}
+{% endblock page_actions %}
+{% block content %}
+  <list-view show-active-filters>
+  <filter-panel id="rp-resource-plans-filter-panel">
+  <search-field id="rp-resource-plans-search" name="search" placeholder="Search plans..." shortcut="/" show-label></search-field>
+  <is-active-field id="rp-resource-plans-status" name="is_active" value="true" show-label></is-active-field>
+  </filter-panel>
+  <data-table id="rp-resource-plans-table" url="/api/v1/resource-plans/" paginated page-size="25" row-template="renderResourcePlansRow" empty-message="No resource plans found.">
+    <table-columns>
+      <table-column label="" key="_icon" width="52px"></table-column>
+      <table-column label="Plan Name" key="name" sortable></table-column>
+      <table-column label="Code" key="code" mono width="130px" hide-mobile></table-column>
+      <table-column label="Type" key="plan_type_display" hide-mobile></table-column>
+      <table-column label="Financial Year" key="financial_year_display" hide-mobile></table-column>
+      <table-column label="Status" key="is_active"></table-column>
+      <table-column label="Created" key="created_at" hide-mobile sortable></table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_resource_plan %}
+        <table-action icon="bi-pencil" label="Edit" event="rp:resource-plan:edit"></table-action>
+        <table-action icon="bi-toggle-on" label="Toggle" event="rp:resource-plan:toggle" color-key="is_active"></table-action>
+      {% endif %}
+      {% if can_delete_resource_plan %}
+        <table-action icon="bi-trash" label="Delete" event="rp:resource-plan:delete" danger></table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </list-view>
+  <!-- Create drawer -->
+  <drawer-modal id="rp-resource-plan-create-drawer" width="900">
+  <drawer-header eyebrow="New record" title="Create resource plan" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-new-resource-plan-name" col="col-12" label="Plan Name" placeholder="e.g. FY2026 Workforce Plan" required maxlength="255" show-counter></text-field>
+    <financial-year-field id="rp-new-resource-plan-fy" col="col-12 col-md-6" required show-label show-short></financial-year-field>
+    <dropdown-field id="rp-new-resource-plan-type" col="col-12 col-md-6" label="Plan Type" placeholder="Select type" required show-label>
+      <values-list>
+        <value value="financial_year">Financial Year</value>
+        <value value="programme">Programme</value>
+        <value value="project">Project</value>
+        <value value="team">Team</value>
+      </values-list>
+    </dropdown-field>
+    <text-field id="rp-new-resource-plan-description" col="col-12" cols="3" label="Description" placeholder="Optional description" maxlength="500"></text-field>
+    <percentage-field id="rp-new-resource-plan-threshold" col="col-12 col-md-4" label="Threshold %" placeholder="10" value="10" min="0" max="100" step="0.01" show-label></percentage-field>
+    <div id="rp-new-resource-plan-scope-section" class="col-12" hidden>
+      <hr class="my-2">
+      <p class="text-muted small mb-2">Scope — select the target for this plan based on plan type.</p>
+      <div class="row g-3">
+        <programme-field id="rp-new-resource-plan-scope-programme" col="col-12" label="Scope: Programme" required show-label hidden></programme-field>
+        <project-field id="rp-new-resource-plan-scope-project" col="col-12" label="Scope: Project" required show-label hidden></project-field>
+        <team-field id="rp-new-resource-plan-scope-team" col="col-12" label="Scope: Team" required show-label hidden></team-field>
+      </div>
+    </div>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Create plan" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <!-- Edit drawer -->
+  <drawer-modal id="rp-resource-plan-edit-drawer" width="900">
+  <drawer-header eyebrow="Edit record" title="Edit resource plan" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-edit-resource-plan-name" col="col-12" label="Plan Name" placeholder="e.g. FY2026 Workforce Plan" required maxlength="255" show-counter></text-field>
+    <text-field id="rp-edit-resource-plan-description" col="col-12" cols="3" label="Description" placeholder="Optional description" maxlength="500"></text-field>
+    <percentage-field id="rp-edit-resource-plan-threshold" col="col-12 col-md-4" label="Threshold %" placeholder="10" min="0" max="100" step="0.01" show-label></percentage-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <delete-modal id="rp-resource-plan-delete-modal" action-label="Delete plan"></delete-modal>
+  <activate-modal id="rp-resource-plan-activate-modal"></activate-modal>
+  <deactivate-modal id="rp-resource-plan-deactivate-modal"></deactivate-modal>
+{% endblock content %}

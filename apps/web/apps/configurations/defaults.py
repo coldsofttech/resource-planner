@@ -409,6 +409,20 @@ _SPRINT_DEFAULTS = {
         "is_admin": False,
         "module": "sprints",
     },
+    "DEFAULT_HOLIDAYS_PER_SPRINT": {
+        "label": "Default Holidays Per Sprint",
+        "value": "1",
+        "description": (
+            "Assumed absence days per sprint for a hire placeholder that has not "
+            "yet joined. Used as the baseline when generating "
+            "EngineerHirePlaceholderAbsence rows, since a placeholder has no real "
+            "leave history to calculate from."
+        ),
+        "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "sprints",
+    },
 }
 
 

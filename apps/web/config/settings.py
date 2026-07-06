@@ -89,6 +89,7 @@ INSTALLED_APPS = [
     "apps.how_to.apps.HowToConfig",
     "apps.notifications.apps.NotificationsConfig",
     "apps.reports.apps.ReportConfig",
+    "apps.resource_plans.apps.ResourcePlanConfig",
 ]
 
 MIDDLEWARE = [

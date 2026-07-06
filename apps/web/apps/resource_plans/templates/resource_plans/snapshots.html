@@ -1,0 +1,99 @@
+{% extends "base.html" %} {% load static %} {% block title %} Snapshots {% endblock title %} {% block scripts %}
+<script type="module" src="{% static 'js/dist/resource-plans.min.js' %}"></script>
+{% endblock scripts %} {% block page_eyebrow %} Projects &rsaquo; Resource Plans &rsaquo; Versions &rsaquo; Allocation
+Grid &rsaquo; Snapshots {% endblock page_eyebrow %} {% block page_title %}
+<icon-field icon="bi-camera" size="lg"></icon-field>
+<span class="ms-2">Snapshots</span>
+{% endblock page_title %} {% block page_actions %}
+<secondary-button id="rp-snapshots-grid-btn" label="Allocation Grid" prefix-icon="bi-grid-3x3-gap"></secondary-button>
+<secondary-button id="rp-snapshots-compare-btn" label="Compare" prefix-icon="bi-arrow-left-right"></secondary-button>
+{% if can_add_snapshot %}
+<engine-button id="rp-snapshots-take-btn" label="Take Snapshot" prefix-icon="bi-camera-fill"></engine-button>
+{% endif %} {% endblock page_actions %} {% block content %}
+
+<data-table
+  id="rp-snapshots-table"
+  url="/api/v1/resource-plans/{{ plan_code }}/versions/v{{ version }}/snapshots/"
+  paginated
+  page-size="25"
+  row-template="renderSnapshotRow"
+  empty-message="No snapshots yet."
+>
+  <table-columns>
+    <table-column label="Label" key="label"></table-column>
+    <table-column label="Status" key="status_display"></table-column>
+    <table-column label="Total Days" key="total_allocation_days" numeric></table-column>
+    <table-column label="Members" key="total_members" numeric></table-column>
+    <table-column label="Projects" key="total_projects" numeric></table-column>
+    <table-column label="Created" key="initiated_at"></table-column>
+  </table-columns>
+  <table-actions>
+    <table-action icon="bi-eye" label="View Allocations" event="rp:snapshot:view-allocations"></table-action>
+    {% if can_delete_snapshot %}
+    <table-action icon="bi-trash" label="Delete Snapshot" event="rp:snapshot:delete" danger></table-action>
+    {% endif %}
+  </table-actions>
+</data-table>
+
+{% if can_add_snapshot %}
+<drawer-modal id="rp-snapshot-take-drawer" width="600">
+  <drawer-header eyebrow="New snapshot" title="Take Snapshot" no-sizes></drawer-header>
+  <drawer-panel>
+    <div id="rp-snapshot-take-form-view" class="row g-3">
+      <text-field
+        id="rp-new-snapshot-label"
+        col="col-12"
+        label="Label"
+        placeholder="e.g. Pre-review baseline"
+        required
+        maxlength="255"
+      ></text-field>
+      <text-field
+        id="rp-new-snapshot-notes"
+        col="col-12"
+        label="Notes"
+        placeholder="Optional context for this snapshot"
+        cols="3"
+      ></text-field>
+    </div>
+
+    <div id="rp-snapshot-take-progress-view" hidden>
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <span id="rp-snapshot-take-status-pill" class="rp-badge rp-badge-soft"></span>
+        <span id="rp-snapshot-take-status-text" class="small"></span>
+      </div>
+      <div id="rp-snapshot-take-error" class="small text-danger mt-2" hidden></div>
+    </div>
+  </drawer-panel>
+  <drawer-footer close="Close" primary="Take Snapshot" primary-icon="bi-camera-fill"></drawer-footer>
+</drawer-modal>
+{% endif %}
+
+<drawer-modal id="rp-snapshot-compare-drawer" width="900">
+  <drawer-header eyebrow="Compare" title="Compare Snapshots" no-sizes></drawer-header>
+  <drawer-panel>
+    <div id="rp-snapshot-compare-form-view" class="row g-3">
+      <div class="col-12 col-md-6">
+        <label for="rp-snapshot-compare-a" class="fw-medium mb-1 d-block">Snapshot A (baseline)</label>
+        <span id="rp-snapshot-compare-a-container"></span>
+      </div>
+      <div class="col-12 col-md-6">
+        <label for="rp-snapshot-compare-b" class="fw-medium mb-1 d-block">Snapshot B (compare to)</label>
+        <span id="rp-snapshot-compare-b-container"></span>
+      </div>
+    </div>
+
+    <div id="rp-snapshot-compare-result-view" hidden>
+      <diff-compare id="rp-snapshot-diff"></diff-compare>
+    </div>
+  </drawer-panel>
+  <drawer-footer close="Close" primary="Compare" primary-icon="bi-arrow-left-right"></drawer-footer>
+</drawer-modal>
+
+{% if can_delete_snapshot %}
+<delete-modal id="rp-snapshot-delete-modal" action-label="Delete"></delete-modal>
+{% endif %}
+
+<input type="hidden" id="rp-snapshots-plan-code" value="{{ plan_code }}" />
+<input type="hidden" id="rp-snapshots-version-number" value="{{ version }}" />
+{% endblock content %}
