@@ -15,6 +15,8 @@ _PROJECT_STATUS_SEEDS = [
     "Cancelled",
 ]
 
+_TERMINAL_STATUSES = {"Completed", "Cancelled"}
+
 
 def seed_default_programme(sender, **kwargs):
     """Seeds the protected 'Others' programme on every migrate run."""
@@ -47,8 +49,17 @@ def seed_project_statuses(sender, **kwargs):
             for name in _PROJECT_STATUS_SEEDS:
                 ProjectStatus.objects.get_or_create(
                     name=name,
-                    defaults={"is_active": True},
+                    defaults={
+                        "is_active": True,
+                        "is_terminal": name in _TERMINAL_STATUSES,
+                    },
                 )
+            ProjectStatus.objects.filter(name__in=_TERMINAL_STATUSES).update(
+                is_terminal=True
+            )
+            ProjectStatus.objects.exclude(name__in=_TERMINAL_STATUSES).filter(
+                is_terminal=True
+            ).update(is_terminal=False)
         except Exception as exc:
             logger.error("Failed to seed project statuses: %s", exc)
 

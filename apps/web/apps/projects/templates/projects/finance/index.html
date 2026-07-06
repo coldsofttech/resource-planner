@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Burn Tracker
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/projects.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Finance
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Burn Tracker
+{% endblock page_title %}
+{% block page_sub %}
+  Track cost burn across all projects for a selected financial year.
+{% endblock page_sub %}
+{% block content %}
+  <section-panel class="mb-4">
+    <panel-body>
+    <div class="d-flex flex-wrap align-items-end gap-3">
+      <financial-year-field id="rp-burn-tracker-fy" show-label style="min-width:200px;max-width:260px"></financial-year-field>
+      <primary-button id="rp-burn-tracker-show-btn" label="Show" prefix-icon="bi-search"></primary-button>
+    </div>
+    </panel-body>
+  </section-panel>
+  <div id="rp-burn-tracker-content" hidden>
+    <filter-panel id="rp-burn-tracker-filter-panel" class="mb-3">
+    <search-field id="rp-burn-tracker-search" name="search" placeholder="Search projects..." shortcut="/" show-label></search-field>
+    <programme-field id="rp-burn-tracker-programme" name="programme" col="col-auto" show-label allow-all></programme-field>
+    <team-field id="rp-burn-tracker-team" name="team" col="col-auto" show-label allow-all></team-field>
+    <project-status-field id="rp-burn-tracker-status" name="status" label="Status" col="col-auto" show-label allow-all></project-status-field>
+    <dropdown-field id="rp-burn-tracker-risk" name="risk" label="Risk" col="col-auto" show-label>
+    <values-list>
+    <value value="">All</value>
+    <value value="none">No Risk</value>
+    <value value="warning">Warning</value>
+    <value value="at_risk">At Risk</value>
+    </values-list>
+    </dropdown-field>
+    </filter-panel>
+    <data-table id="rp-burn-tracker-table" row-template="renderBurnTrackerRow" paginated page-size="25" empty-message="No projects found for this financial year." fixable="2" actions-fixable>
+      <table-columns>
+        <table-column label="Programme" key="programme_name" sortable width="160px">
+        </table-column>
+        <table-column label="Project" key="project_name" sortable width="300px">
+        </table-column>
+        <table-column label="FY" key="financial_year" hide-mobile>
+        </table-column>
+        <table-column label="Labels" key="labels" hide-mobile>
+        </table-column>
+        <table-column label="Code" key="project_code_value" hide-mobile>
+        </table-column>
+        <table-column label="Team / Collaborators" key="assigned_team_name" hide-mobile>
+        </table-column>
+        <table-column label="Estimate" key="estimate_cost" numeric hide-mobile>
+        </table-column>
+        <table-column label="Estimate (w/ Contingency)" key="estimate_cost_with_contingency" numeric hide-mobile>
+        </table-column>
+        <table-column label="Total To Date" key="total_cost_to_date" numeric>
+        </table-column>
+        <table-column label="Remaining" key="remaining_cost" numeric>
+        </table-column>
+        <table-column label="Prev FY Actuals" key="prev_fy_actuals" numeric hide-mobile>
+        </table-column>
+      </table-columns>
+      <table-actions>
+        {% if can_change_project %}
+          <table-action icon="bi-gear" label="Configure" event="rp:burn-tracker:config">
+          </table-action>
+          <table-action icon="bi-check-circle" label="Mark Done" event="rp:burn-tracker:done">
+          </table-action>
+        {% endif %}
+      </table-actions>
+    </data-table>
+  </div>
+  {% if can_change_project %}
+    <!-- Actuals config drawer -->
+    <drawer-modal id="rp-burn-tracker-config-drawer" width="900">
+    <drawer-header eyebrow="Actuals" title="Configuration" icon="bi-gear" no-sizes></drawer-header>
+    <drawer-panel>
+    <div class="row g-3">
+      <checkbox-field id="rp-bt-config-ignore-risk" col="col-12" label="Ignore risk for this project" hint="When enabled, this project will always display risk=None regardless of spend vs. estimate."></checkbox-field>
+      <checkbox-field id="rp-bt-config-ignore-prev-fy" col="col-12" label="Ignore Previous FYs actuals in total cost" hint="When enabled, only the current FY cost is used for total cost till date calculations and risk."></checkbox-field>
+      <text-field id="rp-bt-config-notes" col="col-12" cols="3" label="Notes" placeholder="Optional notes..." maxlength="1000"></text-field>
+    </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Save Changes" primary-icon="bi-check2"></drawer-footer>
+    </drawer-modal>
+    <!-- Mark done drawer -->
+    <drawer-modal id="rp-burn-tracker-done-drawer" width="900">
+    <drawer-header eyebrow="Burn Tracker" title="Mark Project as Done" icon="bi-check-circle" no-sizes></drawer-header>
+    <drawer-panel>
+    <div class="row g-3">
+      <p id="rp-bt-done-description" class="col-12 text-muted mb-1"></p>
+      <sprint-field id="rp-bt-done-sprint" col="col-12" label="Sprint Completed In" show-label required></sprint-field>
+    </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Mark as Done" primary-icon="bi-check-circle"></drawer-footer>
+    </drawer-modal>
+  {% endif %}
+{% endblock content %}

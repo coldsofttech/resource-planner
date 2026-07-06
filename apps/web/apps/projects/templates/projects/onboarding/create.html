@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Raise a Demand Request{% endblock %}
+
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/onboarding.min.js' %}"></script>
+{% endblock %}
+
+{% block page_eyebrow %}Projects{% endblock %}
+{% block page_title %}Raise a Demand Request{% endblock %}
+{% block page_sub %}Fill in the details below to submit a project intake request. Our delivery team will review your submission and get back to you.{% endblock %}
+
+{% block content %}
+  <section-panel>
+    <panel-body>
+      <flash-banner id="rp-onb-error" type="error" title="Submission failed" subtitle="" class="mb-3"></flash-banner>
+      <form id="rp-onb-form" class="rp-stack-16" novalidate
+            data-post-submit-redirect="/demands/"
+            data-requester-email="{{ requester_email }}">
+        {% csrf_token %}
+        <div class="row g-3">
+          <text-field id="rp-onb-project-name" name="project_name" label="Project name" col="col-12" required placeholder="e.g. Customer Analytics Platform"></text-field>
+          <email-field id="rp-onb-requester-email" name="requester_email" label="Your email" col="col-12 col-md-6" required prefix-icon placeholder="you@example.com" readonly></email-field>
+          <email-field id="rp-onb-exec-email" name="accountable_executive_email" label="Accountable executive email" col="col-12 col-md-6" prefix-icon placeholder="exec@example.com"></email-field>
+          <div class="col-12">
+            <product-field id="rp-onb-products" multi-select show-label options-defer></product-field>
+          </div>
+          <div class="col-12">
+            <business-unit-field id="rp-onb-bu" multi-select show-label options-defer></business-unit-field>
+          </div>
+          <text-field id="rp-onb-project-code" name="project_code" label="Project code / reference (optional)" col="col-12 col-md-6" placeholder="e.g. PRJ-2025-001"></text-field>
+          <date-field id="rp-onb-start-date" name="tentative_start_date" label="Tentative start date" col="col-12 col-md-3"></date-field>
+          <date-field id="rp-onb-end-date" name="tentative_end_date" label="Tentative end date" col="col-12 col-md-3"></date-field>
+          <text-field id="rp-onb-requirements" name="requirements" label="Requirements" col="col-12" cols="3" placeholder="Describe the project requirements, goals, and expected outcomes…"></text-field>
+          <text-field id="rp-onb-risk" name="risk" label="Risk &amp; constraints" col="col-12" cols="3" placeholder="Describe any known risks or constraints…"></text-field>
+        </div>
+
+        <!-- Additional contacts -->
+        <div>
+          <label class="rp-label mb-2">Additional contacts (optional)</label>
+          <div id="rp-onb-contacts-list" class="rp-stack-8 mb-2"></div>
+          <secondary-button id="rp-onb-add-contact" label="Add contact" prefix-icon="bi-plus" type="button" size="sm"></secondary-button>
+        </div>
+
+        <!-- Reference links -->
+        <div>
+          <label class="rp-label mb-2">Reference links (optional)</label>
+          <div id="rp-onb-links-list" class="rp-stack-8 mb-2"></div>
+          <secondary-button id="rp-onb-add-link" label="Add link" prefix-icon="bi-link-45deg" type="button" size="sm"></secondary-button>
+        </div>
+
+        <!-- Attachments -->
+        <div class="row g-3">
+          <file-import-field id="rp-onb-attachments" label="Attachments (optional)" col="col-12"
+            multiple
+            accept=".pdf,.docx,.xlsx,.csv,.pptx,.txt,.png,.jpg,.jpeg"
+            drop-label="Drop supporting documents here"
+            sub-text="Attach any documents relevant to this demand request.">
+          </file-import-field>
+        </div>
+
+        <primary-button id="rp-onb-submit" label="Submit demand request" prefix-icon="bi-send" type="submit"></primary-button>
+      </form>
+    </panel-body>
+  </section-panel>
+{% endblock %}

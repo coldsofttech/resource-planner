@@ -46,3 +46,20 @@ class ProjectBudgetAction(models.TextChoices):
 class ContactRole(models.TextChoices):
     PROJECT = "project", "Project"
     FINANCE = "finance", "Finance"
+
+
+class ActualsRiskType(models.TextChoices):
+    WARNING = "warning", "Warning"
+    AT_RISK = "at_risk", "At Risk"
+
+
+class OnboardingContactRole(models.TextChoices):
+    REQUESTER = "requester", "Requester"
+    ACCOUNTABLE_EXECUTIVE = "accountable_executive", "Accountable Executive"
+    POINT_OF_CONTACT = "point_of_contact", "Point of Contact"
+
+
+class OnboardingStatus(models.TextChoices):
+    PENDING = "pending", "Pending"
+    ACCEPTED = "accepted", "Accepted"
+    REJECTED = "rejected", "Rejected"

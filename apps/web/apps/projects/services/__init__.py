@@ -2,12 +2,15 @@ from __future__ import annotations
 
 from .attachment import ProjectAttachmentService
 from .budget import ProjectBudgetExportService, ProjectBudgetService
+from .burn_tracker import BurnTrackerService
 from .comment import ProjectCommentService
 from .contact import ProjectContactService
 from .estimate import ProjectEstimateExportService, ProjectEstimateService
 from .follower import ProjectFollowerService
 from .label import ProjectLabelService
 from .link import ProjectLinkService
+from .onboarding import OnboardingReviewService, OnboardingService
+from .onboarding_attachment import OnboardingAttachmentService
 from .programme import ProgrammeExportService, ProgrammeImportService, ProgrammeService
 from .project import ProjectExportService, ProjectImportService, ProjectService
 from .project_status import (
@@ -26,6 +29,10 @@ from .project_type import (
 from .tag import ProjectTagService
 
 __all__ = [
+    "OnboardingService",
+    "OnboardingReviewService",
+    "OnboardingAttachmentService",
+    "BurnTrackerService",
     "ProgrammeService",
     "ProgrammeImportService",
     "ProgrammeExportService",

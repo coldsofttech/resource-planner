@@ -38,6 +38,11 @@ from apps.projects.serializers.link import (
     ProjectLinkSerializer,
     ProjectLinkUpdateSerializer,
 )
+from apps.projects.serializers.onboarding import (
+    OnboardingDetailSerializer,
+    OnboardingListSerializer,
+    OnboardingSubmitSerializer,
+)
 from apps.projects.serializers.programme import (
     ProgrammeCreateSerializer,
     ProgrammeDetailSerializer,
@@ -51,6 +56,9 @@ from apps.projects.serializers.project import (
     ProjectDetailSerializer,
     ProjectListSerializer,
     ProjectUpdateSerializer,
+)
+from apps.projects.serializers.project_actual_config import (
+    ProjectActualConfigSerializer,
 )
 from apps.projects.serializers.project_size_config import ProjectSizeConfigSerializer
 from apps.projects.serializers.project_status import (
@@ -75,6 +83,9 @@ from apps.projects.serializers.tag import (
 )
 
 __all__ = [
+    "OnboardingDetailSerializer",
+    "OnboardingListSerializer",
+    "OnboardingSubmitSerializer",
     "ProjectSizeConfigSerializer",
     "ProgrammeCreateSerializer",
     "ProgrammeDetailSerializer",
@@ -126,4 +137,5 @@ __all__ = [
     "ProjectTypeListSerializer",
     "ProjectTypeUpdateSerializer",
     "ProjectUpdateSerializer",
+    "ProjectActualConfigSerializer",
 ]

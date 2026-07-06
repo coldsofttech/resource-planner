@@ -1,7 +1,13 @@
 from django.urls import path
 
 from apps.projects.api_views import (
+    BurnTrackerViewSet,
+    DemandAttachmentViewSet,
+    DemandsViewSet,
+    OnboardingAttachmentUploadViewSet,
+    OnboardingViewSet,
     ProgrammeViewSet,
+    ProjectActualsViewSet,
     ProjectAttachmentViewSet,
     ProjectBudgetViewSet,
     ProjectCommentViewSet,
@@ -308,6 +314,17 @@ urlpatterns = [
         ProjectViewSet.as_view({"get": "export"}),
         name="projects-export",
     ),
+    # Burn tracker — must precede projects/<str:code>/ catch-all
+    path(
+        "projects/burn-tracker/",
+        BurnTrackerViewSet.as_view({"get": "list"}),
+        name="projects-burn-tracker-list",
+    ),
+    path(
+        "projects/burn-tracker/<str:code>/done/",
+        BurnTrackerViewSet.as_view({"post": "mark_done"}),
+        name="projects-burn-tracker-done",
+    ),
     path(
         "projects/<str:code>/",
         ProjectViewSet.as_view(
@@ -507,6 +524,22 @@ urlpatterns = [
         ),
         name="project-contacts-detail",
     ),
+    # Project actuals nested routes
+    path(
+        "projects/<str:code>/actuals/summary/",
+        ProjectActualsViewSet.as_view({"get": "summary"}),
+        name="project-actuals-summary",
+    ),
+    path(
+        "projects/<str:code>/actuals/config/",
+        ProjectActualsViewSet.as_view({"get": "get_config", "patch": "update_config"}),
+        name="project-actuals-config",
+    ),
+    path(
+        "projects/<str:code>/actuals/",
+        ProjectActualsViewSet.as_view({"get": "list"}),
+        name="project-actuals-list",
+    ),
     path(
         "projects/<str:code>/attachments/",
         ProjectAttachmentViewSet.as_view({"get": "list", "post": "create"}),
@@ -521,5 +554,64 @@ urlpatterns = [
         "projects/<str:code>/attachments/<str:attachment_code>/download/",
         ProjectAttachmentViewSet.as_view({"get": "download"}),
         name="project-attachments-download",
+    ),
+    # Onboarding routes (public portal)
+    path(
+        "onboarding/options/",
+        OnboardingViewSet.as_view({"get": "options"}),
+        name="onboarding-options",
+    ),
+    path(
+        "onboarding/submit/",
+        OnboardingViewSet.as_view({"post": "submit"}),
+        name="onboarding-submit",
+    ),
+    path(
+        "onboarding/stats/",
+        OnboardingViewSet.as_view({"get": "stats"}),
+        name="onboarding-stats",
+    ),
+    # Public attachment upload (part of onboarding flow)
+    path(
+        "onboarding/<str:code>/attachments/",
+        OnboardingAttachmentUploadViewSet.as_view({"post": "create"}),
+        name="onboarding-attachments-upload",
+    ),
+    # Demands routes (authenticated review)
+    path(
+        "demands/",
+        DemandsViewSet.as_view({"get": "list"}),
+        name="demands-list",
+    ),
+    path(
+        "demands/<str:code>/",
+        DemandsViewSet.as_view({"get": "retrieve"}),
+        name="demands-detail",
+    ),
+    path(
+        "demands/<str:code>/accept/",
+        DemandsViewSet.as_view({"post": "accept"}),
+        name="demands-accept",
+    ),
+    path(
+        "demands/<str:code>/reject/",
+        DemandsViewSet.as_view({"post": "reject"}),
+        name="demands-reject",
+    ),
+    # Demand attachment routes (authenticated)
+    path(
+        "demands/<str:code>/attachments/",
+        DemandAttachmentViewSet.as_view({"get": "list", "post": "create"}),
+        name="demands-attachments-list",
+    ),
+    path(
+        "demands/<str:code>/attachments/<str:attachment_code>/",
+        DemandAttachmentViewSet.as_view({"delete": "destroy"}),
+        name="demands-attachments-detail",
+    ),
+    path(
+        "demands/<str:code>/attachments/<str:attachment_code>/download/",
+        DemandAttachmentViewSet.as_view({"get": "download"}),
+        name="demands-attachments-download",
     ),
 ]

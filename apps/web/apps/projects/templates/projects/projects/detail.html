@@ -300,6 +300,71 @@
   </div>
   </tab-content>
   </tab-item>
+  <tab-item id="actuals">
+  <tab-header title="Actuals" icon="bi-receipt"></tab-header>
+  <tab-content>
+  <div class="row g-3 mt-0">
+    <card-panel variant="sunken" col="col-12 col-md-3">
+    <panel-body>
+    <p class="text-muted rp-fs-11 mb-1 text-uppercase fw-semibold">Estimate Cost</p>
+    <p class="mb-0 fw-semibold rp-fs-15" id="rp-actuals-estimate-cost">—</p>
+    </panel-body>
+    </card-panel>
+    <card-panel variant="sunken" col="col-12 col-md-3">
+    <panel-body>
+    <p class="text-muted rp-fs-11 mb-1 text-uppercase fw-semibold">Estimate Cost With Contingency</p>
+    <p class="mb-0 fw-semibold rp-fs-15" id="rp-actuals-estimate-cost-contingency">—</p>
+    </panel-body>
+    </card-panel>
+    <card-panel variant="sunken" col="col-12 col-md-3">
+    <panel-body>
+    <p class="text-muted rp-fs-11 mb-1 text-uppercase fw-semibold">Total Actuals</p>
+    <p class="mb-0 fw-semibold rp-fs-15" id="rp-actuals-total">—</p>
+    </panel-body>
+    </card-panel>
+    <card-panel variant="sunken" col="col-12 col-md-3">
+    <panel-body>
+    <p class="text-muted rp-fs-11 mb-1 text-uppercase fw-semibold">Remaining Amount</p>
+    <div class="d-flex align-items-center gap-2 mt-1">
+      <p class="mb-0 fw-semibold rp-fs-15" id="rp-actuals-remaining">—</p>
+      <span id="rp-actuals-risk-badge" class="rp-badge rp-badge-soft" hidden></span>
+    </div>
+    </panel-body>
+    </card-panel>
+  </div>
+  <div class="row g-4 mt-0">
+    <div class="col-12">
+      <section-panel class="mt-2">
+        <panel-title>Actuals Breakdown</panel-title>
+        <panel-actions>
+          <link-field href="#" icon="bi-gear" variant="icon-btn" label="Configure actuals" title="Configure actuals settings" id="rp-actuals-config-btn"></link-field>
+        </panel-actions>
+        <panel-body>
+        <div class="d-flex justify-content-end mb-3">
+          <financial-year-field id="rp-actuals-fy-picker" allow-all show-label col="col-auto" style="min-width:200px;max-width:260px"></financial-year-field>
+        </div>
+        <data-table id="rp-actuals-by-fy-table" row-template="renderActualsByFyRow" empty-message="No actuals data found.">
+          <table-columns>
+            <table-column label="Financial Year" key="fy"></table-column>
+            <table-column label="Total Days" key="total_days" numeric></table-column>
+            <table-column label="Total Cost" key="total_cost" numeric></table-column>
+            <table-column label="Cumulative Cost" key="cumulative_cost" numeric></table-column>
+          </table-columns>
+        </data-table>
+        <data-table id="rp-actuals-by-sprint-table" row-template="renderActualsBySprintRow" empty-message="No actuals found for this financial year." hidden>
+          <table-columns>
+            <table-column label="Sprint" key="sprint"></table-column>
+            <table-column label="Total Days" key="total_days" numeric></table-column>
+            <table-column label="Total Cost" key="total_cost" numeric></table-column>
+            <table-column label="Cumulative Cost" key="cumulative_cost" numeric></table-column>
+          </table-columns>
+        </data-table>
+        </panel-body>
+      </section-panel>
+    </div>
+  </div>
+  </tab-content>
+  </tab-item>
   <tab-item id="links">
   <tab-header title="Links" icon="bi-link-45deg"></tab-header>
   <tab-content>
@@ -376,6 +441,18 @@
   </tab-item>
   </tab-items>
   </tab-panel>
+  <!-- Actuals configuration drawer -->
+  <drawer-modal id="rp-actuals-config-drawer" width="900">
+  <drawer-header eyebrow="Actuals" title="Configuration" icon="bi-gear" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <checkbox-field id="rp-actuals-config-ignore-risk" col="col-12" label="Ignore risk for this project" hint="When enabled, this project will always display risk=None regardless of spend vs. estimate."></checkbox-field>
+    <checkbox-field id="rp-actuals-config-ignore-prev-fy" col="col-12" label="Ignore Previous FYs actuals in total cost" hint="When enabled, only the current FY cost is used for total cost till date calculations and risk."></checkbox-field>
+    <text-field id="rp-actuals-config-notes" col="col-12" cols="3" label="Notes" placeholder="Optional notes..." maxlength="1000"></text-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save Changes" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
   {% if can_delete_attachment %}<delete-modal id="rp-attachment-delete-modal"></delete-modal>{% endif %}
   {% if can_add_contact %}
     <!-- Add Contact drawer -->

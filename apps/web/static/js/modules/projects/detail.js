@@ -1615,6 +1615,14 @@ function initEstimatesTab() {
   initAdvanceFlow(table);
 }
 
+function actualsRiskBadge(risk) {
+  if (risk === "warning")
+    return { label: "Warning", cls: "rp-badge rp-badge-soft rp-badge-warning" };
+  if (risk === "at_risk")
+    return { label: "At Risk", cls: "rp-badge rp-badge-soft rp-badge-danger" };
+  return null;
+}
+
 function budgetRiskClass(color) {
   switch (color) {
     case "GREEN":
@@ -1651,6 +1659,171 @@ window.renderProjectBudgetRow = function renderProjectBudgetRow(row) {
     `<td><span class="${riskClass}">${riskShort}</span></td>`
   );
 };
+
+window.renderActualsByFyRow = function renderActualsByFyRow(row) {
+  return (
+    `<td>${esc(row.fy ?? "—")}</td>` +
+    `<td class="text-end">${(+row.total_days || 0).toFixed(2)}</td>` +
+    `<td class="text-end">${formatCurrency(row.total_cost ?? 0)}</td>` +
+    `<td class="text-end">${formatCurrency(row.cumulative_cost ?? 0)}</td>`
+  );
+};
+
+window.renderActualsBySprintRow = function renderActualsBySprintRow(row) {
+  return (
+    `<td>${esc(row.sprint ?? "—")}</td>` +
+    `<td class="text-end">${(+row.total_days || 0).toFixed(2)}</td>` +
+    `<td class="text-end">${formatCurrency(row.total_cost ?? 0)}</td>` +
+    `<td class="text-end">${formatCurrency(row.cumulative_cost ?? 0)}</td>`
+  );
+};
+
+async function loadActualsSummary() {
+  try {
+    const { href, method } = API_URLS.projectActuals.summary(projectCode);
+    const resp = await apiFetch(href, { method });
+    const d = resp?.data ?? {};
+
+    const estimateEl = document.getElementById("rp-actuals-estimate-cost");
+    const estimateContEl = document.getElementById("rp-actuals-estimate-cost-contingency");
+    const totalEl = document.getElementById("rp-actuals-total");
+    const remainingEl = document.getElementById("rp-actuals-remaining");
+    const riskBadge = document.getElementById("rp-actuals-risk-badge");
+
+    if (estimateEl) estimateEl.textContent = formatCurrency(d.estimate_cost ?? 0);
+    if (estimateContEl)
+      estimateContEl.textContent = formatCurrency(d.estimate_cost_with_contingency ?? 0);
+    if (totalEl) totalEl.textContent = formatCurrency(d.total_actuals ?? 0);
+    if (remainingEl)
+      remainingEl.textContent =
+        d.remaining_amount != null ? formatCurrency(d.remaining_amount) : "—";
+    if (riskBadge) {
+      const badge = actualsRiskBadge(d.risk);
+      if (badge) {
+        riskBadge.textContent = badge.label;
+        riskBadge.className = badge.cls;
+        riskBadge.hidden = false;
+      } else {
+        riskBadge.hidden = true;
+      }
+    }
+  } catch {
+    // non-fatal
+  }
+}
+
+let actualsLoaded = false;
+
+function initActualsTab() {
+  const fyTable = document.getElementById("rp-actuals-by-fy-table");
+  const sprintTable = document.getElementById("rp-actuals-by-sprint-table");
+  const fyPicker = document.getElementById("rp-actuals-fy-picker");
+  const baseUrl = API_URLS.projectActuals.list(projectCode).href;
+
+  const activateTab = () => {
+    loadActualsSummary();
+    if (!actualsLoaded) {
+      actualsLoaded = true;
+      if (fyTable) {
+        fyTable.setAttribute("url", baseUrl);
+        fyTable.removeAttribute("hidden");
+      }
+    } else {
+      const fyCode = fyPicker?.value;
+      if (fyCode) {
+        sprintTable?.refresh();
+      } else {
+        fyTable?.refresh();
+      }
+    }
+  };
+
+  const tabPanel = document.querySelector("tab-panel");
+  if (tabPanel) {
+    if (tabPanel.activeTab === "actuals") activateTab();
+    tabPanel.addEventListener("rp:tab-change", (e) => {
+      if (e.detail.tab === "actuals") activateTab();
+    });
+  }
+
+  if (fyPicker) {
+    fyPicker.addEventListener("change", () => {
+      const fyCode = fyPicker.value;
+      if (fyCode) {
+        if (fyTable) fyTable.setAttribute("hidden", "");
+        if (sprintTable) {
+          sprintTable.removeAttribute("hidden");
+          const url = `${baseUrl}?fy=${encodeURIComponent(fyCode)}`;
+          if (sprintTable.getAttribute("url") === url) {
+            sprintTable.refresh();
+          } else {
+            sprintTable.setAttribute("url", url);
+          }
+        }
+      } else {
+        if (sprintTable) sprintTable.setAttribute("hidden", "");
+        if (fyTable) {
+          fyTable.removeAttribute("hidden");
+          fyTable.refresh();
+        }
+      }
+    });
+  }
+
+  initActualsConfig();
+}
+
+function initActualsConfig() {
+  const configBtn = document.getElementById("rp-actuals-config-btn");
+  const drawer = document.getElementById("rp-actuals-config-drawer");
+  if (!configBtn || !drawer) return;
+
+  const ignoreRiskField = document.getElementById("rp-actuals-config-ignore-risk");
+  const ignorePrevFyField = document.getElementById("rp-actuals-config-ignore-prev-fy");
+  const notesField = document.getElementById("rp-actuals-config-notes");
+
+  configBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    try {
+      const { href, method } = API_URLS.projectActuals.config(projectCode);
+      const resp = await apiFetch(href, { method });
+      const d = resp?.data ?? {};
+      if (ignoreRiskField) ignoreRiskField.checked = d.ignore_risk ?? false;
+      if (ignorePrevFyField) ignorePrevFyField.checked = d.ignore_prev_fy_actuals ?? false;
+      if (notesField) notesField.value = d.notes ?? "";
+    } catch {
+      if (ignoreRiskField) ignoreRiskField.checked = false;
+      if (ignorePrevFyField) ignorePrevFyField.checked = false;
+      if (notesField) notesField.value = "";
+    }
+    drawer.show();
+  });
+
+  drawer.addEventListener("rp:footer-primary", async () => {
+    const submitBtn = drawer.querySelector("[data-footer-primary]");
+    const snap = snapshotButton(submitBtn);
+    setBusyButton(submitBtn, "Saving…");
+    try {
+      const { href, method } = API_URLS.projectActuals.updateConfig(projectCode);
+      await apiFetch(href, {
+        method,
+        body: JSON.stringify({
+          ignore_risk: ignoreRiskField?.checked ?? false,
+          ignore_prev_fy_actuals: ignorePrevFyField?.checked ?? false,
+          notes: notesField?.value ?? "",
+        }),
+      });
+      restoreButton(submitBtn, snap);
+      drawer.hide();
+      toast({ type: "success", title: "Saved", message: "Actuals configuration updated." });
+      loadActualsSummary();
+    } catch (err) {
+      restoreButton(submitBtn, snap);
+      const msg = err?.data?.error?.message ?? "Failed to save configuration.";
+      toast({ type: "error", title: "Error", message: msg });
+    }
+  });
+}
 
 async function loadBudgetLifetime() {
   try {
@@ -2454,7 +2627,7 @@ function initContactsSection() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  if (!projectCode) return;
+  if (!projectCode || !document.getElementById("rp-project-tabs")) return;
   loadProjectDetails();
   loadProjectTags();
   loadProjectLabels();
@@ -2466,6 +2639,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initContactsSection();
   initEstimatesTab();
   initBudgetsTab();
+  initActualsTab();
   initLinksTab();
   initAttachmentsTab();
 });

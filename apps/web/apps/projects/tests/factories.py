@@ -25,6 +25,7 @@ from apps.projects.models import (
     ProjectEstimate,
     ProjectEstimateStatusHistory,
     ProjectLink,
+    ProjectSprintActual,
     ProjectStatus,
     ProjectStatusHistory,
     ProjectSubStatus,
@@ -346,6 +347,28 @@ def make_project_comment(
         project = make_project()
     comment = Comment.objects.create(comment=comment_text)
     return ProjectComment.objects.create(project=project, comment=comment, **overrides)
+
+
+def make_project_sprint_actual(
+    project: Project | None = None,
+    sprint=None,
+    total_days: float = 5,
+    total_cost: float = 5000,
+    **overrides,
+) -> ProjectSprintActual:
+    if project is None:
+        project = make_project()
+    if sprint is None:
+        from apps.sprints.tests.factories import make_sprint
+
+        sprint = make_sprint()
+    return ProjectSprintActual.objects.create(
+        project=project,
+        sprint=sprint,
+        total_days=total_days,
+        total_cost=total_cost,
+        **overrides,
+    )
 
 
 def make_csv_file(content: str, name: str = "programmes.csv"):

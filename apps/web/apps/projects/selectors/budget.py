@@ -34,6 +34,20 @@ def get_budgets_for_project(project: Project) -> QuerySet[ProjectBudget]:
     )
 
 
+def get_budget_for_project_and_fy(
+    project: Project,
+    financial_year: FinancialYear,
+) -> ProjectBudget | None:
+    try:
+        return ProjectBudget.objects.select_related(
+            "project",
+            "financial_year",
+            "estimate_version",
+        ).get(project=project, financial_year=financial_year)
+    except ProjectBudget.DoesNotExist:
+        return None
+
+
 def budget_exists_for_project_and_fy(
     project: Project,
     financial_year: FinancialYear,

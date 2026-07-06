@@ -15,6 +15,7 @@ class ProjectStatus(CodeModel, NamedModel, ActivatableModel, AuditableModel):
 
     name = models.CharField(max_length=100, db_index=True)
     sort_order = models.PositiveIntegerField(default=0, db_index=True)
+    is_terminal = models.BooleanField(default=False, db_index=True)
 
     class Meta:
         ordering = ["sort_order", "name"]

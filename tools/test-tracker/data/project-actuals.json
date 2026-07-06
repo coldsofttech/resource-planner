@@ -1,0 +1,557 @@
+{
+  "module": {
+    "slug": "project-actuals",
+    "name": "Project Actuals",
+    "sort_order": 14,
+    "parent": {
+      "slug": "projects",
+      "name": "Projects",
+      "sort_order": 11
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-PAC-100",
+      "name": "Access & Initial Load",
+      "test_cases": [
+        {
+          "id": "TC-PAC-101",
+          "severity": "P0",
+          "scenario": "Actuals tab is visible to a user with view permission",
+          "steps": "1. Log in as a user with the projects.view_project permission.\n2. Open any project detail page.\n3. Inspect the tab bar at the top of the page.",
+          "expected": "The Actuals tab is present and clickable."
+        },
+        {
+          "id": "TC-PAC-102",
+          "severity": "P0",
+          "scenario": "Clicking the Actuals tab loads all four summary cards",
+          "steps": "1. Open a project detail page.\n2. Click the Actuals tab.",
+          "expected": "All four summary cards (Estimate Cost, Estimate Cost With Contingency, Total Actuals, Remaining Amount) appear and populate with currency values. No cards are blank or broken."
+        },
+        {
+          "id": "TC-PAC-103",
+          "severity": "P0",
+          "scenario": "Clicking the Actuals tab loads the By-FY breakdown table",
+          "steps": "1. Open a project detail page.\n2. Click the Actuals tab.",
+          "expected": "The Actuals Breakdown panel appears below the summary cards. The By-FY table is visible and either shows FY rows or an empty state message."
+        },
+        {
+          "id": "TC-PAC-104",
+          "severity": "P1",
+          "scenario": "Actuals tab is not accessible to a user without view permission",
+          "steps": "1. Log in as a user without the projects.view_project permission.\n2. Attempt to open a project detail page or the actuals API endpoint directly.",
+          "expected": "The user cannot access the project detail page or receives a 403 response from the API. The Actuals tab is not rendered."
+        },
+        {
+          "id": "TC-PAC-105",
+          "severity": "P1",
+          "scenario": "Summary card placeholders are shown while data is loading",
+          "steps": "1. On a throttled network, click the Actuals tab immediately after the project detail page loads.",
+          "expected": "Summary cards display '—' placeholder values until the API responds. Once data arrives the placeholders are replaced with real values. No blank boxes or broken layout."
+        },
+        {
+          "id": "TC-PAC-106",
+          "severity": "P1",
+          "scenario": "Revisiting the Actuals tab refreshes summary cards and the active table view",
+          "steps": "1. Click the Actuals tab and let data load.\n2. Navigate to a different tab (e.g. General).\n3. Click the Actuals tab again.",
+          "expected": "Summary cards refresh with up-to-date values. The breakdown table reloads its current view (By-FY or sprint drill-down, whichever was last active)."
+        },
+        {
+          "id": "TC-PAC-107",
+          "severity": "P1",
+          "scenario": "Actuals tab URL param is set when the tab is active",
+          "steps": "1. Click the Actuals tab.\n2. Inspect the browser URL bar.",
+          "expected": "The URL contains ?tab=actuals. Copying and opening this URL in a new browser tab opens the project detail page with the Actuals tab active."
+        }
+      ]
+    },
+    {
+      "id": "TC-PAC-200",
+      "name": "Summary Cards",
+      "test_cases": [
+        {
+          "id": "TC-PAC-201",
+          "severity": "P0",
+          "scenario": "Estimate Cost card shows the approved estimate value",
+          "steps": "1. Open a project with a known approved estimate cost.\n2. Click the Actuals tab.",
+          "expected": "The Estimate Cost card displays the correct currency-formatted value matching the project's approved estimate."
+        },
+        {
+          "id": "TC-PAC-202",
+          "severity": "P0",
+          "scenario": "Estimate Cost With Contingency card shows the approved estimate plus contingency",
+          "steps": "1. Open a project with an approved estimate and a contingency budget set.\n2. Click the Actuals tab.",
+          "expected": "The Estimate Cost With Contingency card displays the correct combined currency value."
+        },
+        {
+          "id": "TC-PAC-203",
+          "severity": "P0",
+          "scenario": "Total Actuals card shows the sum of all recorded sprint actuals",
+          "steps": "1. Open a project with sprint actuals recorded across multiple sprints.\n2. Click the Actuals tab.",
+          "expected": "The Total Actuals card displays the correct cumulative currency total across all sprints."
+        },
+        {
+          "id": "TC-PAC-204",
+          "severity": "P0",
+          "scenario": "Remaining Amount card shows the difference between Estimate Cost With Contingency and Total Actuals",
+          "steps": "1. Open a project with a known estimate and actuals.\n2. Click the Actuals tab.",
+          "expected": "The Remaining Amount card shows the correct difference. A negative remaining amount (overspend) is displayed correctly rather than showing £0.00 or an error."
+        },
+        {
+          "id": "TC-PAC-205",
+          "severity": "P0",
+          "scenario": "No risk badge is shown when Total Actuals are within the Estimate Cost",
+          "steps": "1. Open a project where Total Actuals are less than or equal to the approved Estimate Cost.\n2. Click the Actuals tab.",
+          "expected": "No badge appears next to the Remaining Amount value. The field shows only the currency amount."
+        },
+        {
+          "id": "TC-PAC-206",
+          "severity": "P0",
+          "scenario": "Amber Warning badge appears when Total Actuals exceed Estimate Cost but remain within Estimate Cost With Contingency",
+          "steps": "1. Open a project where Total Actuals are greater than the Estimate Cost but less than or equal to Estimate Cost With Contingency.\n2. Click the Actuals tab.",
+          "expected": "An amber 'Warning' badge appears next to the Remaining Amount value."
+        },
+        {
+          "id": "TC-PAC-207",
+          "severity": "P0",
+          "scenario": "Red At Risk badge appears when Total Actuals exceed Estimate Cost With Contingency",
+          "steps": "1. Open a project where Total Actuals are greater than the Estimate Cost With Contingency.\n2. Click the Actuals tab.",
+          "expected": "A red 'At Risk' badge appears next to the Remaining Amount value."
+        },
+        {
+          "id": "TC-PAC-208",
+          "severity": "P1",
+          "scenario": "Summary cards show £0.00 for a project with no actuals recorded",
+          "steps": "1. Open a newly created project that has no sprint actuals.\n2. Click the Actuals tab.",
+          "expected": "Total Actuals shows £0.00. Remaining Amount reflects the full Estimate Cost With Contingency. No risk badge is shown."
+        },
+        {
+          "id": "TC-PAC-209",
+          "severity": "P1",
+          "scenario": "All summary card values are formatted as currency with correct symbol and two decimal places",
+          "steps": "1. Open a project with actuals.\n2. Click the Actuals tab.\n3. Read each summary card value.",
+          "expected": "All values display as formatted currency (e.g. £1,234.56). No raw numbers, no truncated decimals."
+        }
+      ]
+    },
+    {
+      "id": "TC-PAC-300",
+      "name": "By-FY Breakdown Table",
+      "test_cases": [
+        {
+          "id": "TC-PAC-301",
+          "severity": "P0",
+          "scenario": "By-FY table shows one row per financial year that has actuals",
+          "steps": "1. Open a project with actuals recorded across multiple financial years.\n2. Click the Actuals tab.\n3. Confirm the FY picker shows 'All Financial Years'.",
+          "expected": "The By-FY table contains one row per FY. All four columns — Financial Year, Total Days, Total Cost, Cumulative Cost — are populated."
+        },
+        {
+          "id": "TC-PAC-302",
+          "severity": "P0",
+          "scenario": "FY picker defaults to 'All Financial Years' on first tab activation",
+          "steps": "1. Click the Actuals tab for the first time without previously selecting a FY.",
+          "expected": "The FY picker shows 'All Financial Years' selected. The By-FY table is visible. The sprint drill-down table is hidden."
+        },
+        {
+          "id": "TC-PAC-303",
+          "severity": "P0",
+          "scenario": "Selecting a specific FY switches to the sprint drill-down table",
+          "steps": "1. Click the Actuals tab.\n2. Use the FY picker to select a specific financial year (e.g. FY2024-2025).",
+          "expected": "The By-FY table disappears. The sprint drill-down table appears showing one row per sprint within that FY with Sprint, Total Days, Total Cost, and Cumulative Cost columns."
+        },
+        {
+          "id": "TC-PAC-304",
+          "severity": "P0",
+          "scenario": "Switching the FY picker back to 'All Financial Years' restores the By-FY table",
+          "steps": "1. Click the Actuals tab.\n2. Select a specific FY.\n3. Change the picker back to 'All Financial Years'.",
+          "expected": "The sprint drill-down table disappears. The By-FY table reappears with all FY rows intact."
+        },
+        {
+          "id": "TC-PAC-305",
+          "severity": "P0",
+          "scenario": "Cumulative Cost values increase monotonically across sprint rows in the drill-down",
+          "steps": "1. Click the Actuals tab.\n2. Select a FY in the picker.\n3. Inspect each row's Cumulative Cost value in order.",
+          "expected": "Each row's Cumulative Cost equals the running total of all Total Cost values up to and including that sprint. Values increase or stay the same — they never decrease."
+        },
+        {
+          "id": "TC-PAC-306",
+          "severity": "P1",
+          "scenario": "Sprints with no actuals appear as zero-filled rows in the sprint drill-down",
+          "steps": "1. Click the Actuals tab.\n2. Select a FY that contains sprints where some have no actuals recorded.",
+          "expected": "All sprints in the selected FY appear. Those with no actuals show 0.00 days and £0.00 cost. Cumulative Cost carries the value from the previous row correctly."
+        },
+        {
+          "id": "TC-PAC-307",
+          "severity": "P1",
+          "scenario": "By-FY table shows an empty state when the project has no actuals at all",
+          "steps": "1. Open a project with no sprint actuals recorded.\n2. Click the Actuals tab.",
+          "expected": "The By-FY table shows the empty state message 'No actuals data found.' No rows are rendered."
+        },
+        {
+          "id": "TC-PAC-308",
+          "severity": "P1",
+          "scenario": "Sprint drill-down shows an empty state for a FY with no actuals for this project",
+          "steps": "1. Click the Actuals tab.\n2. Select a FY that exists in the system but has no actuals for this project.",
+          "expected": "The sprint table shows the empty state message 'No actuals found for this financial year.' No rows are rendered."
+        },
+        {
+          "id": "TC-PAC-309",
+          "severity": "P1",
+          "scenario": "Total Days values are formatted to two decimal places",
+          "steps": "1. Click the Actuals tab.\n2. Inspect the Total Days column in the By-FY table and in the sprint drill-down.",
+          "expected": "All Total Days values display two decimal places (e.g. 10.00, 3.50). Whole numbers appear as x.00 rather than being truncated."
+        },
+        {
+          "id": "TC-PAC-310",
+          "severity": "P2",
+          "scenario": "Changing the FY picker cancels any in-flight request from the previous selection",
+          "steps": "1. Click the Actuals tab.\n2. Select a FY quickly and then immediately select a different FY before the first table loads.",
+          "expected": "Only the data for the final FY selection is displayed. Stale data from the earlier selection does not appear."
+        }
+      ]
+    },
+    {
+      "id": "TC-PAC-400",
+      "name": "Actuals Config Drawer",
+      "test_cases": [
+        {
+          "id": "TC-PAC-401",
+          "severity": "P0",
+          "scenario": "Gear icon is visible in the Actuals Breakdown panel header",
+          "steps": "1. Click the Actuals tab.\n2. Inspect the header of the 'Actuals Breakdown' section panel.",
+          "expected": "A gear icon button labelled 'Configure actuals settings' is visible on the right side of the panel header."
+        },
+        {
+          "id": "TC-PAC-402",
+          "severity": "P0",
+          "scenario": "Clicking the gear icon opens the actuals config drawer",
+          "steps": "1. Click the Actuals tab.\n2. Click the gear icon in the Actuals Breakdown panel header.",
+          "expected": "A configuration drawer slides in from the right containing the Ignore Risk toggle, Ignore Previous FY Actuals toggle, and a Notes text area."
+        },
+        {
+          "id": "TC-PAC-403",
+          "severity": "P0",
+          "scenario": "Config drawer pre-populates with the project's currently saved configuration",
+          "steps": "1. Save a config with Ignore Risk enabled and a note 'Test note'.\n2. Reload the page.\n3. Click the Actuals tab and click the gear icon.",
+          "expected": "The drawer opens with Ignore Risk toggled on and the Notes field showing 'Test note'. All values match what was previously saved."
+        },
+        {
+          "id": "TC-PAC-404",
+          "severity": "P0",
+          "scenario": "Enabling Ignore Risk and saving causes the risk badge to disappear from summary cards",
+          "steps": "1. Confirm the project currently shows a Warning or At Risk badge in the summary cards.\n2. Click the gear icon to open the config drawer.\n3. Toggle 'Ignore Risk' on.\n4. Click Save.",
+          "expected": "A 'Saved' success toast appears. The drawer closes. The risk badge disappears from the Remaining Amount card. Summary cards refresh without the badge."
+        },
+        {
+          "id": "TC-PAC-405",
+          "severity": "P0",
+          "scenario": "Disabling Ignore Risk and saving causes the risk badge to reappear when spend qualifies",
+          "steps": "1. Open the config drawer with Ignore Risk already enabled.\n2. Toggle 'Ignore Risk' off.\n3. Click Save.",
+          "expected": "A 'Saved' success toast appears. Summary cards refresh. If the project's spend level qualifies, the appropriate Warning or At Risk badge reappears on the Remaining Amount card."
+        },
+        {
+          "id": "TC-PAC-406",
+          "severity": "P0",
+          "scenario": "Enabling Ignore Previous FY Actuals reduces the Total Actuals shown in summary cards",
+          "steps": "1. Open a project with actuals recorded in at least two different financial years.\n2. Note the current Total Actuals value.\n3. Open the config drawer, toggle 'Ignore Previous FY Actuals' on, and click Save.",
+          "expected": "A 'Saved' success toast appears. The drawer closes. The Total Actuals card updates to a lower value excluding prior financial year actuals. Remaining Amount recalculates accordingly."
+        },
+        {
+          "id": "TC-PAC-407",
+          "severity": "P0",
+          "scenario": "Disabling Ignore Previous FY Actuals restores all FY actuals into the total",
+          "steps": "1. Open the config drawer with Ignore Previous FY Actuals already enabled.\n2. Toggle 'Ignore Previous FY Actuals' off.\n3. Click Save.",
+          "expected": "A 'Saved' success toast appears. Total Actuals in the summary card increases to include all historical FY actuals. Remaining Amount recalculates."
+        },
+        {
+          "id": "TC-PAC-408",
+          "severity": "P1",
+          "scenario": "Notes field accepts and saves multi-line text",
+          "steps": "1. Open the config drawer.\n2. Type a multi-line note in the Notes field (press Enter between lines).\n3. Click Save.\n4. Re-open the drawer.",
+          "expected": "The drawer re-opens with the full multi-line text preserved in the Notes field. Line breaks are maintained."
+        },
+        {
+          "id": "TC-PAC-409",
+          "severity": "P1",
+          "scenario": "Save button shows a loading state during submission",
+          "steps": "1. Open the config drawer.\n2. Make any change.\n3. Click Save and observe the button immediately.",
+          "expected": "The Save button becomes disabled and shows a 'Saving…' label while the request is in-flight. It restores to its original state once the request completes."
+        },
+        {
+          "id": "TC-PAC-410",
+          "severity": "P0",
+          "scenario": "Closing the drawer without saving discards all unsaved changes",
+          "steps": "1. Open the config drawer.\n2. Toggle Ignore Risk, change the Notes text.\n3. Close the drawer using the X button or press Escape.",
+          "expected": "The drawer closes. No success toast is shown. Re-opening the drawer shows the original saved values — the unsaved changes are gone."
+        },
+        {
+          "id": "TC-PAC-411",
+          "severity": "P1",
+          "scenario": "Config drawer shows an error toast and stays open when save fails",
+          "steps": "1. Open the config drawer.\n2. Simulate a network or server failure.\n3. Make a change and click Save.",
+          "expected": "An error toast appears with a descriptive message. The Save button is restored. The drawer remains open so the user can retry without losing their changes."
+        },
+        {
+          "id": "TC-PAC-412",
+          "severity": "P1",
+          "scenario": "Gear icon is only visible and functional to users with change permission",
+          "steps": "1. Log in as a user with only projects.view_project permission (no change permission).\n2. Click the Actuals tab.",
+          "expected": "The gear icon is either not visible or clicking it does not open the drawer. The user cannot modify actuals configuration."
+        }
+      ]
+    },
+    {
+      "id": "TC-PAC-500",
+      "name": "Validation",
+      "test_cases": [
+        {
+          "id": "TC-PAC-501",
+          "severity": "P1",
+          "scenario": "Config saves successfully with both toggles off and an empty Notes field",
+          "steps": "1. Open the config drawer.\n2. Ensure both Ignore Risk and Ignore Previous FY Actuals are off.\n3. Clear the Notes field.\n4. Click Save.",
+          "expected": "Save succeeds with a 'Saved' success toast. No validation error is shown."
+        },
+        {
+          "id": "TC-PAC-502",
+          "severity": "P1",
+          "scenario": "Config saves successfully with both toggles on and a populated Notes field",
+          "steps": "1. Open the config drawer.\n2. Enable both toggles.\n3. Enter text in the Notes field.\n4. Click Save.",
+          "expected": "Save succeeds with a 'Saved' toast. All values are persisted and visible when the drawer is re-opened."
+        },
+        {
+          "id": "TC-PAC-503",
+          "severity": "P2",
+          "scenario": "Notes field accepts special characters and Unicode without corruption",
+          "steps": "1. Open the config drawer.\n2. Enter notes containing &, <, >, quotes, and Unicode characters (e.g. é, ñ, 中文).\n3. Click Save.\n4. Re-open the drawer.",
+          "expected": "All characters are saved and displayed correctly. No HTML encoding artefacts (e.g. &amp; or &lt;) appear in the Notes field."
+        },
+        {
+          "id": "TC-PAC-504",
+          "severity": "P2",
+          "scenario": "Notes field accepts very long text without truncation",
+          "steps": "1. Open the config drawer.\n2. Paste a paragraph of 500+ characters into the Notes field.\n3. Click Save.\n4. Re-open the drawer.",
+          "expected": "The full text is saved. When the drawer re-opens, the complete text is present. No truncation, silent cut-off, or layout overflow."
+        }
+      ]
+    },
+    {
+      "id": "TC-PAC-600",
+      "name": "Non-Functional",
+      "test_cases": [
+        {
+          "id": "TC-PAC-601",
+          "severity": "P1",
+          "scenario": "Summary cards and breakdown table load within 3 seconds on a standard connection",
+          "steps": "1. Open a project detail page with actuals data on a standard broadband connection.\n2. Click the Actuals tab and start a timer.",
+          "expected": "All four summary card values and the By-FY table populate within 3 seconds."
+        },
+        {
+          "id": "TC-PAC-602",
+          "severity": "P1",
+          "scenario": "The page layout remains intact if the actuals API returns an error",
+          "steps": "1. Simulate a server error on the actuals summary or table API (e.g. via browser DevTools).\n2. Click the Actuals tab.",
+          "expected": "The page layout is not broken. Summary cards show '—' placeholders or a graceful empty state. No unhandled JavaScript errors cause the page to become unresponsive."
+        },
+        {
+          "id": "TC-PAC-603",
+          "severity": "P1",
+          "scenario": "Actuals tab URL is shareable and opens at the correct tab",
+          "steps": "1. Click the Actuals tab.\n2. Copy the URL from the browser address bar.\n3. Open the URL in a new incognito tab and log in.",
+          "expected": "The project detail page opens with the Actuals tab active. The URL contains ?tab=actuals."
+        },
+        {
+          "id": "TC-PAC-604",
+          "severity": "P1",
+          "scenario": "Summary card values are readable in both light and dark mode",
+          "steps": "1. View the Actuals tab in light mode.\n2. Switch to dark mode using the theme toggle.\n3. Inspect all four summary card values and the risk badge.",
+          "expected": "All text and badge colours have sufficient contrast against the card background in both modes. No values are invisible."
+        },
+        {
+          "id": "TC-PAC-605",
+          "severity": "P2",
+          "scenario": "Config drawer fields are accessible via keyboard navigation",
+          "steps": "1. Click the Actuals tab.\n2. Tab to the gear icon and press Enter to open the drawer.\n3. Tab through the drawer fields.",
+          "expected": "Each drawer field (toggles, notes, Save, Close) receives focus in logical order. All fields are operable via keyboard alone."
+        },
+        {
+          "id": "TC-PAC-606",
+          "severity": "P2",
+          "scenario": "Gear icon has a visible focus ring when navigated to via keyboard",
+          "steps": "1. Click the Actuals tab.\n2. Press Tab repeatedly until the gear icon button receives focus.",
+          "expected": "A clear, visible focus ring appears around the gear icon. The focus indicator is not suppressed."
+        },
+        {
+          "id": "TC-PAC-607",
+          "severity": "P2",
+          "scenario": "Risk badge colour is distinguishable for users with colour blindness",
+          "steps": "1. Open the Actuals tab on a project that shows both Warning and At Risk states (verify separately).\n2. Inspect the badge using a colour blindness simulator.",
+          "expected": "The Warning badge label and the At Risk badge label are readable as text independently of colour. Users with common forms of colour blindness can distinguish between no badge, Warning, and At Risk states."
+        }
+      ]
+    },
+    {
+      "id": "TC-PAC-700",
+      "name": "Performance",
+      "test_cases": [
+        {
+          "id": "TC-PAC-701",
+          "severity": "P1",
+          "scenario": "Switching the FY picker updates the sprint table within 2 seconds",
+          "steps": "1. Click the Actuals tab.\n2. Select a specific FY in the picker and start a timer.",
+          "expected": "The sprint drill-down table loads within 2 seconds of the FY selection. No full page reload occurs."
+        },
+        {
+          "id": "TC-PAC-702",
+          "severity": "P1",
+          "scenario": "Summary cards refresh within 2 seconds after saving config changes",
+          "steps": "1. Open the config drawer.\n2. Toggle a setting and click Save.",
+          "expected": "The 'Saved' success toast appears and summary card values update within 2 seconds of the save completing."
+        },
+        {
+          "id": "TC-PAC-703",
+          "severity": "P2",
+          "scenario": "Breakdown table handles a project with many sprints and FYs without visible lag",
+          "steps": "1. Open a project with 50+ sprints across 5+ financial years.\n2. Click the Actuals tab.\n3. Select each FY in the picker one at a time.",
+          "expected": "Tables load within 3 seconds for each FY selection. The browser remains responsive. No freeze or spinner that does not resolve."
+        },
+        {
+          "id": "TC-PAC-704",
+          "severity": "P2",
+          "scenario": "Rapid FY picker changes do not produce stale data in the table",
+          "steps": "1. Click the Actuals tab.\n2. Switch the FY picker quickly between two different FYs several times in succession.",
+          "expected": "Only the data for the final selected FY is shown when the switching stops. No stale results from earlier selections appear."
+        }
+      ]
+    },
+    {
+      "id": "TC-PAC-800",
+      "name": "Desktop",
+      "test_cases": [
+        {
+          "id": "TC-PAC-801",
+          "severity": "P1",
+          "scenario": "All four summary cards appear in a single row on desktop",
+          "steps": "1. Open a project detail page on a desktop viewport (≥1024 px wide).\n2. Click the Actuals tab.",
+          "expected": "Estimate Cost, Estimate Cost With Contingency, Total Actuals, and Remaining Amount cards appear side by side in a single four-column row."
+        },
+        {
+          "id": "TC-PAC-802",
+          "severity": "P1",
+          "scenario": "All breakdown table columns are visible without horizontal scrolling on desktop",
+          "steps": "1. Click the Actuals tab on a desktop viewport.\n2. Inspect the By-FY breakdown table.",
+          "expected": "All four columns (Financial Year, Total Days, Total Cost, Cumulative Cost) are visible. No horizontal scrollbar appears on the table."
+        },
+        {
+          "id": "TC-PAC-803",
+          "severity": "P2",
+          "scenario": "FY picker is right-aligned above the table and does not stretch to full width on desktop",
+          "steps": "1. Click the Actuals tab on a desktop viewport.\n2. Inspect the position of the FY picker.",
+          "expected": "The FY picker is aligned to the right side above the breakdown table. It has a compact width (approximately 200–260 px) and does not span the full panel width."
+        },
+        {
+          "id": "TC-PAC-804",
+          "severity": "P2",
+          "scenario": "Config drawer is a partial-width side panel on desktop",
+          "steps": "1. Click the Actuals tab on a desktop viewport.\n2. Click the gear icon to open the config drawer.",
+          "expected": "The drawer slides in from the right as a side panel that does not cover the entire page. The project content is partially visible behind it."
+        }
+      ]
+    },
+    {
+      "id": "TC-PAC-900",
+      "name": "Mobile",
+      "test_cases": [
+        {
+          "id": "TC-PAC-901",
+          "severity": "P1",
+          "scenario": "Summary cards stack vertically and are full width on mobile",
+          "steps": "1. Open the Actuals tab on a mobile viewport (≤480 px wide).",
+          "expected": "Each summary card occupies the full width of the screen. The four cards stack one on top of the other. No card overflows or is clipped."
+        },
+        {
+          "id": "TC-PAC-902",
+          "severity": "P1",
+          "scenario": "Breakdown table is horizontally scrollable when columns overflow on mobile",
+          "steps": "1. Open the Actuals tab on a mobile viewport.\n2. Inspect the By-FY breakdown table.",
+          "expected": "When the combined column width exceeds the viewport, the table scrolls horizontally. All columns and their data are accessible by scrolling. No content is cut off."
+        },
+        {
+          "id": "TC-PAC-903",
+          "severity": "P1",
+          "scenario": "FY picker is full width and easily tappable on mobile",
+          "steps": "1. Open the Actuals tab on a mobile device.\n2. Tap the FY picker.",
+          "expected": "The FY picker expands to full or near-full width. The dropdown opens correctly. Options are large enough to tap without accidental mis-selection."
+        },
+        {
+          "id": "TC-PAC-904",
+          "severity": "P1",
+          "scenario": "Config drawer fills the full screen on mobile",
+          "steps": "1. Open the Actuals tab on a mobile device.\n2. Tap the gear icon.",
+          "expected": "The config drawer fills the screen. The Ignore Risk toggle, Ignore Previous FY Actuals toggle, Notes field, Save, and Close buttons are all visible and tappable without needing to scroll."
+        },
+        {
+          "id": "TC-PAC-905",
+          "severity": "P2",
+          "scenario": "Risk badge is visible and readable on the Remaining Amount card on mobile",
+          "steps": "1. Open the Actuals tab on a mobile device on a project that shows a Warning or At Risk badge.",
+          "expected": "The badge appears next to the Remaining Amount value. Badge text is not clipped. The badge colour is visible against the card background."
+        },
+        {
+          "id": "TC-PAC-906",
+          "severity": "P2",
+          "scenario": "Gear icon is easily tappable on mobile without accidentally activating other elements",
+          "steps": "1. Open the Actuals tab on a mobile device.\n2. Tap the gear icon in the Actuals Breakdown panel header.",
+          "expected": "The config drawer opens on first tap. The icon has a tap target large enough for comfortable use (minimum 44×44 px recommended)."
+        }
+      ]
+    },
+    {
+      "id": "TC-PAC-1000",
+      "name": "Integration",
+      "test_cases": [
+        {
+          "id": "TC-PAC-1001",
+          "severity": "P0",
+          "scenario": "Total Actuals reflects sprint actuals data imported via the Sprint Actuals import flow",
+          "steps": "1. Import sprint actuals for a project via the Sprint Actuals import feature.\n2. Navigate to the project detail page.\n3. Click the Actuals tab.",
+          "expected": "The Total Actuals card reflects the imported data. The By-FY breakdown table shows correct FY rows and cost values matching the import."
+        },
+        {
+          "id": "TC-PAC-1002",
+          "severity": "P0",
+          "scenario": "Actuals config changes persist after a full page reload",
+          "steps": "1. Open the config drawer.\n2. Toggle Ignore Risk on and enter a note.\n3. Click Save.\n4. Reload the project detail page.\n5. Click the Actuals tab and re-open the config drawer.",
+          "expected": "Ignore Risk is still toggled on and the note text is unchanged. The risk badge state in the summary cards matches the saved config."
+        },
+        {
+          "id": "TC-PAC-1003",
+          "severity": "P1",
+          "scenario": "Summary cards update to include newly recorded actuals when the tab is re-activated",
+          "steps": "1. Open the Actuals tab for a project and note the Total Actuals value.\n2. In a separate browser tab, import or record new actuals for a sprint belonging to this project.\n3. Return to the project detail page, navigate to a different tab, then back to Actuals.",
+          "expected": "The summary cards refresh to include the newly recorded actuals. Total Actuals and Remaining Amount show the updated values."
+        },
+        {
+          "id": "TC-PAC-1004",
+          "severity": "P1",
+          "scenario": "Ignore Previous FY Actuals excludes prior-year data from Total Actuals correctly",
+          "steps": "1. Open a project with actuals in at least two financial years.\n2. Note the Total Actuals value with the toggle off.\n3. Enable Ignore Previous FY Actuals and save.\n4. Note the new Total Actuals value.",
+          "expected": "The Total Actuals decreases to reflect only the current financial year's actuals. The reduction in value corresponds exactly to the sum of prior-year actuals visible in the By-FY table."
+        },
+        {
+          "id": "TC-PAC-1005",
+          "severity": "P1",
+          "scenario": "Two users with view permission see identical actuals data on the same project",
+          "steps": "1. Log in as User A and note the Total Actuals and Remaining Amount values on a project.\n2. Log in as User B (with the same view permission) and open the same project's Actuals tab.",
+          "expected": "Both users see the same summary card values and breakdown table data. No user-specific filtering is applied to the actuals view."
+        },
+        {
+          "id": "TC-PAC-1006",
+          "severity": "P2",
+          "scenario": "By-FY table Cumulative Cost final row matches the Total Actuals summary card",
+          "steps": "1. Open the Actuals tab.\n2. Ensure the FY picker is set to 'All Financial Years'.\n3. Read the Cumulative Cost of the last row in the By-FY table.\n4. Compare to the Total Actuals summary card.",
+          "expected": "The Cumulative Cost of the last By-FY row is equal to or consistent with the Total Actuals card value (accounting for any Ignore Previous FY Actuals config)."
+        }
+      ]
+    }
+  ]
+}

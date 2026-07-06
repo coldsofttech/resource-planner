@@ -8,9 +8,16 @@ from .estimate import ProjectEstimate, ProjectEstimateStatusHistory
 from .follower import ProjectFollower
 from .label import ProjectLabel
 from .link import ProjectLink
+from .onboarding import Onboarding
+from .onboarding_attachment import OnboardingAttachment
+from .onboarding_contact import OnboardingContact
+from .onboarding_link import OnboardingLink
 from .programme import Programme
 from .project import Project, ProjectCollaborator
+from .project_actual_config import ProjectActualConfig
+from .project_actuals import ProjectActuals
 from .project_code import ProjectCode, ProjectCodeHistory
+from .project_sprint_actual import ProjectSprintActual
 from .project_status import ProjectStatus, ProjectStatusHistory, ProjectSubStatus
 from .project_type import ProjectType
 from .tag import ProjectTag
@@ -38,4 +45,11 @@ __all__ = [
     "ProjectBudget",
     "ProjectBudgetAction",
     "ProjectBudgetStatusHistory",
+    "ProjectSprintActual",
+    "ProjectActuals",
+    "ProjectActualConfig",
+    "OnboardingContact",
+    "Onboarding",
+    "OnboardingAttachment",
+    "OnboardingLink",
 ]

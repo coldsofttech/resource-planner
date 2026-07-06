@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Review Demand Requests{% endblock %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/project-demands.min.js' %}"></script>
+{% endblock %}
+{% block page_eyebrow %}Projects{% endblock %}
+{% block page_title %}Demand Requests{% endblock %}
+{% block page_sub %}Review and action submitted project demand requests.{% endblock %}
+{% block page_actions %}
+  <primary-button id="rp-demands-create-btn" label="Create Demand" prefix-icon="bi-plus"></primary-button>
+{% endblock %}
+{% block content %}
+  <section-panel>
+    <panel-body>
+    <list-view show-active-filters>
+    <filter-panel layout="horizontal">
+    <search-field id="rp-onb-search" name="search" placeholder="Search by project name, requester, or code…" show-label></search-field>
+    <dropdown-field id="rp-onb-status-filter" name="status" label="Status" placeholder="All statuses" clearable show-label>
+    <values-list>
+    <value value="" label="All">All</value>
+    <value value="pending" label="Pending">Pending</value>
+    <value value="accepted" label="Accepted">Accepted</value>
+    <value value="rejected" label="Rejected">Rejected</value>
+    </values-list>
+    </dropdown-field>
+    </filter-panel>
+    <data-table id="rp-onboardings-table" url="/api/v1/demands/" paginated page-size="25" row-template="renderOnboardingRow" empty-message="No demand requests found.">
+      <table-columns>
+        <table-column label="Project name" key="project_name" sortable>
+        </table-column>
+        <table-column label="Requester" key="requester">
+        </table-column>
+        <table-column label="Products" key="products" hide-mobile>
+        </table-column>
+        <table-column label="Status" key="status">
+        </table-column>
+        <table-column label="Submitted" key="created_at" sortable hide-mobile>
+        </table-column>
+      </table-columns>
+      <table-actions max-inline-actions="2">
+        <table-action event="rp:onboarding:accept" label="Accept" icon="bi-check-circle">
+        </table-action>
+        <table-action event="rp:onboarding:reject" label="Reject" icon="bi-x-circle">
+        </table-action>
+      </table-actions>
+    </data-table>
+    </list-view>
+    </panel-body>
+  </section-panel>
+  <!-- View drawer -->
+  <drawer-modal id="rp-onboarding-view-drawer" width="900">
+  <drawer-header title="Demand Request" eyebrow="Review submission details" no-sizes></drawer-header>
+  <drawer-footer close="Close" secondary="Reject" secondary-icon="bi-x-circle" primary="Accept &amp; create project" primary-icon="bi-check-circle"></drawer-footer>
+  <drawer-panel>
+  <div class="rp-stack-16 p-3">
+    <div id="rp-view-onb-project-section" hidden>
+      <view-field id="rp-view-onb-project-link" label="Created project"></view-field>
+    </div>
+    <view-field id="rp-view-onb-project-name" label="Project name"></view-field>
+    <view-field id="rp-view-onb-status" label="Status"></view-field>
+    <view-field id="rp-view-onb-requester" label="Requester"></view-field>
+    <view-field id="rp-view-onb-exec" label="Accountable executive"></view-field>
+    <view-field id="rp-view-onb-products" label="Products"></view-field>
+    <view-field id="rp-view-onb-bu" label="Business unit"></view-field>
+    <view-field id="rp-view-onb-project-code" label="Reference code"></view-field>
+    <view-field id="rp-view-onb-start" label="Tentative start"></view-field>
+    <view-field id="rp-view-onb-end" label="Tentative end"></view-field>
+    <view-field id="rp-view-onb-requirements" label="Requirements" col="col-12" desc></view-field>
+    <view-field id="rp-view-onb-risk" label="Risk &amp; constraints" col="col-12" desc></view-field>
+    <view-field id="rp-view-onb-contacts" label="Additional contacts" col="col-12"></view-field>
+    <view-field id="rp-view-onb-links" label="Reference links" col="col-12" desc></view-field>
+    <view-field id="rp-view-onb-attachments" label="Attachments" col="col-12"></view-field>
+    <view-field id="rp-view-onb-created-at" label="Submitted"></view-field>
+  </div>
+  </drawer-panel>
+  </drawer-modal>
+  <!-- Confirm accept modal -->
+  <accept-modal id="rp-onboarding-accept-modal"></accept-modal>
+  <!-- Confirm reject modal -->
+  <reject-modal id="rp-onboarding-reject-modal"></reject-modal>
+{% endblock %}

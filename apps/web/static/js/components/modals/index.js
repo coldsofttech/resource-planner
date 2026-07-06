@@ -1,6 +1,8 @@
+import "./accept-modal.js";
 import "./activate-modal.js";
 import "./deactivate-modal.js";
 import "./delete-modal.js";
 import "./form-modal.js";
+import "./reject-modal.js";
 import "./set-default-modal.js";
 import "./status-modal.js";
