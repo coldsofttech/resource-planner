@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -7,11 +9,19 @@ from rest_framework.request import Request
 
 from apps.core.permissions import HasPermission
 from apps.core.viewsets import BaseViewSet, ExportMixin, ImportMixin, StatisticsMixin
+from apps.recharges import selectors as recharge_selectors
+from apps.recharges.engine import RechargeEmailEngine
 from apps.recharges.serializers import (
     ProjectTypeMappingCreateSerializer,
     ProjectTypeMappingDetailSerializer,
     ProjectTypeMappingListSerializer,
     ProjectTypeMappingUpdateSerializer,
+    RechargeEmailGroupSerializer,
+    RechargeEmailTriggerSerializer,
+    RechargeProjectGroupCreateSerializer,
+    RechargeProjectGroupDetailSerializer,
+    RechargeProjectGroupListSerializer,
+    RechargeProjectGroupUpdateSerializer,
     RechargeTypeCreateSerializer,
     RechargeTypeDetailSerializer,
     RechargeTypeListSerializer,
@@ -21,6 +31,7 @@ from apps.recharges.services import (
     ProjectTypeMappingExportService,
     ProjectTypeMappingImportService,
     ProjectTypeMappingService,
+    RechargeProjectGroupService,
     RechargeTypeExportService,
     RechargeTypeImportService,
     RechargeTypeService,
@@ -443,4 +454,373 @@ class ProjectTypeMappingViewSet(ImportMixin, ExportMixin, BaseViewSet):
         return self.response(
             message=self.get_delete_custom_message(),
             status_code=self.get_delete_status_code(),
+        )
+
+
+@extend_schema(tags=["Recharges: Project Groups"])
+class RechargeProjectGroupViewSet(StatisticsMixin, BaseViewSet):
+    service_class = RechargeProjectGroupService
+
+    def get_permissions(self):
+        action_perms = {
+            "list": "recharges.view_rechargeprojectgroup",
+            "retrieve": "recharges.view_rechargeprojectgroup",
+            "statistics": "recharges.view_rechargeprojectgroup",
+            "create": "recharges.add_rechargeprojectgroup",
+            "partial_update": "recharges.change_rechargeprojectgroup",
+            "destroy": "recharges.delete_rechargeprojectgroup",
+        }
+        perm = action_perms.get(self.action)
+        if perm:
+            return [IsAuthenticated(), HasPermission(perm)]
+        return [IsAuthenticated()]
+
+    def get_list_serializer_class(self):
+        return RechargeProjectGroupListSerializer
+
+    def get_retrieve_serializer_class(self):
+        return RechargeProjectGroupDetailSerializer
+
+    def get_create_serializer_class(self):
+        return RechargeProjectGroupCreateSerializer
+
+    def get_update_serializer_class(self):
+        return RechargeProjectGroupUpdateSerializer
+
+    def get_create_response_serializer_class(self):
+        return RechargeProjectGroupDetailSerializer
+
+    @extend_schema(
+        summary="List recharge project groups",
+        responses={200: RechargeProjectGroupListSerializer(many=True)},
+    )
+    def list(self, request: Request):
+        """GET /recharges/project-groups/"""
+        return super().list(request)
+
+    @extend_schema(
+        summary="Retrieve a recharge project group",
+        responses={
+            200: RechargeProjectGroupDetailSerializer,
+            404: OpenApiResponse(description="Project group not found."),
+        },
+    )
+    def retrieve(self, request: Request, code=None):
+        """GET /recharges/project-groups/<code>/"""
+        obj = self.service.get(code=code)
+        serializer = RechargeProjectGroupDetailSerializer(
+            obj, context=self.get_serializer_context()
+        )
+        return self.response(data=serializer.data)
+
+    @extend_schema(
+        summary="Create a recharge project group",
+        request=RechargeProjectGroupCreateSerializer,
+        responses={
+            201: RechargeProjectGroupDetailSerializer,
+            409: OpenApiResponse(description="A group with this name already exists."),
+        },
+    )
+    def create(self, request: Request):
+        """POST /recharges/project-groups/"""
+        return super().create(request)
+
+    @extend_schema(
+        summary="Update a recharge project group",
+        request=RechargeProjectGroupUpdateSerializer,
+        responses={
+            200: RechargeProjectGroupDetailSerializer,
+            404: OpenApiResponse(description="Project group not found."),
+            409: OpenApiResponse(description="A group with this name already exists."),
+        },
+    )
+    def partial_update(self, request: Request, code=None):
+        """PATCH /recharges/project-groups/<code>/"""
+        serializer = RechargeProjectGroupUpdateSerializer(
+            data=request.data,
+            partial=True,
+            context=self.get_serializer_context(),
+        )
+        serializer.is_valid(raise_exception=True)
+        obj = self.service.update(code=code, **serializer.validated_data)
+        data = RechargeProjectGroupDetailSerializer(
+            obj, context=self.get_serializer_context()
+        ).data
+        return self.response(
+            data=data,
+            message=self.get_update_custom_message(),
+            status_code=self.get_update_status_code(),
+        )
+
+    @extend_schema(
+        summary="Delete a recharge project group",
+        responses={
+            204: OpenApiResponse(description="Project group deleted successfully."),
+            404: OpenApiResponse(description="Project group not found."),
+        },
+    )
+    def destroy(self, request: Request, code=None):
+        """DELETE /recharges/project-groups/<code>/"""
+        self.service.delete(code=code)
+        return self.response(
+            message=self.get_delete_custom_message(),
+            status_code=self.get_delete_status_code(),
+        )
+
+
+@extend_schema(tags=["Recharges"])
+class RechargeViewSet(BaseViewSet):
+    """Read-only dashboard APIs for the Recharges page."""
+
+    def get_permissions(self):
+        return [IsAuthenticated()]
+
+    @extend_schema(
+        summary="Recharge summary and finance type breakdown for a sprint",
+        responses={200: OpenApiResponse(description="Summary + by-type breakdown.")},
+    )
+    def summary(self, request: Request):
+        """GET /api/v1/recharges/summary/?sprint=<code>"""
+        sprint_code = request.query_params.get("sprint", "").strip()
+        if not sprint_code:
+            return self.response(
+                data={
+                    "summary": {},
+                    "results": [],
+                    "pagination": {
+                        "total_count": 0,
+                        "total_pages": 1,
+                        "current_page": 1,
+                        "page_size": 100,
+                        "has_next": False,
+                        "has_previous": False,
+                    },
+                },
+                message="sprint query parameter is required.",
+            )
+        data = recharge_selectors.get_recharge_summary(sprint_code)
+        return self.response(data=data, message="Recharge summary retrieved.")
+
+    @extend_schema(
+        summary="Paginated list of recharge records for a sprint",
+        responses={200: OpenApiResponse(description="Paginated recharge rows.")},
+    )
+    def list(self, request: Request):
+        """GET /api/v1/recharges/?sprint=<code>&type=forecast|actual"""
+        sprint_code = request.query_params.get("sprint", "").strip()
+        type_val = request.query_params.get("type", "forecast").strip()
+
+        empty_pagination = {
+            "total_count": 0,
+            "total_pages": 1,
+            "current_page": 1,
+            "page_size": self.DEFAULT_PAGE_SIZE,
+            "has_next": False,
+            "has_previous": False,
+        }
+        if not sprint_code:
+            return self.response(
+                data={"results": [], "pagination": empty_pagination},
+                message="sprint query parameter is required.",
+            )
+
+        qs = recharge_selectors.get_recharges_for_sprint(sprint_code, type_val)
+        page, page_size = self.get_pagination_params(request)
+        total = qs.count()
+        offset = (page - 1) * page_size
+        rows = list(qs[offset : offset + page_size])
+
+        results = []
+        for r in rows:
+            results.append(
+                {
+                    "code": r.code,
+                    "programme_name": r.programme.name if r.programme else "",
+                    "project_name": r.project.name if r.project else "",
+                    "recharge_type_name": (
+                        r.recharge_type.name if r.recharge_type else ""
+                    ),
+                    "total_days": str(r.total_days),
+                    "total_cost": str(r.total_cost),
+                    "project_contacts": [
+                        {"name": pc.contact.name, "email": pc.contact.email}
+                        for pc in r.project_contacts.all()
+                    ],
+                    "finance_contacts": [
+                        {"name": fc.contact.name, "email": fc.contact.email}
+                        for fc in r.finance_contacts.all()
+                    ],
+                }
+            )
+
+        total_pages = max(1, math.ceil(total / page_size))
+        return self.response(
+            data={
+                "results": results,
+                "pagination": {
+                    "total_count": total,
+                    "total_pages": total_pages,
+                    "current_page": page,
+                    "page_size": page_size,
+                    "has_next": page < total_pages,
+                    "has_previous": page > 1,
+                },
+            },
+            message="Recharges retrieved.",
+        )
+
+    @extend_schema(
+        summary="Grouped RechargeDetail breakdown for a single Recharge",
+        responses={200: OpenApiResponse(description="Grouped detail rows.")},
+    )
+    def details(self, request: Request, code: str):
+        """GET /api/v1/recharges/<code>/details/?group_by=engineer|team|label"""
+        group_by = request.query_params.get("group_by", "engineer").strip()
+        if group_by not in ("engineer", "team", "label"):
+            group_by = "engineer"
+
+        rows = recharge_selectors.get_recharge_details_grouped(code, group_by)
+        return self.response(
+            data={
+                "results": rows,
+                "pagination": {
+                    "total_count": len(rows),
+                    "total_pages": 1,
+                    "current_page": 1,
+                    "page_size": len(rows) or 1,
+                    "has_next": False,
+                    "has_previous": False,
+                },
+            },
+            message="Recharge details retrieved.",
+        )
+
+    @extend_schema(
+        summary="Jira stories for a single Recharge",
+        responses={200: OpenApiResponse(description="RechargeDetail Jira story rows.")},
+    )
+    def jira(self, request: Request, code: str):
+        """GET /api/v1/recharges/<code>/jira/"""
+        qs = recharge_selectors.get_recharge_jira_stories(code)
+
+        page, page_size = self.get_pagination_params(request)
+        total = qs.count()
+        offset = (page - 1) * page_size
+        rows = list(qs[offset : offset + page_size])
+
+        results = [
+            {
+                "jira_id": r.jira_id,
+                "title": r.title,
+                "team": r.team.name if r.team else "",
+                "engineer": (
+                    r.assignee.user.get_full_name() or r.assignee.user.email
+                    if r.assignee
+                    else "Unassigned"
+                ),
+                "label": r.label.label if r.label else "",
+                "total_days": str(r.total_days),
+                "total_cost": str(r.total_cost),
+            }
+            for r in rows
+        ]
+
+        total_pages = max(1, math.ceil(total / page_size))
+        return self.response(
+            data={
+                "results": results,
+                "pagination": {
+                    "total_count": total,
+                    "total_pages": total_pages,
+                    "current_page": page,
+                    "page_size": page_size,
+                    "has_next": page < total_pages,
+                    "has_previous": page > 1,
+                },
+            },
+            message="Recharge Jira stories retrieved.",
+        )
+
+
+@extend_schema(tags=["Recharges: Email Review"])
+class RechargeEmailViewSet(BaseViewSet):
+    """APIs for the Email Review flow: listing groups, triggering, and resending."""
+
+    def get_permissions(self):
+        return [IsAuthenticated()]
+
+    @extend_schema(
+        summary="List email review groups for a sprint and type",
+        responses={200: OpenApiResponse(description="Email review group list.")},
+    )
+    def list(self, request: Request):
+        """GET /api/v1/recharges/email-review/?sprint=<code>&type=forecast|actual"""
+        sprint_code = request.query_params.get("sprint", "").strip()
+        type_val = request.query_params.get("type", "forecast").strip()
+        if type_val not in ("forecast", "actual"):
+            type_val = "forecast"
+
+        if not sprint_code:
+            return self.response(
+                data={
+                    "results": [],
+                    "pagination": {
+                        "total_count": 0,
+                        "total_pages": 1,
+                        "current_page": 1,
+                        "page_size": 100,
+                        "has_next": False,
+                        "has_previous": False,
+                    },
+                },
+                message="sprint query parameter is required.",
+            )
+
+        groups = recharge_selectors.get_email_review_groups(sprint_code, type_val)
+        serializer = RechargeEmailGroupSerializer(groups, many=True)
+        return self.response(
+            data={
+                "results": serializer.data,
+                "pagination": {
+                    "total_count": len(groups),
+                    "total_pages": 1,
+                    "current_page": 1,
+                    "page_size": len(groups) or 1,
+                    "has_next": False,
+                    "has_previous": False,
+                },
+            },
+            message="Email review groups retrieved.",
+        )
+
+    @extend_schema(
+        summary="Trigger all emails for a sprint and type",
+        request=RechargeEmailTriggerSerializer,
+        responses={200: OpenApiResponse(description="Engine result summary.")},
+    )
+    def trigger_all(self, request: Request):
+        """POST /api/v1/recharges/email-review/trigger/"""
+        serializer = RechargeEmailTriggerSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        sprint_code = serializer.validated_data["sprint"]
+        type_val = serializer.validated_data["type"]
+
+        engine = RechargeEmailEngine(user=request.user)
+        result = engine.trigger_all(sprint_code, type_val)
+        return self.response(data=result, message="Email trigger completed.")
+
+    @extend_schema(
+        summary="Resend a single recharge email",
+        responses={
+            200: OpenApiResponse(description="Email resent."),
+            404: OpenApiResponse(description="RechargeEmail not found."),
+        },
+    )
+    def resend(self, request: Request, code: str):
+        """POST /api/v1/recharges/email-review/<code>/resend/"""
+        engine = RechargeEmailEngine(user=request.user)
+        engine.trigger_single(code)
+        return self.response(
+            data={"code": code},
+            message="Email resent.",
         )

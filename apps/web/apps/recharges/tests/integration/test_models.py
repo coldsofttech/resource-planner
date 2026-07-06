@@ -1,10 +1,32 @@
+from decimal import Decimal
+
 from django.db import IntegrityError
 from django.test import TestCase
 
 from apps.projects.tests.factories import make_project_type
-from apps.recharges.models import ProjectTypeMapping, RechargeType
+from apps.recharges.models import ProjectTypeMapping, RechargeDetail, RechargeType
 from apps.recharges.tests.factories import make_project_type_mapping, make_recharge_type
+from apps.sprints.constants import SprintDataImportStatus, SprintDataImportType
+from apps.sprints.models import SprintDataImport
+from apps.sprints.tests.factories import make_sprint
+from apps.teams.tests.factories import make_team
 from apps.users.tests.factories import make_user
+
+
+def _make_import(sprint, team, user=None):
+    if user is None:
+        user = make_user()
+    return SprintDataImport.objects.create(
+        sprint=sprint,
+        team=team,
+        version_number=1,
+        file_name="test.csv",
+        status=SprintDataImportStatus.ACTIVE,
+        import_type=SprintDataImportType.FORECAST,
+        created_by=user,
+        updated_by=user,
+    )
+
 
 # ── RechargeType ──────────────────────────────────────────────────────────────
 
@@ -184,3 +206,262 @@ class ProjectTypeMappingOrderingTest(TestCase):
             )
         )
         self.assertEqual(names, sorted(names))
+
+
+# ── RechargeDetail ────────────────────────────────────────────────────────────
+
+
+class RechargeDetailCodeTest(TestCase):
+    def setUp(self):
+        self.sprint = make_sprint()
+        self.team = make_team()
+        self.import_record = _make_import(self.sprint, self.team)
+
+    def test_code_assigned_on_save(self):
+        detail = RechargeDetail.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+            type="forecast",
+        )
+        self.assertTrue(detail.code.startswith("RECDET-"))
+
+    def test_code_contains_pk(self):
+        detail = RechargeDetail.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+            type="forecast",
+        )
+        self.assertEqual(detail.code, f"RECDET-{detail.pk}")
+
+    def test_codes_are_unique_across_records(self):
+        d1 = RechargeDetail.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+            type="forecast",
+        )
+        d2 = RechargeDetail.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+            type="actual",
+        )
+        self.assertNotEqual(d1.code, d2.code)
+
+    def test_code_not_editable_directly(self):
+        self.assertFalse(RechargeDetail._meta.get_field("code").editable)
+
+
+class RechargeDetailFieldDefaultsTest(TestCase):
+    def setUp(self):
+        sprint = make_sprint()
+        team = make_team()
+        import_record = _make_import(sprint, team)
+        self.detail = RechargeDetail.objects.create(
+            sprint=sprint,
+            team=team,
+            import_record=import_record,
+        )
+
+    def test_type_defaults_to_forecast(self):
+        self.assertEqual(self.detail.type, "forecast")
+
+    def test_jira_id_defaults_to_empty(self):
+        self.assertEqual(self.detail.jira_id, "")
+
+    def test_title_defaults_to_empty(self):
+        self.assertEqual(self.detail.title, "")
+
+    def test_total_days_defaults_to_zero(self):
+        self.assertEqual(self.detail.total_days, Decimal("0"))
+
+    def test_total_cost_defaults_to_zero(self):
+        self.assertEqual(self.detail.total_cost, Decimal("0"))
+
+    def test_assignee_defaults_to_none(self):
+        self.assertIsNone(self.detail.assignee)
+
+    def test_programme_defaults_to_none(self):
+        self.assertIsNone(self.detail.programme)
+
+    def test_project_defaults_to_none(self):
+        self.assertIsNone(self.detail.project)
+
+    def test_label_defaults_to_none(self):
+        self.assertIsNone(self.detail.label)
+
+    def test_recharge_type_defaults_to_none(self):
+        self.assertIsNone(self.detail.recharge_type)
+
+    def test_created_at_is_set(self):
+        self.assertIsNotNone(self.detail.created_at)
+
+    def test_updated_at_is_set(self):
+        self.assertIsNotNone(self.detail.updated_at)
+
+    def test_created_by_defaults_to_none(self):
+        self.assertIsNone(self.detail.created_by)
+
+    def test_updated_by_defaults_to_none(self):
+        self.assertIsNone(self.detail.updated_by)
+
+
+class RechargeDetailFieldValuesTest(TestCase):
+    def setUp(self):
+        self.sprint = make_sprint()
+        self.team = make_team()
+        self.user = make_user()
+        self.import_record = _make_import(self.sprint, self.team, user=self.user)
+
+    def test_stores_jira_id(self):
+        detail = RechargeDetail.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+            jira_id="JIRA-42",
+        )
+        self.assertEqual(detail.jira_id, "JIRA-42")
+
+    def test_stores_title(self):
+        detail = RechargeDetail.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+            title="Implement feature X",
+        )
+        self.assertEqual(detail.title, "Implement feature X")
+
+    def test_stores_total_days(self):
+        detail = RechargeDetail.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+            total_days=Decimal("2.50"),
+        )
+        self.assertEqual(detail.total_days, Decimal("2.50"))
+
+    def test_stores_total_cost(self):
+        detail = RechargeDetail.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+            total_cost=Decimal("2875.00"),
+        )
+        self.assertEqual(detail.total_cost, Decimal("2875.00"))
+
+    def test_type_actual_accepted(self):
+        detail = RechargeDetail.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+            type="actual",
+        )
+        self.assertEqual(detail.type, "actual")
+
+    def test_stores_created_by(self):
+        detail = RechargeDetail.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+            created_by=self.user,
+            updated_by=self.user,
+        )
+        self.assertEqual(detail.created_by, self.user)
+
+
+class RechargeDetailForeignKeyTest(TestCase):
+    def setUp(self):
+        self.sprint = make_sprint()
+        self.team = make_team()
+        self.import_record = _make_import(self.sprint, self.team)
+
+    def test_sprint_linked(self):
+        detail = RechargeDetail.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+        )
+        self.assertEqual(detail.sprint, self.sprint)
+
+    def test_team_linked(self):
+        detail = RechargeDetail.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+        )
+        self.assertEqual(detail.team, self.team)
+
+    def test_import_record_linked(self):
+        detail = RechargeDetail.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+        )
+        self.assertEqual(detail.import_record, self.import_record)
+
+    def test_cascade_delete_when_sprint_deleted(self):
+        detail = RechargeDetail.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+        )
+        pk = detail.pk
+        self.sprint.delete()
+        self.assertFalse(RechargeDetail.objects.filter(pk=pk).exists())
+
+    def test_cascade_delete_when_import_record_deleted(self):
+        detail = RechargeDetail.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+        )
+        pk = detail.pk
+        self.import_record.delete()
+        self.assertFalse(RechargeDetail.objects.filter(pk=pk).exists())
+
+    def test_set_null_when_team_deleted(self):
+        # team FK is CASCADE, not SET_NULL — verify cascade
+        detail = RechargeDetail.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+        )
+        pk = detail.pk
+        self.team.delete()
+        self.assertFalse(RechargeDetail.objects.filter(pk=pk).exists())
+
+
+class RechargeDetailRechargeTypeFkTest(TestCase):
+    def setUp(self):
+        self.sprint = make_sprint()
+        self.team = make_team()
+        self.import_record = _make_import(self.sprint, self.team)
+        self.recharge_type = make_recharge_type("BAU")
+
+    def test_recharge_type_linked(self):
+        detail = RechargeDetail.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+            recharge_type=self.recharge_type,
+        )
+        self.assertEqual(detail.recharge_type, self.recharge_type)
+
+    def test_set_null_when_recharge_type_deleted(self):
+        detail = RechargeDetail.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+            recharge_type=self.recharge_type,
+        )
+        self.recharge_type.delete()
+        detail.refresh_from_db()
+        self.assertIsNone(detail.recharge_type)
+
+
+class RechargeDetailOrderingTest(TestCase):
+    def test_default_ordering_by_sprint_team_assignee(self):
+        meta_ordering = RechargeDetail._meta.ordering
+        self.assertEqual(list(meta_ordering), ["sprint", "team", "assignee"])

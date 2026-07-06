@@ -12,7 +12,7 @@ from apps.core.serializers import (
     UserMiniSerializer,
     WriteMixin,
 )
-from apps.recharges.models import ProjectTypeMapping, RechargeType
+from apps.recharges.models import ProjectTypeMapping, RechargeProjectGroup, RechargeType
 
 _UPPER_SNAKE_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
 
@@ -129,3 +129,87 @@ class ProjectTypeMappingCreateSerializer(WriteMixin, serializers.Serializer):
 
 class ProjectTypeMappingUpdateSerializer(WriteMixin, serializers.Serializer):
     project_type_code = serializers.CharField(required=True, max_length=50)
+
+
+class _ProjectNestedSerializer(serializers.Serializer):
+    code = serializers.CharField(read_only=True)
+    name = serializers.CharField(read_only=True)
+    display_name = serializers.CharField(read_only=True)
+
+
+class RechargeProjectGroupListSerializer(ListMixin, CodeSerializer):
+    name = serializers.CharField(read_only=True)
+    projects = _ProjectNestedSerializer(many=True, read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
+    created_by = UserMiniSerializer(read_only=True, allow_null=True)
+    updated_at = serializers.DateTimeField(read_only=True)
+    updated_by = UserMiniSerializer(read_only=True, allow_null=True)
+
+    class Meta(CodeSerializer.Meta):
+        model = RechargeProjectGroup
+        fields = [
+            "code",
+            "name",
+            "projects",
+            "created_at",
+            "created_by",
+            "updated_at",
+            "updated_by",
+        ]
+
+
+class RechargeProjectGroupDetailSerializer(ReadMixin, AuditableSerializer):
+    code = serializers.CharField(read_only=True)
+    name = serializers.CharField(read_only=True)
+    projects = _ProjectNestedSerializer(many=True, read_only=True)
+
+    class Meta(AuditableSerializer.Meta):
+        model = RechargeProjectGroup
+        fields = [
+            "code",
+            "name",
+            "projects",
+            "created_at",
+            "created_by",
+            "updated_at",
+            "updated_by",
+        ]
+
+
+class RechargeProjectGroupCreateSerializer(WriteMixin, serializers.Serializer):
+    name = serializers.CharField(max_length=255, required=True)
+    project_codes = serializers.ListField(
+        child=serializers.CharField(max_length=50),
+        required=False,
+        default=list,
+        allow_empty=True,
+    )
+
+
+class RechargeProjectGroupUpdateSerializer(WriteMixin, serializers.Serializer):
+    name = serializers.CharField(max_length=255, required=False)
+    project_codes = serializers.ListField(
+        child=serializers.CharField(max_length=50),
+        required=False,
+        allow_empty=True,
+    )
+
+
+class RechargeEmailGroupSerializer(ReadMixin, serializers.Serializer):
+    email_code = serializers.CharField(allow_null=True)
+    group_code = serializers.CharField()
+    group_name = serializers.CharField()
+    total_days = serializers.CharField()
+    total_cost = serializers.CharField()
+    project_count = serializers.IntegerField()
+    status = serializers.CharField()
+    sent_at = serializers.CharField(allow_null=True)
+    to = serializers.ListField(child=serializers.DictField())
+    cc = serializers.ListField(child=serializers.DictField())
+    subject = serializers.CharField()
+    body = serializers.CharField()
+
+
+class RechargeEmailTriggerSerializer(WriteMixin, serializers.Serializer):
+    sprint = serializers.CharField(max_length=50, required=True)
+    type = serializers.ChoiceField(choices=["forecast", "actual"], required=True)

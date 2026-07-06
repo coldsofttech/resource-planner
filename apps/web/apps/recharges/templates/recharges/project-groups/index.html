@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Recharge Project Groups
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/recharges.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Recharges / Configurations
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Project Groups
+{% endblock page_title %}
+{% block page_sub %}
+  Group projects together to define recharge boundaries. Each project can belong to at most one group.
+{% endblock page_sub %}
+{% block page_actions %}
+  <primary-button id="rp-recharge-project-groups-add-btn" label="Add Project Group" prefix-icon="bi-plus-lg" hidden></primary-button>
+{% endblock page_actions %}
+{% block content %}
+  <list-view show-active-filters>
+  <filter-panel id="rp-recharge-project-groups-filter-panel">
+  <search-field id="rp-recharge-project-groups-search" name="search" placeholder="Search project groups..." shortcut="/" show-label></search-field>
+  </filter-panel>
+  <data-table id="rp-recharge-project-groups-table" url="/api/v1/recharges/project-groups/" paginated page-size="25" row-template="renderRechargeProjectGroupRow" empty-message="No project groups found.">
+    <table-columns>
+      <table-column label="Group Name" key="name" sortable>
+      </table-column>
+      <table-column label="Code" key="code" mono width="160px" hide-mobile>
+      </table-column>
+      <table-column label="Projects" key="projects">
+      </table-column>
+      <table-column label="Created" key="created_at" hide-mobile sortable>
+      </table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_group %}
+        <table-action icon="bi-pencil" label="Edit" event="rp:recharge-project-group:edit">
+        </table-action>
+      {% endif %}
+      {% if can_delete_group %}
+        <table-action icon="bi-trash" label="Delete" event="rp:recharge-project-group:delete" danger>
+        </table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </list-view>
+  <!-- Create drawer -->
+  <drawer-modal id="rp-recharge-project-group-create-drawer" width="900">
+  <drawer-header eyebrow="New record" title="Create project group" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-new-recharge-project-group-name" col="col-12" label="Group Name" placeholder="e.g. Infrastructure Projects" required maxlength="255" show-counter></text-field>
+    <project-field id="rp-new-recharge-project-group-projects" col="col-12" label="Projects" placeholder="Select projects..." multi-select show-label></project-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Create project group" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <!-- Edit drawer -->
+  <drawer-modal id="rp-recharge-project-group-edit-drawer" width="900">
+  <drawer-header eyebrow="Edit record" title="Edit project group" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-edit-recharge-project-group-name" col="col-12" label="Group Name" placeholder="e.g. Infrastructure Projects" required maxlength="255" show-counter></text-field>
+    <project-field id="rp-edit-recharge-project-group-projects" col="col-12" label="Projects" placeholder="Select projects..." multi-select show-label></project-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <delete-modal id="rp-recharge-project-group-delete-modal" action-label="Delete project group"></delete-modal>
+{% endblock content %}

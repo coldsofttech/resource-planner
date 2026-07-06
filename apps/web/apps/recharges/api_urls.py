@@ -1,8 +1,53 @@
 from django.urls import path
 
-from apps.recharges.api_views import ProjectTypeMappingViewSet, RechargeTypeViewSet
+from apps.recharges.api_views import (
+    ProjectTypeMappingViewSet,
+    RechargeEmailViewSet,
+    RechargeProjectGroupViewSet,
+    RechargeTypeViewSet,
+    RechargeViewSet,
+)
 
 urlpatterns = [
+    # Project Groups
+    path(
+        "recharges/project-groups/",
+        RechargeProjectGroupViewSet.as_view({"get": "list", "post": "create"}),
+        name="recharge-project-groups-list",
+    ),
+    path(
+        "recharges/project-groups/stats/",
+        RechargeProjectGroupViewSet.as_view({"get": "statistics"}),
+        name="recharge-project-groups-stats",
+    ),
+    path(
+        "recharges/project-groups/<str:code>/",
+        RechargeProjectGroupViewSet.as_view(
+            {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
+        ),
+        name="recharge-project-groups-detail",
+    ),
+    # Recharges
+    path(
+        "recharges/",
+        RechargeViewSet.as_view({"get": "list"}),
+        name="recharges-list",
+    ),
+    path(
+        "recharges/summary/",
+        RechargeViewSet.as_view({"get": "summary"}),
+        name="recharges-summary",
+    ),
+    path(
+        "recharges/<str:code>/details/",
+        RechargeViewSet.as_view({"get": "details"}),
+        name="recharges-details",
+    ),
+    path(
+        "recharges/<str:code>/jira/",
+        RechargeViewSet.as_view({"get": "jira"}),
+        name="recharges-jira",
+    ),
     path(
         "recharges/types/",
         RechargeTypeViewSet.as_view({"get": "list", "post": "create"}),
@@ -59,6 +104,22 @@ urlpatterns = [
         "recharges/types/<str:code>/deactivate/",
         RechargeTypeViewSet.as_view({"post": "deactivate"}),
         name="recharge-types-deactivate",
+    ),
+    # Email Review
+    path(
+        "recharges/email-review/",
+        RechargeEmailViewSet.as_view({"get": "list"}),
+        name="recharge-email-review-list",
+    ),
+    path(
+        "recharges/email-review/trigger/",
+        RechargeEmailViewSet.as_view({"post": "trigger_all"}),
+        name="recharge-email-review-trigger",
+    ),
+    path(
+        "recharges/email-review/<str:code>/resend/",
+        RechargeEmailViewSet.as_view({"post": "resend"}),
+        name="recharge-email-review-resend",
     ),
     # ProjectTypeMapping nested routes
     path(

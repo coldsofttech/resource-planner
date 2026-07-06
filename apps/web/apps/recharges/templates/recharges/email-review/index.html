@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Email Review — {{ sprint_code }}{% endblock %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/recharge-email-review.min.js' %}"></script>
+{% endblock %}
+{% block page_eyebrow %}Recharges{% endblock %}
+{% block page_title %}Email Review{% endblock %}
+{% block page_sub %}{{ sprint_code }} — {{ review_type|capfirst }}{% endblock %}
+{% block page_actions %}
+  <engine-button id="rp-recharge-email-trigger-btn" label="Trigger All Emails" prefix-icon="bi-send"></engine-button>
+{% endblock %}
+{% block content %}
+<div
+  class="row g-4"
+  id="rp-recharge-email-review-root"
+  data-sprint="{{ sprint_code }}"
+  data-type="{{ review_type }}"
+>
+  <div class="col-12">
+    <div id="rp-recharge-email-review-container">
+      <!-- Accordion panels rendered by JS -->
+    </div>
+  </div>
+</div>
+
+<status-modal id="rp-recharge-email-trigger-modal"></status-modal>
+{% endblock %}

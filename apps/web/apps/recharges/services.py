@@ -21,7 +21,12 @@ from apps.core.services import (
     ImportService,
 )
 from apps.recharges import selectors
-from apps.recharges.models import ProjectTypeMapping, RechargeType
+from apps.recharges.models import (
+    ProjectTypeMapping,
+    RechargeEmail,
+    RechargeProjectGroup,
+    RechargeType,
+)
 
 _UPPER_SNAKE_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
 
@@ -679,6 +684,140 @@ class ProjectTypeMappingExportService(ExportService):
         )
 
 
+class RechargeProjectGroupService(AuditableService, FilterableQueryService):
+    _MODULE = "recharges"
+    _RESOURCE_TYPE = "recharge_project_group"
+
+    filterable_fields: dict[str, str] = {}
+    search_fields: list[str] = ["name"]
+    sortable_fields: list[str] = ["name", "created_at"]
+    default_ordering: list[str] = ["name"]
+    filter_active_by_default: bool = False
+
+    def get_queryset(self):
+        return selectors.get_all_recharge_project_groups()
+
+    def _snapshot(self, group: RechargeProjectGroup) -> dict:
+        return {
+            "code": group.code,
+            "name": group.name,
+            "projects": [p.code for p in group.projects.all()],
+        }
+
+    def get(self, code: str, *args, **kwargs) -> RechargeProjectGroup:
+        obj = selectors.get_recharge_project_group_by_code(code)
+        if obj is None:
+            raise NotFoundException(
+                resource="RechargeProjectGroup",
+                lookup_field="code",
+                lookup_value=code,
+            )
+        return obj
+
+    @transaction.atomic
+    def create(
+        self,
+        *,
+        name: str,
+        project_codes: list[str] | None = None,
+    ) -> RechargeProjectGroup:
+        from apps.projects.models.project import Project
+
+        if selectors.recharge_project_group_exists(name):
+            raise AlreadyExistsException(
+                detail=f"A project group named '{name}' already exists."
+            )
+        codes = project_codes or []
+        if codes:
+            conflicting = selectors.get_project_codes_already_in_groups(codes)
+            if conflicting:
+                raise ValidationException(
+                    f"The following projects are already assigned to another group: "
+                    f"{', '.join(conflicting)}."
+                )
+        obj = RechargeProjectGroup.objects.create(
+            name=name,
+            created_by=self.user,
+            updated_by=self.user,
+        )
+        if codes:
+            obj.projects.set(Project.objects.filter(code__in=codes))
+        AuditService.log_create(
+            module=self._MODULE,
+            resource_type=self._RESOURCE_TYPE,
+            resource_code=obj.code,
+            after=self._snapshot(obj),
+            actor=self.user,
+        )
+        return obj
+
+    @transaction.atomic
+    def update(self, code: str, **kwargs) -> RechargeProjectGroup:
+        from apps.projects.models.project import Project
+
+        obj = self.get(code=code)
+        before = self._snapshot(obj)
+        update_fields: list[str] = ["updated_by", "updated_at"]
+
+        new_name = kwargs.get("name", obj.name)
+        if new_name != obj.name and selectors.recharge_project_group_exists(
+            new_name, exclude_pk=obj.pk
+        ):
+            raise AlreadyExistsException(
+                detail=f"A project group named '{new_name}' already exists."
+            )
+
+        if "name" in kwargs:
+            obj.name = kwargs["name"]
+            update_fields.append("name")
+
+        obj.updated_by = self.user
+        obj.save(update_fields=update_fields)
+
+        if "project_codes" in kwargs:
+            codes = kwargs["project_codes"] or []
+            if codes:
+                conflicting = selectors.get_project_codes_already_in_groups(
+                    codes, exclude_pk=obj.pk
+                )
+                if conflicting:
+                    raise ValidationException(
+                        "The following projects are already assigned to "
+                        f"another group: {', '.join(conflicting)}."
+                    )
+            obj.projects.set(Project.objects.filter(code__in=codes))
+
+        AuditService.log_update(
+            module=self._MODULE,
+            resource_type=self._RESOURCE_TYPE,
+            resource_code=obj.code,
+            before=before,
+            after=self._snapshot(obj),
+            actor=self.user,
+        )
+        return obj
+
+    @transaction.atomic
+    def delete(self, code: str, *args, **kwargs) -> None:
+        obj = self.get(code=code)
+        group_code = obj.code
+        before = self._snapshot(obj)
+        obj.delete()
+        AuditService.log_delete(
+            module=self._MODULE,
+            resource_type=self._RESOURCE_TYPE,
+            resource_code=group_code,
+            before=before,
+            actor=self.user,
+        )
+
+    def stats(self, fields=None, *args, **kwargs) -> dict:
+        all_stats = selectors.get_recharge_project_group_stats()
+        if fields:
+            return {k: v for k, v in all_stats.items() if k in fields}
+        return all_stats
+
+
 class RechargeDetailService:
     """Populates RechargeDetail records from confirmed forecast import data."""
 
@@ -698,7 +837,9 @@ class RechargeDetailService:
 
         groups = (
             RechargeDetail.objects.filter(sprint_id=sprint_id, type=recharge_type)
-            .values("sprint_id", "type", "programme_id", "project_id")
+            .values(
+                "sprint_id", "type", "programme_id", "project_id", "recharge_type_id"
+            )
             .annotate(agg_days=Sum("total_days"), agg_cost=Sum("total_cost"))
         )
 
@@ -710,6 +851,7 @@ class RechargeDetailService:
                 type=g["type"],
                 programme_id=g["programme_id"],
                 project_id=project_id,
+                recharge_type_id=g["recharge_type_id"],
                 total_days=g["agg_days"] or Decimal("0"),
                 total_cost=g["agg_cost"] or Decimal("0"),
             )
@@ -773,6 +915,8 @@ class RechargeDetailService:
                 "assignee_code_override",
                 "label_code__project__programme",
                 "label_code_override__project__programme",
+                "mapping_code",
+                "mapping_code_override",
             )
             .filter(import_record_id__in=latest_import_ids, is_deleted=False)
             .order_by("import_record_id", "pk")
@@ -792,6 +936,7 @@ class RechargeDetailService:
                 programme=programme,
                 project=project,
                 label=label,
+                recharge_type=row.effective_mapping_code,
                 type=RechargeTypeChoice.FORECAST,
                 jira_id=row.effective_jira_id or "",
                 title=row.effective_title or "",
@@ -859,6 +1004,8 @@ class RechargeDetailService:
                 "assignee_code_override",
                 "label_code__project__programme",
                 "label_code_override__project__programme",
+                "mapping_code",
+                "mapping_code_override",
             )
             .filter(import_record_id__in=latest_import_ids, is_deleted=False)
             .order_by("import_record_id", "pk")
@@ -878,6 +1025,7 @@ class RechargeDetailService:
                 programme=programme,
                 project=project,
                 label=label,
+                recharge_type=row.effective_mapping_code,
                 type=RechargeTypeChoice.ACTUAL,
                 jira_id=row.effective_jira_id or "",
                 title=row.effective_title or "",
@@ -892,3 +1040,115 @@ class RechargeDetailService:
 
         self._sync_recharges(sprint_id, "actual")
         return count
+
+
+class RechargeEmailService(AuditableService):
+    _MODULE = "recharges"
+    _RESOURCE_TYPE = "recharge_email"
+
+    def get(self, code: str) -> RechargeEmail:
+        obj = selectors.get_recharge_email_by_code(code)
+        if obj is None:
+            raise NotFoundException(
+                resource="RechargeEmail", lookup_field="code", lookup_value=code
+            )
+        return obj
+
+    @transaction.atomic
+    def create_or_update(
+        self,
+        *,
+        sprint_code: str,
+        type_val: str,
+        group_code: str,
+        to: list,
+        cc: list,
+        subject: str,
+        body: str,
+    ) -> RechargeEmail:
+        from apps.recharges.constants import RechargeEmailStatus  # noqa: PLC0415
+        from apps.sprints.selectors.sprint import get_sprint_by_code  # noqa: PLC0415
+
+        sprint = get_sprint_by_code(sprint_code)
+        if sprint is None:
+            raise NotFoundException(
+                resource="Sprint", lookup_field="code", lookup_value=sprint_code
+            )
+        group = selectors.get_recharge_project_group_by_code(group_code)
+        if group is None:
+            raise NotFoundException(
+                resource="RechargeProjectGroup",
+                lookup_field="code",
+                lookup_value=group_code,
+            )
+
+        existing = selectors.get_recharge_email_by_sprint_type_group(
+            sprint_code, type_val, group_code
+        )
+        if existing:
+            existing.to = to
+            existing.cc = cc
+            existing.subject = subject
+            existing.body = body
+            existing.status = RechargeEmailStatus.PENDING
+            existing.error_message = ""
+            existing.updated_by = self.user
+            existing.save(
+                update_fields=[
+                    "to",
+                    "cc",
+                    "subject",
+                    "body",
+                    "status",
+                    "error_message",
+                    "updated_by",
+                    "updated_at",
+                ]
+            )
+            return existing
+
+        return RechargeEmail.objects.create(
+            sprint=sprint,
+            type=type_val,
+            group=group,
+            to=to,
+            cc=cc,
+            subject=subject,
+            body=body,
+            status=RechargeEmailStatus.PENDING,
+            created_by=self.user,
+            updated_by=self.user,
+        )
+
+    @transaction.atomic
+    def mark_sent(self, code: str) -> RechargeEmail:
+        from django.utils import timezone  # noqa: PLC0415
+
+        from apps.recharges.constants import RechargeEmailStatus  # noqa: PLC0415
+
+        obj = self.get(code)
+        obj.status = RechargeEmailStatus.SENT
+        obj.sent_at = timezone.now()
+        obj.error_message = ""
+        obj.updated_by = self.user
+        obj.save(
+            update_fields=[
+                "status",
+                "sent_at",
+                "error_message",
+                "updated_by",
+                "updated_at",
+            ]
+        )
+        return obj
+
+    @transaction.atomic
+    def mark_error(self, code: str, message: str) -> RechargeEmail:
+        from apps.recharges.constants import RechargeEmailStatus  # noqa: PLC0415
+
+        obj = self.get(code)
+        obj.status = RechargeEmailStatus.ERROR
+        obj.error_message = message
+        obj.updated_by = self.user
+        obj.save(update_fields=["status", "error_message", "updated_by", "updated_at"])
+        return obj

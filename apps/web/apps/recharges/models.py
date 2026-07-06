@@ -12,8 +12,32 @@ from apps.core.models import (
     unique_constraint,
 )
 from apps.projects.models.project_type import ProjectType
+from apps.recharges.constants import RechargeEmailStatus
 from apps.recharges.constants import RechargeType as RechargeTypeChoice
 from apps.recharges.validators import RECHARGE_TYPE_VALIDATOR
+
+
+class RechargeProjectGroup(CodeModel, NamedModel, AuditableModel):
+    MODEL_CODE = "RECHPG"
+
+    projects = models.ManyToManyField(
+        "projects.Project",
+        related_name="recharge_project_groups",
+        blank=True,
+    )
+
+    class Meta:
+        ordering = ["name"]
+        constraints = [
+            unique_constraint(
+                app_label="recharges",
+                model="rechargeprojectgroup",
+                fields=["name"],
+            )
+        ]
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class RechargeType(
@@ -112,6 +136,14 @@ class RechargeDetail(AuditableModel, CodeModel):
         related_name="recharge_details",
         db_index=True,
     )
+    recharge_type = models.ForeignKey(
+        RechargeType,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="recharge_details",
+        db_index=True,
+    )
     type = models.CharField(
         max_length=20,
         choices=RechargeTypeChoice.choices,
@@ -168,6 +200,14 @@ class Recharge(CreatedAtModel, CodeModel):
         related_name="recharges",
         db_index=True,
     )
+    recharge_type = models.ForeignKey(
+        RechargeType,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="recharges",
+        db_index=True,
+    )
     total_days = models.DecimalField(
         max_digits=10, decimal_places=2, default=Decimal("0")
     )
@@ -193,6 +233,55 @@ class Recharge(CreatedAtModel, CodeModel):
             unique_constraint(
                 app_label="recharges",
                 model="recharge",
-                fields=["sprint", "type", "programme", "project"],
+                fields=["sprint", "type", "programme", "project", "recharge_type"],
             )
         ]
+
+
+class RechargeEmail(CodeModel, AuditableModel):
+    MODEL_CODE = "RECHEM"
+
+    sprint = models.ForeignKey(
+        "sprints.Sprint",
+        on_delete=models.CASCADE,
+        related_name="recharge_emails",
+        db_index=True,
+    )
+    type = models.CharField(
+        max_length=20,
+        choices=RechargeTypeChoice.choices,
+        default=RechargeTypeChoice.FORECAST,
+        db_index=True,
+    )
+    group = models.ForeignKey(
+        RechargeProjectGroup,
+        on_delete=models.CASCADE,
+        related_name="recharge_emails",
+        db_index=True,
+    )
+    to = models.JSONField(default=list)
+    cc = models.JSONField(default=list)
+    subject = models.CharField(max_length=500, blank=True, default="")
+    body = models.TextField(blank=True, default="")
+    status = models.CharField(
+        max_length=20,
+        choices=RechargeEmailStatus.choices,
+        default=RechargeEmailStatus.PENDING,
+        db_index=True,
+    )
+    sent_at = models.DateTimeField(null=True, blank=True)
+    error_message = models.TextField(blank=True, default="")
+    sent_data = models.JSONField(default=dict)
+
+    class Meta:
+        ordering = ["sprint", "type", "group"]
+        constraints = [
+            unique_constraint(
+                app_label="recharges",
+                model="rechargeemail",
+                fields=["sprint", "type", "group"],
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.code} — {self.group} ({self.type})"

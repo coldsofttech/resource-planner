@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Recharge Detail{% endblock %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/recharges.min.js' %}"></script>
+{% endblock %}
+{% block page_eyebrow %}Finance / Recharges{% endblock %}
+{% block page_title %}<span id="rp-recharge-detail-title">Recharge</span>{% endblock %}
+{% block page_sub %}<span id="rp-recharge-detail-sub"></span>{% endblock %}
+{% block content %}
+  <div class="row g-4">
+    <div class="col-12">
+      <section-panel>
+        <panel-title>Jira Stories</panel-title>
+        <panel-body>
+        <data-table id="rp-recharge-jira-table" paginated page-size="25" row-template="renderRechargeJiraRow" empty-message="No Jira stories found for this recharge.">
+          <table-columns>
+            <table-column label="Jira ID" key="jira_id">
+            </table-column>
+            <table-column label="Title" key="title">
+            </table-column>
+            <table-column label="Team" key="team" hide-mobile>
+            </table-column>
+            <table-column label="Engineer" key="engineer" hide-mobile>
+            </table-column>
+            <table-column label="Label" key="label" hide-mobile>
+            </table-column>
+            <table-column label="Days" key="total_days" hide-mobile>
+            </table-column>
+            <table-column label="Cost" key="total_cost">
+            </table-column>
+          </table-columns>
+        </data-table>
+        </panel-body>
+      </section-panel>
+    </div>
+  </div>
+{% endblock %}

@@ -1,15 +1,23 @@
 from django.test import TestCase
 
+from apps.configurations.tests.factories import mark_setup_complete
 from apps.core.exceptions import (
     AlreadyExistsException,
     NotFoundException,
     ValidationException,
 )
 from apps.projects.tests.factories import make_project_type
-from apps.recharges.models import ProjectTypeMapping, RechargeType
+from apps.recharges.constants import RechargeType as RechargeTypeChoice
+from apps.recharges.models import (
+    ProjectTypeMapping,
+    Recharge,
+    RechargeDetail,
+    RechargeType,
+)
 from apps.recharges.services import (
     ProjectTypeMappingImportService,
     ProjectTypeMappingService,
+    RechargeDetailService,
     RechargeTypeImportService,
     RechargeTypeService,
 )
@@ -18,7 +26,38 @@ from apps.recharges.tests.factories import (
     make_project_type_mapping,
     make_recharge_type,
 )
+from apps.sprints.constants import SprintDataImportStatus, SprintDataImportType
+from apps.sprints.models import SprintDataImport
+from apps.sprints.services.sprint_data_import import SprintDataImportForecastService
+from apps.sprints.tests.factories import make_sprint
+from apps.teams.tests.factories import make_team
 from apps.users.tests.factories import make_user
+
+
+def _make_import(sprint, team, user=None):
+    if user is None:
+        user = make_user()
+    return SprintDataImport.objects.create(
+        sprint=sprint,
+        team=team,
+        version_number=1,
+        file_name="test.csv",
+        status=SprintDataImportStatus.ACTIVE,
+        import_type=SprintDataImportType.FORECAST,
+        created_by=user,
+        updated_by=user,
+    )
+
+
+CSV_HEADER = "Story Type,Jira ID,Title,Assignee,Efforts,Sprint,Label,Mapping\n"
+CSV_ROW = (
+    "Story,JIRA-1,Test Title,user@example.com,3600,Sprint 1,sample-label,PROJECT\n"
+)
+
+
+def _make_valid_csv(rows: int = 1) -> FakeCsvFile:
+    content = CSV_HEADER + (CSV_ROW * rows)
+    return FakeCsvFile(content, name="forecast.csv")
 
 
 def _svc(user=None):
@@ -504,3 +543,159 @@ class ProjectTypeMappingImportServiceTest(TestCase):
         f = self._make_csv([self.pt.code])
         with self.assertRaises(ValidationException):
             svc.bulk_import(f)
+
+
+# ── RechargeDetailService.populate_from_sprint_forecast ──────────────────────
+
+
+def _confirm_forecast(sprint, team, user):
+    """Upload, review, and confirm a forecast import for a sprint/team."""
+    svc = SprintDataImportForecastService(user=user)
+    import_record = svc.upload(
+        sprint_code=sprint.code,
+        team_code=team.code,
+        file=_make_valid_csv(),
+    )
+    svc.review(import_code=import_record.code)
+    svc.confirm(import_code=import_record.code, notes="override")
+    return import_record
+
+
+class RechargeDetailServicePopulateForecastTest(TestCase):
+    def setUp(self):
+        mark_setup_complete()
+        self.user = make_user()
+        self.sprint = make_sprint()
+        self.team = make_team()
+        self.svc = RechargeDetailService(user=self.user)
+
+    def test_returns_zero_when_no_confirmed_imports(self):
+        count = self.svc.populate_from_sprint_forecast(self.sprint.id)
+        self.assertEqual(count, 0)
+
+    def test_creates_no_recharge_details_when_no_confirmed_imports(self):
+        self.svc.populate_from_sprint_forecast(self.sprint.id)
+        self.assertEqual(
+            RechargeDetail.objects.filter(
+                sprint=self.sprint, type=RechargeTypeChoice.FORECAST
+            ).count(),
+            0,
+        )
+
+    def test_returns_count_of_created_details(self):
+        _confirm_forecast(self.sprint, self.team, self.user)
+        count = self.svc.populate_from_sprint_forecast(self.sprint.id)
+        self.assertGreater(count, 0)
+
+    def test_creates_recharge_detail_records(self):
+        _confirm_forecast(self.sprint, self.team, self.user)
+        self.svc.populate_from_sprint_forecast(self.sprint.id)
+        self.assertTrue(
+            RechargeDetail.objects.filter(
+                sprint=self.sprint, type=RechargeTypeChoice.FORECAST
+            ).exists()
+        )
+
+    def test_type_is_forecast_on_created_details(self):
+        _confirm_forecast(self.sprint, self.team, self.user)
+        self.svc.populate_from_sprint_forecast(self.sprint.id)
+        types = list(
+            RechargeDetail.objects.filter(sprint=self.sprint).values_list(
+                "type", flat=True
+            )
+        )
+        self.assertTrue(all(t == RechargeTypeChoice.FORECAST for t in types))
+
+    def test_team_is_set_on_created_details(self):
+        _confirm_forecast(self.sprint, self.team, self.user)
+        self.svc.populate_from_sprint_forecast(self.sprint.id)
+        detail = RechargeDetail.objects.filter(sprint=self.sprint).first()
+        self.assertIsNotNone(detail)
+        self.assertEqual(detail.team, self.team)
+
+    def test_deletes_existing_forecast_details_before_recreating(self):
+        _confirm_forecast(self.sprint, self.team, self.user)
+        self.svc.populate_from_sprint_forecast(self.sprint.id)
+        count_first = RechargeDetail.objects.filter(
+            sprint=self.sprint, type=RechargeTypeChoice.FORECAST
+        ).count()
+
+        self.svc.populate_from_sprint_forecast(self.sprint.id)
+        count_second = RechargeDetail.objects.filter(
+            sprint=self.sprint, type=RechargeTypeChoice.FORECAST
+        ).count()
+
+        self.assertEqual(count_first, count_second)
+
+    def test_does_not_delete_actuals_details(self):
+        import_record = _make_import(self.sprint, self.team, self.user)
+        RechargeDetail.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=import_record,
+            type=RechargeTypeChoice.ACTUAL,
+        )
+        self.svc.populate_from_sprint_forecast(self.sprint.id)
+        self.assertTrue(
+            RechargeDetail.objects.filter(
+                sprint=self.sprint, type=RechargeTypeChoice.ACTUAL
+            ).exists()
+        )
+
+    def test_creates_recharge_aggregate_records(self):
+        _confirm_forecast(self.sprint, self.team, self.user)
+        self.svc.populate_from_sprint_forecast(self.sprint.id)
+        self.assertTrue(
+            Recharge.objects.filter(
+                sprint=self.sprint, type=RechargeTypeChoice.FORECAST
+            ).exists()
+        )
+
+    def test_syncs_recharges_even_when_no_confirmed_imports(self):
+        Recharge.objects.create(sprint=self.sprint, type=RechargeTypeChoice.FORECAST)
+        self.svc.populate_from_sprint_forecast(self.sprint.id)
+        self.assertFalse(
+            Recharge.objects.filter(
+                sprint=self.sprint, type=RechargeTypeChoice.FORECAST
+            ).exists()
+        )
+
+
+# ── RechargeDetailService.populate_from_sprint_actuals ───────────────────────
+
+
+class RechargeDetailServicePopulateActualsTest(TestCase):
+    def setUp(self):
+        mark_setup_complete()
+        self.user = make_user()
+        self.sprint = make_sprint()
+        self.team = make_team()
+        self.svc = RechargeDetailService(user=self.user)
+
+    def test_returns_zero_when_no_confirmed_actuals(self):
+        count = self.svc.populate_from_sprint_actuals(self.sprint.id)
+        self.assertEqual(count, 0)
+
+    def test_creates_no_recharge_details_when_no_confirmed_actuals(self):
+        self.svc.populate_from_sprint_actuals(self.sprint.id)
+        self.assertEqual(
+            RechargeDetail.objects.filter(
+                sprint=self.sprint, type=RechargeTypeChoice.ACTUAL
+            ).count(),
+            0,
+        )
+
+    def test_does_not_delete_forecast_details(self):
+        import_record = _make_import(self.sprint, self.team, self.user)
+        RechargeDetail.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=import_record,
+            type=RechargeTypeChoice.FORECAST,
+        )
+        self.svc.populate_from_sprint_actuals(self.sprint.id)
+        self.assertTrue(
+            RechargeDetail.objects.filter(
+                sprint=self.sprint, type=RechargeTypeChoice.FORECAST
+            ).exists()
+        )

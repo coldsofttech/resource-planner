@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Recharges{% endblock %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/recharges.min.js' %}"></script>
+{% endblock %}
+{% block page_eyebrow %}Finance{% endblock %}
+{% block page_title %}Recharges{% endblock %}
+{% block page_sub %}Sprint recharge forecast and actuals by finance type and project.{% endblock %}
+{% block page_actions %}
+  <primary-button id="rp-recharges-project-groups-btn" label="Project Groups" prefix-icon="bi-collection"></primary-button>
+{% endblock %}
+{% block content %}
+<div class="row g-4">
+
+  <div class="col-12">
+    <section-panel>
+      <panel-title>Filters</panel-title>
+      <panel-body>
+        <div class="row g-3 align-items-end">
+          <financial-year-field id="rp-recharges-fy" col="col-12 col-md-4" show-label></financial-year-field>
+          <sprint-field id="rp-recharges-sprint" col="col-12 col-md-4" show-label></sprint-field>
+          <div class="col-12 col-md-auto d-flex align-items-end">
+            <primary-button id="rp-recharges-show-btn" label="Show" prefix-icon="bi-search"></primary-button>
+          </div>
+        </div>
+      </panel-body>
+    </section-panel>
+  </div>
+
+  <div id="rp-recharges-results" class="col-12" hidden>
+
+    <!-- Summary cards -->
+    <div class="row g-3 mb-4">
+      <section-panel col="col-12 col-md-4">
+        <panel-title><i class="bi bi-graph-up-arrow me-1"></i> Forecast</panel-title>
+        <panel-body>
+          <div id="rp-recharges-forecast-cost" class="fw-bold fs-4 mb-1">—</div>
+          <div id="rp-recharges-forecast-days" style="color:var(--rp-muted);font-size:.85rem">— days</div>
+        </panel-body>
+      </section-panel>
+      <section-panel col="col-12 col-md-4">
+        <panel-title><i class="bi bi-receipt me-1"></i> Actuals</panel-title>
+        <panel-body>
+          <div id="rp-recharges-actual-cost" class="fw-bold fs-4 mb-1">—</div>
+          <div id="rp-recharges-actual-days" style="color:var(--rp-muted);font-size:.85rem">— days</div>
+        </panel-body>
+      </section-panel>
+      <section-panel col="col-12 col-md-4">
+        <panel-title><i class="bi bi-arrow-left-right me-1"></i> Variance</panel-title>
+        <panel-body>
+          <div id="rp-recharges-variance-cost" class="fw-bold fs-4 mb-1">—</div>
+          <div id="rp-recharges-variance-days" style="color:var(--rp-muted);font-size:.85rem">— days</div>
+        </panel-body>
+      </section-panel>
+    </div>
+
+    <!-- Finance type breakdown -->
+    <div class="row g-3 mb-4">
+      <div class="col-12">
+        <section-panel>
+          <panel-title>Finance Type Breakdown</panel-title>
+          <panel-body>
+            <data-table
+              id="rp-recharges-type-table"
+              row-template="renderRechargesByTypeRow"
+              empty-message="No finance type data available for the selected sprint."
+            >
+              <table-columns>
+                <table-column label="Type" key="type_name"></table-column>
+                <table-column label="Forecast Days" key="forecast_days" hide-mobile></table-column>
+                <table-column label="Forecast Cost" key="forecast_cost"></table-column>
+                <table-column label="Actual Days" key="actual_days" hide-mobile></table-column>
+                <table-column label="Actual Cost" key="actual_cost"></table-column>
+                <table-column label="Variance Days" key="variance_days" hide-mobile></table-column>
+                <table-column label="Variance Cost" key="variance_cost"></table-column>
+              </table-columns>
+            </data-table>
+          </panel-body>
+        </section-panel>
+      </div>
+    </div>
+
+    <!-- Forecast / Actuals tabs -->
+    <div class="row g-3">
+      <div class="col-12">
+        <section-panel>
+          <panel-body>
+            <tab-panel id="rp-recharges-tabs">
+              <tab-items>
+                <tab-item id="forecast" active>
+                  <tab-header title="Forecast" icon="bi-graph-up-arrow"></tab-header>
+                  <tab-content>
+                    <div class="d-flex justify-content-end mb-2">
+                      <primary-button id="rp-recharges-forecast-email-btn" label="Email Review" prefix-icon="bi-envelope" disabled></primary-button>
+                    </div>
+                    <data-table
+                      id="rp-recharges-forecast-table"
+                      paginated
+                      page-size="25"
+                      row-template="renderRechargeRow"
+                      empty-message="No forecast recharge records found."
+                    >
+                      <table-columns>
+                        <table-column label="Programme" key="programme_name"></table-column>
+                        <table-column label="Project" key="project_name"></table-column>
+                        <table-column label="Total Days" key="total_days" hide-mobile></table-column>
+                        <table-column label="Total Cost" key="total_cost"></table-column>
+                        <table-column label="Project Contacts" key="project_contacts"></table-column>
+                        <table-column label="Finance Contacts" key="finance_contacts"></table-column>
+                      </table-columns>
+                    </data-table>
+                  </tab-content>
+                </tab-item>
+                <tab-item id="actuals">
+                  <tab-header title="Actuals" icon="bi-receipt"></tab-header>
+                  <tab-content>
+                    <div class="d-flex justify-content-end mb-2">
+                      <primary-button id="rp-recharges-actuals-email-btn" label="Email Review" prefix-icon="bi-envelope" disabled></primary-button>
+                    </div>
+                    <data-table
+                      id="rp-recharges-actuals-table"
+                      paginated
+                      page-size="25"
+                      row-template="renderRechargeRow"
+                      empty-message="No actual recharge records found."
+                    >
+                      <table-columns>
+                        <table-column label="Programme" key="programme_name"></table-column>
+                        <table-column label="Project" key="project_name"></table-column>
+                        <table-column label="Total Days" key="total_days" hide-mobile></table-column>
+                        <table-column label="Total Cost" key="total_cost"></table-column>
+                        <table-column label="Project Contacts" key="project_contacts"></table-column>
+                        <table-column label="Finance Contacts" key="finance_contacts"></table-column>
+                      </table-columns>
+                    </data-table>
+                  </tab-content>
+                </tab-item>
+              </tab-items>
+            </tab-panel>
+          </panel-body>
+        </section-panel>
+      </div>
+    </div>
+
+  </div><!-- #rp-recharges-results -->
+
+</div>
+
+<!-- Recharge view drawer -->
+<drawer-modal id="rp-recharge-view-drawer" width="1000">
+  <drawer-header eyebrow="Recharge" title=""></drawer-header>
+  <drawer-panel>
+    <tab-panel id="rp-recharge-detail-tabs">
+      <tab-items>
+        <tab-item id="by-engineer" active>
+          <tab-header title="By Engineer" icon="bi-person"></tab-header>
+          <tab-content>
+            <data-table
+              id="rp-recharge-detail-engineer-table"
+              class="mt-2"
+              row-template="renderRechargeDetailEngineerRow"
+              empty-message="No engineer breakdown available."
+            >
+              <table-columns>
+                <table-column label="Team" key="team"></table-column>
+                <table-column label="Engineer" key="engineer"></table-column>
+                <table-column label="Days" key="total_days"></table-column>
+                <table-column label="Cost" key="total_cost"></table-column>
+              </table-columns>
+            </data-table>
+          </tab-content>
+        </tab-item>
+        <tab-item id="by-team">
+          <tab-header title="By Team" icon="bi-people"></tab-header>
+          <tab-content>
+            <data-table
+              id="rp-recharge-detail-team-table"
+              class="mt-2"
+              row-template="renderRechargeDetailTeamRow"
+              empty-message="No team breakdown available."
+            >
+              <table-columns>
+                <table-column label="Team" key="team"></table-column>
+                <table-column label="Days" key="total_days"></table-column>
+                <table-column label="Cost" key="total_cost"></table-column>
+              </table-columns>
+            </data-table>
+          </tab-content>
+        </tab-item>
+        <tab-item id="by-label">
+          <tab-header title="By Label" icon="bi-tag"></tab-header>
+          <tab-content>
+            <data-table
+              id="rp-recharge-detail-label-table"
+              class="mt-2"
+              row-template="renderRechargeDetailLabelRow"
+              empty-message="No label breakdown available."
+            >
+              <table-columns>
+                <table-column label="Label" key="label"></table-column>
+                <table-column label="Days" key="total_days"></table-column>
+                <table-column label="Cost" key="total_cost"></table-column>
+              </table-columns>
+            </data-table>
+          </tab-content>
+        </tab-item>
+      </tab-items>
+    </tab-panel>
+  </drawer-panel>
+  <drawer-footer close="Close" secondary="Jira Stories" secondary-icon="bi-box-arrow-up-right"></drawer-footer>
+</drawer-modal>
+{% endblock %}
