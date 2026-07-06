@@ -7,5 +7,6 @@ import "./fields/index.js";
 import "./notifications/index.js";
 import "./permissions/index.js";
 import "./pills/index.js";
+import "./to-do/index.js";
 import "./users/index.js";
 import "./views/index.js";

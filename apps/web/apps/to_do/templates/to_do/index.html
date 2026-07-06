@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  To-Do
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/to-do.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Account
+{% endblock page_eyebrow %}
+{% block page_title %}
+  To-Do
+{% endblock page_title %}
+{% block page_sub %}
+  Track personal tasks, due dates, and reminders.
+{% endblock page_sub %}
+{% block page_actions %}
+  <primary-button id="rp-to-do-add-btn" label="Add to-do" prefix-icon="bi-plus-lg"></primary-button>
+  <link-field href="/to-do/preferences/" variant="icon-btn" icon="bi-gear" label="Preferences" title="Preferences"></link-field>
+{% endblock page_actions %}
+{% block content %}
+  <list-view show-active-filters>
+  <filter-panel id="rp-to-do-filter-panel">
+  <search-field id="rp-to-do-search" name="search" placeholder="Search to-dos..." shortcut="/" show-label></search-field>
+  <dropdown-field id="rp-to-do-status" name="status" label="Status" show-label>
+  <values-list>
+  <value value="">Open</value>
+  <value value="open">Not started</value>
+  <value value="in_progress">In progress</value>
+  <value value="done">Done</value>
+  <value value="all">All</value>
+  </values-list>
+  </dropdown-field>
+  <dropdown-field id="rp-to-do-priority" name="priority" label="Priority" show-label>
+  <values-list>
+  <value value="">All</value>
+  <value value="low">Low</value>
+  <value value="medium">Medium</value>
+  <value value="high">High</value>
+  <value value="urgent">Urgent</value>
+  </values-list>
+  </dropdown-field>
+  <dropdown-field id="rp-to-do-due" name="due_filter" label="Due" show-label>
+  <values-list>
+  <value value="">Any time</value>
+  <value value="today">Due today</value>
+  <value value="overdue">Overdue</value>
+  <value value="this_week">This week</value>
+  </values-list>
+  </dropdown-field>
+  </filter-panel>
+  <data-table id="rp-to-do-table" url="/api/v1/to-do/" paginated page-size="25" row-template="renderToDoRow" empty-message="No to-dos found.">
+    <table-columns>
+      <table-column label="" key="priority" width="14px">
+      </table-column>
+      <table-column label="Title" key="title">
+      </table-column>
+      <table-column label="Group" key="group" hide-mobile>
+      </table-column>
+      <table-column label="Due" key="due_date" sortable hide-mobile>
+      </table-column>
+      <table-column label="Status" key="status" width="120px">
+      </table-column>
+    </table-columns>
+    <table-actions>
+      <table-action icon="bi-check2" label="Mark complete" event="rp:todo:complete">
+      </table-action>
+      <table-action icon="bi-arrow-counterclockwise" label="Reopen" event="rp:todo:reopen">
+      </table-action>
+      <table-action icon="bi-pencil" label="Edit" event="rp:todo:edit">
+      </table-action>
+      <table-action icon="bi-trash" label="Delete" event="rp:todo:delete" danger>
+      </table-action>
+    </table-actions>
+  </data-table>
+  </list-view>
+  <!-- Create drawer -->
+  <drawer-modal id="rp-todo-create-drawer" width="700">
+  <drawer-header eyebrow="New record" title="Add to-do" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-new-todo-title" col="col-12" label="Title" required></text-field>
+    <text-field id="rp-new-todo-description" col="col-12" cols="3" label="Description" placeholder="Optional details..." maxlength="2000" show-counter></text-field>
+    <dropdown-field id="rp-new-todo-priority" col="col-md-6" label="Priority" value="medium" placeholder="Select priority...">
+      <values-list>
+        <value id="low" label="Low">Low</value>
+        <value id="medium" label="Medium">Medium</value>
+        <value id="high" label="High">High</value>
+        <value id="urgent" label="Urgent">Urgent</value>
+      </values-list>
+    </dropdown-field>
+    <text-field id="rp-new-todo-group" col="col-md-6" label="Group" placeholder="e.g. Work, Personal..."></text-field>
+    <date-field id="rp-new-todo-due-date" col="col-md-6" label="Due Date"></date-field>
+    <date-field id="rp-new-todo-reminder-date" col="col-md-6" label="Remind Me On"></date-field>
+    <toggle-field id="rp-new-todo-is-recurring" col="col-12" label="Repeats"></toggle-field>
+    <dropdown-field id="rp-new-todo-recurrence-rule" col="col-md-6" label="Repeat Every" placeholder="Select frequency...">
+      <values-list>
+        <value id="daily" label="Daily">Daily</value>
+        <value id="weekly" label="Weekly">Weekly</value>
+        <value id="monthly" label="Monthly">Monthly</value>
+        <value id="yearly" label="Yearly">Yearly</value>
+      </values-list>
+    </dropdown-field>
+    <date-field id="rp-new-todo-recurrence-end-date" col="col-md-6" label="Repeat Until"></date-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Add to-do" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <!-- Edit drawer -->
+  <drawer-modal id="rp-todo-edit-drawer" width="700">
+  <drawer-header eyebrow="Edit record" title="Edit to-do" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-edit-todo-title" col="col-12" label="Title" required></text-field>
+    <text-field id="rp-edit-todo-description" col="col-12" cols="3" label="Description" maxlength="2000" show-counter></text-field>
+    <dropdown-field id="rp-edit-todo-priority" col="col-md-6" label="Priority" placeholder="Select priority...">
+      <values-list>
+        <value id="low" label="Low">Low</value>
+        <value id="medium" label="Medium">Medium</value>
+        <value id="high" label="High">High</value>
+        <value id="urgent" label="Urgent">Urgent</value>
+      </values-list>
+    </dropdown-field>
+    <text-field id="rp-edit-todo-group" col="col-md-6" label="Group"></text-field>
+    <date-field id="rp-edit-todo-due-date" col="col-md-6" label="Due Date"></date-field>
+    <date-field id="rp-edit-todo-reminder-date" col="col-md-6" label="Remind Me On"></date-field>
+    <toggle-field id="rp-edit-todo-is-recurring" col="col-12" label="Repeats"></toggle-field>
+    <dropdown-field id="rp-edit-todo-recurrence-rule" col="col-md-6" label="Repeat Every" placeholder="Select frequency...">
+      <values-list>
+        <value id="daily" label="Daily">Daily</value>
+        <value id="weekly" label="Weekly">Weekly</value>
+        <value id="monthly" label="Monthly">Monthly</value>
+        <value id="yearly" label="Yearly">Yearly</value>
+      </values-list>
+    </dropdown-field>
+    <date-field id="rp-edit-todo-recurrence-end-date" col="col-md-6" label="Repeat Until"></date-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <!-- View drawer -->
+  <drawer-modal id="rp-todo-view-drawer" width="700">
+  <drawer-header eyebrow="To-do" title="To-do" no-sizes></drawer-header>
+  <drawer-panel>
+  <view-field id="rp-view-todo-title" label="Title"></view-field>
+  <view-field id="rp-view-todo-description" label="Description" desc></view-field>
+  <view-field id="rp-view-todo-status" label="Status"></view-field>
+  <view-field id="rp-view-todo-priority" label="Priority"></view-field>
+  <view-field id="rp-view-todo-group" label="Group"></view-field>
+  <view-field id="rp-view-todo-due-date" label="Due Date"></view-field>
+  <view-field id="rp-view-todo-source" label="Source"></view-field>
+  <view-field id="rp-view-todo-code" label="Code" code></view-field>
+  <view-field id="rp-view-todo-created" label="Created" meta></view-field>
+  <view-field id="rp-view-todo-created-by" label="Created by" meta></view-field>
+  </drawer-panel>
+  <drawer-footer close="Close" primary="Edit to-do" primary-icon="bi-pencil"></drawer-footer>
+  </drawer-modal>
+  <delete-modal id="rp-todo-delete-modal" action-label="Delete to-do"></delete-modal>
+{% endblock content %}

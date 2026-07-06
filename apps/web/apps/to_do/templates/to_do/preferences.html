@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  To-Do Preferences
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/to-do.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Account
+{% endblock page_eyebrow %}
+{% block page_title %}
+  To-Do Preferences
+{% endblock page_title %}
+{% block page_sub %}
+  Choose which to-do reminders you want delivered.
+{% endblock page_sub %}
+{% block content %}
+  <section-panel>
+  <panel-title>Reminders</panel-title>
+  <panel-body>
+  <div id="rp-todo-prefs-list" class="rp-notif-prefs-list"></div>
+  </panel-body>
+  </section-panel>
+{% endblock content %}

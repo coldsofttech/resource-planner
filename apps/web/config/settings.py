@@ -91,6 +91,7 @@ INSTALLED_APPS = [
     "apps.reports.apps.ReportConfig",
     "apps.resource_plans.apps.ResourcePlanConfig",
     "apps.wins.apps.WinsConfig",
+    "apps.to_do.apps.ToDoConfig",
 ]
 
 MIDDLEWARE = [
