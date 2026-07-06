@@ -14,3 +14,14 @@ class NotificationType(models.TextChoices):
     SUCCESS = "success", "Success"
     COMMENT = "comment", "Comment"
     REMINDER = "reminder", "Reminder"
+
+
+# Categories the user cannot suppress via preferences (always delivered).
+NON_SUPPRESSIBLE_CATEGORIES = frozenset(
+    {NotificationCategory.MENTION, NotificationCategory.TODO}
+)
+
+# Categories the user can configure via NotificationPreference.
+SUPPRESSIBLE_CATEGORIES = tuple(
+    c for c in NotificationCategory.values if c not in NON_SUPPRESSIBLE_CATEGORIES
+)

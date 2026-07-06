@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Notifications
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/notifications.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Account
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Notifications
+{% endblock page_title %}
+{% block page_sub %}
+  Review, filter, and manage your notifications.
+{% endblock page_sub %}
+{% block page_actions %}
+  <secondary-button id="rp-notifications-mark-all-btn" label="Mark all read" prefix-icon="bi-check2-all"></secondary-button>
+  <link-field href="/notifications/preferences/" variant="icon-btn" icon="bi-gear" label="Preferences" title="Preferences"></link-field>
+{% endblock page_actions %}
+{% block content %}
+  <list-view show-active-filters>
+  <filter-panel id="rp-notifications-filter-panel">
+  <search-field id="rp-notifications-search" name="search" placeholder="Search notifications..." shortcut="/" show-label></search-field>
+  <dropdown-field id="rp-notifications-category" name="category" label="Category" show-label>
+  <values-list>
+  <value value="">All</value>
+  <value value="general">General</value>
+  <value value="mention">Mention</value>
+  <value value="todo">To-do</value>
+  </values-list>
+  </dropdown-field>
+  <dropdown-field id="rp-notifications-read" name="is_read" label="Read" show-label>
+  <values-list>
+  <value value="">All</value>
+  <value value="false">Unread</value>
+  <value value="true">Read</value>
+  </values-list>
+  </dropdown-field>
+  <dropdown-field id="rp-notifications-dismissed" name="is_dismissed" label="Dismissed" value="false" show-label>
+  <values-list>
+  <value value="false">Active</value>
+  <value value="true">Dismissed</value>
+  <value value="all">All</value>
+  </values-list>
+  </dropdown-field>
+  </filter-panel>
+  <data-table id="rp-notifications-table" url="/api/v1/notifications/" paginated page-size="25" row-template="renderNotificationsRow" empty-message="No notifications found.">
+    <table-columns>
+      <table-column label="" key="notification_type" width="36px">
+      </table-column>
+      <table-column label="Title" key="title">
+      </table-column>
+      <table-column label="Category" key="category" hide-mobile>
+      </table-column>
+      <table-column label="Received" key="created_at" sortable hide-mobile>
+      </table-column>
+      <table-column label="Status" key="is_read" width="100px">
+      </table-column>
+    </table-columns>
+    <table-actions>
+      <table-action icon="bi-envelope-open" label="Mark read" event="rp:notification:read">
+      </table-action>
+      <table-action icon="bi-envelope" label="Mark unread" event="rp:notification:unread">
+      </table-action>
+      <table-action icon="bi-x-circle" label="Dismiss" event="rp:notification:dismiss">
+      </table-action>
+      <table-action icon="bi-trash" label="Delete" event="rp:notification:delete" danger>
+      </table-action>
+    </table-actions>
+  </data-table>
+  </list-view>
+  <delete-modal id="rp-notification-delete-modal" action-label="Delete notification"></delete-modal>
+{% endblock content %}

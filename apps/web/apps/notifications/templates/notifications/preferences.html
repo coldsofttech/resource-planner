@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Notification Preferences
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/notifications.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Account
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Notification Preferences
+{% endblock page_title %}
+{% block page_sub %}
+  Choose which notification categories you want to receive. Mentions and to-dos are always delivered.
+{% endblock page_sub %}
+{% block content %}
+  <section-panel>
+  <panel-title>Categories</panel-title>
+  <panel-body>
+  <div id="rp-notification-prefs-list" class="rp-notif-prefs-list"></div>
+  </panel-body>
+  </section-panel>
+{% endblock content %}
