@@ -1,0 +1,153 @@
+{% extends "how_to/guide/_base.html" %}
+{% block page_title %}Project Budgets{% endblock %}
+{% block breadcrumb_extra %} / <a href="/docs/guide/project-budgets/">Project Budgets</a>{% endblock %}
+{% block section_content %}
+          <section id="project-budgets" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-cash-stack" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Project Budgets</h2>
+                <p class="small rp-muted mb-0">Track allocated, refined, and remaining budget per financial year — with automatic risk status based on your estimate.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Project Budgets let you record and track financial budgets for each project on a per-financial-year basis. Each budget record captures the approved allocation, an optional refined figure, and links to an estimate version so the remaining budget and risk status can be calculated automatically. One budget record is allowed per project per financial year.</p>
+
+            <h3 class="rp-docs-subheading">Navigating to Project Budgets</h3>
+            <ol class="rp-step-list">
+              <li>Open any project from the <strong>Projects</strong> list.</li>
+              <li>Click the <strong>Budgets</strong> tab inside the project detail page.</li>
+              <li>All budget records for this project are listed here, one per financial year.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Budget fields</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Field</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Financial Year</strong></td>
+                  <td>The financial year this budget applies to. Each project can have at most one budget record per financial year.</td>
+                </tr>
+                <tr>
+                  <td><strong>Allocated Budget</strong></td>
+                  <td>The initial approved budget for this project in the chosen financial year. Always required.</td>
+                </tr>
+                <tr>
+                  <td><strong>Refined Budget</strong></td>
+                  <td>An optional revised budget figure. When set, this replaces the Allocated Budget as the <em>actual budget</em> used for remaining budget and risk calculations. Use this when the approved amount is revised mid-year without wanting to overwrite the original allocation.</td>
+                </tr>
+                <tr>
+                  <td><strong>Actual Budget</strong></td>
+                  <td>Read-only. The effective budget — the Refined Budget if one is set, otherwise the Allocated Budget.</td>
+                </tr>
+                <tr>
+                  <td><strong>Estimate Version</strong></td>
+                  <td>Optional. Link a saved estimate version to this budget record. When linked, the estimate's total cost is used to calculate the Remaining Budget and Risk Status automatically.</td>
+                </tr>
+                <tr>
+                  <td><strong>Remaining Budget</strong></td>
+                  <td>Read-only. Actual Budget minus the linked estimate's total cost. Only shown when an Estimate Version is linked.</td>
+                </tr>
+                <tr>
+                  <td><strong>Note</strong></td>
+                  <td>Optional free-text field for recording context about this budget record — approval references, revision rationale, or planning notes.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Adding a budget record</h3>
+            <ol class="rp-step-list">
+              <li>Open the project and click the <strong>Budgets</strong> tab.</li>
+              <li>Click <strong>Add Budget</strong>.</li>
+              <li>Select the <strong>Financial Year</strong> this budget covers.</li>
+              <li>Enter the <strong>Allocated Budget</strong> — the approved amount for this financial year.</li>
+              <li>Optionally enter a <strong>Refined Budget</strong> if the original allocation has been revised.</li>
+              <li>Optionally link an <strong>Estimate Version</strong> to enable automatic remaining budget and risk status calculation.</li>
+              <li>Add a <strong>Note</strong> if needed and click <strong>Save</strong>.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Editing a budget record</h3>
+            <ol class="rp-step-list">
+              <li>On the <strong>Budgets</strong> tab, click the <strong>Edit</strong> action on the record you want to change.</li>
+              <li>Update the fields as needed and click <strong>Save</strong>.</li>
+              <li>Every change is automatically recorded in the budget's history log — you can always see what was changed, when, and by whom.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Budget risk status</h3>
+            <p class="small rp-muted">When an Estimate Version is linked, Resource Planner calculates a risk status by comparing the estimate's total cost against the Actual Budget. The variance percentage determines the colour-coded risk level.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Status</th><th>Colour</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>On Budget</strong></td>
+                  <td><span style="color:var(--rp-success,green);font-weight:600;">GREEN</span></td>
+                  <td>The cost variance is within the acceptable range for this project's size. The project is tracking on budget.</td>
+                </tr>
+                <tr>
+                  <td><strong>At Risk (Over)</strong></td>
+                  <td><span style="color:var(--rp-warning,orange);font-weight:600;">AMBER</span></td>
+                  <td>The estimate exceeds the actual budget, but the overspend is within the configured risk threshold. Monitor closely.</td>
+                </tr>
+                <tr>
+                  <td><strong>At Risk (Under)</strong></td>
+                  <td><span style="color:var(--rp-warning,orange);font-weight:600;">AMBER</span></td>
+                  <td>The estimate is below the actual budget within the risk threshold — the project may be under-utilising its allocation.</td>
+                </tr>
+                <tr>
+                  <td><strong>Over Budget</strong></td>
+                  <td><span style="color:var(--rp-danger,red);font-weight:600;">RED</span></td>
+                  <td>The estimate cost exceeds the actual budget beyond the configured threshold. Immediate attention required.</td>
+                </tr>
+                <tr>
+                  <td><strong>Under Budget</strong></td>
+                  <td><span style="color:var(--rp-danger,red);font-weight:600;">RED</span></td>
+                  <td>The estimate cost is significantly below the actual budget beyond the threshold — a large underspend that may indicate planning issues.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Risk thresholds are configurable.</strong>
+              The AMBER/RED boundary is set by the <strong>Budget Risk Threshold</strong> configuration. The GREEN/AMBER boundary is set per project size (XS, S, M, L, XL) using size-specific budget variance settings. Contact your administrator to adjust these thresholds under <strong>Settings → Projects</strong>.
+            </div>
+
+            <h3 class="rp-docs-subheading">Lifetime summary</h3>
+            <p class="small rp-muted">The <strong>Lifetime</strong> view aggregates budget figures across all financial years for the project. It gives a single rolled-up picture of total allocated budget, total refined budget, total estimate cost, and total remaining budget over the life of the project. Access it from the Budgets tab by clicking <strong>Lifetime Summary</strong>.</p>
+
+            <h3 class="rp-docs-subheading">Budget history</h3>
+            <p class="small rp-muted">Every change to a budget record — an allocation update, a refined budget entry, a linked estimate change — is automatically recorded in the budget's history log. Click the <strong>History</strong> action on any budget record to see the full audit trail: what changed, the previous and new values, the total cost at the time, and who made the change.</p>
+
+            <h3 class="rp-docs-subheading">Exporting budgets</h3>
+            <p class="small rp-muted">Click <strong>Export</strong> on the Budgets tab to download the budget records for this project. Choose which columns to include — allocated budget, refined budget, actual budget, remaining budget, estimate version, and more. The export respects your current filter selection.</p>
+
+            <h3 class="rp-docs-subheading">Permissions</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Action</th><th>Permission required</th></tr></thead>
+              <tbody>
+                <tr><td>View budget records and lifetime summary</td><td>Standard project view access (<code>projects.view_projectbudget</code>)</td></tr>
+                <tr><td>Add a budget record</td><td><strong>Add project budget</strong> (<code>projects.add_projectbudget</code>)</td></tr>
+                <tr><td>Edit a budget record</td><td><strong>Change project budget</strong> (<code>projects.change_projectbudget</code>)</td></tr>
+                <tr><td>Delete a budget record</td><td><strong>Delete project budget</strong> (<code>projects.delete_projectbudget</code>)</td></tr>
+                <tr><td>Export budgets</td><td><strong>Export project budgets</strong> (<code>projects.export_projectbudget</code>)</td></tr>
+              </tbody>
+            </table>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> One budget per financial year per project.</strong>
+              You cannot create two budget records for the same financial year on the same project. If you need to revise the budget for a year that already has a record, edit the existing record and use the <strong>Refined Budget</strong> field rather than deleting and recreating it — this preserves the original allocation and the full history.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"A budget for this financial year already exists on this project"</strong> — edit the existing record instead of creating a new one. Use <strong>Refined Budget</strong> to record a revision without losing the original allocated figure.<br><br>
+              <strong>"No risk status shown"</strong> — risk status only appears when an Estimate Version is linked and both the actual budget and the estimate's total cost are non-zero. Link an estimate version to enable automatic risk calculation.<br><br>
+              <strong>"Remaining budget shows as the full actual budget"</strong> — no estimate version is linked. The remaining budget defaults to the actual budget when no estimate is attached. Link an estimate version to get an accurate remaining figure.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Create budget records at the start of each financial year before planning begins. Link the most relevant estimate version as soon as one is finalised — this activates automatic risk tracking and gives the team an immediate view of where the project stands financially without any manual calculation.
+            </div>
+          </section>
+
+          <!-- ── Project Actuals ── -->
+{% endblock %}

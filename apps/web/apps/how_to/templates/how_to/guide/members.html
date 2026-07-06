@@ -1,0 +1,70 @@
+{% extends "how_to/guide/_base.html" %}
+{% block page_title %}Members{% endblock %}
+{% block breadcrumb_extra %} / <a href="/docs/guide/members/">Members</a>{% endblock %}
+{% block section_content %}
+          <section id="members" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-person-badge" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Members</h2>
+                <p class="small rp-muted mb-0">Manage workforce profiles — role, skills, location, employment type, and personal preferences.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Every user has a profile combining their account settings with workforce data. Some fields are controlled by administrators; others are managed by the members themselves from their own Profile menu.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>View</strong> <i class="bi bi-eye"></i></td><td>Opens the full profile — personal details, Workforce tab (role, skills, location, team), Permissions tab, and account settings.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the member's workforce fields. Requires the workforce management permission.</td></tr>
+                <tr><td><strong>Import</strong></td><td>Bulk-update workforce fields (role, location, team, employment type) for many members at once from a CSV or Excel file.</td></tr>
+                <tr><td><strong>Export</strong></td><td>Download the member list with workforce data included.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Who can change what</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Field</th><th>Who can update it</th></tr></thead>
+              <tbody>
+                <tr><td>Display name, theme (light/dark), timezone</td><td>The member themselves — from the <strong>Profile</strong> menu in the top-right corner</td></tr>
+                <tr><td>Role, skills, location, employment type, join date, leaving date, team</td><td>Administrators with the workforce management permission</td></tr>
+                <tr><td>Permission groups</td><td>Administrators with the user management permission</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Updating a member's workforce details</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Members</strong> and click the member's name to open their profile.</li>
+              <li>Click the <strong>Workforce</strong> tab.</li>
+              <li>Click <strong>Edit</strong> and update the role, skills, location, employment type, and dates as needed.</li>
+              <li>Click <strong>Save</strong>.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Inviting a new member</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Users</strong> in the admin area.</li>
+              <li>Click <strong>Invite User</strong> and enter their email address.</li>
+              <li>Assign them to the appropriate permission group.</li>
+              <li>Once they accept the invitation and sign in, open their profile and fill in the Workforce details — role, location, team, and employment type.</li>
+            </ol>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Always set the location before recording leaves.</strong>
+              The leave day calculator uses the member's location to find public holidays. A missing or incorrect location means sprint capacity figures will be inaccurate for that member.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"You do not have permission to edit workforce fields"</strong> — you need the workforce management permission. Contact your administrator to request access.<br><br>
+              <strong>"Leaving date cannot be before joining date"</strong> — check both fields and ensure the leaving date is on or after the joining date.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Encourage members to set their own <strong>display name</strong> from the Profile menu. The display name appears throughout the platform and is more recognisable than a raw email address or first/last name combination.
+            </div>
+          </section>
+
+          <!-- ── Leaves ── -->
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "how_to/guide/_base.html" %}
+{% block page_title %}Roles{% endblock %}
+{% block breadcrumb_extra %} / <a href="/docs/guide/roles/">Roles</a>{% endblock %}
+{% block section_content %}
+          <section id="roles" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-award" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Roles</h2>
+                <p class="small rp-muted mb-0">Define job roles that control multi-team assignment eligibility and resource plan visibility.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Roles classify what a team member does. Two flags on a role have real functional effects on how the platform behaves — not just how the member is labelled.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Role</strong></td><td>Create a new role with a name and configure the Leadership and Assignable flags.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the name or flags. Changes apply immediately to all members who hold this role.</td></tr>
+                <tr><td><strong>Set as Default</strong></td><td>Pre-selects this role when creating new members. Only one role can be the default — setting a new default clears the previous one.</td></tr>
+                <tr><td><strong>Deactivate / Activate</strong></td><td>Hides or shows the role in member profile dropdowns. Members who already hold the role are unaffected.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Removes the role permanently if no members currently hold it.</td></tr>
+                <tr><td><strong>Import / Export</strong></td><td>Bulk-create roles from a spreadsheet, or download the list.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">The two functional flags</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Flag</th><th>What it controls</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Leadership</strong></td>
+                  <td>Members with this flag can be assigned to <strong>multiple teams at the same time</strong>. Regular (non-leadership) members can only be on one team. Use this for managers, heads of practice, or anyone who spans multiple teams.</td>
+                </tr>
+                <tr>
+                  <td><strong>Assignable</strong></td>
+                  <td>Members with this flag appear in the <strong>resource planning allocation panel</strong>. Non-assignable members (e.g. administrative staff) are excluded. Tick this for any role that does project delivery work.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">How to use</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Roles</strong> and click <strong>Add Role</strong>.</li>
+              <li>Enter the role name (e.g. <em>Senior Engineer</em>, <em>Delivery Manager</em>).</li>
+              <li>Enable <strong>Leadership</strong> if members with this role should be able to span multiple teams.</li>
+              <li>Enable <strong>Assignable</strong> if members with this role should appear in resource planning.</li>
+              <li>Mark one role as the <strong>default</strong> — it is pre-selected when creating new members.</li>
+              <li>Click <strong>Save</strong>.</li>
+            </ol>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Changing Leadership affects existing team assignments.</strong>
+              If you change a member's role from non-leadership to leadership (or vice versa), their team assignments are not automatically adjusted. Review the member's team memberships manually after changing this flag.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Cannot delete a role assigned to active members"</strong> — use the <strong>Export</strong> button to see which members hold this role, then reassign them before attempting to delete.
+            </div>
+          </section>
+
+          <!-- ── Skills ── -->
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "how_to/guide/_base.html" %}
+{% block page_title %}Business Units{% endblock %}
+{% block breadcrumb_extra %} / <a href="/docs/guide/business-units/">Business Units</a>{% endblock %}
+{% block section_content %}
+          <section id="business-units" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-building" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Business Units</h2>
+                <p class="small rp-muted mb-0">Represent your organisation's divisions for portfolio reporting and budget tracking.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Business Units are top-level organisational groupings — divisions, departments, or cost centres. Teams and budget allocations can be linked to a business unit, enabling portfolio views and reports to roll up by division.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Business Unit</strong></td><td>Create a new division. Enter a full name and a short abbreviation (max 10 characters) for badges and dashboards.</td></tr>
+                <tr><td><strong>Click a row</strong></td><td>Opens the business unit detail page — its name, code, and abbreviation on the left, and the list of Products belonging to it on the right.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the name or abbreviation.</td></tr>
+                <tr><td><strong>Deactivate / Activate</strong></td><td>Hides or shows the unit in reporting dropdowns. Existing team associations are preserved.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Permanently removes the unit if no teams or allocations reference it.</td></tr>
+                <tr><td><strong>Import / Export</strong></td><td>Bulk-create units from a spreadsheet, or download the current list.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">How to use</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Business Units</strong> and click <strong>Add Business Unit</strong>.</li>
+              <li>Enter the full name (e.g. <em>Finance &amp; Operations</em>) and a short abbreviation (e.g. <em>FIN</em>).</li>
+              <li>Click <strong>Save</strong>. The unit now appears in team and reporting dropdowns.</li>
+              <li>Click any row to open its detail page and see the Products associated with that business unit.</li>
+            </ol>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Keep abbreviations to 3–6 characters so they fit neatly in dashboard badges and report table columns without truncating.
+            </div>
+          </section>
+
+          <!-- ── Roles ── -->
+{% endblock %}

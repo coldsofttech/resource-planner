@@ -1,0 +1,153 @@
+{% extends "how_to/guide/_base.html" %}
+{% block page_title %}Project Estimates{% endblock %}
+{% block breadcrumb_extra %} / <a href="/docs/guide/estimates/">Project Estimates</a>{% endblock %}
+{% block section_content %}
+          <section id="estimates" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-calculator" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Project Estimates</h2>
+                <p class="small rp-muted mb-0">Versioned effort and cost estimates with a governed approval workflow.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">An estimate records how many effort days a project requires, the day rate, and a contingency allowance. You can hold multiple estimate versions as scope evolves. Each version passes through a defined review and approval workflow. Only one version is <strong>Approved</strong> at any time — approving a newer version automatically supersedes the previous one. The Approved version drives budget and financial views.</p>
+
+            <h3 class="rp-docs-subheading">Estimate fields</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Field</th><th>What it means</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Estimate Days</strong></td><td>The total effort required, in working days.</td></tr>
+                <tr><td><strong>Contingency %</strong></td><td>A percentage buffer added on top of the base cost. Defaults to 0.</td></tr>
+                <tr><td><strong>Day Rate</strong></td><td>Automatically taken from the current sprint configuration at the moment the estimate is created. It is snapshotted and does not change if the sprint day rate changes later.</td></tr>
+                <tr><td><strong>Total Cost</strong></td><td>Calculated automatically: <em>Estimate Days × Day Rate × (1 + Contingency % ÷ 100)</em>.</td></tr>
+                <tr><td><strong>Size</strong></td><td>A T-shirt size badge (XS / S / M / L / XL) derived from the total cost against configured thresholds. Updated automatically when the cost changes.</td></tr>
+                <tr><td><strong>Shared By</strong></td><td>Required. The person or people who shared this estimate with stakeholders.</td></tr>
+                <tr><td><strong>Reviewed By</strong></td><td>Required when advancing to Reviewed or beyond. One or more internal reviewers.</td></tr>
+                <tr><td><strong>Estimate Link</strong></td><td>Optional URL to a detailed estimate document (e.g. a Confluence page or spreadsheet). Clicking the estimate row in the table opens this link.</td></tr>
+                <tr><td><strong>Note</strong></td><td>A free-text note recorded in the version history at the time of creation or update.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Creating an estimate</h3>
+            <ol class="rp-step-list">
+              <li>Open the project and click the <strong>Estimates</strong> tab.</li>
+              <li>Click <strong>Create Estimate</strong>.</li>
+              <li>Enter the number of <strong>Estimate Days</strong>.</li>
+              <li>Enter a <strong>Contingency %</strong> if applicable (leave blank for 0).</li>
+              <li>Select one or more people in <strong>Shared By</strong> — this field is required.</li>
+              <li>Optionally paste an <strong>Estimate Link</strong> URL and add a <strong>Note</strong>.</li>
+              <li>Click <strong>Save</strong>. The estimate is created in <strong>Draft</strong> status. The version number, day rate, total cost, and size are set automatically.</li>
+            </ol>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Versions are project-scoped.</strong>
+              Each new estimate on the same project gets the next version number (v1, v2, v3 …). Version numbers are never reused, even if an intermediate version is deleted.
+            </div>
+
+            <h3 class="rp-docs-subheading">Estimate status workflow</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Status</th><th>What it means</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Draft</strong></td><td>Being prepared. Not yet shared externally. Can be edited or deleted.</td></tr>
+                <tr><td><strong>Reviewed</strong></td><td>Reviewed internally. At least one reviewer must be named before advancing.</td></tr>
+                <tr><td><strong>Shared</strong></td><td>Sent to stakeholders for sign-off.</td></tr>
+                <tr><td><strong>Approved</strong></td><td>Formally agreed. Locked for editing and deletion. Only one estimate per project can be Approved at a time.</td></tr>
+                <tr><td><strong>Superseded</strong></td><td>Replaced by a newer Approved version. Kept permanently for historical reference. Locked.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Advancing an estimate through the workflow</h3>
+            <p class="small rp-muted">Use the <strong>Advance</strong> action on any estimate row. Each step moves the estimate to the next status. The action is hidden once an estimate reaches Approved or Superseded.</p>
+
+            <h4 class="rp-docs-subheading" style="font-size:0.82rem;margin-top:0.5rem;">Draft → Reviewed</h4>
+            <ol class="rp-step-list">
+              <li>Click <strong>Advance</strong> on a Draft estimate.</li>
+              <li>A <em>Mark as Reviewed</em> modal opens. Select one or more people in <strong>Reviewed By</strong> — this is required.</li>
+              <li>Click <strong>Confirm</strong>. The estimate moves to Reviewed.</li>
+            </ol>
+
+            <h4 class="rp-docs-subheading" style="font-size:0.82rem;margin-top:0.5rem;">Reviewed → Shared</h4>
+            <ol class="rp-step-list">
+              <li>Click <strong>Advance</strong> on a Reviewed estimate.</li>
+              <li>No additional input is needed. The estimate moves to Shared immediately.</li>
+            </ol>
+
+            <h4 class="rp-docs-subheading" style="font-size:0.82rem;margin-top:0.5rem;">Shared → Approved</h4>
+            <ol class="rp-step-list">
+              <li>Click <strong>Advance</strong> on a Shared estimate.</li>
+              <li>If the project already has a <strong>project code</strong> set, the estimate is approved immediately — no further input needed.</li>
+              <li>If the project does <em>not</em> yet have a project code, an <em>Approve Estimate</em> modal opens. Enter the project code (e.g. a Jira ID or portfolio reference). This is required before approval can proceed.</li>
+              <li>Click <strong>Approve</strong>. The estimate moves to Approved. Any previously Approved estimate on this project is automatically moved to Superseded.</li>
+            </ol>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-lock-fill"></i> Approved and Superseded estimates are locked.</strong>
+              Once an estimate reaches Approved or Superseded, it cannot be edited or deleted. This protects the record of what was agreed.
+            </div>
+
+            <h3 class="rp-docs-subheading">Approving via the Edit drawer</h3>
+            <p class="small rp-muted">You can also change an estimate's status directly in the <strong>Edit</strong> drawer using the Status dropdown. If you set Status to <em>Approved</em> and the project has no project code, the Approve Estimate modal will open to collect the code before saving. Setting status to <em>Reviewed</em>, <em>Shared</em>, or <em>Approved</em> requires at least one reviewer in the <strong>Reviewed By</strong> field.</p>
+
+            <h3 class="rp-docs-subheading">Approve and supersede</h3>
+            <p class="small rp-muted">Only one estimate per project can be Approved at a time. When you approve a new version, the system automatically:</p>
+            <ul class="rp-rule-list">
+              <li>Sets the new estimate to <strong>Approved</strong>.</li>
+              <li>Sets any previously Approved estimate to <strong>Superseded</strong>.</li>
+              <li>Records a <em>Superseded</em> history entry on the old estimate with the note: "Superseded by a newer approved estimate."</li>
+            </ul>
+            <p class="small rp-muted">Superseded estimates are kept permanently — they are never deleted automatically. They remain visible in the Estimates tab with a Superseded badge.</p>
+
+            <h3 class="rp-docs-subheading">Deleting an estimate</h3>
+            <p class="small rp-muted">Draft and Reviewed estimates can be deleted. Approved and Superseded estimates cannot be deleted.</p>
+            <ol class="rp-step-list">
+              <li>Click the <strong>Delete</strong> action on a Draft or Reviewed estimate.</li>
+              <li>A confirmation modal opens. Type the version label (e.g. <em>v2</em>) to confirm.</li>
+              <li>Click <strong>Delete</strong>. The estimate is permanently removed.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Version history panel</h3>
+            <p class="small rp-muted">Every estimate maintains a full, read-only change log. To view it:</p>
+            <ol class="rp-step-list">
+              <li>Navigate to the <strong>Estimates</strong> tab.</li>
+              <li>In the <strong>Version History</strong> panel, select a version from the picker.</li>
+              <li>The history list shows every action on that estimate: Created, Updated, Approved, or Superseded — with the status transition, timestamp, and actor email.</li>
+            </ol>
+            <p class="small rp-muted">History entries cannot be edited or deleted.</p>
+
+            <h3 class="rp-docs-subheading">Email action</h3>
+            <p class="small rp-muted">Once an estimate is Approved, an <strong>Email</strong> action appears on its row. Use it to trigger an approval notification email to stakeholders. After the first send the button changes to <strong>Resend Email</strong> — you can resend as many times as needed.</p>
+
+            <h3 class="rp-docs-subheading">Exporting estimates</h3>
+            <p class="small rp-muted">Click the <strong>Export</strong> button in the Estimates tab header to download estimate data. Choose from CSV, Excel (XLSX), PDF, or JSON. The export includes all estimate versions for the project and respects any active status filter.</p>
+            <p class="small rp-muted">Default export columns: Code, Project, Version, Status, Estimate Days, Contingency %, Day Rate (£), Total Cost (£), Active, Created On. Additional columns (Estimate Link, Approval Email Sent, Created By, Updated On, Updated By) can be selected from the export configuration panel.</p>
+
+            <h3 class="rp-docs-subheading">Project size bands</h3>
+            <p class="small rp-muted">The Size badge on each estimate is derived from its total cost against configurable thresholds. See <a href="/docs/guide/project-sizes/">Project Sizes</a> for the full configuration guide and default values.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Size</th><th>Typical total cost range</th></tr></thead>
+              <tbody>
+                <tr><td><strong>XS</strong></td><td>Up to the XS threshold (default: £20,000)</td></tr>
+                <tr><td><strong>S</strong></td><td>Up to the S threshold (default: £60,000)</td></tr>
+                <tr><td><strong>M</strong></td><td>Up to the M threshold (default: £200,000)</td></tr>
+                <tr><td><strong>L</strong></td><td>Up to the L threshold (default: £500,000)</td></tr>
+                <tr><td><strong>XL</strong></td><td>Above the L threshold — automatically derived</td></tr>
+              </tbody>
+            </table>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Shared By is required"</strong> — at least one person must be selected in Shared By before an estimate can be created.<br><br>
+              <strong>"Please select at least one reviewer"</strong> — advancing to Reviewed requires at least one person in the Reviewed By field. Open the Mark as Reviewed modal and add a reviewer.<br><br>
+              <strong>"Project code is required before approving"</strong> — the project does not yet have a project code. The Approve Estimate modal will ask for one. Enter the portfolio or finance reference code and confirm.<br><br>
+              <strong>"Approved and superseded estimates cannot be edited"</strong> — the estimate is locked. To make changes, create a new estimate version, revise it, and advance it through the workflow.<br><br>
+              <strong>"Invalid estimate link — must be a valid URL"</strong> — the Estimate Link field only accepts full URLs (e.g. https://). Remove the link or correct the format.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Create a new estimate version for every significant scope change — do not overwrite an existing one. Having the full version history (v1 scoping, v2 revised scope, v3 final approved) makes it easy to explain cost movements to stakeholders at any later date.
+            </div>
+          </section>
+
+          <!-- ── Project Sizes ── -->
+{% endblock %}

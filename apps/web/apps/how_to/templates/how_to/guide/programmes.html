@@ -1,0 +1,50 @@
+{% extends "how_to/guide/_base.html" %}
+{% block page_title %}Programmes{% endblock %}
+{% block breadcrumb_extra %} / <a href="/docs/guide/programmes/">Programmes</a>{% endblock %}
+{% block section_content %}
+          <section id="programmes" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-collection" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Programmes</h2>
+                <p class="small rp-muted mb-0">Group related projects under a strategic initiative for portfolio-level reporting.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">A Programme is a named container for related projects. Portfolio views and reports can roll up budget totals and delivery status across every project in a programme. Every project must belong to a programme — create programmes before creating projects.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Programme</strong></td><td>Creates a new programme. Enter a name and optional description.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the programme name or description.</td></tr>
+                <tr><td><strong>Deactivate / Activate</strong></td><td>Hides or shows the programme in the project creation dropdown. Does not affect existing projects.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Permanently removes the programme. Only possible when no projects are linked to it.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">How to use</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Projects → Programmes</strong>.</li>
+              <li>Click <strong>Add Programme</strong>, enter a name and optional description, and save.</li>
+              <li>When creating a project, select this programme from the dropdown.</li>
+            </ol>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Protected programmes cannot be deleted.</strong>
+              Some programmes are marked as <strong>protected</strong> by an administrator. They can only be deactivated, not deleted, to preserve historical project data.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Cannot delete a programme with linked projects"</strong> — reassign or delete all projects in this programme before deleting it. Consider deactivating instead of deleting if you want to keep the history.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Set up your programme structure before inviting other users. A project cannot be saved without a programme, so having them ready prevents blockages when the team starts adding projects.
+            </div>
+          </section>
+
+          <!-- ── Teams ── -->
+{% endblock %}

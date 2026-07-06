@@ -1,0 +1,144 @@
+{% extends "how_to/guide/_base.html" %}
+{% block page_title %}Projects{% endblock %}
+{% block breadcrumb_extra %} / <a href="/docs/guide/projects/">Projects</a>{% endblock %}
+{% block section_content %}
+          <section id="projects" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-kanban" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Projects</h2>
+                <p class="small rp-muted mb-0">The core delivery entity — status, estimates, budgets, collaborators, and history in one place.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">A Project captures everything about a funded body of work — what it is, who owns it, where it is in delivery, how much it costs, and who is involved. Every project belongs to a Programme, is owned by a Team, and can carry multiple estimate versions and a per-FY budget.</p>
+
+            <h3 class="rp-docs-subheading">Actions on the projects list</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Project</strong></td><td>Opens the creation panel. Fill in the name, programme, type, status, team, dates, and priority.</td></tr>
+                <tr><td><strong>View</strong> <i class="bi bi-eye"></i></td><td>Opens the full project detail page — overview, estimates, budget, collaborators, history, and followers tabs.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the project's core fields (name, status, dates, team, priority, tags, etc.).</td></tr>
+                <tr><td><strong>Export</strong></td><td>Download the project list in your chosen format. Current filters are respected.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Creating a project</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Projects</strong> and click <strong>Add Project</strong>.</li>
+              <li>Enter the full name and a short display name (used in dashboards and reports).</li>
+              <li>Select a <strong>Programme</strong> — every project must belong to one.</li>
+              <li>Choose the project type, current status, and the team responsible for delivery.</li>
+              <li>Enter the planned start and end dates, a commitment date if known, and the business priority.</li>
+              <li>Add any <strong>Tags</strong> to help with cross-programme filtering.</li>
+              <li>Click <strong>Save</strong>. A unique project code is generated automatically.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Project statuses</h3>
+            <p class="small rp-muted">Statuses represent your organisation's delivery lifecycle (for example: Scoping → In Progress → Completed). Sub-statuses sit underneath a main status for finer-grained tracking. Your administrator configures which statuses are available — contact them if you need a new one added.</p>
+
+            <h3 class="rp-docs-subheading">Estimates</h3>
+            <p class="small rp-muted">An estimate records how much effort and cost a project requires. You can hold multiple estimate versions as scope evolves — the most recent approved one is used in budget and financial views.</p>
+
+            <h3 class="rp-docs-subheading">Adding and progressing an estimate</h3>
+            <ol class="rp-step-list">
+              <li>Open the project and click the <strong>Estimates</strong> tab.</li>
+              <li>Click <strong>Add Estimate</strong>. Enter the number of effort days, a day rate, and an optional contingency percentage. The total cost is calculated automatically.</li>
+              <li>Add a link to your detailed estimate document if you have one, and save.</li>
+              <li>The estimate starts in <strong>Draft</strong>. Move it forward through the workflow as it is reviewed and approved.</li>
+              <li>When a new estimate version replaces an old one, the previous version is automatically marked <strong>Superseded</strong> and kept for reference.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Estimate workflow</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Status</th><th>What it means</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Draft</strong></td><td>Being prepared — not yet shared externally.</td></tr>
+                <tr><td><strong>Reviewed</strong></td><td>Reviewed internally by the team.</td></tr>
+                <tr><td><strong>Shared</strong></td><td>Sent to the business or stakeholders for sign-off.</td></tr>
+                <tr><td><strong>Approved</strong></td><td>Formally agreed. This version is used when creating a budget.</td></tr>
+                <tr><td><strong>Superseded</strong></td><td>Replaced by a newer version. Kept for historical reference.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Project size</h3>
+            <p class="small rp-muted">Every estimate automatically displays a <strong>T-shirt size</strong> badge — a quick visual signal of the project's cost scale. The size is derived from the estimate's total cost and updates automatically when the cost changes.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Size</th><th>Total cost</th></tr></thead>
+              <tbody>
+                <tr><td><strong>XS — X-Small</strong></td><td>Up to the XS threshold (default: £20,000)</td></tr>
+                <tr><td><strong>S — Small</strong></td><td>Up to the S threshold (default: £60,000)</td></tr>
+                <tr><td><strong>M — Medium</strong></td><td>Up to the M threshold (default: £200,000)</td></tr>
+                <tr><td><strong>L — Large</strong></td><td>Up to the L threshold (default: £500,000)</td></tr>
+                <tr><td><strong>XL — X-Large</strong></td><td>Above the L threshold</td></tr>
+              </tbody>
+            </table>
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Thresholds are configurable.</strong>
+              The cost boundaries for each size band are set by your administrator under <strong>Project → Configurations → <a href="/docs/guide/project-sizes/">Project Sizes</a></strong>. The values shown above are the system defaults.
+            </div>
+
+            <h3 class="rp-docs-subheading">Budgets</h3>
+            <p class="small rp-muted">A budget allocates funding to a project for a specific Financial Year. It links to an estimate version and tracks three figures:</p>
+            <ul class="rp-rule-list">
+              <li><strong>Allocated budget</strong> — the initial approved funding amount.</li>
+              <li><strong>Refined budget</strong> — an updated figure that overrides the allocated amount once a more accurate number is known.</li>
+              <li><strong>Remaining budget</strong> — current budget minus the linked estimate total, giving instant over/under-spend visibility.</li>
+            </ul>
+            <p class="small rp-muted">To add a budget: open the project, click the <strong>Budget</strong> tab, then <strong>Add Budget</strong>. Select the Financial Year and the estimate to link it to.</p>
+
+            <h3 class="rp-docs-subheading">Collaborators</h3>
+            <p class="small rp-muted">A project has one <strong>primary team</strong> that leads delivery. Other teams contributing can be added as <strong>Collaborators</strong>. Collaborating teams appear alongside the primary team in resource planning and capacity views.</p>
+            <p class="small rp-muted">To add a collaborator: open the project, go to the <strong>Collaborators</strong> tab, and click <strong>Add Collaborator</strong>. Select the team and their role on the project.</p>
+
+            <h3 class="rp-docs-subheading">Sprint milestones</h3>
+            <p class="small rp-muted">Two optional sprint fields let you record the sprint in which a project's delivery actually began and the sprint in which it was completed:</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Field</th><th>Purpose</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Sprint Started In</strong></td>
+                  <td>The sprint in which the team first began active delivery on this project. Set this when work formally kicks off — not when the project is created or scoped, but when the first sprint of delivery starts.</td>
+                </tr>
+                <tr>
+                  <td><strong>Sprint Completed In</strong></td>
+                  <td>The sprint in which the project was fully delivered and signed off. Set this when delivery ends so portfolio and velocity reports can show the actual delivery window.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="small rp-muted">Both fields are optional and independent — you can set <strong>Sprint Started In</strong> at the start of delivery and leave <strong>Sprint Completed In</strong> blank until the project closes. To set or update either field, open the project and click <strong>Edit</strong>. Select the sprint from the dropdown. To clear a sprint milestone, remove the selection and save.</p>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Sprint milestones are for recording actuals, not planning.</strong>
+              These fields capture what <em>happened</em> — not what was planned. Use the project's start and end date fields for planned dates; use sprint milestones only once a sprint has actually begun or completed. This distinction keeps planned vs. actual data clean in reports.
+            </div>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Deleting a sprint clears its milestone references.</strong>
+              If a sprint that is set as a project's <strong>Sprint Started In</strong> or <strong>Sprint Completed In</strong> is deleted, the field is automatically cleared on all linked projects. Re-set the milestone if a replacement sprint is created.
+            </div>
+
+            <h3 class="rp-docs-subheading">Project codes</h3>
+            <p class="small rp-muted">A project code is an external reference — a Jira ID, portfolio number, or finance code. Only one code is active per project at a time. Every code change is stored in the <strong>Code History</strong> log with a timestamp and who made the change.</p>
+
+            <h3 class="rp-docs-subheading">Labels</h3>
+            <p class="small rp-muted">Labels are short project-specific identifiers (up to 50 characters) you define directly on the project — useful for internal reference numbers unique to that project. One label per project can be marked as the default. Labels are different from Tags: tags come from a shared library and work across all projects; labels belong only to this project.</p>
+
+            <h3 class="rp-docs-subheading">Followers</h3>
+            <p class="small rp-muted">Team members can follow a project to receive notifications when its status or estimate changes. Open the project and click <strong>Follow</strong> to subscribe yourself. Administrators can add followers on behalf of others from the <strong>Followers</strong> tab.</p>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Programme is required"</strong> — every project must belong to a programme. Create the programme first if it does not exist yet (see <a href="/docs/guide/programmes/">Programmes</a>).<br><br>
+              <strong>"Project name already exists"</strong> — names must be unique across the system. Add a year, team abbreviation, or qualifier to differentiate it.<br><br>
+              <strong>"Commitment date cannot be before the start date"</strong> — check both dates and ensure the commitment date is on or after the project start date.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Keep project statuses up to date. Stale statuses make portfolio views unreliable and erode leadership confidence in the data. If a status is genuinely unknown, use the closest available sub-status and add a note rather than leaving it out of date.
+            </div>
+          </section>
+
+          <!-- ── Project Estimates ── -->
+{% endblock %}

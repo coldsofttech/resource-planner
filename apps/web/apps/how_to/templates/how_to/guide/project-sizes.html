@@ -1,0 +1,126 @@
+{% extends "how_to/guide/_base.html" %}
+{% block page_title %}Project Sizes{% endblock %}
+{% block breadcrumb_extra %} / <a href="/docs/guide/project-sizes/">Project Sizes</a>{% endblock %}
+{% block section_content %}
+          <section id="project-sizes" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-rulers" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Project Sizes</h2>
+                <p class="small rp-muted mb-0">Configure the budget thresholds that classify projects by T-shirt size — XS through XL.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Project Sizes lets administrators define the budget boundaries for each size band. Every estimate in the system automatically displays a size badge (XS, S, M, L, or XL) based on its total cost. Changing these thresholds immediately affects how <em>all</em> estimates are classified — no re-saving of individual estimates is required.</p>
+
+            <p class="small rp-muted">Navigate to <strong>Project → Configurations → Project Sizes</strong> to access this screen.</p>
+
+            <h3 class="rp-docs-subheading">The five size tiers</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Size</th><th>Badge</th><th>Range</th><th>Configurable?</th></tr></thead>
+              <tbody>
+                <tr><td><strong>XS — X-Small</strong></td><td><span class="rp-badge rp-badge-soft">XS</span></td><td>Up to the XS max amount</td><td>Yes</td></tr>
+                <tr><td><strong>S — Small</strong></td><td><span class="rp-badge rp-badge-soft rp-badge-info">S</span></td><td>XS max + 1 up to the S max amount</td><td>Yes</td></tr>
+                <tr><td><strong>M — Medium</strong></td><td><span class="rp-badge rp-badge-soft rp-badge-success">M</span></td><td>S max + 1 up to the M max amount</td><td>Yes</td></tr>
+                <tr><td><strong>L — Large</strong></td><td><span class="rp-badge rp-badge-soft rp-badge-warning">L</span></td><td>M max + 1 up to the L max amount</td><td>Yes</td></tr>
+                <tr><td><strong>XL — X-Large</strong></td><td><span class="rp-badge rp-badge-soft rp-badge-danger">XL</span></td><td>Above the L max amount — derived automatically</td><td>No</td></tr>
+              </tbody>
+            </table>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> XL is always derived.</strong>
+              The XL tier has no configurable upper boundary — it covers everything above the L max amount. It is read-only and cannot be adjusted directly. To change where XL begins, increase the L max amount.
+            </div>
+
+            <h3 class="rp-docs-subheading">System defaults</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Size</th><th>Default max amount</th><th>Default range</th></tr></thead>
+              <tbody>
+                <tr><td><strong>XS</strong></td><td>£20,000</td><td>Up to £20,000</td></tr>
+                <tr><td><strong>S</strong></td><td>£60,000</td><td>£20,001 — £60,000</td></tr>
+                <tr><td><strong>M</strong></td><td>£200,000</td><td>£60,001 — £200,000</td></tr>
+                <tr><td><strong>L</strong></td><td>£500,000</td><td>£200,001 — £500,000</td></tr>
+                <tr><td><strong>XL</strong></td><td>—</td><td>£500,001 and above</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Budget variance per size</h3>
+            <p class="small rp-muted">Each size tier has a configurable <strong>Budget Variance (%)</strong> — the percentage within which a project of that size is considered <em>On Budget</em> (GREEN) when comparing its actual budget against the linked estimate's total cost. Variance beyond this band but within the global risk threshold shows as AMBER; beyond the risk threshold shows as RED.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Size</th><th>Default budget variance</th><th>Effect</th></tr></thead>
+              <tbody>
+                <tr><td><strong>XS</strong></td><td>0.5 %</td><td>Cost must be within 0.5% of the actual budget to show GREEN.</td></tr>
+                <tr><td><strong>S</strong></td><td>0.5 %</td><td>Cost must be within 0.5% of the actual budget to show GREEN.</td></tr>
+                <tr><td><strong>M</strong></td><td>0.5 %</td><td>Cost must be within 0.5% of the actual budget to show GREEN.</td></tr>
+                <tr><td><strong>L</strong></td><td>1.0 %</td><td>Cost must be within 1.0% of the actual budget to show GREEN.</td></tr>
+                <tr><td><strong>XL</strong></td><td>1.0 %</td><td>Cost must be within 1.0% of the actual budget to show GREEN.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Budget risk threshold</h3>
+            <p class="small rp-muted">The <strong>Budget Risk Threshold (%)</strong> is a single global setting that defines the AMBER/RED boundary for all project sizes. When the cost variance exceeds the per-size budget variance but stays within this threshold the risk status is AMBER; beyond it the status is RED.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Setting</th><th>Default</th><th>Effect</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Budget Risk Threshold</strong></td>
+                  <td>10.0 %</td>
+                  <td>
+                    Cost variance &lt; per-size variance → <strong style="color:var(--rp-success,green);">GREEN</strong><br>
+                    Per-size variance ≤ cost variance ≤ 10% → <strong style="color:var(--rp-warning,orange);">AMBER</strong><br>
+                    Cost variance &gt; 10% → <strong style="color:var(--rp-danger,red);">RED</strong>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> These settings power the budget risk badges on Project Budgets.</strong>
+              The size-specific variance and global risk threshold work together to produce the GREEN / AMBER / RED status shown on each budget record. See <a href="/docs/guide/project-budgets/">Project Budgets</a> for details on how the risk status is displayed and what each colour means.
+            </div>
+
+            <h3 class="rp-docs-subheading">Updating the thresholds</h3>
+            <ol class="rp-step-list">
+              <li>Navigate to <strong>Project → Configurations → Project Sizes</strong>.</li>
+              <li>Each tier card (XS, S, M, L) shows two editable fields: <strong>Max Amount (£)</strong> and <strong>Budget Variance (%)</strong>. The XL card shows only the <strong>Budget Variance (%)</strong> field — its max amount is derived automatically.</li>
+              <li>Update the <strong>Max Amount</strong> fields to change where each size band starts and ends. The range hints beneath each field update live as you type.</li>
+              <li>Update the <strong>Budget Variance (%)</strong> fields to change how tightly each size tier is evaluated for budget risk.</li>
+              <li>Update the <strong>Budget Risk Threshold (%)</strong> field (shown below the size cards) to change the global AMBER/RED boundary.</li>
+              <li>Review all values and click <strong>Save Changes</strong>. All thresholds take effect immediately across all estimates and budget records in the system.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Live range hints</h3>
+            <p class="small rp-muted">As you type in any Max Amount field, the range label underneath it updates in real time — showing the exact currency boundaries for that tier. The XL card's range also updates live to reflect the new starting point whenever you change the L max amount. Use this to verify your thresholds before committing.</p>
+
+            <h3 class="rp-docs-subheading">Rules for valid thresholds</h3>
+            <ul class="rp-rule-list">
+              <li>All four Max Amount values (XS, S, M, L) must be <strong>positive integers</strong> — zero and negative amounts are not accepted.</li>
+              <li>Max Amount values must be in <strong>strictly ascending order</strong>: XS &lt; S &lt; M &lt; L. Equal values between adjacent tiers are not allowed.</li>
+              <li>Budget Variance values must be <strong>positive decimal numbers</strong> greater than zero.</li>
+              <li>The Budget Risk Threshold must be a <strong>positive decimal number</strong> greater than zero.</li>
+              <li>If any value fails validation when you click Save, an error is shown before anything is sent to the server — no partial saves occur.</li>
+            </ul>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Changes affect all estimates immediately.</strong>
+              Saving new thresholds re-classifies every estimate in the system on the next load. An estimate that was previously <em>M</em> may show as <em>L</em> after you raise the M boundary. There is no preview of how many estimates will change — plan threshold updates carefully.
+            </div>
+
+            <h3 class="rp-docs-subheading">Who can update Project Sizes</h3>
+            <p class="small rp-muted">Only users with the <strong>Change Configuration</strong> permission can view the editable fields and save changes. Users without this permission can still navigate to the page and see the current thresholds as read-only values — but cannot modify them. The Project Sizes menu item is only visible in the navigation when the user has this permission.</p>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Amounts must be in ascending order: XS &lt; S &lt; M &lt; L"</strong> — one or more of your values is equal to or greater than the next tier. Review all four fields side by side and ensure each is strictly larger than the one before it.<br><br>
+              <strong>"This field is required"</strong> — all Max Amount and Budget Variance fields must contain a value before saving. Clearing any field and clicking Save will trigger this validation.<br><br>
+              <strong>"S max amount must be greater than XS max amount"</strong> — the S value you entered is less than or equal to the XS value. Adjust accordingly.<br><br>
+              <strong>"Budget variance must be a positive number"</strong> — Budget Variance and the Budget Risk Threshold must be greater than zero. Enter a decimal value such as <em>0.5</em> or <em>10.0</em>.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Use round numbers that reflect how your organisation thinks about project scale — for example multiples of £25k or £50k. The range hints on the screen show the exact boundaries in real time, so you can see what you are setting before you save.
+            </div>
+          </section>
+
+          <!-- ── Project Links ── -->
+{% endblock %}

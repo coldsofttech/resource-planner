@@ -1,0 +1,51 @@
+{% extends "how_to/guide/_base.html" %}
+{% block page_title %}Tags{% endblock %}
+{% block breadcrumb_extra %} / <a href="/docs/guide/tags/">Tags</a>{% endblock %}
+{% block section_content %}
+          <section id="tags" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-tag" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Tags</h2>
+                <p class="small rp-muted mb-0">Shared labels that group projects across programme boundaries for portfolio filtering.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Tags are simple, reusable labels from a shared library that can be applied to any project. They let you slice the portfolio in ways that cut across programmes — for example, tagging all cloud-related projects with <em>cloud-migration</em> regardless of which programme owns them.</p>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Tags vs. Labels — what is the difference?</strong><br>
+              <strong>Tags</strong> come from a shared library and can be applied to any project. Use them for cross-portfolio categorisation (e.g. <em>regulatory</em>, <em>high-risk</em>, <em>cloud-migration</em>).<br>
+              <strong>Labels</strong> are project-specific short identifiers defined directly on a project. Use them for internal reference codes unique to that one project. They do not appear in a shared library.
+            </div>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Tag</strong></td><td>Create a new tag with a short, unique name (max 50 characters).</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the tag name. The change is reflected immediately on all projects that use it.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Removes the tag from the library and unlinks it from every project that used it. This cannot be undone.</td></tr>
+                <tr><td><strong>Import / Export</strong></td><td>Bulk-create tags from a spreadsheet, or download the tag library.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">How to use</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Tags</strong> and click <strong>Add Tag</strong>. Enter a concise, lowercase name and click <strong>Save</strong>.</li>
+              <li>Open a project and go to the <strong>Tags</strong> field. Search for and select one or more tags.</li>
+              <li>On the Projects list, use the <strong>Tags</strong> filter to find all projects with a given tag across all programmes.</li>
+            </ol>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Deleting a tag removes it from all projects.</strong>
+              When you delete a tag from the library, it is immediately unlinked from every project that used it — with no confirmation step beyond the initial delete prompt. If in doubt, check which projects use the tag before deleting.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Agree on a tag vocabulary with your team before creating the library. Having <em>cloud</em>, <em>cloud-migration</em>, and <em>Cloud Migration</em> as three separate tags fragments your portfolio view. Pick one name per concept and stick to it.
+            </div>
+          </section>
+
+          <!-- ── Recharge Types ── -->
+{% endblock %}

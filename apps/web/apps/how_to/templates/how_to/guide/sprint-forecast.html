@@ -1,0 +1,188 @@
+{% extends "how_to/guide/_base.html" %}
+{% block page_title %}Sprint Forecast{% endblock %}
+{% block breadcrumb_extra %} / <a href="/docs/guide/sprint-forecast/">Sprint Forecast</a>{% endblock %}
+{% block section_content %}
+          <section id="sprint-forecast" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-graph-up" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Sprint Forecast</h2>
+                <p class="small rp-muted mb-0">Import planned effort per team into a sprint and confirm the data to drive recharge records for financial reconciliation.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Sprint Forecast captures the planned effort per story or ticket for a sprint — per team, per project label. Once each team's forecast is confirmed, the <strong>Review Complete</strong> action generates recharge detail records that feed the financial recharge process. These records group effort by project and recharge type, ready for billing or cost recovery.</p>
+
+            <h3 class="rp-docs-subheading">Navigating to Sprint Forecast</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Sprints</strong> and open the sprint you want to forecast.</li>
+              <li>Click the <strong>Forecast</strong> button in the sprint detail page actions.</li>
+              <li>The Sprint Forecast page shows a <strong>Teams</strong> panel with one accordion row per active team.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Page actions</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button</th><th>What it does</th><th>Permission required</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Download Template</strong></td><td>Downloads the CSV template pre-formatted for forecast data entry.</td><td>Any authenticated user</td></tr>
+                <tr><td><strong>Review Complete</strong></td><td>Marks the forecast as finalised for this sprint and generates recharge detail records from all confirmed team imports.</td><td><code>sprints.review_complete</code></td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Team accordion</h3>
+            <p class="small rp-muted">Each active team has an accordion row showing its name, a status badge for its latest import, and an <strong>Import</strong> button. Expand the accordion to see the full import history for that team.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Status badge</th><th>Colour</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Active</strong></td>
+                  <td><span style="color:var(--rp-info,steelblue);font-weight:600;">BLUE</span></td>
+                  <td>The most recent import is in progress — uploaded but not yet confirmed.</td>
+                </tr>
+                <tr>
+                  <td><strong>Confirmed</strong></td>
+                  <td><span style="color:var(--rp-success,green);font-weight:600;">GREEN</span></td>
+                  <td>The import has been reviewed and confirmed. Rows are locked and included in recharge generation.</td>
+                </tr>
+                <tr>
+                  <td><strong>Superseded</strong></td>
+                  <td><span style="color:var(--rp-muted,grey);font-weight:600;">GREY</span></td>
+                  <td>An older import replaced when a newer file was uploaded for this team.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Uploading forecast data</h3>
+            <ol class="rp-step-list">
+              <li>Click <strong>Download Template</strong> to get the CSV. Fill in one row per planned story or ticket.</li>
+              <li>In the Teams panel, locate the team whose forecast you are uploading.</li>
+              <li>Click <strong>Import</strong> on that team's accordion row.</li>
+              <li>Select the completed CSV file. The file is uploaded immediately.</li>
+              <li>A success toast confirms the upload and the team's status badge updates to <strong>Active</strong>.</li>
+            </ol>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Upload permissions.</strong>
+              The <strong>Import</strong> button is only shown to users with the <code>sprints.import_forecast</code> permission.
+            </div>
+
+            <h3 class="rp-docs-subheading">Import history table</h3>
+            <p class="small rp-muted">Expanding a team accordion shows a table of all imports for that team in this sprint. Click any row to open the <strong>import detail page</strong>.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Column</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Version</strong></td><td>Auto-incremented (<code>v1</code>, <code>v2</code>, …). Each upload creates a new version. Only the latest can be Active.</td></tr>
+                <tr><td><strong>File Name</strong></td><td>Name of the uploaded CSV file.</td></tr>
+                <tr><td><strong>Status</strong></td><td>Active, Confirmed, or Superseded — see badge definitions above.</td></tr>
+                <tr><td><strong>Imported At</strong></td><td>Date and time of the upload.</td></tr>
+                <tr><td><strong>Imported By</strong></td><td>The user who uploaded the file.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Import detail page</h3>
+            <p class="small rp-muted">The import detail page shows the full contents of a single import version and lets you review, correct, and confirm it.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Button</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Review</strong></td><td>Validates all rows — assignee, sprint, label, and mapping checks. Results appear in the Checks column.</td></tr>
+                <tr><td><strong>Add Row</strong></td><td>Manually adds a row to the import without re-uploading the whole file.</td></tr>
+                <tr><td><strong>Confirm</strong></td><td>Locks the import. Rows are finalised and included in the next recharge generation. Cannot be undone.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Rows tab columns</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Column</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Story Type</strong></td><td>The type of work item — e.g. Story, Bug, Task.</td></tr>
+                <tr><td><strong>Jira ID</strong></td><td>Ticket identifier from Jira.</td></tr>
+                <tr><td><strong>Title</strong></td><td>Story or ticket title.</td></tr>
+                <tr><td><strong>Assignee</strong></td><td>Planned assignee. Highlighted red if the name is not found in the system.</td></tr>
+                <tr><td><strong>Efforts</strong></td><td>Planned effort in seconds (Jira export format).</td></tr>
+                <tr><td><strong>Days</strong></td><td>Efforts converted to days using the configured hours-per-day setting.</td></tr>
+                <tr><td><strong>Sprint</strong></td><td>Sprint the work is planned for. Highlighted red if not found.</td></tr>
+                <tr><td><strong>Label</strong></td><td>Project label this work maps to. Highlighted red if not found.</td></tr>
+                <tr><td><strong>Mapping</strong></td><td>Recharge type for this work. Highlighted red if invalid for the project type.</td></tr>
+                <tr><td><strong>Checks</strong></td><td>Green tick if all checks passed; red icons for each failing check. Dash if review has not been run yet.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Confirming an import</h3>
+            <ol class="rp-step-list">
+              <li>Run <strong>Review</strong> and fix any failing rows, or decide to proceed despite failures.</li>
+              <li>Click <strong>Confirm</strong>.</li>
+              <li>If all checks passed, a confirmation drawer appears — click <strong>Confirm</strong> to lock the import.</li>
+              <li>If checks failed, an <strong>Override Notes</strong> field appears. Enter a reason and click <strong>Confirm</strong>.</li>
+              <li>The import status changes to <strong>Confirmed</strong>. If a newer version was already confirmed, this version supersedes it.</li>
+            </ol>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Confirming is irreversible.</strong>
+              Once confirmed, a forecast import is locked. Upload a new file to make corrections — the previous version becomes <strong>Superseded</strong>.
+            </div>
+
+            <h3 class="rp-docs-subheading">Review Complete</h3>
+            <p class="small rp-muted">Once all teams have confirmed their imports, click <strong>Review Complete</strong> to finalise the sprint forecast and generate recharge records.</p>
+            <ol class="rp-step-list">
+              <li>Click <strong>Review Complete</strong> in the page actions. The button requires the <code>sprints.review_complete</code> permission.</li>
+              <li>A drawer opens showing the status of each team — which teams are confirmed and which are not.</li>
+              <li>If all teams are confirmed, click <strong>Complete</strong> to proceed.</li>
+              <li>If some teams are not yet confirmed, enable the <strong>Override</strong> checkbox, enter a note explaining why, and click <strong>Complete</strong>.</li>
+              <li>The system generates recharge detail records from all confirmed rows across all teams for this sprint. A success message shows how many records were created.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">What happens after Review Complete</h3>
+            <p class="small rp-muted">Clicking <strong>Review Complete</strong> triggers the following:</p>
+            <ol class="rp-step-list">
+              <li><strong>Recharge detail records are rebuilt</strong> — all existing forecast recharge detail records for this sprint are deleted and recreated from the latest confirmed import rows. Each row that has a valid assignee, label, and mapping creates one recharge detail entry.</li>
+              <li><strong>Cost is calculated</strong> — total cost per row is derived from the effort (in days) multiplied by the configured sprint point price. The hours-per-day setting converts effort seconds to days.</li>
+              <li><strong>Recharge aggregates are rebuilt</strong> — the system groups recharge detail records by project, programme, and recharge type, then creates or replaces aggregate recharge records. These aggregate records are what financial teams use for cost recovery and billing.</li>
+              <li><strong>Finance contacts are linked</strong> — for project-linked recharges, the project's finance and project contacts are automatically associated with the aggregate record.</li>
+            </ol>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Re-running Review Complete.</strong>
+              You can click <strong>Review Complete</strong> again after uploading and confirming a corrected import. Each run fully rebuilds the recharge records for this sprint — previous recharge data is replaced, not accumulated.
+            </div>
+
+            <h3 class="rp-docs-subheading">Recharge records generated</h3>
+            <p class="small rp-muted">The recharge workflow produces two levels of records:</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Record type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Recharge Detail</strong></td>
+                  <td>One record per confirmed import row. Stores the individual story-level effort, cost, assignee, project label, and recharge type. Used for granular audit and drill-down.</td>
+                </tr>
+                <tr>
+                  <td><strong>Recharge</strong> (aggregate)</td>
+                  <td>One record per unique combination of sprint, recharge type, programme, and project. Stores the summed total days and total cost. These are the financial-facing records used for billing and cost recovery.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Permissions</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Action</th><th>Permission required</th></tr></thead>
+              <tbody>
+                <tr><td>View Sprint Forecast page and import history</td><td>Standard authenticated access</td></tr>
+                <tr><td>Upload forecast CSV for a team</td><td><code>sprints.import_forecast</code></td></tr>
+                <tr><td>Review and confirm an import</td><td><code>sprints.review_forecast</code> / <code>sprints.confirm_forecast</code></td></tr>
+                <tr><td>Mark Review Complete and generate recharge records</td><td><code>sprints.review_complete</code></td></tr>
+              </tbody>
+            </table>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common issues</div>
+              <strong>"Import button is not visible"</strong> — you need the <code>sprints.import_forecast</code> permission. Contact your administrator.<br><br>
+              <strong>"Review Complete button is not visible"</strong> — this button requires the <code>sprints.review_complete</code> permission.<br><br>
+              <strong>"Assignee check fails for a valid member"</strong> — the name in the CSV does not match the system. Check the member's display name or email in the Workforce section.<br><br>
+              <strong>"Mapping check fails"</strong> — the recharge type code in the CSV is not mapped to the project type of the target label. Review the <a href="/docs/guide/recharge-types/">Recharge Types</a> configuration and ensure the mapping exists.<br><br>
+              <strong>"Zero recharge records created after Review Complete"</strong> — no teams had a confirmed import at the time Review Complete was triggered. Confirm at least one team's import before running Review Complete.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Run <strong>Review</strong> before confirming even if you expect all rows to pass — it surfaces mapping and label issues early. If corrections are needed, upload a new version of the file rather than editing individual rows.
+            </div>
+          </section>
+{% endblock %}

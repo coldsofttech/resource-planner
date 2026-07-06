@@ -1,0 +1,96 @@
+{% extends "how_to/guide/_base.html" %}
+{% block page_title %}Project Contacts{% endblock %}
+{% block breadcrumb_extra %} / <a href="/docs/guide/project-contacts/">Project Contacts</a>{% endblock %}
+{% block section_content %}
+          <section id="project-contacts" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-person-lines-fill" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Project Contacts</h2>
+                <p class="small rp-muted mb-0">Record the key external or internal stakeholders associated with a project — delivery contacts, finance contacts, and more.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Project Contacts let you attach named individuals to a project in a specific role. Use them to record who the business stakeholders are — who is accountable for delivery decisions and who holds the financial sign-off — without requiring them to have a Resource Planner account. Contacts are drawn from a shared contact library; adding a new name to a project automatically adds it to that library for reuse on future projects.</p>
+
+            <h3 class="rp-docs-subheading">Navigating to Project Contacts</h3>
+            <ol class="rp-step-list">
+              <li>Open any project from the <strong>Projects</strong> list.</li>
+              <li>Click the <strong>Contacts</strong> tab inside the project detail page.</li>
+              <li>All contacts currently assigned to this project are listed here, sorted by name.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Contact roles</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Role</th><th>Intended for</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Project</strong></td>
+                  <td>The primary delivery stakeholder — the business sponsor, product owner, or senior responsible owner who is accountable for what the project delivers.</td>
+                </tr>
+                <tr>
+                  <td><strong>Finance</strong></td>
+                  <td>The financial contact — the budget holder, finance business partner, or cost centre owner who approves and monitors project spend.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Actions on the Contacts tab</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Contact</strong></td><td>Opens a panel to enter the contact's name, optional email, and role. Saves the contact to the shared library if they are not already in it.</td></tr>
+                <tr><td><strong>Remove</strong> <i class="bi bi-trash"></i></td><td>Removes the contact from this project. The contact record remains in the shared library and can be reused on other projects.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Adding a contact</h3>
+            <ol class="rp-step-list">
+              <li>Open the project and click the <strong>Contacts</strong> tab.</li>
+              <li>Click <strong>Add Contact</strong>.</li>
+              <li>Enter the contact's <strong>Name</strong>. This field is required.</li>
+              <li>Optionally enter their <strong>Email</strong> address.</li>
+              <li>Select the <strong>Role</strong> — choose <strong>Project</strong> for the delivery stakeholder or <strong>Finance</strong> for the budget holder.</li>
+              <li>Click <strong>Save</strong>. The contact is assigned to the project immediately.</li>
+            </ol>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Contacts are shared across projects.</strong>
+              When you add a contact by name and email, the system checks the shared contact library first. If a contact with the same name and email already exists, it is linked to this project rather than created again. This means the same person can be a stakeholder on multiple projects without duplicating their record.
+            </div>
+
+            <h3 class="rp-docs-subheading">Removing a contact</h3>
+            <ol class="rp-step-list">
+              <li>On the <strong>Contacts</strong> tab, click the <strong>Remove</strong> action next to the contact you want to unlink.</li>
+              <li>Confirm the removal. The contact is removed from this project only — their record in the shared contact library is preserved, and they remain linked to any other projects they are assigned to.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Permissions</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Action</th><th>Permission required</th></tr></thead>
+              <tbody>
+                <tr><td>View contacts on a project</td><td>Standard project view access (<code>projects.view_projectcontact</code>)</td></tr>
+                <tr><td>Add a contact to a project</td><td><strong>Add project contact</strong> (<code>projects.add_projectcontact</code>)</td></tr>
+                <tr><td>Remove a contact from a project</td><td><strong>Delete project contact</strong> (<code>projects.delete_projectcontact</code>)</td></tr>
+              </tbody>
+            </table>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Each contact can only be assigned once per project.</strong>
+              The same person cannot be added to the same project twice, even with a different role. If you need to change a contact's role, remove them and re-add them with the correct role.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Contact is already assigned to this project"</strong> — this person is already listed on the Contacts tab. Each contact can appear on a project only once. If their role needs updating, remove the existing entry and add them again with the correct role.<br><br>
+              <strong>"Name is required"</strong> — the contact's name cannot be blank. Email is optional, but a name is always required to identify the contact.<br><br>
+              <strong>"You do not have permission to add contacts"</strong> — contact your administrator to request the <em>Add project contact</em> permission.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Add contacts at project creation time so that stakeholders are always visible alongside the project record. Including an email address makes it easier for team members to reach the right person directly from the project page — especially useful for Finance contacts during budget review cycles.
+            </div>
+          </section>
+
+          <!-- ── Project Comments ── -->
+{% endblock %}

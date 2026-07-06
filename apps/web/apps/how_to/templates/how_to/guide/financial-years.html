@@ -1,0 +1,70 @@
+{% extends "how_to/guide/_base.html" %}
+{% block page_title %}Financial Years{% endblock %}
+{% block breadcrumb_extra %} / <a href="/docs/guide/financial-years/">Financial Years</a>{% endblock %}
+{% block section_content %}
+          <section id="financial-years" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-calendar3" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Financial Years</h2>
+                <p class="small rp-muted mb-0">The top-level planning container for sprints, budgets, and all reporting.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">A Financial Year (FY) is the foundation of everything in Resource Planner. Sprints sit inside FYs, project budgets are allocated per FY, and all reports are anchored to a financial year. Set these up first, before creating sprints or allocating budgets.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Financial Year</strong></td><td>Opens a panel on the right. Enter the start date, end date, initial status, and an optional note. Labels and duration are calculated for you.</td></tr>
+                <tr><td><strong>View</strong> <i class="bi bi-eye"></i></td><td>Opens a read-only summary of the financial year, including all sprints within it.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the dates, status, or note.</td></tr>
+                <tr><td><strong>Deactivate / Activate</strong></td><td>Hides or shows the FY in planning dropdowns. Does not affect existing sprints or budget data.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Status explained</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Status</th><th>When to use it</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Future</strong></td><td>The year has not started. Use when creating an upcoming FY in advance.</td></tr>
+                <tr><td><strong>In Progress</strong></td><td>The currently active year. Only one FY can be In Progress at a time.</td></tr>
+                <tr><td><strong>Completed</strong></td><td>The year ended normally. Sprints and budgets are preserved for historical reporting.</td></tr>
+                <tr><td><strong>Expired</strong></td><td>The end date passed without the year being marked Completed.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Setting up a financial year</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Financial Years</strong> in the navigation.</li>
+              <li>Click <strong>Add Financial Year</strong>.</li>
+              <li>Enter the start date (e.g. 1 July) and end date (e.g. 30 June the following year).</li>
+              <li>Set the status to <strong>Future</strong> if it has not started yet, or <strong>In Progress</strong> for the current year.</li>
+              <li>Click <strong>Save</strong>. The year label (e.g. FY2025-26) and total days are calculated automatically.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Transitioning to a new year</h3>
+            <ol class="rp-step-list">
+              <li>Create the new FY with status <strong>Future</strong> a few weeks before the current year ends.</li>
+              <li>On the first day of the new year, open it and change the status to <strong>In Progress</strong>.</li>
+              <li>The current FY is automatically moved to <strong>Completed</strong> — you do not need to update it manually.</li>
+            </ol>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Only one year can be In Progress at a time.</strong>
+              Setting a second FY to In Progress will be blocked if another one is already active. Transition or complete the current year first.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Date ranges overlap with an existing financial year"</strong> — your new FY's start or end date falls inside an existing one. Ensure the years sit end-to-end with no overlap. A common mistake: if the current year ends on 30 June, the new one should start on 1 July, not 30 June.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Create the next FY in <strong>Future</strong> status a few weeks early. This lets you set up sprints and start planning for the upcoming year before the current one closes.
+            </div>
+          </section>
+
+          <!-- ── Sprints ── -->
+{% endblock %}

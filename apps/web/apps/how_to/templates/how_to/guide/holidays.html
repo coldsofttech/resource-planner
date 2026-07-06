@@ -1,0 +1,62 @@
+{% extends "how_to/guide/_base.html" %}
+{% block page_title %}Holidays{% endblock %}
+{% block breadcrumb_extra %} / <a href="/docs/guide/holidays/">Holidays</a>{% endblock %}
+{% block section_content %}
+          <section id="holidays" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-calendar-heart" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Holidays</h2>
+                <p class="small rp-muted mb-0">Public holidays per location — automatically excluded from leave day counts and sprint capacity.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Holiday records tell Resource Planner which dates are non-working days for each location. They are factored out of leave calculations and sprint capacity automatically. Without them, capacity is overstated for every member in a location that observes public holidays.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Holiday</strong></td><td>Record a single public holiday for a specific location and date. All open sprints and leaves that cover this date are recalculated immediately.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the holiday name or date. Capacity is recalculated on save.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Removes the holiday. Open sprints and leaves that covered this date are recalculated — the day is restored to capacity.</td></tr>
+                <tr><td><strong>Import</strong></td><td>Bulk-load a full year's public holidays for one or more locations from a CSV or Excel file — by far the fastest way to set up holiday data.</td></tr>
+                <tr><td><strong>Export</strong></td><td>Download the holiday list for your currently filtered location and date range.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Recording a single holiday</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Holidays</strong> and click <strong>Add Holiday</strong>.</li>
+              <li>Select the location this holiday applies to.</li>
+              <li>Enter the date and the holiday name (e.g. <em>Christmas Day</em>).</li>
+              <li>Click <strong>Save</strong>. All open sprints and leave records covering this date are updated immediately.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Bulk importing a full year's holidays</h3>
+            <ol class="rp-step-list">
+              <li>Click <strong>Import</strong> on the Holidays page.</li>
+              <li>Download the <strong>sample template</strong>. It shows three columns: location, date, and holiday name.</li>
+              <li>Fill in every public holiday for each location. If the same bank holiday applies to multiple locations, add a row for each one.</li>
+              <li>Upload the file. Review the preview and fix any errors.</li>
+              <li>Click <strong>Confirm Import</strong>. Capacity figures across all affected sprints and leaves are recalculated immediately.</li>
+            </ol>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> One record per location per date.</strong>
+              Each location/date combination is unique. If the same bank holiday applies across multiple city locations, add it separately for each — one row per location in your import file.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"A holiday already exists for this location on this date"</strong> — check whether the holiday is already recorded before adding it again. Use the location filter to narrow the list to the specific location.<br><br>
+              <strong>"Sprint capacity does not change after adding a holiday"</strong> — the sprint is likely already closed. Closed sprints have frozen capacity. Only open sprints are recalculated when a holiday is added or removed.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> At the start of each financial year, use <strong>Import</strong> to load the full year's public holidays for every location in one go. This takes a few minutes and ensures accurate capacity from the first sprint onwards.
+            </div>
+          </section>
+
+          <!-- ── Tags ── -->
+{% endblock %}

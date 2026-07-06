@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}" />
+    <link rel="alternate icon" href="{% static 'images/favicon.ico' %}" />
+    <title>{% block page_title %}User Guide{% endblock %} — Resource Planner</title>
+    <script src="{% static 'js/dist/theme-init.min.js' %}"></script>
+    <script type="module" src="{% static 'js/dist/components.min.js' %}"></script>
+    <script type="module" src="{% static 'js/modules/how-to/guide.js' %}"></script>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+          crossorigin="anonymous" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="{% static 'css/dist/styles.min.css' %}" />
+  </head>
+  <body>
+    <div class="rp-docs-page">
+
+      <!-- Top bar -->
+      <div class="rp-docs-bar">
+        <div class="rp-logo" data-app-logo>RP</div>
+        <div>
+          <span class="rp-auth-bar-name" id="rp-app-name">Resource Planner</span>
+          <span class="rp-docs-bar-crumb">
+            / <a href="/docs/">Docs</a> / <a href="/docs/guide/">User Guide</a>{% block breadcrumb_extra %}{% endblock %}
+          </span>
+        </div>
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <theme-toggle></theme-toggle>
+          <a href="{{ cta_url }}" class="rp-docs-bar-btn">
+            <i class="bi bi-box-arrow-in-right"></i> {{ cta_label }}
+          </a>
+        </div>
+      </div>
+
+      <div class="rp-docs-layout">
+
+        {% include "how_to/guide/_guide_nav.html" %}
+
+        <!-- Main content -->
+        <main class="rp-docs-main">
+
+          {% block section_content %}{% endblock %}
+
+          <!-- Footer -->
+          <div class="rp-docs-footer-nav">
+            {% block footer_prev %}
+            <a href="/docs/" class="rp-docs-footer-link">
+              <i class="bi bi-arrow-left"></i> Back to Docs
+            </a>
+            {% endblock %}
+            {% block footer_next %}
+            <a href="/docs/setup/" class="rp-docs-footer-link">
+              Setup Guide <i class="bi bi-arrow-right"></i>
+            </a>
+            {% endblock %}
+            <a href="{{ cta_url }}" class="rp-docs-footer-link rp-docs-footer-link--primary">
+              {{ cta_footer_label }} <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

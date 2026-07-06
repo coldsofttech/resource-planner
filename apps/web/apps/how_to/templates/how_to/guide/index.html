@@ -1,0 +1,83 @@
+{% extends "how_to/guide/_base.html" %}
+{% block section_content %}
+          <section id="overview" class="rp-module">
+            <h1 class="rp-h1 mb-2">User Guide</h1>
+            <p class="rp-muted mb-4">
+              Step-by-step instructions for every module in Resource Planner.
+              Start with <a href="#concepts">Key Concepts</a> to understand the building blocks,
+              then jump to the module you need.
+            </p>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <div class="rp-card p-3 h-100">
+                  <div class="fw-bold mb-1"><i class="bi bi-calendar3"></i> Plan</div>
+                  <p class="small rp-muted mb-0">Set up financial years and sprints to frame delivery capacity over time.</p>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="rp-card p-3 h-100">
+                  <div class="fw-bold mb-1"><i class="bi bi-kanban"></i> Deliver</div>
+                  <p class="small rp-muted mb-0">Create and manage projects, estimates, budgets, and programmes.</p>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="rp-card p-3 h-100">
+                  <div class="fw-bold mb-1"><i class="bi bi-people"></i> Manage</div>
+                  <p class="small rp-muted mb-0">Organise teams, track capacity, and manage workforce skills and leaves.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ── Key Concepts ── -->
+          <section id="concepts" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-diagram-3" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Key Concepts</h2>
+                <p class="small rp-muted mb-0">Understand these ideas once and everything else will make sense.</p>
+              </div>
+            </div>
+
+            <h3 class="rp-docs-subheading">Codes</h3>
+            <p class="small rp-muted">Every record gets an auto-generated code when it is created — for example <strong>TEAM-0001</strong> or <strong>PRJ-0042</strong>. Codes are permanent: they never change even if you rename the record. You will see them in search results, exports, history logs, and URLs.</p>
+
+            <h3 class="rp-docs-subheading">Active and Inactive</h3>
+            <p class="small rp-muted">Most records can be set to <strong>Active</strong> or <strong>Inactive</strong>. Inactive records disappear from dropdown menus and filters so they do not clutter your day-to-day view — but they are not deleted. You can reactivate them at any time. Use inactive to archive records you no longer need without losing their history.</p>
+
+            <h3 class="rp-docs-subheading">Audit trail</h3>
+            <p class="small rp-muted">Every record shows who created it and when it was last changed. Key modules (Teams, Projects, Estimates) also keep a full <strong>change history</strong> — a timestamped log of every edit, who made it, and what the previous value was. History logs are read-only and cannot be altered.</p>
+
+            <h3 class="rp-docs-subheading">Defaults</h3>
+            <p class="small rp-muted">Roles, Locations, and Employment Types each support a single <strong>default</strong> record. When you create a new team member, the default values are pre-filled for you. Only one record per type can be the default at any time — setting a new default automatically clears the previous one.</p>
+
+            <h3 class="rp-docs-subheading">Filters</h3>
+            <p class="small rp-muted">Every list page has a filter bar. Use it to narrow down what you are looking at before taking an action. Filters also affect exports — if you apply a filter and then export, only the filtered records are downloaded. Remove all filters first if you want the full list.</p>
+
+            <h3 class="rp-docs-subheading">Importing records</h3>
+            <p class="small rp-muted">Most list pages have an <strong>Import</strong> button. Use it to create many records at once from a spreadsheet.</p>
+            <ol class="rp-step-list">
+              <li>Click <strong>Import</strong> on the list page.</li>
+              <li>Download the <strong>sample template</strong> — it shows the exact columns and format required.</li>
+              <li>Fill in your data and save the file as CSV or XLSX.</li>
+              <li>Upload the file. The system validates every row and shows a preview with any errors before saving anything.</li>
+              <li>Fix any highlighted errors and re-upload. When there are no errors, click <strong>Confirm Import</strong> to commit.</li>
+            </ol>
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Always download a fresh sample template for each import — it reflects the current column requirements exactly. Using an old template from a previous session may cause format errors.
+            </div>
+
+            <h3 class="rp-docs-subheading">Exporting records</h3>
+            <p class="small rp-muted">Click <strong>Export</strong> on any list page to download the visible records. Choose from <strong>CSV</strong>, <strong>Excel (XLSX)</strong>, <strong>PDF</strong>, or <strong>JSON</strong>. The export respects your current filters — only matching records are included.</p>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Supported export formats</strong><br>
+              <strong>CSV</strong> — plain text, opens in any spreadsheet app.<br>
+              <strong>XLSX</strong> — formatted Excel workbook with column headers.<br>
+              <strong>PDF</strong> — ready-to-print document.<br>
+              <strong>JSON</strong> — structured data for integrations or backups.
+            </div>
+          </section>
+
+          <!-- ── Financial Years ── -->
+{% endblock %}

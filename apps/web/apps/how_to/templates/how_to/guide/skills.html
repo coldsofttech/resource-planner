@@ -1,0 +1,47 @@
+{% extends "how_to/guide/_base.html" %}
+{% block page_title %}Skills{% endblock %}
+{% block breadcrumb_extra %} / <a href="/docs/guide/skills/">Skills</a>{% endblock %}
+{% block section_content %}
+          <section id="skills" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-stars" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Skills</h2>
+                <p class="small rp-muted mb-0">A shared library of competencies assigned to team members for resource matching.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Skills define the competencies in your workforce. Members can hold multiple skills. Skill data powers workforce search and resource planning filters — helping you find people with the right expertise for a given project.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Skill</strong></td><td>Create a new skill with a short name (max 20 characters) and optional description.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the name or description. Changes appear immediately on all member profiles that hold this skill.</td></tr>
+                <tr><td><strong>Deactivate / Activate</strong></td><td>Hides the skill from the member profile dropdown. Members who already have it keep it on their profile.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Removes the skill from the library permanently. Only possible when no members currently hold it.</td></tr>
+                <tr><td><strong>Import / Export</strong></td><td>Bulk-create skills from a spreadsheet, or download the skill library.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">How to use</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Skills</strong> and click <strong>Add Skill</strong>.</li>
+              <li>Enter a short, precise name — 20 characters maximum. Use the simplest recognisable form (e.g. <em>Python</em>, not <em>Python programming language</em>).</li>
+              <li>Add an optional description if the name needs clarification and click <strong>Save</strong>.</li>
+              <li>Assign skills to members via their <strong>Profile → Workforce</strong> tab.</li>
+            </ol>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Cannot delete a skill assigned to members"</strong> — deactivate the skill instead. It will be hidden from the dropdown but will remain visible on existing member profiles. To fully delete it, first remove it from all affected profiles.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Agree on a fixed skill vocabulary before building the library. Having <em>AWS</em>, <em>Amazon Web Services</em>, and <em>aws-cloud</em> as three separate entries makes skill-based filtering useless. One canonical name per skill, consistently applied.
+            </div>
+          </section>
+
+          <!-- ── Employment Types ── -->
+{% endblock %}

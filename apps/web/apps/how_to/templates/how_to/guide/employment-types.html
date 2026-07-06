@@ -1,0 +1,39 @@
+{% extends "how_to/guide/_base.html" %}
+{% block page_title %}Employment Types{% endblock %}
+{% block breadcrumb_extra %} / <a href="/docs/guide/employment-types/">Employment Types</a>{% endblock %}
+{% block section_content %}
+          <section id="employment-types" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-briefcase" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Employment Types</h2>
+                <p class="small rp-muted mb-0">Classify how team members are engaged — permanent, contractor, part-time, and so on.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Employment Types label the nature of each member's contract. They appear in workforce reports and filters, and can be used to segment capacity assumptions across different categories of worker.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Employment Type</strong></td><td>Create a new type with a clear, descriptive name.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the name. Changes apply immediately to all members who hold this type.</td></tr>
+                <tr><td><strong>Set as Default</strong></td><td>Pre-selects this type when creating new members. Only one can be the default at a time.</td></tr>
+                <tr><td><strong>Deactivate / Activate</strong></td><td>Hides or shows the type in member profile dropdowns.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Removes the type if no members currently use it.</td></tr>
+                <tr><td><strong>Import / Export</strong></td><td>Bulk-create types from a spreadsheet, or download the list.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">How to use</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Employment Types</strong> and click <strong>Add Employment Type</strong>.</li>
+              <li>Enter a clear, self-explanatory name (e.g. <em>Full-time Permanent</em>, <em>Fixed-Term Contractor</em>, <em>Part-time</em>).</li>
+              <li>Mark one as the <strong>default</strong> — typically your most common employment type.</li>
+              <li>Click <strong>Save</strong>. The type now appears in member profile dropdowns.</li>
+            </ol>
+          </section>
+
+          <!-- ── Locations ── -->
+{% endblock %}

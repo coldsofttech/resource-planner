@@ -1,0 +1,59 @@
+{% extends "how_to/guide/_base.html" %}
+{% block page_title %}Teams{% endblock %}
+{% block breadcrumb_extra %} / <a href="/docs/guide/teams/">Teams</a>{% endblock %}
+{% block section_content %}
+          <section id="teams" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-people" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Teams</h2>
+                <p class="small rp-muted mb-0">Organise your workforce into delivery teams. Every membership change is recorded in history.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Teams are the central organising unit for resource allocation. Members belong to teams, and projects are owned and collaborated on by teams. Every team change — who joined, who left, when — is recorded in an immutable history log.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Team</strong></td><td>Creates a new team. Enter a name and optional description.</td></tr>
+                <tr><td><strong>View</strong> <i class="bi bi-eye"></i></td><td>Opens the team detail page — current members, assignment history, and projects this team owns or collaborates on.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the team name or description.</td></tr>
+                <tr><td><strong>Deactivate / Activate</strong></td><td>Hides or shows the team in assignment dropdowns. Existing member assignments and project links are not removed.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Permanently removes the team. Only possible when no members are assigned and no projects reference the team.</td></tr>
+                <tr><td><strong>Import</strong></td><td>Create multiple teams at once from a CSV or Excel file.</td></tr>
+                <tr><td><strong>Export</strong></td><td>Download the full team list.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Creating a team</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Teams</strong> and click <strong>Add Team</strong>.</li>
+              <li>Enter a clear, unique team name and an optional description of the team's purpose.</li>
+              <li>Click <strong>Save</strong>.</li>
+              <li>Add members by opening each member's profile and updating their team assignment — or use the team's assignment panel inside the team detail page.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Team assignment rules</h3>
+            <ul class="rp-rule-list">
+              <li><strong>Regular members</strong> can only be on <strong>one team</strong> at a time. Moving someone to a new team automatically removes them from their current team and records the transfer in history.</li>
+              <li><strong>Leadership members</strong> (those with a role marked as Leadership) can belong to <strong>multiple teams simultaneously</strong>. Assigning them to a second team does not remove them from the first.</li>
+            </ul>
+
+            <h3 class="rp-docs-subheading">Viewing team history</h3>
+            <p class="small rp-muted">Open the team's detail page and click the <strong>History</strong> tab. You will see the complete log of who joined the team, when, who they replaced, and who made each change. This log is read-only — it cannot be edited or deleted.</p>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Cannot delete a team with active members"</strong> — reassign all current members to other teams before deleting. To stop using the team without losing history, deactivate it instead of deleting.<br><br>
+              <strong>"Cannot delete a team linked to projects"</strong> — remove the team from all projects (as primary team or collaborator) before attempting to delete it.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Use the team History tab for retrospectives and capacity reviews. It shows exactly who was on the team during any past sprint period — invaluable when revisiting what capacity was actually available.
+            </div>
+          </section>
+
+          <!-- ── Members ── -->
+{% endblock %}

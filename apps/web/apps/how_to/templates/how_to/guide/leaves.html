@@ -1,0 +1,58 @@
+{% extends "how_to/guide/_base.html" %}
+{% block page_title %}Leaves{% endblock %}
+{% block breadcrumb_extra %} / <a href="/docs/guide/leaves/">Leaves</a>{% endblock %}
+{% block section_content %}
+          <section id="leaves" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-calendar-x" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Leaves</h2>
+                <p class="small rp-muted mb-0">Record approved absences — sprint capacity is automatically adjusted.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Leave records represent approved absence periods. When you save a leave record, Resource Planner calculates the exact working days lost — excluding public holidays at the member's location — and immediately updates sprint capacity for any sprints that overlap the leave period.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Leave</strong></td><td>Opens a panel. Select the member, enter the dates, and choose whether it is a full day, half day AM, or half day PM.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the leave dates or notes. Sprint capacity is recalculated on save.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Removes the leave record and restores the capacity days to all open sprints that overlapped it.</td></tr>
+                <tr><td><strong>Import</strong></td><td>Bulk-load leave records for multiple members at once from a CSV or Excel file — the fastest way to enter planned leave for a whole team.</td></tr>
+                <tr><td><strong>Export</strong></td><td>Download the leave list with your current filters applied.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Recording a leave</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Leaves</strong> and click <strong>Add Leave</strong>.</li>
+              <li>Select the team member who is taking leave.</li>
+              <li>Enter the start and end dates.</li>
+              <li>If it is a half-day, enable the <strong>Half Day</strong> toggle and select <strong>AM</strong> or <strong>PM</strong>. For a half-day, start and end must be the same date.</li>
+              <li>Click <strong>Save</strong>. Working days are calculated automatically. Any open sprint that overlaps these dates is updated immediately.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">How days are counted</h3>
+            <p class="small rp-muted">The system counts working days in the leave range and subtracts any public holidays at the member's location. A full day counts as 1; a half-day counts as 0.5. Weekends are counted as part of the calendar range but will not increase the day count beyond what the system considers working days based on your location's holiday data.</p>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Record leaves before closing sprints.</strong>
+              Closing a sprint locks its capacity figures. Leave records added after a sprint is closed will not update the closed sprint — only open sprints are recalculated.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Leave dates overlap with an existing leave record for this member"</strong> — this member already has leave covering some of these dates. Edit the existing record rather than creating a new one, or adjust the date range.<br><br>
+              <strong>"Half-day start and end dates must be the same date"</strong> — for a half-day, both the start and end date must be identical.<br><br>
+              <strong>"Capacity has not changed after adding leave"</strong> — the sprint may already be closed, or the member does not have a location set. Check both — a closed sprint's capacity is frozen; a member without a location will not have holidays correctly applied either.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> At the start of each financial year, use <strong>Import</strong> to load the full year's planned leave for all team members in one go. This gets accurate capacity figures into every sprint before planning begins, and is far faster than entering leave one record at a time.
+            </div>
+          </section>
+
+          <!-- ── Business Units ── -->
+{% endblock %}

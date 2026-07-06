@@ -1,0 +1,54 @@
+{% extends "how_to/guide/_base.html" %}
+{% block page_title %}Locations{% endblock %}
+{% block breadcrumb_extra %} / <a href="/docs/guide/locations/">Locations</a>{% endblock %}
+{% block section_content %}
+          <section id="locations" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-geo-alt" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Locations</h2>
+                <p class="small rp-muted mb-0">Office locations that control which public holidays apply to each team member.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">A member's location determines which public holidays are excluded from their leave day count and sprint capacity. Getting this right matters: an incorrect or missing location produces inaccurate capacity figures across all sprints and resource plans for that member.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Location</strong></td><td>Create a city/country pair. After saving, go to Holidays to add the public holidays for this location.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update the city or country name.</td></tr>
+                <tr><td><strong>Set as Default</strong></td><td>Pre-selects this location when creating new members.</td></tr>
+                <tr><td><strong>Deactivate / Activate</strong></td><td>Hides or shows the location in member profile dropdowns. Existing member assignments are preserved.</td></tr>
+                <tr><td><strong>Delete</strong> <i class="bi bi-trash"></i></td><td>Removes the location if no members are assigned to it.</td></tr>
+                <tr><td><strong>Import / Export</strong></td><td>Bulk-create locations from a spreadsheet, or download the list.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">How to use</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Locations</strong> and click <strong>Add Location</strong>.</li>
+              <li>Enter the city and country. Mark one location as the default.</li>
+              <li>Click <strong>Save</strong>.</li>
+              <li>Go to <strong>Holidays</strong> and add the public holidays for this location before any leaves or sprints use it.</li>
+              <li>Assign the location to team members via their <strong>Profile → Workforce</strong> tab.</li>
+            </ol>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Each city + country combination must be unique.</strong>
+              You cannot create two locations with the same city and country. If you have multiple offices in the same city, differentiate them — for example <em>London East</em> and <em>London West</em> — or group them under one location.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"A location with this city and country already exists"</strong> — check the list before creating a new entry. Small spelling differences (e.g. <em>United Kingdom</em> vs <em>UK</em>) can create unintended duplicates that split your holiday data across two locations.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Set up locations and their holidays <em>before</em> inviting members or recording any leaves. Members without a location will have no public holidays deducted, which inflates their apparent capacity in every sprint.
+            </div>
+          </section>
+
+          <!-- ── Holidays ── -->
+{% endblock %}

@@ -1,0 +1,41 @@
+{% load static %}
+<nav class="rp-docs-sidebar" aria-label="User guide navigation">
+  <div class="rp-docs-sidebar-header">
+    <icon-field icon="bi-book-half" color="accent"></icon-field>
+    <span style="font-weight:600;font-size:0.9rem;">User Guide</span>
+  </div>
+
+  <div class="rp-docs-nav-section">Getting Started</div>
+  <a class="rp-docs-nav-link{% if guide_section == 'index' %} active{% endif %}" href="/docs/guide/"><i class="bi bi-grid"></i> Overview</a>
+
+  <div class="rp-docs-nav-section">Planning</div>
+  <a class="rp-docs-nav-link{% if guide_section == 'financial-years' %} active{% endif %}" href="/docs/guide/financial-years/"><i class="bi bi-calendar3"></i> Financial Years</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'sprints' %} active{% endif %}" href="/docs/guide/sprints/"><i class="bi bi-lightning"></i> Sprints</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'sprint-forecast' %} active{% endif %}" href="/docs/guide/sprint-forecast/"><i class="bi bi-graph-up"></i> Sprint Forecast</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'sprint-actuals' %} active{% endif %}" href="/docs/guide/sprint-actuals/"><i class="bi bi-receipt"></i> Sprint Actuals</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'projects' %} active{% endif %}" href="/docs/guide/projects/"><i class="bi bi-kanban"></i> Projects</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'estimates' %} active{% endif %}" href="/docs/guide/estimates/"><i class="bi bi-calculator"></i> Project Estimates</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'project-sizes' %} active{% endif %}" href="/docs/guide/project-sizes/"><i class="bi bi-rulers"></i> Project Sizes</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'project-links' %} active{% endif %}" href="/docs/guide/project-links/"><i class="bi bi-link-45deg"></i> Project Links</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'project-attachments' %} active{% endif %}" href="/docs/guide/project-attachments/"><i class="bi bi-paperclip"></i> Project Attachments</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'project-budgets' %} active{% endif %}" href="/docs/guide/project-budgets/"><i class="bi bi-cash-stack"></i> Project Budgets</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'project-actuals' %} active{% endif %}" href="/docs/guide/project-actuals/"><i class="bi bi-graph-up-arrow"></i> Project Actuals</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'project-contacts' %} active{% endif %}" href="/docs/guide/project-contacts/"><i class="bi bi-person-lines-fill"></i> Project Contacts</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'project-comments' %} active{% endif %}" href="/docs/guide/project-comments/"><i class="bi bi-chat-left-text"></i> Project Comments</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'programmes' %} active{% endif %}" href="/docs/guide/programmes/"><i class="bi bi-collection"></i> Programmes</a>
+
+  <div class="rp-docs-nav-section">Workforce</div>
+  <a class="rp-docs-nav-link{% if guide_section == 'teams' %} active{% endif %}" href="/docs/guide/teams/"><i class="bi bi-people"></i> Teams</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'members' %} active{% endif %}" href="/docs/guide/members/"><i class="bi bi-person-badge"></i> Members</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'leaves' %} active{% endif %}" href="/docs/guide/leaves/"><i class="bi bi-calendar-x"></i> Leaves</a>
+
+  <div class="rp-docs-nav-section">Configuration</div>
+  <a class="rp-docs-nav-link{% if guide_section == 'business-units' %} active{% endif %}" href="/docs/guide/business-units/"><i class="bi bi-building"></i> Business Units</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'roles' %} active{% endif %}" href="/docs/guide/roles/"><i class="bi bi-award"></i> Roles</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'skills' %} active{% endif %}" href="/docs/guide/skills/"><i class="bi bi-stars"></i> Skills</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'employment-types' %} active{% endif %}" href="/docs/guide/employment-types/"><i class="bi bi-briefcase"></i> Employment Types</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'locations' %} active{% endif %}" href="/docs/guide/locations/"><i class="bi bi-geo-alt"></i> Locations</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'holidays' %} active{% endif %}" href="/docs/guide/holidays/"><i class="bi bi-calendar-heart"></i> Holidays</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'tags' %} active{% endif %}" href="/docs/guide/tags/"><i class="bi bi-tag"></i> Tags</a>
+  <a class="rp-docs-nav-link{% if guide_section == 'recharge-types' %} active{% endif %}" href="/docs/guide/recharge-types/"><i class="bi bi-arrow-repeat"></i> Recharge Types</a>
+</nav>

@@ -55,12 +55,15 @@
           <div class="rp-docs-nav-section">Planning</div>
           <a class="rp-docs-nav-link" href="#financial-years"><i class="bi bi-calendar3"></i> Financial Years</a>
           <a class="rp-docs-nav-link" href="#sprints"><i class="bi bi-lightning"></i> Sprints</a>
+          <a class="rp-docs-nav-link" href="#sprint-forecast"><i class="bi bi-graph-up"></i> Sprint Forecast</a>
+          <a class="rp-docs-nav-link" href="#sprint-actuals"><i class="bi bi-receipt"></i> Sprint Actuals</a>
           <a class="rp-docs-nav-link" href="#projects"><i class="bi bi-kanban"></i> Projects</a>
           <a class="rp-docs-nav-link" href="#estimates"><i class="bi bi-calculator"></i> Project Estimates</a>
           <a class="rp-docs-nav-link" href="#project-sizes"><i class="bi bi-rulers"></i> Project Sizes</a>
           <a class="rp-docs-nav-link" href="#project-links"><i class="bi bi-link-45deg"></i> Project Links</a>
           <a class="rp-docs-nav-link" href="#project-attachments"><i class="bi bi-paperclip"></i> Project Attachments</a>
           <a class="rp-docs-nav-link" href="#project-budgets"><i class="bi bi-cash-stack"></i> Project Budgets</a>
+          <a class="rp-docs-nav-link" href="#project-actuals"><i class="bi bi-graph-up-arrow"></i> Project Actuals</a>
           <a class="rp-docs-nav-link" href="#project-contacts"><i class="bi bi-person-lines-fill"></i> Project Contacts</a>
           <a class="rp-docs-nav-link" href="#project-comments"><i class="bi bi-chat-left-text"></i> Project Comments</a>
           <a class="rp-docs-nav-link" href="#programmes"><i class="bi bi-collection"></i> Programmes</a>
@@ -293,6 +296,393 @@
 
             <div class="rp-tip-block">
               <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Open a sprint's detail view to see the full capacity table — including which members are at zero capacity (fully on leave) or have reduced capacity due to holidays. Use this before assigning work in a resource plan.
+            </div>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Recording actual spend:</strong> Use <a href="#sprint-actuals">Sprint Actuals</a> to import and confirm what each team actually delivered in a sprint. Confirmed actuals feed into project-level cost tracking.
+            </div>
+          </section>
+
+          <!-- ── Sprint Forecast ── -->
+          <section id="sprint-forecast" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-graph-up" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Sprint Forecast</h2>
+                <p class="small rp-muted mb-0">Import planned effort per team into a sprint and confirm the data to drive recharge records for financial reconciliation.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Sprint Forecast captures the planned effort per story or ticket for a sprint — per team, per project label. Once each team's forecast is confirmed, the <strong>Review Complete</strong> action generates recharge detail records that feed the financial recharge process. These records group effort by project and recharge type, ready for billing or cost recovery.</p>
+
+            <h3 class="rp-docs-subheading">Navigating to Sprint Forecast</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Sprints</strong> and open the sprint you want to forecast.</li>
+              <li>Click the <strong>Forecast</strong> button in the sprint detail page actions.</li>
+              <li>The Sprint Forecast page shows a <strong>Teams</strong> panel with one accordion row per active team.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Page actions</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button</th><th>What it does</th><th>Permission required</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Download Template</strong></td><td>Downloads the CSV template pre-formatted for forecast data entry.</td><td>Any authenticated user</td></tr>
+                <tr><td><strong>Review Complete</strong></td><td>Marks the forecast as finalised for this sprint and generates recharge detail records from all confirmed team imports.</td><td><code>sprints.review_complete</code></td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Team accordion</h3>
+            <p class="small rp-muted">Each active team has an accordion row showing its name, a status badge for its latest import, and an <strong>Import</strong> button. Expand the accordion to see the full import history for that team.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Status badge</th><th>Colour</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Active</strong></td>
+                  <td><span style="color:var(--rp-info,steelblue);font-weight:600;">BLUE</span></td>
+                  <td>The most recent import is in progress — uploaded but not yet confirmed.</td>
+                </tr>
+                <tr>
+                  <td><strong>Confirmed</strong></td>
+                  <td><span style="color:var(--rp-success,green);font-weight:600;">GREEN</span></td>
+                  <td>The import has been reviewed and confirmed. Rows are locked and included in recharge generation.</td>
+                </tr>
+                <tr>
+                  <td><strong>Superseded</strong></td>
+                  <td><span style="color:var(--rp-muted,grey);font-weight:600;">GREY</span></td>
+                  <td>An older import replaced when a newer file was uploaded for this team.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Uploading forecast data</h3>
+            <ol class="rp-step-list">
+              <li>Click <strong>Download Template</strong> to get the CSV. Fill in one row per planned story or ticket.</li>
+              <li>In the Teams panel, locate the team whose forecast you are uploading.</li>
+              <li>Click <strong>Import</strong> on that team's accordion row.</li>
+              <li>Select the completed CSV file. The file is uploaded immediately.</li>
+              <li>A success toast confirms the upload and the team's status badge updates to <strong>Active</strong>.</li>
+            </ol>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Upload permissions.</strong>
+              The <strong>Import</strong> button is only shown to users with the <code>sprints.import_forecast</code> permission.
+            </div>
+
+            <h3 class="rp-docs-subheading">Import history table</h3>
+            <p class="small rp-muted">Expanding a team accordion shows a table of all imports for that team in this sprint. Click any row to open the <strong>import detail page</strong>.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Column</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Version</strong></td><td>Auto-incremented (<code>v1</code>, <code>v2</code>, …). Each upload creates a new version. Only the latest can be Active.</td></tr>
+                <tr><td><strong>File Name</strong></td><td>Name of the uploaded CSV file.</td></tr>
+                <tr><td><strong>Status</strong></td><td>Active, Confirmed, or Superseded — see badge definitions above.</td></tr>
+                <tr><td><strong>Imported At</strong></td><td>Date and time of the upload.</td></tr>
+                <tr><td><strong>Imported By</strong></td><td>The user who uploaded the file.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Import detail page</h3>
+            <p class="small rp-muted">The import detail page shows the full contents of a single import version and lets you review, correct, and confirm it.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Button</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Review</strong></td><td>Validates all rows — assignee, sprint, label, and mapping checks. Results appear in the Checks column.</td></tr>
+                <tr><td><strong>Add Row</strong></td><td>Manually adds a row to the import without re-uploading the whole file.</td></tr>
+                <tr><td><strong>Confirm</strong></td><td>Locks the import. Rows are finalised and included in the next recharge generation. Cannot be undone.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Rows tab columns</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Column</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Story Type</strong></td><td>The type of work item — e.g. Story, Bug, Task.</td></tr>
+                <tr><td><strong>Jira ID</strong></td><td>Ticket identifier from Jira.</td></tr>
+                <tr><td><strong>Title</strong></td><td>Story or ticket title.</td></tr>
+                <tr><td><strong>Assignee</strong></td><td>Planned assignee. Highlighted red if the name is not found in the system.</td></tr>
+                <tr><td><strong>Efforts</strong></td><td>Planned effort in seconds (Jira export format).</td></tr>
+                <tr><td><strong>Days</strong></td><td>Efforts converted to days using the configured hours-per-day setting.</td></tr>
+                <tr><td><strong>Sprint</strong></td><td>Sprint the work is planned for. Highlighted red if not found.</td></tr>
+                <tr><td><strong>Label</strong></td><td>Project label this work maps to. Highlighted red if not found.</td></tr>
+                <tr><td><strong>Mapping</strong></td><td>Recharge type for this work. Highlighted red if invalid for the project type.</td></tr>
+                <tr><td><strong>Checks</strong></td><td>Green tick if all checks passed; red icons for each failing check. Dash if review has not been run yet.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Confirming an import</h3>
+            <ol class="rp-step-list">
+              <li>Run <strong>Review</strong> and fix any failing rows, or decide to proceed despite failures.</li>
+              <li>Click <strong>Confirm</strong>.</li>
+              <li>If all checks passed, a confirmation drawer appears — click <strong>Confirm</strong> to lock the import.</li>
+              <li>If checks failed, an <strong>Override Notes</strong> field appears. Enter a reason and click <strong>Confirm</strong>.</li>
+              <li>The import status changes to <strong>Confirmed</strong>. If a newer version was already confirmed, this version supersedes it.</li>
+            </ol>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Confirming is irreversible.</strong>
+              Once confirmed, a forecast import is locked. Upload a new file to make corrections — the previous version becomes <strong>Superseded</strong>.
+            </div>
+
+            <h3 class="rp-docs-subheading">Review Complete</h3>
+            <p class="small rp-muted">Once all teams have confirmed their imports, click <strong>Review Complete</strong> to finalise the sprint forecast and generate recharge records.</p>
+            <ol class="rp-step-list">
+              <li>Click <strong>Review Complete</strong> in the page actions. The button requires the <code>sprints.review_complete</code> permission.</li>
+              <li>A drawer opens showing the status of each team — which teams are confirmed and which are not.</li>
+              <li>If all teams are confirmed, click <strong>Complete</strong> to proceed.</li>
+              <li>If some teams are not yet confirmed, enable the <strong>Override</strong> checkbox, enter a note explaining why, and click <strong>Complete</strong>.</li>
+              <li>The system generates recharge detail records from all confirmed rows across all teams for this sprint. A success message shows how many records were created.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">What happens after Review Complete</h3>
+            <ol class="rp-step-list">
+              <li><strong>Recharge detail records are rebuilt</strong> — all existing forecast recharge detail records for this sprint are deleted and recreated from the latest confirmed import rows.</li>
+              <li><strong>Cost is calculated</strong> — total cost per row is derived from the effort (in days) multiplied by the configured sprint point price.</li>
+              <li><strong>Recharge aggregates are rebuilt</strong> — the system groups recharge detail records by project, programme, and recharge type, then creates or replaces aggregate recharge records.</li>
+              <li><strong>Finance contacts are linked</strong> — for project-linked recharges, the project's finance and project contacts are automatically associated with the aggregate record.</li>
+            </ol>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Re-running Review Complete.</strong>
+              You can click <strong>Review Complete</strong> again after uploading and confirming a corrected import. Each run fully rebuilds the recharge records for this sprint — previous recharge data is replaced, not accumulated.
+            </div>
+
+            <h3 class="rp-docs-subheading">Permissions</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Action</th><th>Permission required</th></tr></thead>
+              <tbody>
+                <tr><td>View Sprint Forecast page and import history</td><td>Standard authenticated access</td></tr>
+                <tr><td>Upload forecast CSV for a team</td><td><code>sprints.import_forecast</code></td></tr>
+                <tr><td>Review and confirm an import</td><td><code>sprints.review_forecast</code> / <code>sprints.confirm_forecast</code></td></tr>
+                <tr><td>Mark Review Complete and generate recharge records</td><td><code>sprints.review_complete</code></td></tr>
+              </tbody>
+            </table>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common issues</div>
+              <strong>"Import button is not visible"</strong> — you need the <code>sprints.import_forecast</code> permission. Contact your administrator.<br><br>
+              <strong>"Review Complete button is not visible"</strong> — this button requires the <code>sprints.review_complete</code> permission.<br><br>
+              <strong>"Assignee check fails for a valid member"</strong> — the name in the CSV does not match the system. Check the member's display name or email in the Workforce section.<br><br>
+              <strong>"Mapping check fails"</strong> — the recharge type code in the CSV is not mapped to the project type of the target label. Review the <a href="#recharge-types">Recharge Types</a> configuration.<br><br>
+              <strong>"Zero recharge records created after Review Complete"</strong> — no teams had a confirmed import at the time Review Complete was triggered. Confirm at least one team's import before running Review Complete.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Run <strong>Review</strong> before confirming even if you expect all rows to pass — it surfaces mapping and label issues early. If corrections are needed, upload a new version of the file rather than editing individual rows.
+            </div>
+          </section>
+
+          <!-- ── Sprint Actuals ── -->
+          <section id="sprint-actuals" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-receipt" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Sprint Actuals</h2>
+                <p class="small rp-muted mb-0">Import what each team actually delivered in a sprint and confirm the data for project cost tracking.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Sprint Actuals capture the real effort recorded against each story or ticket in a sprint — per team, per project label. Once confirmed, these figures flow into project-level cost totals on the Project Actuals tab and feed recharge detail records for financial reconciliation.</p>
+
+            <h3 class="rp-docs-subheading">Navigating to Sprint Actuals</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Sprints</strong> and open the sprint you want to record actuals for.</li>
+              <li>Click the <strong>Actuals</strong> button in the sprint detail page actions.</li>
+              <li>The Sprint Actuals page shows a <strong>Teams</strong> panel with one accordion row per active team.</li>
+            </ol>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-lock-fill"></i> Actuals cannot be imported for closed sprints.</strong>
+              Once a sprint is closed its actuals page shows a locked state. Record and confirm actuals before closing the sprint.
+            </div>
+
+            <h3 class="rp-docs-subheading">Page actions</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button</th><th>What it does</th><th>Permission required</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Download Template</strong></td><td>Downloads the CSV template to fill in actuals data for a team.</td><td>Any authenticated user</td></tr>
+                <tr><td><strong>Review Complete</strong></td><td>Opens the review complete drawer to mark all teams as done for this sprint.</td><td>Any authenticated user (enabled only when at least one team is confirmed)</td></tr>
+                <tr><td><strong>Sync Project Actuals</strong></td><td>Pushes confirmed actuals into project-level cost records. Only visible after review is complete.</td><td><code>sprints.review_complete</code></td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Team accordion</h3>
+            <p class="small rp-muted">Each active team has an accordion row showing its name, a status badge for its latest import, and an <strong>Import</strong> button. Expand the accordion to see the full import history for that team.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Status badge</th><th>Colour</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Active</strong></td>
+                  <td><span style="color:var(--rp-info,steelblue);font-weight:600;">BLUE</span></td>
+                  <td>The most recent import is in progress — it has been uploaded but not yet confirmed.</td>
+                </tr>
+                <tr>
+                  <td><strong>Confirmed</strong></td>
+                  <td><span style="color:var(--rp-success,green);font-weight:600;">GREEN</span></td>
+                  <td>The import has been reviewed and confirmed. Data is locked and feeds project cost totals.</td>
+                </tr>
+                <tr>
+                  <td><strong>Superseded</strong></td>
+                  <td><span style="color:var(--rp-muted,grey);font-weight:600;">GREY</span></td>
+                  <td>An older import that was replaced when a newer file was uploaded.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Uploading actuals data</h3>
+            <ol class="rp-step-list">
+              <li>Click <strong>Download Template</strong> to get the CSV template. Fill in one row per story or ticket.</li>
+              <li>In the Teams panel, find the team whose data you are uploading.</li>
+              <li>Click <strong>Import</strong> on that team's accordion row.</li>
+              <li>Select the completed CSV file. The file is uploaded immediately — no confirmation step.</li>
+              <li>A success toast appears and the import history table refreshes. The team's status badge updates to <strong>Active</strong>.</li>
+            </ol>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Upload permissions.</strong>
+              The <strong>Import</strong> button is only shown to users with the <code>sprints.import_actuals</code> permission. Users without this permission can still view the import history table but cannot upload files.
+            </div>
+
+            <h3 class="rp-docs-subheading">Import history table</h3>
+            <p class="small rp-muted">Expanding a team accordion shows a table of all imports for that team in this sprint.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Column</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Version</strong></td><td>Auto-incremented version number (<code>v1</code>, <code>v2</code>, …). Each upload creates a new version. Only the latest can be in Active state.</td></tr>
+                <tr><td><strong>File Name</strong></td><td>Name of the uploaded CSV file.</td></tr>
+                <tr><td><strong>Status</strong></td><td>Active, Confirmed, or Superseded — see badge definitions above.</td></tr>
+                <tr><td><strong>Imported At</strong></td><td>Date and time the file was uploaded.</td></tr>
+                <tr><td><strong>Imported By</strong></td><td>The user who uploaded the file.</td></tr>
+              </tbody>
+            </table>
+            <p class="small rp-muted">Click any row to open the <strong>import detail page</strong> and review or confirm that version.</p>
+
+            <h3 class="rp-docs-subheading">Import detail page</h3>
+            <p class="small rp-muted">The import detail page shows the full contents of a single import version and lets you review, correct, and confirm it.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Button</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Review</strong></td><td>Runs all validation checks against the rows in this import. Results appear immediately in the Checks column.</td></tr>
+                <tr><td><strong>Add Row</strong></td><td>Manually adds a new row to the import. Use to supplement CSV data with missing entries.</td></tr>
+                <tr><td><strong>Confirm</strong></td><td>Locks the import. All rows are finalised and fed into project cost records. Cannot be undone.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Rows tab</h3>
+            <p class="small rp-muted">The <strong>Rows</strong> tab lists every row from the uploaded CSV. Each row represents one story or ticket.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Column</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Story Type</strong></td><td>The type of work item — e.g. Story, Bug, Task.</td></tr>
+                <tr><td><strong>Jira ID</strong></td><td>The ticket identifier from Jira.</td></tr>
+                <tr><td><strong>Title</strong></td><td>Story or ticket title.</td></tr>
+                <tr><td><strong>Assignee</strong></td><td>The team member who completed the work. Highlighted red if the assignee is not found or inactive.</td></tr>
+                <tr><td><strong>Efforts</strong></td><td>Effort logged in seconds (as exported from Jira).</td></tr>
+                <tr><td><strong>Days</strong></td><td>Efforts converted to days.</td></tr>
+                <tr><td><strong>Sprint</strong></td><td>The sprint the work was recorded against. Highlighted red if the sprint is not found or inactive.</td></tr>
+                <tr><td><strong>Label</strong></td><td>The project label this work maps to. Highlighted red if the label is not found in the system.</td></tr>
+                <tr><td><strong>Mapping</strong></td><td>The recharge type mapping for this work. Highlighted red if the mapping is invalid for the project type.</td></tr>
+                <tr><td><strong>Checks</strong></td><td>A green tick if all checks passed; red icons indicating which checks failed. Dash if review has not been run yet.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Review checks</h3>
+            <p class="small rp-muted">Clicking <strong>Review</strong> validates every row against four check types. Failing cells are highlighted in red in the Checks column.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Check</th><th>What it validates</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Assignee</strong></td><td>The assignee name resolves to an active member in the system.</td></tr>
+                <tr><td><strong>Sprint</strong></td><td>The sprint name resolves to an active sprint in the system.</td></tr>
+                <tr><td><strong>Label</strong></td><td>The label exists as a project label in the system.</td></tr>
+                <tr><td><strong>Mapping</strong></td><td>The recharge type mapping is valid for the project type linked to this label.</td></tr>
+              </tbody>
+            </table>
+
+            <p class="small rp-muted">Use the <strong>Check Type</strong> filter above the table to view only rows with a specific failing check.</p>
+
+            <h3 class="rp-docs-subheading">Engineer Capacity tab</h3>
+            <p class="small rp-muted">The <strong>Engineer Capacity</strong> tab appears after the first review is run. It shows how allocated days compare to net available capacity for each engineer in the team.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Column</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Engineer</strong></td><td>Team member name.</td></tr>
+                <tr><td><strong>Net Capacity (days)</strong></td><td>Available working days for this engineer in the sprint — working days minus holidays and leave.</td></tr>
+                <tr><td><strong>Allocated (days)</strong></td><td>Total days assigned to this engineer across all rows in this import.</td></tr>
+                <tr><td><strong>Checks</strong></td><td>Green tick if allocated days equal or exceed net capacity; red icon if allocated days are less than net capacity.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Adding, editing, and deleting rows</h3>
+            <ul class="rp-rule-list">
+              <li><strong>Add Row</strong> — click the button in the page actions to manually enter a story. Fill in Story Type, Jira ID, Title, Assignee, Efforts, Sprint, Label, and Mapping in the drawer and click <strong>Add Row</strong>.</li>
+              <li><strong>Edit</strong> — click the <strong>Edit</strong> action on any row to open the edit drawer and update its fields. Re-run review after editing to refresh check results.</li>
+              <li><strong>Delete</strong> — click the <strong>Delete</strong> action and confirm. Deleted rows are permanent — they cannot be restored.</li>
+            </ul>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> CSV rows vs manual rows.</strong>
+              Rows uploaded from a CSV file and rows added manually behave identically — both are reviewed and confirmed together.
+            </div>
+
+            <h3 class="rp-docs-subheading">Confirming an import</h3>
+            <ol class="rp-step-list">
+              <li>Run <strong>Review</strong> and fix any failing rows (or decide to proceed despite failures).</li>
+              <li>Click <strong>Confirm</strong>.</li>
+              <li>If all checks passed, a confirmation drawer appears asking you to confirm the action.</li>
+              <li>If any checks failed, an <strong>Override Notes</strong> field appears. Enter a reason for confirming despite the failures.</li>
+              <li>Click <strong>Confirm</strong> in the drawer. The import status changes to <strong>Confirmed</strong> and the data is locked.</li>
+            </ol>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Confirming is irreversible.</strong>
+              Once an import is confirmed it cannot be edited or deleted. If corrections are needed, upload a new version of the file — the old import becomes <strong>Superseded</strong> and the new one becomes the <strong>Active</strong> version to review and confirm.
+            </div>
+
+            <h3 class="rp-docs-subheading">Review Complete</h3>
+            <p class="small rp-muted">Once all teams have confirmed imports, click <strong>Review Complete</strong> in the page actions to mark the sprint actuals as finalised.</p>
+            <ol class="rp-step-list">
+              <li>Click <strong>Review Complete</strong>. The button is only enabled when at least one team has a confirmed import.</li>
+              <li>A drawer opens showing which teams (if any) do not yet have a confirmed import.</li>
+              <li>If all teams are confirmed, a green success message is shown. Click <strong>Complete</strong>.</li>
+              <li>If some teams are not confirmed, enable the <strong>Override</strong> checkbox to acknowledge this, then enter a note explaining why, and click <strong>Complete</strong>.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Sync Project Actuals</h3>
+            <p class="small rp-muted">After review is complete, the <strong>Sync Project Actuals</strong> button becomes active (visible to users with <code>sprints.review_complete</code> permission). Syncing pushes confirmed actuals into project-level cost records, which then appear on each project's Actuals tab.</p>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Wait before syncing.</strong>
+              It is generally recommended to wait at least 3–5 days after Review Complete before syncing project actuals. This allows any late corrections to be uploaded and confirmed before the data is pushed to project records.
+            </div>
+
+            <ol class="rp-step-list">
+              <li>Click <strong>Sync Project Actuals</strong>.</li>
+              <li>Choose the scope — <strong>All Projects</strong> or <strong>Specific Projects</strong>.</li>
+              <li>Click <strong>Sync</strong>. Project cost records are created or updated for all matching projects.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Recharge integration</h3>
+            <p class="small rp-muted">Confirmed actuals also feed into the recharge workflow. Each confirmed row that has a valid mapping creates or updates a recharge detail record for the relevant project and sprint, ready for financial reconciliation. See the recharge documentation for how these records are managed downstream.</p>
+
+            <h3 class="rp-docs-subheading">Permissions</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Action</th><th>Permission required</th></tr></thead>
+              <tbody>
+                <tr><td>View Sprint Actuals page and import history</td><td>Standard authenticated access</td></tr>
+                <tr><td>Upload actuals CSV for a team</td><td><strong>Import actuals</strong> (<code>sprints.import_actuals</code>)</td></tr>
+                <tr><td>Mark Review Complete and sync project actuals</td><td><strong>Review Complete</strong> (<code>sprints.review_complete</code>)</td></tr>
+              </tbody>
+            </table>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common issues</div>
+              <strong>"Import button is not visible"</strong> — you need the <code>sprints.import_actuals</code> permission. Contact your administrator to request access.<br><br>
+              <strong>"Actuals page shows 'Sprint is closed'"</strong> — the sprint has been closed. Actuals must be uploaded and confirmed before closing a sprint.<br><br>
+              <strong>"Review Complete button stays disabled"</strong> — at least one team must have a confirmed import for the button to become active. Confirm at least one team's import first.<br><br>
+              <strong>"Assignee check fails for a valid team member"</strong> — the name in the CSV does not match the member's name in the system. Check the member's profile for the correct display name or email and update the CSV row accordingly.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Run <strong>Review</strong> before uploading a corrected file. If the only failures are mapping issues that are being handled separately, use the <strong>Override Notes</strong> field to document the reason and confirm anyway — this keeps the process moving without blocking other teams.
             </div>
           </section>
 
@@ -1037,6 +1427,145 @@
 
             <div class="rp-tip-block">
               <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Create budget records at the start of each financial year before planning begins. Link the most relevant estimate version as soon as one is finalised — this activates automatic risk tracking and gives the team an immediate view of where the project stands financially without any manual calculation.
+            </div>
+          </section>
+
+          <!-- ── Project Actuals ── -->
+          <section id="project-actuals" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-graph-up-arrow" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Project Actuals</h2>
+                <p class="small rp-muted mb-0">Track cumulative spend against the approved estimate — by financial year and by sprint.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Project Actuals show how much has been spent on a project relative to its approved estimate, broken down by financial year and sprint. The Actuals tab gives the team an immediate view of where the project stands financially — how much has been consumed, how much remains, and whether the project is on track or at risk of overspend.</p>
+
+            <h3 class="rp-docs-subheading">Navigating to Project Actuals</h3>
+            <ol class="rp-step-list">
+              <li>Open any project from the <strong>Projects</strong> list.</li>
+              <li>Click the <strong>Actuals</strong> tab inside the project detail page.</li>
+              <li>The tab shows <strong>summary cards</strong> at the top, a <strong>breakdown table</strong> below, and a <strong>gear icon</strong> (⚙) in the panel header to open the config drawer.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Summary cards</h3>
+            <p class="small rp-muted">Four cards appear at the top of the Actuals tab.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Card</th><th>What it shows</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Approved Estimate</strong></td><td>Total cost from the current approved estimate (days × day rate).</td></tr>
+                <tr><td><strong>Contingency Budget</strong></td><td>Approved estimate plus the configured contingency percentage.</td></tr>
+                <tr><td><strong>Total Actuals</strong></td><td>Cumulative spend to date — current financial year plus all prior-year carry-forward.</td></tr>
+                <tr><td><strong>Remaining Amount</strong></td><td>Budget remaining. A negative value indicates overspend beyond the contingency budget.</td></tr>
+              </tbody>
+            </table>
+
+            <p class="small rp-muted">A <strong>risk badge</strong> appears alongside the Remaining Amount when spend has exceeded the approved estimate base cost:</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Badge</th><th>Colour</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Warning</strong></td>
+                  <td><span style="color:var(--rp-warning,orange);font-weight:600;">AMBER</span></td>
+                  <td>Spend is above the base estimate but still within the contingency budget.</td>
+                </tr>
+                <tr>
+                  <td><strong>At Risk</strong></td>
+                  <td><span style="color:var(--rp-danger,red);font-weight:600;">RED</span></td>
+                  <td>Spend has exceeded the contingency budget. Immediate attention required.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> The risk badge is hidden when:</strong> there is no approved estimate linked to the project, the total actuals are zero, or the <strong>Ignore Risk</strong> config option is enabled.
+            </div>
+
+            <h3 class="rp-docs-subheading">Breakdown table — Financial Year view</h3>
+            <p class="small rp-muted">The default view shows one row per financial year in which the project has recorded actuals.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Column</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Financial Year</strong></td><td>The FY label — for example <em>FY2024-25</em>.</td></tr>
+                <tr><td><strong>Total Days</strong></td><td>Working days recorded against this project in the financial year.</td></tr>
+                <tr><td><strong>Total Cost</strong></td><td>Spend for this financial year only — does not include prior years.</td></tr>
+                <tr><td><strong>Cumulative Cost</strong></td><td>Total spend from project start through the end of this financial year.</td></tr>
+              </tbody>
+            </table>
+            <p class="small rp-muted">Click any row to drill down into the sprint breakdown for that year.</p>
+
+            <h3 class="rp-docs-subheading">Breakdown table — Sprint view</h3>
+            <p class="small rp-muted">Selecting a financial year switches the table to show one row per sprint within that year.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Column</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Sprint</strong></td><td>The sprint name.</td></tr>
+                <tr><td><strong>Sprint No.</strong></td><td>Sprint number within the financial year.</td></tr>
+                <tr><td><strong>Total Days</strong></td><td>Working days recorded in this sprint.</td></tr>
+                <tr><td><strong>Total Cost</strong></td><td>Spend recorded in this sprint.</td></tr>
+                <tr><td><strong>Cumulative Cost</strong></td><td>Running total from the first sprint of the financial year through this sprint.</td></tr>
+              </tbody>
+            </table>
+            <ul class="rp-rule-list">
+              <li><strong>Zero-fill</strong> — sprints with no actuals for this project are still shown with zero days and cost. The cumulative cost carries forward unchanged across those zero-actuals sprints.</li>
+              <li><strong>Future sprints excluded</strong> — only sprints that have started or completed appear in the table. Upcoming sprints are not shown.</li>
+            </ul>
+
+            <h3 class="rp-docs-subheading">Actuals config drawer</h3>
+            <p class="small rp-muted">Click the <strong>gear icon (⚙)</strong> in the Actuals panel header to open the config drawer. These settings adjust how actuals are displayed for this project without changing the underlying data.</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Setting</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Ignore Risk</strong></td>
+                  <td>When enabled, the risk badge (Warning / At Risk) is hidden regardless of how much has been spent against the estimate. Use this when the estimate no longer reflects current scope but has not yet been formally updated, or when the project team has accepted the overspend.</td>
+                </tr>
+                <tr>
+                  <td><strong>Ignore Prev FY Actuals</strong></td>
+                  <td>When enabled, only the current financial year's spend is included in the Total Actuals card and in risk calculations. Prior-year carry-forward is excluded. Use this when prior-year spend relates to a different contract, team, or funding source and should not count against the current estimate.</td>
+                </tr>
+                <tr>
+                  <td><strong>Notes</strong></td>
+                  <td>A free-text field for recording the reason for any config overrides. Visible only inside this drawer.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <p class="small rp-muted">Config effect summary:</p>
+            <table class="rp-field-table">
+              <thead><tr><th>Config</th><th>Total Actuals card</th><th>Risk badge</th></tr></thead>
+              <tbody>
+                <tr><td>Default (neither set)</td><td>Current FY + all prior-year carry-forward</td><td>Calculated from combined total</td></tr>
+                <tr><td>Ignore Prev FY Actuals</td><td>Current FY only</td><td>Calculated from current FY only</td></tr>
+                <tr><td>Ignore Risk</td><td>No change</td><td>Always hidden</td></tr>
+                <tr><td>Both set</td><td>Current FY only</td><td>Always hidden</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Permissions</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Action</th><th>Permission required</th></tr></thead>
+              <tbody>
+                <tr><td>View actuals tab and summary cards</td><td>Standard project view access (<code>projects.view_project</code>)</td></tr>
+                <tr><td>Edit actuals config (gear icon)</td><td><strong>Change project</strong> (<code>projects.change_project</code>)</td></tr>
+              </tbody>
+            </table>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-exclamation-triangle-fill"></i> Actuals data is system-managed.</strong>
+              Sprint actuals are imported via the Sprint Actuals import on the Sprints page — they are not entered manually on the project. The Actuals tab displays the imported data; editing the underlying figures is done through the sprint actuals import flow.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common issues</div>
+              <strong>"No actuals data shown"</strong> — actuals have not been imported for this project yet. Use the <strong>Sprint Actuals import</strong> on the Sprints page to load cost and day figures.<br><br>
+              <strong>"Remaining Amount shows as N/A"</strong> — no approved estimate is linked to this project. Create and approve an estimate to enable remaining amount and risk calculations.<br><br>
+              <strong>"Risk badge not disappearing after enabling Ignore Risk"</strong> — open the config drawer (gear icon) and confirm the setting was saved. The badge should disappear immediately after the config is saved.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Review the Actuals tab at the end of each sprint to keep a close eye on cumulative spend. Use the <strong>Ignore Prev FY Actuals</strong> config option to isolate current-year spend when a project carries over across multiple financial years with different funding arrangements.
             </div>
           </section>
 

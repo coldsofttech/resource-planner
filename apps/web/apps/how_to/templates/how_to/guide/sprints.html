@@ -1,0 +1,74 @@
+{% extends "how_to/guide/_base.html" %}
+{% block page_title %}Sprints{% endblock %}
+{% block breadcrumb_extra %} / <a href="/docs/guide/sprints/">Sprints</a>{% endblock %}
+{% block section_content %}
+          <section id="sprints" class="rp-module">
+            <div class="rp-module-header">
+              <div class="rp-module-icon"><icon-field icon="bi-lightning" color="accent" size="lg"></icon-field></div>
+              <div>
+                <h2 class="rp-h2 mb-1">Sprints</h2>
+                <p class="small rp-muted mb-0">Time-boxed delivery windows within a Financial Year, with automatic capacity tracking per member.</p>
+              </div>
+            </div>
+
+            <p class="small rp-muted">Sprints divide a Financial Year into delivery windows — typically fortnightly or monthly. Each sprint automatically calculates how many days each team member is available, subtracting public holidays and approved leave from the calendar days in the window.</p>
+
+            <h3 class="rp-docs-subheading">Actions on this page</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Button / Action</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Add Sprint</strong></td><td>Opens a panel. Select a financial year, enter a sprint number, name, date range, and status.</td></tr>
+                <tr><td><strong>View</strong> <i class="bi bi-eye"></i></td><td>Opens the sprint detail — shows the capacity breakdown for every team member: working days, holidays, leave, and net available days.</td></tr>
+                <tr><td><strong>Edit</strong> <i class="bi bi-pencil"></i></td><td>Update dates, status, or notes. Capacity is recalculated on save.</td></tr>
+                <tr><td><strong>Close Sprint</strong></td><td>Locks the sprint permanently. Capacity figures cannot change after closing. Use once the sprint period has ended and all leaves for that period are recorded.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">How capacity is calculated</h3>
+            <table class="rp-field-table">
+              <thead><tr><th>Figure</th><th>How it is worked out</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Working days</strong></td><td>Total calendar days in the sprint window (weekends included — the system uses a full calendar day count).</td></tr>
+                <tr><td><strong>Holidays</strong></td><td>Public holidays in the member's location that fall within the sprint dates.</td></tr>
+                <tr><td><strong>Leave days</strong></td><td>Approved leave records for this member that overlap the sprint.</td></tr>
+                <tr><td><strong>Net capacity</strong></td><td>Working days minus holidays minus leave — the actual days available for project allocation.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="rp-docs-subheading">Creating a sprint</h3>
+            <ol class="rp-step-list">
+              <li>Go to <strong>Sprints</strong> and click <strong>Add Sprint</strong>.</li>
+              <li>Select the Financial Year this sprint belongs to.</li>
+              <li>Enter a sprint number (unique across all years), a display name, and the start and end dates.</li>
+              <li>Set the status to <strong>Future</strong> or <strong>In Progress</strong>.</li>
+              <li>Click <strong>Save</strong>. Capacity is calculated automatically for all members.</li>
+            </ol>
+
+            <h3 class="rp-docs-subheading">Closing a sprint</h3>
+            <ol class="rp-step-list">
+              <li>Make sure all leaves for the sprint period are recorded.</li>
+              <li>Open the sprint and click <strong>Close Sprint</strong>.</li>
+              <li>Confirm the action. The sprint is now locked — capacity and status are frozen for historical reporting.</li>
+            </ol>
+
+            <div class="rp-warn-block">
+              <strong><i class="bi bi-lock-fill"></i> Record all leaves before closing.</strong>
+              Once a sprint is closed, its capacity figures are frozen. Leaves added after closing only update open and future sprints — not the closed one.
+            </div>
+
+            <div class="rp-error-block">
+              <div class="rp-error-label">Common errors</div>
+              <strong>"Sprint dates must fall within the selected financial year"</strong> — the start or end date falls outside the FY window. Adjust the sprint dates or select the correct financial year.<br><br>
+              <strong>"Sprint number already exists"</strong> — sprint numbers are unique across all financial years. Use the next available number in the sequence.<br><br>
+              <strong>"Capacity shows zero holidays even though holidays are recorded"</strong> — the member likely has no <strong>location</strong> set on their profile. Go to the member's Workforce tab and set their location.
+            </div>
+
+            <div class="rp-tip-block">
+              <strong><i class="bi bi-lightbulb-fill"></i> Tip:</strong> Open a sprint's detail view to see the full capacity table — including which members are at zero capacity (fully on leave) or have reduced capacity due to holidays. Use this before assigning work in a resource plan.
+            </div>
+
+            <div class="rp-info-block">
+              <strong><i class="bi bi-info-circle-fill"></i> Forecast and actuals:</strong> Use <a href="/docs/guide/sprint-forecast/">Sprint Forecast</a> to import planned effort and generate recharge records. Use <a href="/docs/guide/sprint-actuals/">Sprint Actuals</a> to import and confirm what each team actually delivered. Confirmed actuals feed into project-level cost tracking.
+            </div>
+          </section>
+{% endblock %}
