@@ -453,11 +453,8 @@ class UserProfileService(ContextService):
             profile.skills.set(skill_objs)
 
     def change_password(self, *, current_password: str, new_password: str) -> None:
-        from django.contrib.auth.password_validation import validate_password
-        from django.core.exceptions import ValidationError as DjangoValidationError
-        from django.utils import timezone
-
         from apps.auth.constants import AuthMode
+        from apps.auth.services import PasswordPolicyService
         from apps.configurations.selectors import Auth
         from apps.core.exceptions import ValidationException
 
@@ -471,23 +468,8 @@ class UserProfileService(ContextService):
         if not user.check_password(current_password):
             raise ValidationException("Current password is incorrect.")
 
-        if user.check_password(new_password):
-            raise ValidationException(
-                "New password must be different from your current password."
-            )
-
-        try:
-            validate_password(new_password, user=user)
-        except DjangoValidationError as exc:
-            raise ValidationException(str(exc.messages[0])) from exc
-
-        user.set_password(new_password)
-        user.save(update_fields=["password"])
-
-        profile = getattr(user, "profile", None)
-        if profile:
-            profile.password_last_changed = timezone.now()
-            profile.save(update_fields=["password_last_changed", "updated_at"])
+        PasswordPolicyService.validate_new_password(new_password, user=user)
+        PasswordPolicyService.apply_new_password(user, new_password)
 
     @staticmethod
     def get_timezone_options() -> list[dict]:

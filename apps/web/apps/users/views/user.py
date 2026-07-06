@@ -6,9 +6,16 @@ class ProfileView(ProtectedView):
     template_name = "users/profile.html"
 
     def get_context_data(self, **kwargs: object) -> dict[str, object]:
+        from apps.configurations.selectors import PasswordPolicy
+
         ctx = super().get_context_data(**kwargs)
         perms = get_user_permissions(self.request.user)
         ctx["can_change_workforce"] = "users.change_user_workforce" in perms
+        ctx["pwd_min_length"] = PasswordPolicy.get_min_length()
+        ctx["pwd_require_uppercase"] = PasswordPolicy.require_uppercase()
+        ctx["pwd_require_lowercase"] = PasswordPolicy.require_lowercase()
+        ctx["pwd_require_digits"] = PasswordPolicy.require_digits()
+        ctx["pwd_require_special"] = PasswordPolicy.require_special()
         return ctx
 
 

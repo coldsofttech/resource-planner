@@ -98,7 +98,7 @@
           <panel-body>
           <div class="row g-3">
             <password-field id="rp-profile-current-pw" col="col-12" label="Current password" required prefix-icon eye-icon></password-field>
-            <password-field id="rp-profile-new-pw" col="col-md-6" label="New password" required prefix-icon eye-icon hint="Minimum 12 characters, mixed case, number and symbol."></password-field>
+            <password-field id="rp-profile-new-pw" col="col-md-6" label="New password" required prefix-icon eye-icon strength dynamic-policy min-length="{{ pwd_min_length }}" {% if pwd_require_uppercase %}require-uppercase{% endif %} {% if pwd_require_lowercase %}require-lowercase{% endif %} {% if pwd_require_digits %}require-digit{% endif %} {% if pwd_require_special %}require-special{% endif %}></password-field>
             <confirm-password-field id="rp-profile-confirm-pw" col="col-md-6" label="Confirm password" required prefix-icon eye-icon password-field-id="rp-profile-new-pw"></confirm-password-field>
           </div>
           <div class="d-flex justify-content-end mt-3">
