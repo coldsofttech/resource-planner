@@ -105,21 +105,25 @@ document.getElementById("rp-teams-export-btn").addEventListener("click", () => {
 
 ### `<sprint-pill>`
 
-Displays the active sprint name and a live countdown to its end date. The element hides itself when `name` is omitted.
+Displays the active sprint name and a live countdown to its end date. The element **auto-fetches** `GET /api/v1/sprints/active/` on connect — no external attributes are required. It hides itself when there is no active sprint or when the fetch fails.
 
-| Attribute | Type   | Default  | Description                                                             |
-| --------- | ------ | -------- | ----------------------------------------------------------------------- |
-| `name`    | string | —        | Sprint label (e.g. `S24.10`); element hides when absent                 |
-| `end`     | string | —        | ISO-8601 datetime of the sprint end (e.g. `2026-05-30T17:00:00`)        |
-| `status`  | string | `active` | `active` \| `warning` \| `inactive` — controls the indicator dot colour |
+The dot colour reflects sprint health:
 
-The countdown auto-updates every minute. Set attributes from JS after sprint data is available — the element is pre-mounted in `templates/base.html` as `<sprint-pill id="active-sprint">`.
+| Colour | Condition                                             |
+| ------ | ----------------------------------------------------- |
+| Green  | In progress, more than 3 days remaining               |
+| Amber  | In progress, 3 days or fewer remaining                |
+| Muted  | Sprint not in progress (should not normally be shown) |
 
-```js
-const pill = document.getElementById("active-sprint");
-pill.setAttribute("name", "S24.10");
-pill.setAttribute("end", "2026-05-30T17:00:00");
-pill.setAttribute("status", "active");
+The countdown auto-updates every minute.
+
+**Click navigation:** Clicking the pill (or pressing Enter / Space while it has focus) navigates to the sprint detail page at `/sprints/<code>/`. The element sets `role="link"` and `tabindex="0"` automatically so it is keyboard-accessible.
+
+The element is pre-mounted in `templates/base.html` as `<sprint-pill id="active-sprint">` — do not add it to individual page templates.
+
+```html
+<!-- Already in base.html — do not repeat in child templates -->
+<sprint-pill id="active-sprint"></sprint-pill>
 ```
 
 ---

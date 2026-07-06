@@ -1,0 +1,79 @@
+email-view {
+  display: block;
+}
+
+.rp-email-view {
+  border: 1px solid var(--rp-border);
+  border-radius: var(--rp-r-8);
+  overflow: hidden;
+  background: var(--rp-surface);
+}
+
+/* ── Meta header (To / Cc / Subject rows) ── */
+.rp-email-meta {
+  background: var(--rp-bg-sunken);
+  border-bottom: 1px solid var(--rp-border);
+}
+
+.rp-email-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--rp-divider);
+}
+
+.rp-email-row:last-child {
+  border-bottom: 0;
+}
+
+.rp-email-row-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 76px;
+  flex-shrink: 0;
+  font-size: var(--rp-fs-12);
+  font-weight: 600;
+  color: var(--rp-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding-top: 2px;
+}
+
+.rp-email-row-value {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--rp-fs-13);
+  color: var(--rp-text);
+  min-width: 0;
+}
+
+.rp-email-row-value--subject {
+  font-size: var(--rp-fs-14);
+  font-weight: 500;
+}
+
+/* ── Recipient badge ── */
+.rp-email-recipient {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border-radius: var(--rp-r-4);
+  background: var(--rp-accent-soft);
+  color: var(--rp-accent-soft-text);
+  font-size: var(--rp-fs-12);
+  border: 1px solid transparent;
+}
+
+/* ── Body ── */
+.rp-email-body {
+  padding: 24px;
+  font-size: var(--rp-fs-14);
+  color: var(--rp-text);
+  line-height: 1.6;
+  overflow-x: auto;
+}

@@ -73,6 +73,14 @@ class FinancialYearField extends DropdownField {
       const select = this.querySelector(".rp-input");
       if (select) select.disabled = true;
       this._fetchOptions(this._loadId);
+    } else if (this._fyData === undefined) {
+      // Reconnected before the initial fetch completed (e.g. tab-panel re-renders its innerHTML
+      // before this element was defined, causing disconnect then reconnect before fetch resolved).
+      const id = Symbol();
+      this._loadId = id;
+      const select = this.querySelector(".rp-input");
+      if (select) select.disabled = true;
+      this._fetchOptions(id);
     }
   }
 

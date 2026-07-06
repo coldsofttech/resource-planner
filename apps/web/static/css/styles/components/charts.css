@@ -1,0 +1,166 @@
+/* Chart components (#196) — <bar-chart> card shell and <heatmap-chart> CSS
+   Grid heatmap used by apps/web/static/js/modules/resource-plans/utilisation.js */
+
+.rp-chart-card {
+  background: var(--rp-surface);
+  border: 1px solid var(--rp-border);
+  border-radius: var(--rp-r-8);
+  display: flex;
+  flex-direction: column;
+}
+
+.rp-chart-card .rp-chart-head {
+  padding: var(--rp-s-12) var(--rp-s-16);
+  border-bottom: 1px solid var(--rp-divider);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--rp-s-8);
+}
+
+.rp-chart-card .rp-chart-head h4 {
+  font-size: var(--rp-fs-14);
+  font-weight: 600;
+  margin: 0;
+}
+
+.rp-chart-card .rp-chart-head .rp-subtle {
+  font-size: var(--rp-fs-12);
+  color: var(--rp-text-muted);
+}
+
+.rp-chart-card .rp-chart-body {
+  padding: var(--rp-s-16);
+  min-height: 280px;
+  position: relative;
+}
+
+.rp-chart-card canvas {
+  max-width: 100%;
+}
+
+/* ---------- Heatmap (CSS Grid, no charting library) ---------- */
+
+.rp-hm-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--rp-s-16);
+  font-size: var(--rp-fs-12);
+  color: var(--rp-text-muted);
+  margin-bottom: var(--rp-s-12);
+}
+
+.rp-hm-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rp-s-4);
+}
+
+.rp-hm-swatch {
+  width: 18px;
+  height: 14px;
+  border-radius: var(--rp-r-4);
+  display: inline-block;
+}
+
+.rp-heatmap-wrap {
+  overflow-x: auto;
+  padding-bottom: var(--rp-s-4);
+}
+
+.rp-heatmap {
+  display: grid;
+  gap: 3px;
+  font-size: var(--rp-fs-12);
+  min-width: 720px;
+}
+
+.rp-hm-head {
+  height: 28px;
+  font-size: var(--rp-fs-12);
+  color: var(--rp-text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  display: grid;
+  place-items: center;
+}
+
+.rp-hm-label {
+  min-height: 40px;
+  min-width: 0;
+  padding: var(--rp-s-4) var(--rp-s-8) var(--rp-s-4) 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.rp-hm-label > div:first-child {
+  font-weight: 600;
+  color: var(--rp-text);
+  font-size: var(--rp-fs-13);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rp-hm-sublabel {
+  color: var(--rp-text-muted);
+  font-size: var(--rp-fs-12);
+}
+
+.rp-hm-cell {
+  min-height: 40px;
+  border-radius: var(--rp-r-4);
+  display: grid;
+  place-items: center;
+  font-family: var(--rp-font-mono);
+  font-weight: 600;
+  cursor: default;
+}
+
+.rp-hm-swatch.rp-hm-cell {
+  min-height: 0;
+}
+
+/* Threshold buckets */
+.rp-hm-none {
+  background: var(--rp-bg-sunken);
+  color: var(--rp-text-muted);
+  font-weight: 500;
+}
+
+.rp-hm-ramp {
+  background: var(--rp-warning-soft);
+  color: var(--rp-warning-soft-text);
+}
+
+.rp-hm-healthy {
+  background: var(--rp-success-soft);
+  color: var(--rp-success-soft-text);
+}
+
+.rp-hm-excellent {
+  background: var(--rp-success);
+  color: var(--rp-text-on-accent);
+}
+
+.rp-hm-over {
+  background: var(--rp-danger);
+  color: var(--rp-text-on-accent);
+}
+
+.rp-hm-fallback {
+  background: var(--rp-info-soft);
+  color: var(--rp-info-soft-text);
+  font-style: italic;
+  font-weight: 500;
+}
+
+.rp-hm-over-marker {
+  border-bottom: 3px solid var(--rp-danger);
+}

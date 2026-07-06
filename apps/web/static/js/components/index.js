@@ -1,8 +1,11 @@
 import "./accordions/index.js";
 import "./banners/index.js";
+import "./emails/index.js";
 import "./breadcrumbs/index.js";
 import "./buttons/index.js";
+import "./charts/index.js";
 import "./choices/index.js";
+import "./diffs/index.js";
 import "./drawers/index.js";
 import "./dropdowns/index.js";
 import "./fields/index.js";

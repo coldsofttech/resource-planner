@@ -8,17 +8,21 @@ Custom elements defined in `apps/web/static/js/components/tables/`.
 
 Full-featured data table with dynamic (API-driven) and static modes, sorting, pagination, and row actions.
 
-| Attribute            | Type    | Default | Description                                                       |
-| -------------------- | ------- | ------- | ----------------------------------------------------------------- |
-| `url`                | string  | —       | API endpoint URL; triggers dynamic mode (auto-fetches on connect) |
-| `paginated`          | boolean | —       | Parses the pagination block from API response and renders a pager |
-| `page-size`          | number  | `20`    | Rows per page                                                     |
-| `data`               | string  | —       | JSON array string for static mode (no API call)                   |
-| `title`              | string  | —       | Card head title                                                   |
-| `subtitle`           | string  | —       | Card head subtitle                                                |
-| `row-template`       | string  | —       | Global function name: `fn(row, index) → td cells HTML`            |
-| `max-inline-actions` | number  | `2`     | Max icon buttons before collapsing into a `…` overflow menu       |
-| `empty-message`      | string  | —       | Custom empty-state text                                           |
+| Attribute            | Type    | Default | Description                                                                                              |
+| -------------------- | ------- | ------- | -------------------------------------------------------------------------------------------------------- |
+| `url`                | string  | —       | API endpoint URL; triggers dynamic mode (auto-fetches on connect)                                        |
+| `paginated`          | boolean | —       | Parses the pagination block from API response and renders a pager                                        |
+| `page-size`          | number  | `20`    | Rows per page                                                                                            |
+| `data`               | string  | —       | JSON array string for static mode (no API call)                                                          |
+| `title`              | string  | —       | Card head title                                                                                          |
+| `subtitle`           | string  | —       | Card head subtitle                                                                                       |
+| `row-template`       | string  | —       | Global function name: `fn(row, index) → td cells HTML`                                                   |
+| `max-inline-actions` | number  | `2`     | Max icon buttons before collapsing into a `…` overflow menu                                              |
+| `empty-message`      | string  | —       | Custom empty-state text                                                                                  |
+| `fixable`            | number  | —       | Number of leading columns to pin (sticky) when scrolling horizontally. Only first columns are supported. |
+| `actions-fixable`    | boolean | —       | Pins the trailing actions column to the right edge when scrolling horizontally.                          |
+| `expandable`         | boolean | —       | Adds a leading chevron toggle per row that expands a colspan'd detail row                                |
+| `detail-template`    | string  | —       | Global function name: `fn(row, index) → detail row HTML`. Only used when `expandable` is set             |
 
 **Declarative children (read before first render, then discarded):**
 
@@ -35,6 +39,76 @@ Full-featured data table with dynamic (API-driven) and static modes, sorting, pa
   </table-actions>
 </data-table>
 ```
+
+**Fixed (pinned) columns:**
+
+Use `fixable` to pin the first N columns so they stay visible during horizontal scroll:
+
+```html
+<data-table url="/api/v1/projects/" paginated fixable="2">
+  <table-columns>
+    <table-column label="Code" key="code" width="100px"></table-column>
+    <table-column label="Name" key="name" width="200px"></table-column>
+    <!-- remaining columns scroll freely -->
+    <table-column label="Team" key="team_name"></table-column>
+    <table-column label="Status" key="status"></table-column>
+    <table-column label="Budget" key="budget" numeric></table-column>
+  </table-columns>
+</data-table>
+```
+
+Only leading columns can be pinned (`fixable` applies from index 0). Setting `width` on fixed columns ensures consistent layout.
+
+**Fixed actions column:**
+
+Use `actions-fixable` to keep the row-action buttons visible at the right edge during horizontal scroll:
+
+```html
+<data-table url="/api/v1/projects/" paginated actions-fixable>
+  <table-columns>
+    <table-column label="Name" key="name"></table-column>
+    <!-- many columns … -->
+  </table-columns>
+  <table-actions>
+    <table-action icon="bi-pencil" label="Edit" event="rp:edit"></table-action>
+    <table-action icon="bi-trash3" label="Delete" event="rp:delete" danger></table-action>
+  </table-actions>
+</data-table>
+```
+
+Both attributes can be combined: `<data-table fixable="2" actions-fixable>`.
+
+**Expandable rows:**
+
+Use `expandable` with `detail-template` to let each row expand into a
+colspan'd detail row (e.g. showing sub-steps or nested detail for that row):
+
+```html
+<data-table
+  url="/api/v1/engine-jobs/"
+  paginated
+  expandable
+  row-template="renderJobRow"
+  detail-template="renderJobSteps"
+>
+  <table-columns>
+    <table-column label="Mode" key="mode_display"></table-column>
+    <table-column label="Status" key="status_display"></table-column>
+  </table-columns>
+</data-table>
+
+<script>
+  window.renderJobRow = (row) => `<td>${row.mode_display}</td><td>${row.status_display}</td>`;
+  window.renderJobSteps = (row) => `
+    <strong>Steps</strong>
+    <ul>${row.steps.map((s) => `<li>${s.name_display} — ${s.duration_milliseconds}ms</li>`).join("")}</ul>
+  `;
+</script>
+```
+
+Clicking the chevron toggles the detail row open/closed. Expanded state is
+not preserved across `refresh()`/re-render — a fresh render always starts
+collapsed.
 
 **Public API:**
 

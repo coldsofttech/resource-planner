@@ -25,6 +25,7 @@ class MenuBar extends HTMLElement {
 
     if (this._items === undefined) {
       this._items = this._parseItems();
+      this._knownHrefs = this._collectHrefs();
     }
 
     this._render();
@@ -78,6 +79,20 @@ class MenuBar extends HTMLElement {
       .filter(Boolean);
   }
 
+  _collectHrefs() {
+    const hrefs = [];
+    for (const item of this._items) {
+      if (item.type === "item") {
+        hrefs.push(item.href);
+      } else if (item.type === "group") {
+        for (const sec of item.sections) {
+          for (const si of sec.items) hrefs.push(si.href);
+        }
+      }
+    }
+    return hrefs;
+  }
+
   _isActive(href) {
     if (!href || href === "#") return false;
     const path = window.location.pathname;
@@ -85,7 +100,16 @@ class MenuBar extends HTMLElement {
     if (href === "/") return false;
     // Normalise so prefix check works whether or not href has a trailing slash
     const prefix = href.endsWith("/") ? href : href + "/";
-    return path.startsWith(prefix);
+    if (!path.startsWith(prefix)) return false;
+    // Suppress prefix-match when a more-specific sibling menu item also matches
+    // the current path — ensures only the most-specific item is highlighted.
+    // Example: /projects/ should NOT be active when on /projects/types/ because
+    // /projects/types/ is a registered menu item that is itself active.
+    return !(this._knownHrefs || []).some((other) => {
+      if (other === href || !other || other === "#") return false;
+      const otherPrefix = other.endsWith("/") ? other : other + "/";
+      return other.startsWith(prefix) && (path === other || path.startsWith(otherPrefix));
+    });
   }
 
   _panelId(group) {

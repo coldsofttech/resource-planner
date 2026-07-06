@@ -14,6 +14,11 @@ import { esc } from "../utils.js";
  *   row-template       – global function name: fn(row, idx) → td cells HTML
  *   max-inline-actions – max icon buttons before "…" overflow (default 2)
  *   empty-message      – custom empty-state text
+ *   fixable            – number of leading columns to pin (e.g. fixable="2")
+ *   actions-fixable    – boolean; pins the trailing actions column to the right edge
+ *   expandable         – boolean; adds a leading chevron toggle that expands a detail row
+ *   detail-template    – global function name: fn(row, idx) → detail row HTML (colspan'd),
+ *                         only used when expandable is set
  *
  * Declarative children (read before first render, then discarded)
  *   <table-columns>
@@ -61,6 +66,7 @@ class DataTable extends HTMLElement {
     this._pagination = null;
     this._render();
     this._bindEvents();
+    this._applyFixedColumns();
 
     if (this.getAttribute("url")) {
       this._loadData(1);
@@ -112,6 +118,12 @@ class DataTable extends HTMLElement {
   get _emptyMsg() {
     return this.getAttribute("empty-message") || "No records found.";
   }
+  get _isExpandable() {
+    return this.hasAttribute("expandable");
+  }
+  get _detailTmplFn() {
+    return this.getAttribute("detail-template") || "";
+  }
 
   _readConfig() {
     this._columns = Array.from(this.querySelectorAll("table-column")).map((el) => ({
@@ -136,6 +148,8 @@ class DataTable extends HTMLElement {
     }));
 
     this._staticRows = this._parseData(this.getAttribute("data"));
+    this._fixableCount = parseInt(this.getAttribute("fixable") || "0", 10);
+    this._actionsFixable = this.hasAttribute("actions-fixable");
   }
 
   _parseData(raw) {
@@ -150,12 +164,19 @@ class DataTable extends HTMLElement {
   _render() {
     const headHTML = this._buildCardHead();
     const theadCells = this._buildTheadCells();
+    const tableClasses = [
+      this._fixableCount > 0 ? "rp-table--fixable" : "",
+      this._actionsFixable ? "rp-table--actions-fixable" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+    const tableClass = tableClasses ? ` ${tableClasses}` : "";
 
     this.innerHTML = `
       <div class="rp-table-wrap">
         ${headHTML}
         <div class="rp-table-scroll">
-          <table class="rp-table">
+          <table class="rp-table${tableClass}">
             <thead><tr>${theadCells}</tr></thead>
             <tbody data-rp-tbody></tbody>
           </table>
@@ -188,24 +209,31 @@ class DataTable extends HTMLElement {
   }
 
   _buildTheadCells() {
-    const cells = this._columns.map((col) => {
-      const width = col.width ? ` style="width:${esc(col.width)}"` : "";
-      const align = col.numeric ? ` class="text-end"` : "";
-      const mobile = col.hideMobile ? ` data-rp-hide-mobile` : "";
-      let inner;
-      if (col.sortable) {
-        inner = `<span class="rp-sort" data-rp-sort="${esc(col.key)}">
+    const fixCount = this._fixableCount;
+    const cells = this._isExpandable ? [`<th style="width:40px"></th>`] : [];
+    cells.push(
+      ...this._columns.map((col, idx) => {
+        const width = col.width ? ` style="width:${esc(col.width)}"` : "";
+        const align = col.numeric ? ` class="text-end"` : "";
+        const mobile = col.hideMobile ? ` data-rp-hide-mobile` : "";
+        const fixed = idx < fixCount ? ` data-rp-fixed` : "";
+        const fixedLast = idx === fixCount - 1 ? ` data-rp-fixed-last` : "";
+        let inner;
+        if (col.sortable) {
+          inner = `<span class="rp-sort" data-rp-sort="${esc(col.key)}">
           ${esc(col.label)}
           <i class="bi bi-arrow-down-up rp-sort-icon" data-rp-sort-icon="${esc(col.key)}"></i>
         </span>`;
-      } else {
-        inner = esc(col.label);
-      }
-      return `<th${width}${align}${mobile}>${inner}</th>`;
-    });
+        } else {
+          inner = esc(col.label);
+        }
+        return `<th${width}${align}${mobile}${fixed}${fixedLast}>${inner}</th>`;
+      }),
+    );
 
     if (this._actions.length > 0) {
-      cells.push(`<th style="width:${this._actionColWidth()}px"></th>`);
+      const afx = this._actionsFixable ? ` data-rp-actions-fixed` : "";
+      cells.push(`<th style="width:${this._actionColWidth()}px"${afx}></th>`);
     }
     return cells.join("");
   }
@@ -321,16 +349,34 @@ class DataTable extends HTMLElement {
     if (!tbody) return;
 
     const tmplFn = this._rowTmplFn ? window[this._rowTmplFn] : null;
+    const detailFn = this._isExpandable && this._detailTmplFn ? window[this._detailTmplFn] : null;
+    const totalCols =
+      this._columns.length + (this._actions.length > 0 ? 1 : 0) + (this._isExpandable ? 1 : 0);
 
     tbody.innerHTML = this._rows
       .map((row, idx) => {
         const cells = typeof tmplFn === "function" ? tmplFn(row, idx) : this._buildAutoCells(row);
         const actionCell = this._actions.length > 0 ? this._buildActionCell(row, idx) : "";
-        return `<tr data-rp-row="${idx}">${cells}${actionCell}</tr>`;
+        const expandCell = this._isExpandable ? this._buildExpandCell(idx) : "";
+        const mainRow = `<tr data-rp-row="${idx}">${expandCell}${cells}${actionCell}</tr>`;
+        if (!this._isExpandable) return mainRow;
+
+        const detailHTML = typeof detailFn === "function" ? detailFn(row, idx) : "";
+        const detailRow = `<tr class="rp-table-detail-row" data-rp-detail-row="${idx}" hidden><td colspan="${totalCols}">${detailHTML}</td></tr>`;
+        return mainRow + detailRow;
       })
       .join("");
 
     this._applyMobileHide(tbody);
+    this._applyFixedColumns();
+  }
+
+  _buildExpandCell(idx) {
+    return `<td class="rp-table-expand-cell">
+      <button type="button" class="rp-iconbtn" data-rp-expand-toggle="${idx}" aria-label="Toggle details" aria-expanded="false">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </td>`;
   }
 
   _buildAutoCells(row) {
@@ -345,6 +391,36 @@ class DataTable extends HTMLElement {
       .join("");
   }
 
+  _applyFixedColumns() {
+    if (!this._fixableCount) return;
+    const table = this.querySelector(".rp-table");
+    if (!table) return;
+
+    // Measure header cells and assign left offsets
+    const ths = Array.from(table.querySelectorAll("thead tr th[data-rp-fixed]"));
+    const offsets = [];
+    let left = 0;
+
+    ths.forEach((th) => {
+      offsets.push(left);
+      th.style.left = `${left}px`;
+      left += th.getBoundingClientRect().width || 0;
+    });
+
+    // Apply the same offsets to matching body cells
+    const tdOffset = this._isExpandable ? 1 : 0;
+    table.querySelectorAll("tbody tr[data-rp-row]").forEach((tr) => {
+      const tds = tr.querySelectorAll("td");
+      offsets.forEach((off, i) => {
+        const td = tds[i + tdOffset];
+        if (!td) return;
+        td.setAttribute("data-rp-fixed", "");
+        if (i === offsets.length - 1) td.setAttribute("data-rp-fixed-last", "");
+        td.style.left = `${off}px`;
+      });
+    });
+  }
+
   _applyMobileHide(tbody) {
     const hiddenIndices = this._columns
       .map((col, i) => (col.hideMobile ? i : -1))
@@ -352,10 +428,11 @@ class DataTable extends HTMLElement {
 
     if (hiddenIndices.length === 0) return;
 
+    const offset = this._isExpandable ? 1 : 0;
     tbody.querySelectorAll("tr[data-rp-row]").forEach((tr) => {
       const tds = tr.querySelectorAll("td");
       hiddenIndices.forEach((i) => {
-        if (tds[i]) tds[i].setAttribute("data-rp-hide-mobile", "");
+        if (tds[i + offset]) tds[i + offset].setAttribute("data-rp-hide-mobile", "");
       });
     });
   }
@@ -424,7 +501,8 @@ class DataTable extends HTMLElement {
       }
     }
 
-    return `<td class="rp-td-actions"><span class="rp-icon-row">${inlineBtns}${moreHTML}</span></td>`;
+    const afx = this._actionsFixable ? ` data-rp-actions-fixed` : "";
+    return `<td class="rp-td-actions"${afx}><span class="rp-icon-row">${inlineBtns}${moreHTML}</span></td>`;
   }
 
   _resolveIconColor(a, row) {
@@ -542,6 +620,24 @@ class DataTable extends HTMLElement {
         this._sortKey = key;
         this._updateSortIcons();
         if (this._apiUrl) this._loadData(1);
+        return;
+      }
+
+      // Expand/collapse toggle
+      const expandBtn = e.target.closest("[data-rp-expand-toggle]");
+      if (expandBtn) {
+        const idx = expandBtn.getAttribute("data-rp-expand-toggle");
+        const detailRow = wrap.querySelector(`tr[data-rp-detail-row="${idx}"]`);
+        if (detailRow) {
+          const isOpen = !detailRow.hidden;
+          detailRow.hidden = isOpen;
+          expandBtn.setAttribute("aria-expanded", String(!isOpen));
+          const icon = expandBtn.querySelector("i");
+          if (icon) {
+            icon.classList.toggle("bi-chevron-right", isOpen);
+            icon.classList.toggle("bi-chevron-down", !isOpen);
+          }
+        }
         return;
       }
 

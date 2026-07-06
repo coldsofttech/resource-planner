@@ -4,7 +4,7 @@
  *
  * Attributes:
  *   name     – Display name used to derive initials and colour palette seed. Required.
- *   variant  – "monogram" (default) | "initials" | "geometric"
+ *   variant  – "monogram" (default) | "initials" | "geometric" | "rings" | "hexagon" | "bars"
  *   size     – "sm" | "md" (default) | "lg" | "xl"
  *   shape    – "rounded" (default for monogram) | "circle" (default for initials)
  *   bordered – Boolean. Adds a subtle ring shadow around the identicon.
@@ -116,10 +116,78 @@ function renderGeometric(name) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" fill="${pal[1]}" opacity="0.18"/>${cellsSvg}</svg>`;
 }
 
+function renderRings(name) {
+  const seed = hash(String(name || "x"));
+  const r = rng(seed);
+  const pal = PALETTES[Math.floor(r() * PALETTES.length)];
+  let rings = "";
+  let prev = 28;
+  for (let i = 0; i < 4; i++) {
+    const rad = prev - 4 - Math.floor(r() * 2);
+    prev = rad;
+    if (rad <= 2) break;
+    const w = 2 + Math.floor(r() * 3);
+    const op = (0.5 + r() * 0.5).toFixed(2);
+    const c = i % 2 === 0 ? "#fff" : pal[0];
+    rings += `<circle cx="32" cy="32" r="${rad}" fill="none" stroke="${c}" stroke-width="${w}" opacity="${op}"/>`;
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" fill="${pal[1]}"/>${rings}</svg>`;
+}
+
+function renderHexagon(name) {
+  const seed = hash(String(name || "x"));
+  const r = rng(seed);
+  const pal = PALETTES[Math.floor(r() * PALETTES.length)];
+  const positions = [
+    [32, 12],
+    [16, 24],
+    [48, 24],
+    [32, 36],
+    [16, 48],
+    [48, 48],
+  ];
+  let shapes = "";
+  positions.forEach(([cx, cy]) => {
+    if (r() > 0.35) {
+      const size = 6 + Math.floor(r() * 6);
+      const op = (0.4 + r() * 0.55).toFixed(2);
+      const color = r() > 0.5 ? "#fff" : pal[0];
+      const pts = [];
+      for (let i = 0; i < 6; i++) {
+        const a = (Math.PI / 3) * i - Math.PI / 6;
+        pts.push(`${(cx + size * Math.cos(a)).toFixed(1)},${(cy + size * Math.sin(a)).toFixed(1)}`);
+      }
+      shapes += `<polygon points="${pts.join(" ")}" fill="${color}" opacity="${op}"/>`;
+    }
+  });
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" fill="${pal[1]}"/>${shapes}</svg>`;
+}
+
+function renderBars(name) {
+  const seed = hash(String(name || "x"));
+  const r = rng(seed);
+  const pal = PALETTES[Math.floor(r() * PALETTES.length)];
+  let bars = "";
+  let x = 4;
+  while (x < 60) {
+    const w = 2 + Math.floor(r() * 6);
+    const h = 12 + Math.floor(r() * 48);
+    const y = (64 - h) / 2 + (r() - 0.5) * 8;
+    const c = r() > 0.5 ? "#fff" : pal[0];
+    const op = (0.35 + r() * 0.6).toFixed(2);
+    bars += `<rect x="${x}" y="${y.toFixed(1)}" width="${w}" height="${h}" fill="${c}" opacity="${op}" rx="1"/>`;
+    x += w + 1 + Math.floor(r() * 3);
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" fill="${pal[1]}"/>${bars}</svg>`;
+}
+
 const VARIANTS = {
   monogram: renderMonogram,
   initials: renderInitials,
   geometric: renderGeometric,
+  rings: renderRings,
+  hexagon: renderHexagon,
+  bars: renderBars,
 };
 
 const SIZE_CLASSES = new Set(["sm", "lg", "xl"]);
@@ -142,7 +210,7 @@ export class IdenticonField extends HTMLElement {
     const name = this.getAttribute("name") || "";
     const variant = this.getAttribute("variant") || "monogram";
     const size = this.getAttribute("size") || "md";
-    const defaultShape = variant === "initials" ? "circle" : "rounded";
+    const defaultShape = variant === "initials" || variant === "rings" ? "circle" : "rounded";
     const shape = this.getAttribute("shape") || defaultShape;
     const bordered = this.hasAttribute("bordered");
     const noBorder = this.hasAttribute("no-border");
@@ -152,6 +220,7 @@ export class IdenticonField extends HTMLElement {
     const classes = ["rp-identicon"];
     if (SIZE_CLASSES.has(size)) classes.push(size);
     if (shape === "circle") classes.push("circle");
+    if (shape === "hexagon") classes.push("hexagon");
     if (noBorder) classes.push("no-border");
     if (bordered) classes.push("bordered");
     this.className = classes.join(" ");

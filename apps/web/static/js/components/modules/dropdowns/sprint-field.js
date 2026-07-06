@@ -5,7 +5,8 @@ import { API_URLS } from "../../../modules/main/urls.js";
 /* SprintField  <sprint-field>
  *
  * Dropdown field pre-wired to the sprints API.
- * Active sprints are fetched from GET /api/v1/sprints/options/ on first connect.
+ * Active sprints are fetched from GET /api/v1/sprints/options/ on connect, and
+ * retried on reconnect until the fetch succeeds at least once.
  * Options display the sprint name (e.g. "Sprint 1").
  * Inherits all attributes and public API from DropdownField / BaseField.
  *
@@ -53,6 +54,7 @@ class SprintField extends DropdownField {
     } else if (name === "fy-code" && this._connected && oldVal !== newVal) {
       this._sprintOptions = undefined;
       this._initialOptions = [];
+      this._loaded = false;
       this._loadId = Symbol();
       const select = this.querySelector(".rp-input");
       if (select) select.disabled = true;
@@ -67,17 +69,19 @@ class SprintField extends DropdownField {
       this.setAttribute("placeholder", "Select sprint…");
     }
 
-    const firstConnect = this._initialOptions === undefined;
-    if (firstConnect) {
-      this._initialOptions = [];
-      this._loadId = Symbol();
-    }
+    if (this._initialOptions === undefined) this._initialOptions = [];
 
     super.connectedCallback();
 
-    if (firstConnect) {
+    // Fetch whenever options haven't successfully loaded yet — not just on the very first
+    // connect. Containers like <tab-panel> capture and re-insert child nodes on their own
+    // initial render, which disconnects/reconnects this element before its first fetch
+    // resolves; gating on "first connect" alone would then discard that in-flight result
+    // and never retry, leaving the dropdown stuck on its placeholder.
+    if (!this._loaded) {
       const select = this.querySelector(".rp-input");
       if (select) select.disabled = true;
+      this._loadId = Symbol();
       this._fetchOptions(this._loadId);
     }
   }
@@ -87,6 +91,7 @@ class SprintField extends DropdownField {
   }
 
   refresh() {
+    this._loaded = false;
     this._loadId = Symbol();
     this._fetchOptions(this._loadId);
   }
@@ -109,6 +114,7 @@ class SprintField extends DropdownField {
       }));
 
       this._initialOptions = this._collectSprintOptions();
+      this._loaded = true;
       this._doRender();
     } catch {
       if (this._loadId !== id) return;

@@ -8,8 +8,9 @@ import { esc } from "../utils.js";
  * the card shell already exists (wizard-safe guard).
  *
  * Declarative children (captured before first render):
- *   <panel-title>  – raw HTML content used as the card heading; takes precedence over `title`
- *   <panel-body>   – child elements placed inside the card body slot
+ *   <panel-title>    – raw HTML content used as the card heading; takes precedence over `title`
+ *   <panel-actions>  – child nodes placed in the right side of the card header (e.g. icon buttons)
+ *   <panel-body>     – child elements placed inside the card body slot
  *
  * Attributes:
  *   col    – Bootstrap column class applied to the host element (default "col-12")
@@ -29,6 +30,9 @@ class SectionPanel extends HTMLElement {
       // Captured once here (=== undefined guard) before _render() replaces innerHTML.
       const titleEl = this.querySelector("panel-title");
       this._titleContent = titleEl ? titleEl.innerHTML.trim() : null;
+
+      const actionsEl = this.querySelector("panel-actions");
+      this._actionsNodes = actionsEl ? Array.from(actionsEl.childNodes) : null;
 
       const body = this.querySelector("panel-body");
       this._bodyNodes = body ? Array.from(body.children) : [];
@@ -63,11 +67,15 @@ class SectionPanel extends HTMLElement {
     this.className = [this._col, ...extras].join(" ").trim();
     const headContent = this._titleContent ?? (this._title ? esc(this._title) : "");
     const iconHTML = this._icon ? `<i class="bi ${esc(this._icon)} rp-card-head-icon"></i>` : "";
+    const actionsSlot = this._actionsNodes ? `<div data-panel-actions></div>` : "";
     const headHTML =
-      headContent || iconHTML
-        ? `<div class="rp-card-head">${iconHTML}<strong>${headContent}</strong></div>`
+      headContent || iconHTML || this._actionsNodes
+        ? `<div class="rp-card-head">${iconHTML}<strong>${headContent}</strong>${actionsSlot}</div>`
         : "";
     this.innerHTML = `<div class="rp-card rp-card-sunken">${headHTML}<div class="rp-card-body" data-panel-body></div></div>`;
+    const actionsSlotEl = this.querySelector("[data-panel-actions]");
+    if (actionsSlotEl && this._actionsNodes)
+      this._actionsNodes.forEach((node) => actionsSlotEl.appendChild(node));
     const slot = this.querySelector("[data-panel-body]");
     if (slot && this._bodyNodes) this._bodyNodes.forEach((node) => slot.appendChild(node));
   }

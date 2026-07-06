@@ -33,6 +33,9 @@ class TabPanel extends HTMLElement {
 
   setTab(id) {
     this._activeId = id;
+    const url = new URL(window.location.href);
+    url.searchParams.set("tab", id);
+    history.replaceState(null, "", url);
     this.querySelectorAll("[data-tab]").forEach((btn) => {
       const active = btn.dataset.tab === id;
       btn.classList.toggle("is-active", active);
@@ -84,7 +87,9 @@ class TabPanel extends HTMLElement {
   _render() {
     if (!this._tabs.length) return;
 
-    const activeId = (this._tabs.find((t) => t.active) ?? this._tabs[0]).id;
+    const urlTab = new URLSearchParams(window.location.search).get("tab");
+    const matchedTab = urlTab && this._tabs.find((t) => t.id === urlTab);
+    const activeId = (matchedTab ?? this._tabs.find((t) => t.active) ?? this._tabs[0]).id;
     this._activeId = activeId;
 
     const tabsBarHTML = `<div class="rp-tabs" role="tablist">${this._tabs

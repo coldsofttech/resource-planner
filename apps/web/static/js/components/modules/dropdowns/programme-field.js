@@ -5,8 +5,9 @@ import { API_URLS } from "../../../modules/main/urls.js";
 /* ProgrammeField  <programme-field>
  *
  * Dropdown field pre-wired to the programmes API. Active programmes are fetched
- * from GET /api/v1/programmes/options/ on first connect. Inherits all attributes
- * and public API from DropdownField and BaseField.
+ * from GET /api/v1/programmes/options/ on connect, and retried on reconnect until
+ * the fetch succeeds at least once. Inherits all attributes and public API from
+ * DropdownField and BaseField.
  *
  * Defaults applied when the attribute is absent:
  *   label       → "Programme"
@@ -39,17 +40,19 @@ class ProgrammeField extends DropdownField {
   connectedCallback() {
     if (!this.hasAttribute("placeholder")) this.setAttribute("placeholder", "Select programme...");
 
-    const firstConnect = this._initialOptions === undefined;
-    if (firstConnect) {
-      this._initialOptions = [];
-      this._loadId = Symbol();
-    }
+    if (this._initialOptions === undefined) this._initialOptions = [];
 
     super.connectedCallback();
 
-    if (firstConnect) {
+    // Fetch whenever options haven't successfully loaded yet — not just on the very first
+    // connect. Containers like <tab-panel> capture and re-insert child nodes on their own
+    // initial render, which disconnects/reconnects this element before its first fetch
+    // resolves; gating on "first connect" alone would then discard that in-flight result
+    // and never retry, leaving the dropdown stuck on its placeholder.
+    if (!this._loaded) {
       const select = this.querySelector(".rp-input");
       if (select) select.disabled = true;
+      this._loadId = Symbol();
       this._fetchOptions(this._loadId);
     }
   }
@@ -60,6 +63,7 @@ class ProgrammeField extends DropdownField {
   }
 
   refresh() {
+    this._loaded = false;
     this._loadId = Symbol();
     this._fetchOptions(this._loadId);
   }
@@ -95,6 +99,7 @@ class ProgrammeField extends DropdownField {
         })),
       ];
 
+      this._loaded = true;
       this._doRender();
     } catch {
       if (this._loadId !== id) return;

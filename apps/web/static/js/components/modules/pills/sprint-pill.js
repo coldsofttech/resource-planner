@@ -1,6 +1,6 @@
 import { esc } from "../../utils.js";
 import { apiFetch } from "../../../modules/utils/utils.js";
-import { API_URLS } from "../../../modules/main/urls.js";
+import { API_URLS, UI_URLS } from "../../../modules/main/urls.js";
 
 /* SprintPill: <sprint-pill>
  *
@@ -46,6 +46,7 @@ class SprintPill extends HTMLElement {
         name: sprint.name,
         end: sprint.end_date,
         statusKey: sprint.status,
+        code: sprint.code,
       };
       this._render();
     } catch {
@@ -74,23 +75,44 @@ class SprintPill extends HTMLElement {
   }
 
   _render() {
-    const name = this._sprintData?.name;
+    const { name, end, code } = this._sprintData ?? {};
     if (!name) {
       this._hide();
       return;
     }
     this.style.display = "";
     this.className = "rp-sprint-pill";
-    const end = this._sprintData?.end;
     this.innerHTML = `
       <span class="rp-sprint-dot" style="background:${this._dotColor()}"></span>
       <span class="rp-sprint-name">${esc(name)}</span>
       ${end ? `<span class="rp-sprint-time" data-sprint-time>${this._countdown()}</span>` : ""}
     `;
+    if (code) {
+      const href = UI_URLS.sprints.detail(code);
+      this.style.cursor = "pointer";
+      this.setAttribute("role", "link");
+      this.setAttribute("tabindex", "0");
+      this.setAttribute("title", `View ${esc(name)}`);
+      this.onclick = () => {
+        window.location.href = href;
+      };
+      this.onkeydown = (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          window.location.href = href;
+        }
+      };
+    }
   }
 
   _hide() {
     this.style.display = "none";
+    this.style.cursor = "";
+    this.onclick = null;
+    this.onkeydown = null;
+    this.removeAttribute("role");
+    this.removeAttribute("tabindex");
+    this.removeAttribute("title");
     this.innerHTML = "";
   }
 

@@ -36,7 +36,14 @@ import { API_URLS } from "../../../modules/main/urls.js";
  */
 class BusinessUnitField extends DropdownField {
   static get observedAttributes() {
-    return [...super.observedAttributes, "show-label", "multi-select", "allow-all"];
+    return [
+      ...super.observedAttributes,
+      "show-label",
+      "multi-select",
+      "allow-all",
+      "options-data",
+      "options-defer",
+    ];
   }
 
   get _label() {
@@ -105,6 +112,18 @@ class BusinessUnitField extends DropdownField {
     ) {
       this._initialOptions = this._buildSingleOptions();
       this._doRender();
+    } else if (name === "options-data" && newVal && this._connected) {
+      this._loadId = Symbol();
+      this._applyOptionsData(newVal);
+    } else if (name === "options-defer" && oldVal !== null && newVal === null && this._connected) {
+      this._loadId = Symbol();
+      if (this._isMultiSelect) {
+        this._setLoadingState(true);
+      } else {
+        const select = this.querySelector(".rp-input");
+        if (select) select.disabled = true;
+      }
+      this._fetchOptions(this._loadId);
     } else {
       super.attributeChangedCallback(name, oldVal, newVal);
     }
@@ -150,7 +169,12 @@ class BusinessUnitField extends DropdownField {
         const select = this.querySelector(".rp-input");
         if (select) select.disabled = true;
       }
-      this._fetchOptions(this._loadId);
+      const optionsData = this.getAttribute("options-data");
+      if (optionsData) {
+        this._applyOptionsData(optionsData);
+      } else if (!this.hasAttribute("options-defer")) {
+        this._fetchOptions(this._loadId);
+      }
     } else if (!this._isMultiSelect && this._buOptions === undefined) {
       this._loadId = Symbol();
       const select = this.querySelector(".rp-input");
@@ -210,6 +234,38 @@ class BusinessUnitField extends DropdownField {
       this._setFetchError();
     } finally {
       if (this._loadId === id && this._isMultiSelect) this._setLoadingState(false);
+    }
+  }
+
+  _applyOptionsData(json) {
+    try {
+      const units = JSON.parse(json);
+      const opts = units.map((u) => ({
+        id: u.code,
+        label: u.name,
+        value: u.code,
+        selected: false,
+        disabled: false,
+      }));
+      if (this._isMultiSelect) {
+        this._initialOptions = opts;
+        if (this._selectedValues && this._selectedValues.length > 0) {
+          this._selectedValues = this._selectedValues.map((sv) => {
+            const opt = this._initialOptions.find((o) => o.value === sv.value);
+            return opt ? { ...opt } : sv;
+          });
+          this._refreshChipsAndInput();
+        }
+        const dropdown = this.querySelector(".rp-ms-dropdown");
+        if (dropdown && !dropdown.hidden) this._updateDropdown();
+        this._setLoadingState(false);
+      } else {
+        this._buOptions = opts;
+        this._initialOptions = this._buildSingleOptions();
+        this._doRender();
+      }
+    } catch {
+      this._fetchOptions(this._loadId);
     }
   }
 

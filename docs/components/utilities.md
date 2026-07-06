@@ -106,6 +106,47 @@ statusModal.close();
 
 ---
 
+## `barChart(container, config)`
+
+**Source:** `apps/web/static/js/modules/utils/bar-chart.js`
+
+Imperative counterpart to the declarative `<bar-chart>` custom element (see [charts.md](charts.md)). Creates a `<bar-chart>`, mounts it into `container`, and sets its data — for pages that build chart placement dynamically rather than declaring `<bar-chart>` markup directly in a template.
+
+```js
+import { barChart } from "/static/js/modules/utils/index.js";
+
+const chart = barChart(document.getElementById("chart-slot"), {
+  title: "Team Utilisation — Net Capacity vs Allocated",
+  data: { labels, bars, line },
+});
+
+// Later — re-render in place:
+chart.data = newData;
+```
+
+Returns the mounted `<bar-chart>` element.
+
+---
+
+## `heatmapChart(container, config)`
+
+**Source:** `apps/web/static/js/modules/utils/heatmap-chart.js`
+
+Imperative counterpart to the declarative `<heatmap-chart>` custom element (see [charts.md](charts.md)). Same mount/return pattern as `barChart()`.
+
+```js
+import { heatmapChart } from "/static/js/modules/utils/index.js";
+
+const heatmap = heatmapChart(document.getElementById("heatmap-slot"), {
+  title: "Member Utilisation Heatmap",
+  data: { sprints, rows },
+});
+```
+
+Returns the mounted `<heatmap-chart>` element.
+
+---
+
 ## Other utilities
 
 For other shared utilities (`apiFetch`, `getCsrfToken`, `snapshotButton`, `setBusyButton`, `restoreButton`, `setLink`, validators, cookie utilities, `API_URLS`, `UI_URLS`), see the JS Standards rule file at `.claude/rules/js-standards.md`.

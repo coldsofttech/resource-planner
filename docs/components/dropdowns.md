@@ -301,6 +301,7 @@ These fields extend `DropdownField` and support a `multi-select` attribute that 
 | ----------------------- | ------------- | ------------------------------------ | ------------------------------------------------------------ |
 | `<team-field>`          | Team          | `GET /api/v1/teams/options/`         | `unassign` — prepends "Unassign" option (single-select only) |
 | `<business-unit-field>` | Business Unit | `GET /api/v1/bu/options/`            |                                                              |
+| `<product-field>`       | Product       | `GET /api/v1/products/options/`      |                                                              |
 | `<member-field>`        | Member        | `GET /api/v1/members/?page_size=200` | See full details below                                       |
 
 ```html

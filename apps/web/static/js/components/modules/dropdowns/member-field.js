@@ -127,11 +127,8 @@ class MemberField extends DropdownField {
   connectedCallback() {
     if (!this.hasAttribute("placeholder")) this.setAttribute("placeholder", "Select member…");
 
-    const firstConnect = this._initialOptions === undefined;
-
-    if (firstConnect) {
+    if (this._initialOptions === undefined) {
       this._initialOptions = [];
-      this._loadId = Symbol();
 
       if (this._isMultiSelect) {
         // Seed _selectedValues with placeholder chips (code as label) so pre-selected
@@ -144,13 +141,19 @@ class MemberField extends DropdownField {
 
     super.connectedCallback();
 
-    if (firstConnect) {
+    // Fetch whenever options haven't successfully loaded yet — not just on the very first
+    // connect. Containers like <drawer-modal> capture and re-insert child nodes on their own
+    // initial render, which disconnects/reconnects this element before its first fetch
+    // resolves; gating on "first connect" alone would then discard that in-flight result
+    // and never retry, leaving the dropdown stuck on its placeholder.
+    if (!this._loaded) {
       if (this._isMultiSelect) {
         this._setLoadingState(true);
       } else {
         const select = this.querySelector(".rp-input");
         if (select) select.disabled = true;
       }
+      this._loadId = Symbol();
       this._fetchOptions(this._loadId);
     }
   }
@@ -198,6 +201,7 @@ class MemberField extends DropdownField {
         this._initialOptions = this._buildSingleOptions();
         this._doRender();
       }
+      this._loaded = true;
     } catch {
       if (this._loadId !== id) return;
       this._setFetchError();

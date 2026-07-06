@@ -10,6 +10,12 @@ Sunken card container with an optional titled header and a body slot. Body child
 
 **Declarative children (captured before first render):**
 
+| Child             | Captured by     | Description                                                  |
+| ----------------- | --------------- | ------------------------------------------------------------ |
+| `<panel-title>`   | `section-panel` | Rich HTML heading; replaces the plain-text `title` attribute |
+| `<panel-actions>` | `section-panel` | Action controls placed in the right side of the card header  |
+| `<panel-body>`    | `section-panel` | Main card content                                            |
+
 ```html
 <section-panel id="details" title="Details" icon="bi-person" col="col-12">
   <panel-title>Team <strong>Details</strong></panel-title>
@@ -19,6 +25,30 @@ Sunken card container with an optional titled header and a body slot. Body child
   </panel-body>
 </section-panel>
 ```
+
+To place action controls in the panel header, add a `<panel-actions>` child:
+
+```html
+<section-panel title="Project Actuals">
+  <panel-actions>
+    <link-field
+      href="#"
+      icon="bi-gear"
+      variant="icon-btn"
+      label="Settings"
+      title="Settings"
+    ></link-field>
+  </panel-actions>
+  <panel-body>
+    <!-- content -->
+  </panel-body>
+</section-panel>
+```
+
+- Child nodes of `<panel-actions>` are captured once on first connect (wizard-safe).
+- They are inserted into a `div[data-panel-actions]` rendered after `<strong>` inside `.rp-card-head`.
+- `.rp-card-head` uses `display: flex; justify-content: space-between`, so actions appear right-aligned automatically.
+- Omitting `<panel-actions>` produces identical output to before — fully backwards compatible.
 
 | Attribute | Type   | Default    | Description                                                         |
 | --------- | ------ | ---------- | ------------------------------------------------------------------- |
@@ -39,6 +69,31 @@ Rich HTML heading container for `<section-panel>`. When present as a direct chil
 ```html
 <panel-title>Team <strong>Details</strong></panel-title>
 ```
+
+---
+
+## `<panel-actions>`
+
+Action controls slot for `<section-panel>`. When present as a direct child, its child nodes are captured once on first connect and inserted into a `div[data-panel-actions]` placed after the heading text inside `.rp-card-head`. The header's `justify-content: space-between` pushes them to the right automatically.
+
+```html
+<section-panel title="Project Actuals">
+  <panel-actions>
+    <link-field
+      href="#"
+      icon="bi-gear"
+      variant="icon-btn"
+      label="Config"
+      title="Config"
+    ></link-field>
+  </panel-actions>
+  <panel-body>
+    <!-- content -->
+  </panel-body>
+</section-panel>
+```
+
+Omitting `<panel-actions>` leaves the panel header unchanged — the slot is fully optional.
 
 ---
 

@@ -1,0 +1,108 @@
+/* Diff/Compare (#197) — <diff-compare> git-like diff table used by
+   apps/web/static/js/modules/resource-plans/snapshots.js's Compare drawer.
+   Reuses the add/del color language from .temp/claude_design's field-level
+   diff mockup, generalized to tabular rows. */
+
+.rp-diff {
+  font-family: var(--rp-font-mono);
+  font-size: var(--rp-fs-13);
+  border: 1px solid var(--rp-border);
+  border-radius: var(--rp-r-6);
+  overflow: hidden;
+}
+
+.rp-diff-row {
+  display: grid;
+  align-items: center;
+}
+
+.rp-diff-header-row {
+  background: var(--rp-bg-sunken);
+  border-bottom: 1px solid var(--rp-divider);
+  font-family: var(--rp-font-base, inherit);
+  font-weight: 600;
+  font-size: var(--rp-fs-12);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--rp-text-muted);
+}
+
+.rp-diff-ln {
+  padding: var(--rp-s-4) var(--rp-s-8);
+  color: var(--rp-text-subtle);
+  text-align: center;
+  background: var(--rp-bg-sunken);
+  border-right: 1px solid var(--rp-divider);
+  user-select: none;
+}
+
+.rp-diff-cell {
+  padding: var(--rp-s-4) var(--rp-s-12);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rp-diff-head-cell {
+  background: transparent;
+}
+
+.rp-diff-row.add {
+  background: oklch(0.95 0.05 150 / 0.6);
+}
+
+.rp-diff-row.add .rp-diff-ln {
+  background: oklch(0.92 0.07 150 / 0.7);
+  color: oklch(0.4 0.15 150);
+}
+
+.rp-diff-row.del {
+  background: oklch(0.95 0.05 25 / 0.6);
+}
+
+.rp-diff-row.del .rp-diff-ln {
+  background: oklch(0.92 0.07 25 / 0.7);
+  color: oklch(0.45 0.18 25);
+}
+
+[data-theme="dark"] .rp-diff-row.add {
+  background: oklch(0.3 0.05 150 / 0.4);
+}
+
+[data-theme="dark"] .rp-diff-row.del {
+  background: oklch(0.3 0.05 25 / 0.4);
+}
+
+/* Diff legend (#220) — small +/- swatches explaining add/del row colors
+   outside the diff table itself, e.g. above a <diff-compare> instance. */
+.rp-diff-legend-swatch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25em;
+  height: 1.25em;
+  border-radius: var(--rp-r-4, 4px);
+  font-family: var(--rp-font-mono);
+  font-weight: 700;
+  margin-right: 0.25em;
+}
+
+.rp-diff-legend-swatch.add {
+  background: oklch(0.92 0.07 150 / 0.7);
+  color: oklch(0.4 0.15 150);
+}
+
+.rp-diff-legend-swatch.del {
+  background: oklch(0.92 0.07 25 / 0.7);
+  color: oklch(0.45 0.18 25);
+}
+
+[data-theme="dark"] .rp-diff-legend-swatch.add {
+  background: oklch(0.3 0.05 150 / 0.4);
+  color: oklch(0.75 0.15 150);
+}
+
+[data-theme="dark"] .rp-diff-legend-swatch.del {
+  background: oklch(0.3 0.05 25 / 0.4);
+  color: oklch(0.75 0.18 25);
+}
