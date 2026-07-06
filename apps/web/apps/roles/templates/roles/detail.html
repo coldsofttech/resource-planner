@@ -20,6 +20,7 @@
           <view-field id="rp-role-detail-name" label="Role Name"></view-field>
           <view-field id="rp-role-detail-code" label="Code" code></view-field>
           <view-field id="rp-role-detail-status" label="Status"></view-field>
+          <view-field id="rp-role-detail-default" label="Default"></view-field>
           <view-field id="rp-role-detail-assignable" label="Assignable"></view-field>
           <view-field id="rp-role-detail-leadership" label="Leadership"></view-field>
           <view-field id="rp-role-detail-created" label="Created" meta></view-field>
@@ -29,7 +30,7 @@
     </div>
     <div id="rp-role-members-col" class="col-lg-8" hidden>
       <section-panel>
-        <panel-title>Members</panel-title>
+        <panel-title>Members <span id="rp-role-members-count" style="font-weight:400;color:var(--rp-text-muted)"></span></panel-title>
         <panel-body>
           <data-table id="rp-role-members-table"
                       url="/api/v1/roles/{{ role_code }}/members/"

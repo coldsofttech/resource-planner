@@ -17,6 +17,7 @@ class RoleListSerializer(ListMixin, CodeSerializer):
     is_default = serializers.BooleanField(read_only=True)
     is_assignable = serializers.BooleanField(read_only=True)
     is_leadership = serializers.BooleanField(read_only=True)
+    members_count = serializers.IntegerField(read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
     created_by = UserMiniSerializer(read_only=True, allow_null=True)
     updated_at = serializers.DateTimeField(read_only=True)
@@ -31,6 +32,7 @@ class RoleListSerializer(ListMixin, CodeSerializer):
             "is_default",
             "is_assignable",
             "is_leadership",
+            "members_count",
             "created_at",
             "created_by",
             "updated_at",

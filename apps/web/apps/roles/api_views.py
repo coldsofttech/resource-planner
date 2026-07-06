@@ -41,12 +41,6 @@ class RoleViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
             "description": "true/false/yes/no/1/0 — defaults to true.",
         },
         {
-            "name": "is_default",
-            "type": "boolean",
-            "required": False,
-            "description": "true/false/yes/no/1/0 — defaults to false.",
-        },
-        {
             "name": "is_assignable",
             "type": "boolean",
             "required": False,
@@ -83,7 +77,7 @@ class RoleViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
     ]
 
     def get_import_sample_row(self):
-        return ["Developer", "true", "false", "true", "false"]
+        return ["Developer", "true", "true", "false"]
 
     def get_permissions(self):
         action_perms = {

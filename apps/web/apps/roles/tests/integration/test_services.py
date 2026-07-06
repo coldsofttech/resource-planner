@@ -538,7 +538,8 @@ class RoleImportBulkImportSkipTest(TestCase):
 
     def test_invalid_row_not_created(self):
         f = make_csv_file("role\n")
-        self.svc.bulk_import(f)
+        with self.assertRaises(ValidationException):
+            self.svc.bulk_import(f)
         self.assertEqual(Role.objects.count(), 0)
 
 

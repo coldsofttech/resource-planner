@@ -41,7 +41,15 @@ class RoleService(AuditableService, FilterableQueryService):
     filter_active_by_default: bool = True
 
     def get_queryset(self):
-        return selectors.get_all_roles()
+        return selectors.get_all_roles_with_member_count()
+
+    def apply_filters(self, qs, filters: dict):
+        qs = super().apply_filters(qs, filters)
+        for field in ("is_assignable", "is_leadership"):
+            raw = filters.get(field)
+            if raw not in (None, "", "all"):
+                qs = qs.filter(**{field: str(raw).lower() not in ("false", "0")})
+        return qs
 
     def _snapshot(self, role: Role) -> dict:
         return {
@@ -177,6 +185,8 @@ class RoleService(AuditableService, FilterableQueryService):
     @transaction.atomic
     def set_default(self, code: str) -> Role:
         obj = self.get(code=code)
+        if not obj.is_active:
+            raise ValidationException("Only an active role can be set as default.")
         if not obj.is_default:
             before = self._snapshot(obj)
             Role.objects.exclude(pk=obj.pk).filter(is_default=True).update(
@@ -266,6 +276,7 @@ class RoleImportService(ImportService):
 
     def bulk_import(self, file, dry_run: bool = False) -> dict:
         content = file.read().decode("utf-8-sig")
+        self.validate_csv_not_empty(content)
         reader = csv.DictReader(io.StringIO(content))
 
         required_columns = {"role"}
@@ -296,8 +307,6 @@ class RoleImportService(ImportService):
             role = row["role"].strip()
             is_active_raw = (row.get("is_active") or "true").strip().lower()
             is_active = is_active_raw not in ("false", "0", "no")
-            is_default_raw = (row.get("is_default") or "false").strip().lower()
-            is_default = is_default_raw in ("true", "1", "yes")
             is_assignable_raw = (row.get("is_assignable") or "false").strip().lower()
             is_assignable = is_assignable_raw in ("true", "1", "yes")
             is_leadership_raw = (row.get("is_leadership") or "false").strip().lower()
@@ -317,7 +326,6 @@ class RoleImportService(ImportService):
                 role_svc.create(
                     role=role,
                     is_active=is_active,
-                    is_default=is_default,
                     is_assignable=is_assignable,
                     is_leadership=is_leadership,
                 )

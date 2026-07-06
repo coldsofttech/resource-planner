@@ -26,12 +26,15 @@ window.renderRolesRow = function renderRolesRow(row) {
     ? `<span class="rp-badge rp-badge-soft rp-badge-success">Yes</span>`
     : `<span class="rp-badge rp-badge-soft">No</span>`;
 
+  const membersCount = typeof row.members_count === "number" ? row.members_count : "—";
+
   return `
     <td class="fw-medium">${esc(row.role)}</td>
     <td><code class="rp-mono">${esc(row.code)}</code></td>
     <td>${assignableBadge}</td>
     <td>${leadershipBadge}</td>
     <td>${defaultBadge}</td>
+    <td style="color:var(--rp-text-muted)">${membersCount}</td>
     <td><span class="rp-badge ${badgeCls}">${statusLabel}</span></td>
     <td style="color:var(--rp-text-muted)">${formatDate(row.created_at)}</td>
   `;
@@ -72,7 +75,7 @@ function initDeleteModal(table) {
       pendingRow = null;
     } catch (err) {
       deleteBtn?.removeAttribute("disabled");
-      const msg = err?.data?.error?.message ?? "Failed to delete role. Please try again.";
+      const msg = err?.data?.message ?? "Failed to delete role. Please try again.";
       toast({ type: "error", title: "Error", message: msg });
     }
   });
@@ -124,7 +127,7 @@ function initToggleModals(table) {
     } catch (err) {
       actionBtn?.removeAttribute("disabled");
       const msg =
-        err?.data?.error?.message ??
+        err?.data?.message ??
         `Failed to ${isActivating ? "activate" : "deactivate"} role. Please try again.`;
       toast({ type: "error", title: "Error", message: msg });
     }
@@ -206,8 +209,8 @@ function initEditDrawer(table) {
     } catch (err) {
       restoreButton(submitBtn, snap);
       const msg =
-        err?.data?.error?.message ??
-        err?.data?.role?.[0] ??
+        err?.data?.message ??
+        err?.data?.errors?.role?.[0] ??
         "Failed to update role. Please try again.";
       toast({ type: "error", title: "Error", message: msg });
     }
@@ -292,8 +295,8 @@ function initAddButton(table) {
     } catch (err) {
       restoreButton(submitBtn, snap);
       const msg =
-        err?.data?.error?.message ??
-        err?.data?.role?.[0] ??
+        err?.data?.message ??
+        err?.data?.errors?.role?.[0] ??
         "Failed to create role. Please try again.";
       toast({ type: "error", title: "Error", message: msg });
     }
@@ -335,7 +338,7 @@ function initSetDefaultModal(table) {
       defaultRow = null;
     } catch (err) {
       actionBtn?.removeAttribute("disabled");
-      const msg = err?.data?.error?.message ?? "Failed to set default role. Please try again.";
+      const msg = err?.data?.message ?? "Failed to set default role. Please try again.";
       toast({ type: "error", title: "Error", message: msg });
     }
   });

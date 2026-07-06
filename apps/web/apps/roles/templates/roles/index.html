@@ -25,6 +25,20 @@
   <filter-panel id="rp-roles-filter-panel">
   <search-field id="rp-roles-search" name="search" placeholder="Search roles..." shortcut="/" show-label></search-field>
   <is-active-field id="rp-roles-status" name="is_active" value="true" show-label></is-active-field>
+  <dropdown-field id="rp-roles-assignable" name="is_assignable" label="Assignable" show-label>
+  <values-list>
+  <value value="">All</value>
+  <value value="true">Yes</value>
+  <value value="false">No</value>
+  </values-list>
+  </dropdown-field>
+  <dropdown-field id="rp-roles-leadership" name="is_leadership" label="Leadership" show-label>
+  <values-list>
+  <value value="">All</value>
+  <value value="true">Yes</value>
+  <value value="false">No</value>
+  </values-list>
+  </dropdown-field>
   </filter-panel>
   <data-table id="rp-roles-table" url="/api/v1/roles/" paginated page-size="25" row-template="renderRolesRow" empty-message="No roles found.">
     <table-columns>
@@ -37,6 +51,8 @@
       <table-column label="Leadership" key="is_leadership" hide-mobile sortable>
       </table-column>
       <table-column label="Default" key="is_default" hide-mobile sortable>
+      </table-column>
+      <table-column label="Members" key="members_count" hide-mobile sortable>
       </table-column>
       <table-column label="Status" key="is_active">
       </table-column>

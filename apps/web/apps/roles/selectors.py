@@ -7,6 +7,14 @@ def get_all_roles() -> QuerySet[Role]:
     return Role.objects.select_related("created_by", "updated_by").all()
 
 
+def get_all_roles_with_member_count() -> QuerySet[Role]:
+    return (
+        Role.objects.select_related("created_by", "updated_by")
+        .annotate(members_count=Count("user_profiles", distinct=True))
+        .all()
+    )
+
+
 def get_active_roles() -> QuerySet[Role]:
     return Role.objects.select_related("created_by", "updated_by").filter(
         is_active=True

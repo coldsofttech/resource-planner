@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import csv
+import io
 import math
 from abc import ABC, abstractmethod
 
@@ -62,6 +64,22 @@ class ImportService(ContextService, ABC):
     SUPPORTED_IMPORT_FORMATS = ["csv"]
     MAX_IMPORT_ROWS = 1000
     MAX_IMPORT_FILE_SIZE_MB = 5
+
+    def validate_csv_not_empty(self, content: str) -> None:
+        """Raise ValidationException when the CSV content has no data rows."""
+        from apps.core.exceptions import ValidationException
+
+        if not content.strip():
+            raise ValidationException(
+                "The uploaded file is empty. Please upload a valid CSV file "
+                "with at least a header row and one data row."
+            )
+        reader = csv.DictReader(io.StringIO(content))
+        if not list(reader):
+            raise ValidationException(
+                "No data rows found in the file. "
+                "Please add at least one data row below the header."
+            )
 
     @abstractmethod
     def bulk_import(self, *args, **kwargs):

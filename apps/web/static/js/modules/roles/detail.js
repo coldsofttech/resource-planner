@@ -56,6 +56,17 @@ async function loadRoleDetails() {
       statusEl.value = role.is_active ? "Active" : "Inactive";
     }
 
+    const defaultEl = document.getElementById("rp-role-detail-default");
+    if (defaultEl) {
+      if (role.is_default) {
+        defaultEl.setAttribute("badge", "rp-badge rp-badge-soft");
+        defaultEl.value = "Default";
+      } else {
+        defaultEl.removeAttribute("badge");
+        defaultEl.value = "—";
+      }
+    }
+
     const yesNo = (val) => (val ? "Yes" : "No");
     setView("rp-role-detail-assignable", yesNo(role.is_assignable));
     setView("rp-role-detail-leadership", yesNo(role.is_leadership));
@@ -75,5 +86,14 @@ document.addEventListener("DOMContentLoaded", () => {
   loadRoleDetails();
   if (hasPermission("auth.view_user")) {
     document.getElementById("rp-role-members-col")?.removeAttribute("hidden");
+  }
+
+  const membersTable = document.getElementById("rp-role-members-table");
+  if (membersTable) {
+    membersTable.addEventListener("rp:data:loaded", (e) => {
+      const count = e.detail.pagination?.total_count ?? e.detail.rows?.length ?? 0;
+      const countEl = document.getElementById("rp-role-members-count");
+      if (countEl) countEl.textContent = `(${count})`;
+    });
   }
 });
