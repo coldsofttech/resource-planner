@@ -50,6 +50,7 @@ class SprintActualsView(ProtectedView):
         ctx = super().get_context_data(**kwargs)
         perms = get_user_permissions(self.request.user)
         ctx["can_import_actuals"] = "sprints.import_actuals" in perms
+        ctx["can_review_complete"] = "sprints.review_complete" in perms
         return ctx
 
 

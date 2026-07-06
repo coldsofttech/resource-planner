@@ -90,11 +90,21 @@ class SprintDetailSerializer(ReadMixin, AuditableSerializer):
     closed_on = serializers.DateTimeField(read_only=True, allow_null=True)
     closed_by = UserMiniSerializer(read_only=True, allow_null=True)
 
+    actuals_review_complete = serializers.SerializerMethodField()
+
     def get_is_in_progress(self, obj: Sprint) -> bool:
         return obj.status == SprintStatus.IN_PROGRESS
 
     def get_days_remaining(self, obj: Sprint) -> int:
         return SprintEngine.days_remaining(obj.end_date)
+
+    def get_actuals_review_complete(self, obj: Sprint) -> bool:
+        from apps.recharges.constants import RechargeType as RechargeTypeChoice
+        from apps.recharges.models import RechargeDetail
+
+        return RechargeDetail.objects.filter(
+            sprint=obj, type=RechargeTypeChoice.ACTUAL
+        ).exists()
 
     class Meta(AuditableSerializer.Meta):
         model = Sprint
@@ -112,6 +122,7 @@ class SprintDetailSerializer(ReadMixin, AuditableSerializer):
             "is_closed",
             "is_in_progress",
             "days_remaining",
+            "actuals_review_complete",
             "note",
             "closed_on",
             "closed_by",

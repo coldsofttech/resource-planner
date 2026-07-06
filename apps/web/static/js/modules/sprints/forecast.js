@@ -12,6 +12,20 @@ const sprintCode = pathParts[1] || null;
 // Team code currently pending an upload action
 let pendingTeamCode = null;
 
+// Tracks confirmed state per team to gate the Review Complete button
+const teamConfirmedMap = new Map();
+
+function updateReviewCompleteBtn() {
+  const btn = document.getElementById("rp-forecast-review-complete-btn");
+  if (!btn) return;
+  const anyConfirmed = [...teamConfirmedMap.values()].some(Boolean);
+  if (anyConfirmed) {
+    btn.removeAttribute("disabled");
+  } else {
+    btn.setAttribute("disabled", "");
+  }
+}
+
 function formatDateTime(iso) {
   if (!iso) return "—";
   const d = new Date(iso);
@@ -143,6 +157,8 @@ async function refreshTeamStatusBadge(teamCode) {
     const latest = resp?.data?.results?.[0] ?? null;
     const badge = document.getElementById(`rp-forecast-team-status-${teamCode}`);
     if (badge) badge.innerHTML = latest ? statusBadgeHtml(latest.status) : "";
+    teamConfirmedMap.set(teamCode, latest?.status === "confirmed");
+    updateReviewCompleteBtn();
   } catch {
     // silently ignore — badge stays empty
   }
@@ -151,6 +167,8 @@ async function refreshTeamStatusBadge(teamCode) {
 function renderTeams(teams) {
   const container = document.getElementById("rp-forecast-teams-container");
   if (!container) return;
+
+  teamConfirmedMap.clear();
 
   if (!teams.length) {
     container.innerHTML = `

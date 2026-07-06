@@ -5,10 +5,43 @@ from django.db import IntegrityError
 from django.test import TestCase
 
 from apps.financial_years.tests.factories import make_financial_year
-from apps.sprints.constants import SprintStatus
-from apps.sprints.models import Capacity, Sprint
+from apps.sprints.constants import (
+    SprintDataImportStatus,
+    SprintDataImportType,
+    SprintStatus,
+)
+from apps.sprints.models import (
+    Capacity,
+    Sprint,
+    SprintDataImport,
+    SprintDataImportConfirmed,
+    SprintDataImportRow,
+)
 from apps.sprints.tests.factories import make_capacity, make_sprint
+from apps.teams.tests.factories import make_team
 from apps.users.tests.factories import make_user
+
+
+def _make_import(
+    sprint,
+    team,
+    user=None,
+    import_type=SprintDataImportType.FORECAST,
+    version_number=1,
+    status=SprintDataImportStatus.ACTIVE,
+):
+    if user is None:
+        user = make_user()
+    return SprintDataImport.objects.create(
+        sprint=sprint,
+        team=team,
+        version_number=version_number,
+        file_name="test.csv",
+        status=status,
+        import_type=import_type,
+        created_by=user,
+        updated_by=user,
+    )
 
 
 class SprintCodeTest(TestCase):
@@ -199,3 +232,239 @@ class CapacityUniqueConstraintTest(TestCase):
         make_capacity(sprint=sprint, member=user)
         with self.assertRaises(IntegrityError):
             Capacity.objects.create(sprint=sprint, member=user)
+
+
+# ── SprintDataImport ──────────────────────────────────────────────────────────
+
+
+class SprintDataImportCodeTest(TestCase):
+    def test_code_starts_with_sptimp_prefix(self):
+        sprint = make_sprint()
+        team = make_team()
+        record = _make_import(sprint, team)
+        self.assertTrue(record.code.startswith("SPTIMP-"))
+
+    def test_code_contains_pk(self):
+        sprint = make_sprint()
+        team = make_team()
+        record = _make_import(sprint, team)
+        self.assertEqual(record.code, f"SPTIMP-{record.pk}")
+
+
+class SprintDataImportFieldDefaultsTest(TestCase):
+    def test_status_defaults_to_active(self):
+        sprint = make_sprint()
+        team = make_team()
+        record = SprintDataImport.objects.create(
+            sprint=sprint, team=team, version_number=1
+        )
+        self.assertEqual(record.status, SprintDataImportStatus.ACTIVE)
+
+    def test_import_type_defaults_to_forecast(self):
+        sprint = make_sprint()
+        team = make_team()
+        record = SprintDataImport.objects.create(
+            sprint=sprint, team=team, version_number=1
+        )
+        self.assertEqual(record.import_type, SprintDataImportType.FORECAST)
+
+    def test_file_name_defaults_to_empty(self):
+        sprint = make_sprint()
+        team = make_team()
+        record = SprintDataImport.objects.create(
+            sprint=sprint, team=team, version_number=1
+        )
+        self.assertEqual(record.file_name, "")
+
+    def test_created_at_set_on_create(self):
+        sprint = make_sprint()
+        team = make_team()
+        record = _make_import(sprint, team)
+        self.assertIsNotNone(record.created_at)
+
+    def test_created_by_nullable(self):
+        sprint = make_sprint()
+        team = make_team()
+        record = SprintDataImport.objects.create(
+            sprint=sprint, team=team, version_number=1
+        )
+        self.assertIsNone(record.created_by)
+
+    def test_created_by_stores_user(self):
+        user = make_user()
+        sprint = make_sprint()
+        team = make_team()
+        record = _make_import(sprint, team, user=user)
+        self.assertEqual(record.created_by, user)
+
+    def test_version_number_stores_correctly(self):
+        sprint = make_sprint()
+        team = make_team()
+        record = _make_import(sprint, team, version_number=3)
+        self.assertEqual(record.version_number, 3)
+
+
+class SprintDataImportStrTest(TestCase):
+    def test_str_contains_import_type_and_version(self):
+        sprint = make_sprint(name="Sprint 1")
+        team = make_team(name="Team A")
+        record = _make_import(sprint, team, import_type=SprintDataImportType.FORECAST)
+        result = str(record)
+        self.assertIn("FORECAST", result.upper())
+        self.assertIn("1", result)
+
+
+class SprintDataImportOrderingTest(TestCase):
+    def test_ordered_by_version_number_descending(self):
+        sprint = make_sprint()
+        team = make_team()
+        user = make_user()
+        _make_import(sprint, team, user=user, version_number=1)
+        _make_import(sprint, team, user=user, version_number=2)
+        _make_import(sprint, team, user=user, version_number=3)
+        version_numbers = list(
+            SprintDataImport.objects.filter(sprint=sprint, team=team).values_list(
+                "version_number", flat=True
+            )
+        )
+        self.assertEqual(version_numbers, [3, 2, 1])
+
+
+class SprintDataImportUniqueConstraintTest(TestCase):
+    def test_duplicate_sprint_team_type_version_raises_integrity_error(self):
+        sprint = make_sprint()
+        team = make_team()
+        _make_import(
+            sprint, team, import_type=SprintDataImportType.FORECAST, version_number=1
+        )
+        with self.assertRaises(IntegrityError):
+            SprintDataImport.objects.create(
+                sprint=sprint,
+                team=team,
+                import_type=SprintDataImportType.FORECAST,
+                version_number=1,
+            )
+
+    def test_same_sprint_team_different_import_type_allowed(self):
+        sprint = make_sprint()
+        team = make_team()
+        _make_import(
+            sprint, team, import_type=SprintDataImportType.FORECAST, version_number=1
+        )
+        record = SprintDataImport.objects.create(
+            sprint=sprint,
+            team=team,
+            import_type=SprintDataImportType.ACTUAL,
+            version_number=1,
+        )
+        self.assertIsNotNone(record.pk)
+
+
+class SprintDataImportCustomPermissionsTest(TestCase):
+    def test_custom_permissions_defined(self):
+        perm_codenames = {p[0] for p in SprintDataImport._meta.permissions}
+        self.assertIn("import_forecast", perm_codenames)
+        self.assertIn("import_actuals", perm_codenames)
+        self.assertIn("review_forecast", perm_codenames)
+        self.assertIn("confirm_forecast", perm_codenames)
+        self.assertIn("review_complete", perm_codenames)
+
+
+# ── SprintDataImportRow ───────────────────────────────────────────────────────
+
+
+class SprintDataImportRowCodeTest(TestCase):
+    def test_code_starts_with_sptimprw_prefix(self):
+        sprint = make_sprint()
+        team = make_team()
+        record = _make_import(sprint, team)
+        row = SprintDataImportRow.objects.create(import_record=record, title="Test")
+        self.assertTrue(row.code.startswith("SPTIMPRW-"))
+
+
+class SprintDataImportRowFieldDefaultsTest(TestCase):
+    def test_is_manually_added_defaults_to_false(self):
+        sprint = make_sprint()
+        team = make_team()
+        record = _make_import(sprint, team)
+        row = SprintDataImportRow.objects.create(import_record=record, title="Row")
+        self.assertFalse(row.is_manually_added)
+
+    def test_is_deleted_defaults_to_false(self):
+        sprint = make_sprint()
+        team = make_team()
+        record = _make_import(sprint, team)
+        row = SprintDataImportRow.objects.create(import_record=record, title="Row")
+        self.assertFalse(row.is_deleted)
+
+    def test_story_type_defaults_to_empty(self):
+        sprint = make_sprint()
+        team = make_team()
+        record = _make_import(sprint, team)
+        row = SprintDataImportRow.objects.create(import_record=record)
+        self.assertEqual(row.story_type, "")
+
+    def test_efforts_defaults_to_empty(self):
+        sprint = make_sprint()
+        team = make_team()
+        record = _make_import(sprint, team)
+        row = SprintDataImportRow.objects.create(import_record=record)
+        self.assertEqual(row.efforts, "")
+
+
+# ── SprintDataImportConfirmed ─────────────────────────────────────────────────
+
+
+class SprintDataImportConfirmedFieldsTest(TestCase):
+    def setUp(self):
+        self.sprint = make_sprint()
+        self.team = make_team()
+        self.import_record = _make_import(self.sprint, self.team)
+
+    def test_story_type_defaults_to_empty(self):
+        confirmed = SprintDataImportConfirmed.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+            import_type=SprintDataImportType.FORECAST,
+        )
+        self.assertEqual(confirmed.story_type, "")
+
+    def test_days_defaults_to_zero(self):
+        from decimal import Decimal
+
+        confirmed = SprintDataImportConfirmed.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+            import_type=SprintDataImportType.FORECAST,
+        )
+        self.assertEqual(confirmed.days, Decimal("0"))
+
+    def test_jira_id_stores_correctly(self):
+        confirmed = SprintDataImportConfirmed.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+            import_type=SprintDataImportType.FORECAST,
+            jira_id="JIRA-42",
+        )
+        self.assertEqual(confirmed.jira_id, "JIRA-42")
+
+    def test_import_type_stores_correctly(self):
+        confirmed = SprintDataImportConfirmed.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+            import_type=SprintDataImportType.ACTUAL,
+        )
+        self.assertEqual(confirmed.import_type, SprintDataImportType.ACTUAL)
+
+    def test_created_at_set_on_create(self):
+        confirmed = SprintDataImportConfirmed.objects.create(
+            sprint=self.sprint,
+            team=self.team,
+            import_record=self.import_record,
+            import_type=SprintDataImportType.FORECAST,
+        )
+        self.assertIsNotNone(confirmed.created_at)

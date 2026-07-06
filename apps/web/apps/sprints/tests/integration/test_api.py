@@ -14,6 +14,7 @@ from apps.users.tests.factories import make_user
 LIST_URL = "/api/v1/sprints/"
 STATS_URL = "/api/v1/sprints/stats/"
 OPTIONS_URL = "/api/v1/sprints/options/"
+MONTHS_URL = "/api/v1/sprints/months/"
 ACTIVE_URL = "/api/v1/sprints/active/"
 GENERATE_URL = "/api/v1/sprints/generate/"
 IMPORT_URL = "/api/v1/sprints/import/"
@@ -240,6 +241,42 @@ class SprintOptionsAPITest(TestCase):
             "status",
         ):
             self.assertIn(key, entry)
+
+
+# ── GET /sprints/months/ ──────────────────────────────────────────────────────
+
+
+class SprintMonthsAPITest(TestCase):
+    def setUp(self):
+        mark_setup_complete()
+        self.client = APIClient()
+        self.user = make_user(is_superuser=True)
+        self.fy = make_financial_year(
+            start_date=date(2024, 4, 1), end_date=date(2025, 3, 31)
+        )
+        make_sprint(
+            financial_year=self.fy,
+            sprint_number=1,
+            start_date=date(2024, 4, 1),
+            end_date=date(2024, 4, 14),
+        )
+
+    def test_unauthenticated_returns_401(self):
+        response = self.client.get(MONTHS_URL, {"fy_code": self.fy.code})
+        self.assertEqual(response.status_code, 401)
+
+    def test_missing_fy_code_returns_422(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(MONTHS_URL)
+        self.assertEqual(response.status_code, 422)
+
+    def test_returns_months_for_fy(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(MONTHS_URL, {"fy_code": self.fy.code})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.data["data"], [{"value": "2024-04", "label": "Apr 2024"}]
+        )
 
 
 # ── GET /sprints/active/ ──────────────────────────────────────────────────────

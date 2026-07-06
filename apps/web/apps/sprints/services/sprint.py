@@ -3,7 +3,7 @@ from __future__ import annotations
 import csv
 import io
 import os
-from datetime import date
+from datetime import date, datetime
 
 from django.db import transaction
 from django.http import HttpResponse
@@ -349,6 +349,14 @@ class SprintService(AuditableService, FilterableQueryService):
                 "status": s.status,
             }
             for s in selectors.get_sprint_options(fy_code=fy_code)
+        ]
+
+    def months(self, fy_code: str) -> list[dict]:
+        if not fy_code:
+            raise ValidationException("fy_code is required.")
+        return [
+            {"value": m, "label": datetime.strptime(m, "%Y-%m").strftime("%b %Y")}
+            for m in selectors.get_distinct_months_for_fy(fy_code)
         ]
 
     def stats(self, fields=None, *args, **kwargs) -> dict:

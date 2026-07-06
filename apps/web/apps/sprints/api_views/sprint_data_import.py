@@ -412,6 +412,8 @@ class SprintDataImportActualViewSet(BaseViewSet):
             "upload": "sprints.import_actuals",
             "download_template": "sprints.import_actuals",
             "actuals_review_complete": "sprints.review_complete",
+            "sync_project_actuals": "sprints.review_complete",
+            "list_actuals_projects": "sprints.review_complete",
         }
         perm = action_perms.get(self.action)
         if perm:
@@ -477,6 +479,80 @@ class SprintDataImportActualViewSet(BaseViewSet):
         return self.response(
             data={"created": count},
             message="Sprint actuals review marked complete.",
+        )
+
+    @extend_schema(
+        summary="List projects with actuals data for a sprint",
+        responses={200: OpenApiResponse(description="List of projects.")},
+    )
+    def list_actuals_projects(self, request: Request, sprint_code: str):
+        """GET /sprints/<sprint_code>/actuals/projects/"""
+        from apps.projects.models import Project
+        from apps.recharges.constants import RechargeType as RechargeTypeChoice
+        from apps.recharges.models import RechargeDetail
+        from apps.sprints.selectors import get_sprint_by_code
+
+        sprint = get_sprint_by_code(sprint_code)
+        if sprint is None:
+            raise NotFoundException(
+                resource="Sprint", lookup_field="code", lookup_value=sprint_code
+            )
+
+        project_ids = (
+            RechargeDetail.objects.filter(
+                sprint=sprint,
+                type=RechargeTypeChoice.ACTUAL,
+                project__isnull=False,
+            )
+            .values_list("project_id", flat=True)
+            .distinct()
+        )
+        projects = (
+            Project.objects.filter(pk__in=project_ids)
+            .order_by("name")
+            .values("code", "name")
+        )
+        return self.response(data={"results": list(projects)})
+
+    @extend_schema(
+        summary="Sync ProjectSprintActual records for a sprint",
+        responses={
+            200: OpenApiResponse(description="Sync complete."),
+            404: OpenApiResponse(description="Sprint not found."),
+        },
+    )
+    def sync_project_actuals(self, request: Request, sprint_code: str):
+        """POST /sprints/<sprint_code>/actuals/sync-project-actuals/"""
+        from apps.projects.services.project_sprint_actual import (
+            ProjectSprintActualService,
+        )
+        from apps.sprints.selectors import get_sprint_by_code
+
+        sprint = get_sprint_by_code(sprint_code)
+        if sprint is None:
+            raise NotFoundException(
+                resource="Sprint", lookup_field="code", lookup_value=sprint_code
+            )
+
+        data = request.data
+        all_projects: bool = data.get("all_projects", True)
+        project_codes: list[str] = data.get("project_codes") or []
+
+        project_ids: list[int] | None = None
+        if not all_projects and project_codes:
+            from apps.projects.models import Project
+
+            project_ids = list(
+                Project.objects.filter(code__in=project_codes).values_list(
+                    "id", flat=True
+                )
+            )
+
+        svc = ProjectSprintActualService(user=request.user)
+        count = svc.populate_for_sprint(sprint_id=sprint.pk, project_ids=project_ids)
+        return self.response(
+            data={"created": count},
+            message="Project actuals synced successfully.",
         )
 
 

@@ -1,0 +1,651 @@
+{
+  "module": {
+    "slug": "sprint-forecasts",
+    "name": "Sprint Forecasts",
+    "sort_order": 21,
+    "parent": {
+      "slug": "planning",
+      "name": "Planning",
+      "sort_order": 6
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-SF-100",
+      "name": "Page Access & Security",
+      "test_cases": [
+        {
+          "id": "TC-SF-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user is redirected to login when accessing the Forecast page",
+          "steps": "1. Open a browser with no active session.\n2. Navigate directly to /sprints/SPRINT-x/forecast/.",
+          "expected": "The user is redirected to the login page. No forecast data or team information is visible."
+        },
+        {
+          "id": "TC-SF-102",
+          "severity": "P0",
+          "scenario": "Authenticated user can access the Sprint Forecast page",
+          "steps": "1. Log in with a valid account.\n2. Navigate to Planning > Sprints.\n3. Open a sprint detail page.\n4. Click the Forecast button in the sprint detail page actions.",
+          "expected": "The Sprint Forecast page loads. The page title reads '{Sprint Name} — Forecast'. The Teams panel is visible with accordion rows for each active team."
+        },
+        {
+          "id": "TC-SF-103",
+          "severity": "P1",
+          "scenario": "Import button is not visible to users without the import_forecast permission",
+          "steps": "1. Log in as a user without the sprints.import_forecast permission.\n2. Open the Sprint Forecast page.",
+          "expected": "No Import button appears on any team accordion row. The file input element is not rendered in the page."
+        },
+        {
+          "id": "TC-SF-104",
+          "severity": "P1",
+          "scenario": "Import button is visible to users with the import_forecast permission",
+          "steps": "1. Log in as a user with the sprints.import_forecast permission.\n2. Open the Sprint Forecast page.",
+          "expected": "An Import button (with upload icon) is visible on every team accordion row header."
+        },
+        {
+          "id": "TC-SF-105",
+          "severity": "P1",
+          "scenario": "Review Complete button is initially disabled and enables after a team is confirmed",
+          "steps": "1. Open the Sprint Forecast page for a sprint where no team has a confirmed import.\n2. Observe the Review Complete button state.",
+          "expected": "The Review Complete button is disabled. After at least one team confirms an import, the button becomes enabled."
+        },
+        {
+          "id": "TC-SF-106",
+          "severity": "P0",
+          "scenario": "Sprint Forecast page is inaccessible for a closed sprint",
+          "steps": "1. Navigate to the Forecast page for a sprint whose status is Closed.",
+          "expected": "The Teams panel shows a locked state: a lock icon, the message 'Sprint is closed', and a description that forecast data cannot be imported. The Import button is not rendered."
+        }
+      ]
+    },
+    {
+      "id": "TC-SF-200",
+      "name": "Page Layout & Initial Render",
+      "test_cases": [
+        {
+          "id": "TC-SF-201",
+          "severity": "P1",
+          "scenario": "Page title updates to include the sprint name after loading",
+          "steps": "1. Open the Sprint Forecast page.\n2. Wait for the page to finish loading.",
+          "expected": "The page title changes from 'Forecast' to '{Sprint Name} — Forecast'. The breadcrumbs update to show: Project / Planning / Sprints / {Sprint Name} / Forecast."
+        },
+        {
+          "id": "TC-SF-202",
+          "severity": "P1",
+          "scenario": "Loading spinner is shown while teams are being fetched",
+          "steps": "1. Open the Sprint Forecast page on a throttled network.\n2. Observe the Teams panel immediately after the page loads.",
+          "expected": "A loading spinner with the text 'Loading teams…' is shown inside the Teams panel until the API responds."
+        },
+        {
+          "id": "TC-SF-203",
+          "severity": "P2",
+          "scenario": "Empty state is shown when there are no active teams",
+          "steps": "1. Open the Sprint Forecast page for an instance where no active teams exist.",
+          "expected": "The Teams panel shows an empty state with a people icon and the message 'No active teams found.'"
+        },
+        {
+          "id": "TC-SF-204",
+          "severity": "P1",
+          "scenario": "Download Template button is always visible regardless of permissions",
+          "steps": "1. Log in as any authenticated user.\n2. Open the Sprint Forecast page.",
+          "expected": "The Download Template button is visible in the page header actions for all authenticated users."
+        }
+      ]
+    },
+    {
+      "id": "TC-SF-300",
+      "name": "Team Accordion",
+      "test_cases": [
+        {
+          "id": "TC-SF-301",
+          "severity": "P1",
+          "scenario": "Each active team appears as a separate accordion row",
+          "steps": "1. Open the Sprint Forecast page for a sprint.\n2. Count the accordion rows in the Teams panel.",
+          "expected": "One accordion row is shown per active team. Inactive teams are not listed."
+        },
+        {
+          "id": "TC-SF-302",
+          "severity": "P1",
+          "scenario": "Team status badge shows Active (blue) when the latest import is not confirmed",
+          "steps": "1. Upload a CSV for a team without confirming it.\n2. Return to the Sprint Forecast page.",
+          "expected": "The team's accordion row shows an 'Active' badge in blue next to the team name."
+        },
+        {
+          "id": "TC-SF-303",
+          "severity": "P1",
+          "scenario": "Team status badge shows Confirmed (green) when the latest import is confirmed",
+          "steps": "1. Upload and confirm a forecast import for a team.\n2. Return to the Sprint Forecast page.",
+          "expected": "The team's accordion row shows a 'Confirmed' badge in green next to the team name."
+        },
+        {
+          "id": "TC-SF-304",
+          "severity": "P2",
+          "scenario": "Team status badge shows Superseded (grey) for an older import replaced by a newer one",
+          "steps": "1. Upload and confirm a forecast import for a team.\n2. Upload a second CSV for the same team.\n3. Open the import history table for that team.",
+          "expected": "The first import shows a 'Superseded' badge. The second import shows 'Active'."
+        },
+        {
+          "id": "TC-SF-305",
+          "severity": "P1",
+          "scenario": "Expanding an accordion row shows the import history table",
+          "steps": "1. Open the Sprint Forecast page.\n2. Click to expand a team accordion row.",
+          "expected": "The accordion body expands to reveal the import history table with columns: Version, File Name, Status, Imported At, Imported By."
+        },
+        {
+          "id": "TC-SF-306",
+          "severity": "P2",
+          "scenario": "Import history shows empty state when no imports exist for the team",
+          "steps": "1. Expand a team accordion that has had no files uploaded.",
+          "expected": "The import history table shows the empty message 'No forecast data imported yet for this team.'"
+        },
+        {
+          "id": "TC-SF-307",
+          "severity": "P1",
+          "scenario": "Clicking Import on a team accordion header triggers the file picker",
+          "steps": "1. Log in as a user with import_forecast permission.\n2. Open the Sprint Forecast page.\n3. Click the Import button on any team row (without expanding the accordion).",
+          "expected": "A file picker opens. Clicking Import does not expand or collapse the accordion."
+        }
+      ]
+    },
+    {
+      "id": "TC-SF-400",
+      "name": "Download Template",
+      "test_cases": [
+        {
+          "id": "TC-SF-401",
+          "severity": "P1",
+          "scenario": "Download Template button initiates a file download",
+          "steps": "1. Open the Sprint Forecast page.\n2. Click the Download Template button.",
+          "expected": "A CSV file is downloaded. The file contains the expected column headers for the forecast import format."
+        },
+        {
+          "id": "TC-SF-402",
+          "severity": "P2",
+          "scenario": "Downloaded template is specific to the current sprint",
+          "steps": "1. Open the Sprint Forecast page for sprint S1.\n2. Download the template.\n3. Open the Sprint Forecast page for sprint S2.\n4. Download the template.",
+          "expected": "Each download produces a template file scoped to its respective sprint (e.g. may include the sprint code in metadata or filename)."
+        }
+      ]
+    },
+    {
+      "id": "TC-SF-500",
+      "name": "CSV Upload",
+      "test_cases": [
+        {
+          "id": "TC-SF-501",
+          "severity": "P0",
+          "scenario": "Valid CSV file uploads successfully and the import history table refreshes",
+          "steps": "1. Log in with import_forecast permission.\n2. On the Sprint Forecast page, click Import on a team.\n3. Select a valid CSV file from the file picker.",
+          "expected": "A success toast appears: 'Forecast uploaded — The file has been recorded successfully.' The team's import history table refreshes and shows the new import as version v1 (or next version) with status Active."
+        },
+        {
+          "id": "TC-SF-502",
+          "severity": "P0",
+          "scenario": "Uploading a second CSV creates a new version and supersedes the previous one",
+          "steps": "1. Upload a CSV for a team (v1, Active).\n2. Upload a second CSV for the same team.",
+          "expected": "The first import changes status to Superseded. The second import appears as the new Active version. The team's status badge updates to Active."
+        },
+        {
+          "id": "TC-SF-503",
+          "severity": "P1",
+          "scenario": "Uploading a non-CSV file shows an error",
+          "steps": "1. Click Import on a team.\n2. Select a non-CSV file (e.g. a PNG or XLSX).",
+          "expected": "An error toast is displayed. The import history table does not gain a new entry."
+        },
+        {
+          "id": "TC-SF-504",
+          "severity": "P1",
+          "scenario": "Uploading an empty CSV file shows an error",
+          "steps": "1. Click Import on a team.\n2. Select a CSV file with no data rows (headers only or fully empty).",
+          "expected": "An error toast is displayed with a relevant error message. No new import record is created."
+        },
+        {
+          "id": "TC-SF-505",
+          "severity": "P2",
+          "scenario": "Upload error shows the API error message in the toast",
+          "steps": "1. Simulate an API failure during upload (e.g. by temporarily disabling the server or submitting a malformed file).\n2. Observe the toast message.",
+          "expected": "The error toast displays the message returned by the API. The toast type is 'error'."
+        },
+        {
+          "id": "TC-SF-506",
+          "severity": "P2",
+          "scenario": "The same CSV file can be re-selected after a previous upload attempt",
+          "steps": "1. Upload a CSV for a team.\n2. Immediately click Import again and select the same file.",
+          "expected": "The file picker accepts the same file. The upload proceeds and creates a new version. The file input is reset between uploads."
+        }
+      ]
+    },
+    {
+      "id": "TC-SF-600",
+      "name": "Import History Table",
+      "test_cases": [
+        {
+          "id": "TC-SF-601",
+          "severity": "P1",
+          "scenario": "Import history table shows correct columns and data",
+          "steps": "1. Upload a CSV for a team.\n2. Expand the team accordion.",
+          "expected": "The import history table shows: Version (e.g. v1), File Name (CSV filename), Status badge, Imported At (formatted date/time), Imported By (user display name or email)."
+        },
+        {
+          "id": "TC-SF-602",
+          "severity": "P1",
+          "scenario": "Clicking an import history row navigates to the import detail page",
+          "steps": "1. Expand a team accordion with at least one import.\n2. Click any row in the import history table.",
+          "expected": "The user is navigated to the forecast import detail page at /sprints/{code}/forecast/{import_code}/."
+        },
+        {
+          "id": "TC-SF-603",
+          "severity": "P2",
+          "scenario": "Multiple imports are listed in order with most recent version last",
+          "steps": "1. Upload two CSV files for the same team.\n2. Expand the accordion and inspect the import history table.",
+          "expected": "Both imports are listed. The version numbers increment correctly (v1, v2). The table is readable and does not show duplicate rows."
+        }
+      ]
+    },
+    {
+      "id": "TC-SF-700",
+      "name": "Review Complete Drawer",
+      "test_cases": [
+        {
+          "id": "TC-SF-701",
+          "severity": "P1",
+          "scenario": "Review Complete drawer shows a loading state while checking team statuses",
+          "steps": "1. On the Sprint Forecast page, click Review Complete.\n2. Observe the drawer immediately after it opens.",
+          "expected": "A loading spinner is shown with the text 'Checking team statuses…'. The drawer body is hidden until the API responds."
+        },
+        {
+          "id": "TC-SF-702",
+          "severity": "P0",
+          "scenario": "Review Complete drawer shows 'all confirmed' message when every team has a confirmed import",
+          "steps": "1. Confirm the forecast import for every team in the sprint.\n2. Click Review Complete.",
+          "expected": "After loading, the drawer shows a green success message: 'All teams have confirmed forecast imports.' The Complete button is enabled."
+        },
+        {
+          "id": "TC-SF-703",
+          "severity": "P0",
+          "scenario": "Review Complete drawer lists teams with unconfirmed imports",
+          "steps": "1. Leave at least one team without a confirmed import.\n2. Click Review Complete.",
+          "expected": "The drawer lists the unconfirmed teams by name. The message reads 'The following teams do not have a confirmed forecast import for this sprint:'. The Complete button is disabled until the Override checkbox is ticked."
+        },
+        {
+          "id": "TC-SF-704",
+          "severity": "P0",
+          "scenario": "Review Complete requires Override checkbox to proceed when teams are unconfirmed",
+          "steps": "1. Open the Review Complete drawer with at least one unconfirmed team.\n2. Attempt to click Complete without ticking the Override checkbox.",
+          "expected": "The Complete button remains disabled. The Override checkbox must be ticked before Complete becomes active."
+        },
+        {
+          "id": "TC-SF-705",
+          "severity": "P1",
+          "scenario": "Notes field in the Review Complete drawer accepts free text",
+          "steps": "1. Open the Review Complete drawer.\n2. Type a message in the Notes field.\n3. Click Complete.",
+          "expected": "The notes are submitted with the review complete action. No validation error is shown for the Notes field — it is optional."
+        },
+        {
+          "id": "TC-SF-706",
+          "severity": "P1",
+          "scenario": "Review Complete succeeds with override when teams are unconfirmed",
+          "steps": "1. Open the Review Complete drawer with one unconfirmed team.\n2. Tick the Override checkbox.\n3. Enter a note.\n4. Click Complete.",
+          "expected": "The review complete action is submitted. A success toast appears. The sprint's forecast is marked as review complete."
+        },
+        {
+          "id": "TC-SF-707",
+          "severity": "P2",
+          "scenario": "Review Complete drawer can be cancelled without submitting",
+          "steps": "1. Open the Review Complete drawer.\n2. Click Cancel.",
+          "expected": "The drawer closes. No review complete action is submitted. The sprint status is unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-SF-800",
+      "name": "Forecast Import Detail — Page Layout",
+      "test_cases": [
+        {
+          "id": "TC-SF-801",
+          "severity": "P1",
+          "scenario": "Import detail page loads with correct title and breadcrumbs",
+          "steps": "1. From the Sprint Forecast page, click an import history row.\n2. Wait for the detail page to load.",
+          "expected": "The page title shows '{Sprint Name} — Forecast Import — v{N}'. Breadcrumbs show: Project / Planning / Sprints / {Sprint Name} / Forecast / Import v{N}."
+        },
+        {
+          "id": "TC-SF-802",
+          "severity": "P1",
+          "scenario": "Page actions show Review, Add Row, and Confirm buttons",
+          "steps": "1. Open a forecast import detail page.",
+          "expected": "Three buttons are visible in the page actions: 'Add Row', 'Review', and 'Confirm'. Confirm is initially disabled."
+        },
+        {
+          "id": "TC-SF-803",
+          "severity": "P1",
+          "scenario": "Rows tab is active by default on the import detail page",
+          "steps": "1. Open a forecast import detail page.",
+          "expected": "The Rows tab is the active tab. The rows table is visible. The Engineer Capacity tab is also present."
+        },
+        {
+          "id": "TC-SF-804",
+          "severity": "P2",
+          "scenario": "Confirmed import shows locked state — action buttons are disabled",
+          "steps": "1. Open the import detail page for an import that is already confirmed.",
+          "expected": "The Review, Add Row, and Confirm buttons are disabled. Row-level Edit and Delete actions are hidden. The import is read-only."
+        }
+      ]
+    },
+    {
+      "id": "TC-SF-900",
+      "name": "Forecast Import Detail — Rows Tab",
+      "test_cases": [
+        {
+          "id": "TC-SF-901",
+          "severity": "P1",
+          "scenario": "Rows table shows all columns from the uploaded CSV",
+          "steps": "1. Upload a CSV with data rows.\n2. Open the import detail page.",
+          "expected": "The Rows table shows: Story Type, Jira ID, Title, Assignee, Efforts, Days, Sprint, Label, Mapping, and Checks columns. All rows from the CSV are present."
+        },
+        {
+          "id": "TC-SF-902",
+          "severity": "P2",
+          "scenario": "Rows table shows 'No rows found' when the import has no rows",
+          "steps": "1. Create an import with no rows.\n2. Open the import detail page.",
+          "expected": "The rows table shows the empty message 'No rows found for this import.'"
+        },
+        {
+          "id": "TC-SF-903",
+          "severity": "P2",
+          "scenario": "Checks column shows a dash before review has been run",
+          "steps": "1. Open the import detail page for a newly uploaded import.\n2. Inspect the Checks column without running Review.",
+          "expected": "Every row's Checks cell shows a muted dash (—). No check icons appear until Review is run."
+        },
+        {
+          "id": "TC-SF-904",
+          "severity": "P2",
+          "scenario": "Search field filters rows by keyword",
+          "steps": "1. Open the import detail page with multiple rows.\n2. Type a keyword in the search field (e.g. a Jira ID or title).",
+          "expected": "The rows table filters to show only matching rows. Non-matching rows are hidden."
+        },
+        {
+          "id": "TC-SF-905",
+          "severity": "P2",
+          "scenario": "Check Type filter narrows rows to those with a specific failing check",
+          "steps": "1. Run Review on an import with at least one row failing the Assignee check.\n2. Select 'Assignee' from the Check Type dropdown.",
+          "expected": "Only rows with a failing Assignee check are shown. Rows that passed all checks or have other failing checks are hidden."
+        }
+      ]
+    },
+    {
+      "id": "TC-SF-1000",
+      "name": "Forecast Import Detail — Review Checks",
+      "test_cases": [
+        {
+          "id": "TC-SF-1001",
+          "severity": "P0",
+          "scenario": "Running Review updates the Checks column for all rows",
+          "steps": "1. Open the import detail page.\n2. Click the Review button.\n3. Wait for the review to complete.",
+          "expected": "Every row's Checks column is updated. Rows that pass all checks show a green tick. Rows with failures show red icons corresponding to which checks failed."
+        },
+        {
+          "id": "TC-SF-1002",
+          "severity": "P1",
+          "scenario": "Assignee check fails and highlights the Assignee cell in red",
+          "steps": "1. Upload a CSV where one row has an assignee name that does not match any active member.\n2. Run Review.",
+          "expected": "The Assignee cell for that row is highlighted in red bold text. The Checks cell shows the assignee-not-found icon. Hovering the icon shows the tooltip 'Assignee not found or inactive'."
+        },
+        {
+          "id": "TC-SF-1003",
+          "severity": "P1",
+          "scenario": "Sprint check fails and highlights the Sprint cell in red",
+          "steps": "1. Upload a CSV where one row has a sprint name that does not match any active sprint.\n2. Run Review.",
+          "expected": "The Sprint cell for that row is highlighted in red. The Checks cell shows the sprint-not-found icon with tooltip 'Sprint not found or inactive'."
+        },
+        {
+          "id": "TC-SF-1004",
+          "severity": "P1",
+          "scenario": "Label check fails and highlights the Label cell in red",
+          "steps": "1. Upload a CSV where one row references a project label that does not exist in the system.\n2. Run Review.",
+          "expected": "The Label cell for that row is highlighted in red. The Checks cell shows the label-not-found icon with tooltip 'Label not found in system'."
+        },
+        {
+          "id": "TC-SF-1005",
+          "severity": "P1",
+          "scenario": "Mapping check fails and highlights the Mapping cell in red",
+          "steps": "1. Upload a CSV where one row has a recharge type mapping that is invalid for the label's project type.\n2. Run Review.",
+          "expected": "The Mapping cell for that row is highlighted in red. The Checks cell shows the mapping-invalid icon with tooltip 'Mapping invalid for project type'."
+        },
+        {
+          "id": "TC-SF-1006",
+          "severity": "P1",
+          "scenario": "Rows that pass all checks show a green tick",
+          "steps": "1. Upload a CSV with at least one fully valid row.\n2. Run Review.",
+          "expected": "Rows where all four checks pass show a single green tick icon in the Checks column. No red icons appear for those rows."
+        },
+        {
+          "id": "TC-SF-1007",
+          "severity": "P2",
+          "scenario": "Re-running Review after editing a row updates the check result",
+          "steps": "1. Run Review — one row fails the Assignee check.\n2. Edit that row to set a valid assignee.\n3. Run Review again.",
+          "expected": "The Assignee check for the edited row now passes. The Checks column updates to a green tick if all checks pass."
+        },
+        {
+          "id": "TC-SF-1008",
+          "severity": "P1",
+          "scenario": "Confirm button becomes enabled after review is run",
+          "steps": "1. Open the import detail page.\n2. Observe Confirm button — it is disabled.\n3. Click Review and wait for completion.",
+          "expected": "After Review completes, the Confirm button becomes enabled regardless of whether checks passed or failed."
+        }
+      ]
+    },
+    {
+      "id": "TC-SF-1100",
+      "name": "Forecast Import Detail — Engineer Capacity Tab",
+      "test_cases": [
+        {
+          "id": "TC-SF-1101",
+          "severity": "P1",
+          "scenario": "Engineer Capacity tab is accessible after first review is run",
+          "steps": "1. Open the import detail page.\n2. Click the Engineer Capacity tab before running Review.",
+          "expected": "The tab is present but shows no capacity data until Review has been run. After running Review, the tab populates with engineer rows."
+        },
+        {
+          "id": "TC-SF-1102",
+          "severity": "P1",
+          "scenario": "Capacity tab shows each engineer's net capacity and allocated days",
+          "steps": "1. Run Review on an import.\n2. Click the Engineer Capacity tab.",
+          "expected": "Each engineer in the team is listed with their Net Capacity (days) and Allocated (days) from the import rows."
+        },
+        {
+          "id": "TC-SF-1103",
+          "severity": "P2",
+          "scenario": "Capacity check shows green tick when allocated days equal net capacity",
+          "steps": "1. Upload a CSV where an engineer's rows total exactly their net sprint capacity.\n2. Run Review.\n3. Check the Engineer Capacity tab.",
+          "expected": "That engineer's Checks cell shows a green tick icon with tooltip 'Capacity fully allocated'."
+        },
+        {
+          "id": "TC-SF-1104",
+          "severity": "P2",
+          "scenario": "Capacity check shows red icon when allocated days are less than net capacity",
+          "steps": "1. Upload a CSV where an engineer's rows total less than their net sprint capacity.\n2. Run Review.\n3. Check the Engineer Capacity tab.",
+          "expected": "That engineer's Checks cell shows a red icon with tooltip 'Allocated days less than net capacity'."
+        },
+        {
+          "id": "TC-SF-1105",
+          "severity": "P2",
+          "scenario": "Search in Engineer Capacity tab filters engineers by name",
+          "steps": "1. Run Review.\n2. Click the Engineer Capacity tab.\n3. Type a partial engineer name in the search field.",
+          "expected": "Only engineers whose names match the search term are shown."
+        }
+      ]
+    },
+    {
+      "id": "TC-SF-1200",
+      "name": "Forecast Import Detail — Add, Edit, Delete Rows",
+      "test_cases": [
+        {
+          "id": "TC-SF-1201",
+          "severity": "P1",
+          "scenario": "Add Row drawer opens with all expected fields",
+          "steps": "1. Open the import detail page.\n2. Click Add Row.",
+          "expected": "A drawer opens titled 'Add Row' with fields: Story Type, Jira ID, Title, Assignee (searchable), Efforts (seconds), Sprint, Label, and Mapping."
+        },
+        {
+          "id": "TC-SF-1202",
+          "severity": "P1",
+          "scenario": "Submitting a valid Add Row form creates a new row in the table",
+          "steps": "1. Click Add Row.\n2. Fill in Story Type, Title, Assignee, Efforts, Sprint, Label, and Mapping.\n3. Click Add Row in the drawer.",
+          "expected": "The drawer closes. The new row appears in the Rows table. A success toast is shown."
+        },
+        {
+          "id": "TC-SF-1203",
+          "severity": "P2",
+          "scenario": "Add Row drawer can be cancelled without saving",
+          "steps": "1. Click Add Row.\n2. Fill in some fields.\n3. Click Cancel.",
+          "expected": "The drawer closes. No new row is added to the table."
+        },
+        {
+          "id": "TC-SF-1204",
+          "severity": "P1",
+          "scenario": "Edit Row drawer pre-populates all fields from the existing row",
+          "steps": "1. Click the Edit action on any row.\n2. Inspect the drawer fields.",
+          "expected": "The Edit Row drawer opens with all fields pre-filled with the row's current values."
+        },
+        {
+          "id": "TC-SF-1205",
+          "severity": "P1",
+          "scenario": "Saving an edited row updates it in the table",
+          "steps": "1. Click Edit on a row.\n2. Change the Title field.\n3. Click Save Changes.",
+          "expected": "The drawer closes. The row in the table reflects the updated Title. A success toast is shown."
+        },
+        {
+          "id": "TC-SF-1206",
+          "severity": "P1",
+          "scenario": "Delete Row confirmation modal appears before deletion",
+          "steps": "1. Click the Delete action on any row.",
+          "expected": "A delete confirmation modal opens with the row's title. The user must confirm before deletion proceeds."
+        },
+        {
+          "id": "TC-SF-1207",
+          "severity": "P1",
+          "scenario": "Confirming delete removes the row from the table",
+          "steps": "1. Click Delete on a row.\n2. Confirm the deletion.",
+          "expected": "The row is removed from the Rows table. A success toast is shown. The deletion cannot be undone."
+        },
+        {
+          "id": "TC-SF-1208",
+          "severity": "P2",
+          "scenario": "Cancelling delete does not remove the row",
+          "steps": "1. Click Delete on a row.\n2. Click Cancel in the modal.",
+          "expected": "The modal closes. The row remains in the table unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-SF-1300",
+      "name": "Forecast Import Detail — Confirm Import",
+      "test_cases": [
+        {
+          "id": "TC-SF-1301",
+          "severity": "P0",
+          "scenario": "Confirming an import with all checks passed does not require override notes",
+          "steps": "1. Run Review on an import with no check failures.\n2. Click Confirm.",
+          "expected": "The Confirm drawer opens with a message indicating all checks passed. The Override Notes field is hidden. Clicking Confirm in the drawer completes the action."
+        },
+        {
+          "id": "TC-SF-1302",
+          "severity": "P0",
+          "scenario": "Confirming an import with failing checks shows the Override Notes field",
+          "steps": "1. Run Review on an import that has at least one failing row.\n2. Click Confirm.",
+          "expected": "The Confirm drawer opens with a message noting that checks have failed. The Override Notes field is visible and required."
+        },
+        {
+          "id": "TC-SF-1303",
+          "severity": "P1",
+          "scenario": "Override Notes field is required when checks have failed",
+          "steps": "1. Run Review on an import with at least one failing row.\n2. Click Confirm.\n3. Leave Override Notes blank.\n4. Click Confirm in the drawer.",
+          "expected": "The confirm action does not proceed. A validation message indicates that Override Notes are required."
+        },
+        {
+          "id": "TC-SF-1304",
+          "severity": "P0",
+          "scenario": "After confirming, the import status changes to Confirmed",
+          "steps": "1. Confirm a forecast import.\n2. Navigate back to the Sprint Forecast page.",
+          "expected": "The team's status badge shows 'Confirmed' (green). The import history table shows the import's status as 'Confirmed'."
+        },
+        {
+          "id": "TC-SF-1305",
+          "severity": "P0",
+          "scenario": "Confirmed import is locked — no further edits are possible",
+          "steps": "1. Confirm a forecast import.\n2. Return to the import detail page.",
+          "expected": "The Review, Add Row, and Confirm buttons are disabled. Row-level Edit and Delete actions are not visible. The import is read-only."
+        },
+        {
+          "id": "TC-SF-1306",
+          "severity": "P2",
+          "scenario": "Confirm drawer can be cancelled without confirming",
+          "steps": "1. Click Confirm to open the drawer.\n2. Click Cancel.",
+          "expected": "The drawer closes. The import status remains unchanged (Active). No data is locked."
+        }
+      ]
+    },
+    {
+      "id": "TC-SF-1400",
+      "name": "Non-Functional — Performance, Accessibility & Responsive",
+      "test_cases": [
+        {
+          "id": "TC-SF-1401",
+          "severity": "P2",
+          "scenario": "Sprint Forecast page loads within acceptable time on a standard connection",
+          "steps": "1. Open the Sprint Forecast page on a standard broadband connection.\n2. Measure time from navigation to teams panel fully rendered.",
+          "expected": "The teams panel renders within 3 seconds. No visible layout shift occurs after the initial render."
+        },
+        {
+          "id": "TC-SF-1402",
+          "severity": "P2",
+          "scenario": "Import detail page renders all rows within acceptable time for large imports",
+          "steps": "1. Upload a CSV with 500+ rows.\n2. Open the import detail page.\n3. Measure time for the rows table to render.",
+          "expected": "The rows table renders within 5 seconds. Scrolling through rows is smooth with no browser freeze."
+        },
+        {
+          "id": "TC-SF-1403",
+          "severity": "P2",
+          "scenario": "Sprint Forecast page is usable on a mobile viewport (375px width)",
+          "steps": "1. Open the Sprint Forecast page in a browser set to 375px width (or on a mobile device).\n2. Inspect the Teams panel and accordion rows.",
+          "expected": "The Teams panel is fully visible. Accordion rows are readable. The Import button and status badge are visible without horizontal scrolling."
+        },
+        {
+          "id": "TC-SF-1404",
+          "severity": "P2",
+          "scenario": "Import detail page is usable on a tablet viewport (768px width)",
+          "steps": "1. Open the import detail page at 768px width.\n2. Check the rows table and page actions.",
+          "expected": "The rows table is scrollable horizontally if needed. All action buttons are accessible. The tab panel switches correctly."
+        },
+        {
+          "id": "TC-SF-1405",
+          "severity": "P2",
+          "scenario": "All interactive elements are keyboard accessible",
+          "steps": "1. Open the Sprint Forecast page.\n2. Use Tab to navigate through accordion rows, buttons, and the Review Complete drawer.\n3. Use Enter/Space to activate focused elements.",
+          "expected": "All buttons, accordion toggles, and drawer controls are reachable and operable via keyboard. Focus order is logical."
+        },
+        {
+          "id": "TC-SF-1406",
+          "severity": "P2",
+          "scenario": "Check icons in the Rows table have accessible tooltips/aria-labels",
+          "steps": "1. Run Review on an import with failing rows.\n2. Inspect the Checks column icons with a screen reader or by reading the aria-label attributes.",
+          "expected": "Each icon has an aria-label or title attribute describing the check failure (e.g. 'Assignee not found or inactive'). Screen readers can announce the check status."
+        },
+        {
+          "id": "TC-SF-1407",
+          "severity": "P2",
+          "scenario": "Page works correctly after a browser back/forward navigation",
+          "steps": "1. Open the Sprint Forecast page.\n2. Navigate to an import detail page.\n3. Press the browser Back button.\n4. Press the browser Forward button.",
+          "expected": "The Sprint Forecast page shows the correct team accordion state. Navigating forward restores the import detail page with correct data."
+        },
+        {
+          "id": "TC-SF-1408",
+          "severity": "P3",
+          "scenario": "API failure during team load shows an error state in the Teams panel",
+          "steps": "1. Open the Sprint Forecast page while the API is unavailable.\n2. Wait for the loading state to resolve.",
+          "expected": "The Teams panel shows an error state with a red icon and the message 'Failed to load teams. Refresh the page to retry.'"
+        }
+      ]
+    }
+  ]
+}

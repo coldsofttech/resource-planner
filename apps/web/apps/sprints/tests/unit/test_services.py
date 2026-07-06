@@ -9,6 +9,12 @@ from apps.sprints.engine import SprintEngine, SprintGenerationEngine
 from apps.sprints.services import SprintService
 
 
+class SprintServiceMonthsValidationTest(SimpleTestCase):
+    def test_raises_without_fy_code(self):
+        with self.assertRaises(ValidationException):
+            SprintService().months(fy_code="")
+
+
 class ValidateDatesTest(SimpleTestCase):
     def test_raises_when_end_equals_start(self):
         with self.assertRaises(ValidationException):

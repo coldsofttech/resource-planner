@@ -13,6 +13,7 @@ from apps.core.exceptions import NotFoundException, ValidationException
 from apps.core.services import ContextService
 from apps.sprints.constants import SprintDataImportStatus, SprintDataImportType
 from apps.sprints.models import SprintDataImport, SprintDataImportRow
+from apps.sprints.selectors import get_sprint_by_code
 from apps.teams.models import Team
 
 
@@ -42,8 +43,6 @@ class BaseSprintDataImportService(ContextService):
     TEMPLATE_FILENAME: str = "sprint_data_import_template.csv"
 
     def _get_sprint(self, sprint_code: str):
-        from apps.sprints.selectors import get_sprint_by_code
-
         sprint = get_sprint_by_code(sprint_code)
         if sprint is None:
             raise NotFoundException(
@@ -274,6 +273,7 @@ class BaseSprintDataImportService(ContextService):
         sprint_code_str: str = "",
         label_code_str: str = "",
         mapping_code_str: str = "",
+        sprint_code: str = "",
     ) -> SprintDataImportRow:
         from apps.sprints.selectors import get_import_by_code
 
@@ -416,7 +416,7 @@ class BaseSprintDataImportService(ContextService):
         )
         return row
 
-    def review(self, import_code: str):
+    def review(self, import_code: str, sprint_code: str = ""):
         """Run review checks and persist results.
 
         Returns ``(review, row_results)`` where ``row_results`` maps
@@ -435,7 +435,7 @@ class BaseSprintDataImportService(ContextService):
         return SprintDataImportEngine.run_review(record.pk, user=self.user)
 
     @transaction.atomic
-    def confirm(self, import_code: str, notes: str = ""):
+    def confirm(self, import_code: str, notes: str = "", sprint_code: str = ""):
         from decimal import ROUND_HALF_UP, Decimal
 
         from apps.configurations.selectors import Sprint as SprintConfig
@@ -551,7 +551,9 @@ class BaseSprintDataImportService(ContextService):
         return completion
 
     @transaction.atomic
-    def delete_row(self, row_code: str) -> None:
+    def delete_row(
+        self, row_code: str, import_code: str = "", sprint_code: str = ""
+    ) -> None:
         try:
             row = SprintDataImportRow.objects.get(code=row_code)
         except SprintDataImportRow.DoesNotExist as exc:

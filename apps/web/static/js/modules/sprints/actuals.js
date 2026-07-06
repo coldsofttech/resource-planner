@@ -12,6 +12,20 @@ const sprintCode = pathParts[1] || null;
 // Team code currently pending an upload action
 let pendingTeamCode = null;
 
+// Tracks confirmed state per team to gate the Review Complete button
+const teamConfirmedMap = new Map();
+
+function updateReviewCompleteBtn() {
+  const btn = document.getElementById("rp-actuals-review-complete-btn");
+  if (!btn) return;
+  const anyConfirmed = [...teamConfirmedMap.values()].some(Boolean);
+  if (anyConfirmed) {
+    btn.removeAttribute("disabled");
+  } else {
+    btn.setAttribute("disabled", "");
+  }
+}
+
 function formatDateTime(iso) {
   if (!iso) return "—";
   const d = new Date(iso);
@@ -143,6 +157,8 @@ async function refreshTeamStatusBadge(teamCode) {
     const latest = resp?.data?.results?.[0] ?? null;
     const badge = document.getElementById(`rp-actuals-team-status-${teamCode}`);
     if (badge) badge.innerHTML = latest ? statusBadgeHtml(latest.status) : "";
+    teamConfirmedMap.set(teamCode, latest?.status === "confirmed");
+    updateReviewCompleteBtn();
   } catch {
     // silently ignore — badge stays empty
   }
@@ -151,6 +167,8 @@ async function refreshTeamStatusBadge(teamCode) {
 function renderTeams(teams) {
   const container = document.getElementById("rp-actuals-teams-container");
   if (!container) return;
+
+  teamConfirmedMap.clear();
 
   if (!teams.length) {
     container.innerHTML = `
@@ -200,6 +218,15 @@ async function loadSprintAndTeams() {
       { label: sprint.name, href: UI_URLS.sprints.detail(sprintCode) },
       { label: "Actuals" },
     ]);
+
+    const syncBtn = document.getElementById("rp-actuals-sync-btn");
+    if (syncBtn) {
+      if (sprint.actuals_review_complete) {
+        syncBtn.removeAttribute("disabled");
+      } else {
+        syncBtn.setAttribute("disabled", "");
+      }
+    }
 
     if (sprint.is_closed) {
       showClosedError(container);
@@ -449,6 +476,118 @@ function initImportRowNavigation() {
   });
 }
 
+function initSyncProjectActualsButton() {
+  const btn = document.getElementById("rp-actuals-sync-btn");
+  const drawer = document.getElementById("rp-actuals-sync-drawer");
+  if (!btn || !drawer) return;
+
+  const scopeField = document.getElementById("rp-actuals-sync-scope");
+  const projectsSection = document.getElementById("rp-actuals-sync-projects-section");
+  const projectsLoading = document.getElementById("rp-actuals-sync-projects-loading");
+  const projectsList = document.getElementById("rp-actuals-sync-projects-list");
+
+  function resetDrawer() {
+    if (scopeField) scopeField.dispatchEvent(new Event("rp:reset", { bubbles: false }));
+    if (projectsSection) projectsSection.hidden = true;
+    if (projectsLoading) projectsLoading.hidden = false;
+    if (projectsList) {
+      projectsList.hidden = true;
+      projectsList.innerHTML = "";
+    }
+  }
+
+  async function loadProjects() {
+    try {
+      const { href, method } = API_URLS.sprints.actualsProjects(sprintCode);
+      const resp = await apiFetch(href, { method });
+      const projects = resp?.data?.results ?? [];
+
+      if (projectsList) {
+        if (!projects.length) {
+          projectsList.innerHTML = `<p class="mb-0" style="color:var(--rp-muted)">No projects with actuals data found for this sprint.</p>`;
+        } else {
+          projectsList.innerHTML = "";
+          projects.forEach((p) => {
+            const wrapper = document.createElement("div");
+            wrapper.className = "py-2 border-bottom";
+            const cb = document.createElement("checkbox-field");
+            cb.setAttribute("label", p.name);
+            cb.dataset.projectCode = p.code;
+            wrapper.appendChild(cb);
+            projectsList.appendChild(wrapper);
+          });
+        }
+        projectsList.hidden = false;
+      }
+      if (projectsLoading) projectsLoading.hidden = true;
+    } catch {
+      if (projectsLoading) projectsLoading.hidden = true;
+      if (projectsList) {
+        projectsList.innerHTML = `<p class="mb-0" style="color:var(--rp-danger)">Failed to load projects. Close and retry.</p>`;
+        projectsList.hidden = false;
+      }
+    }
+  }
+
+  btn.addEventListener("click", () => {
+    resetDrawer();
+    drawer.show();
+    loadProjects();
+  });
+
+  if (scopeField) {
+    scopeField.addEventListener("change", () => {
+      const isSpecific = scopeField.value === "specific";
+      if (projectsSection) projectsSection.hidden = !isSpecific;
+    });
+  }
+
+  drawer.addEventListener("rp:footer-primary", async () => {
+    const scope = scopeField?.value ?? "all";
+    const allProjects = scope !== "specific";
+
+    let projectCodes = [];
+    if (!allProjects) {
+      const checkboxes = projectsList
+        ? Array.from(projectsList.querySelectorAll("checkbox-field"))
+        : [];
+      projectCodes = checkboxes.filter((cb) => cb.checked).map((cb) => cb.dataset.projectCode);
+
+      if (!projectCodes.length) {
+        toast({
+          type: "warning",
+          title: "No projects selected",
+          message: "Please select at least one project or choose All Projects.",
+        });
+        return;
+      }
+    }
+
+    const submitBtn = drawer.querySelector("[data-footer-primary]");
+    const snap = snapshotButton(submitBtn);
+    setBusyButton(submitBtn, "Syncing…");
+
+    try {
+      const { href, method } = API_URLS.sprints.actualsSyncProjectActuals(sprintCode);
+      const payload = allProjects
+        ? { all_projects: true }
+        : { all_projects: false, project_codes: projectCodes };
+      const resp = await apiFetch(href, { method, body: JSON.stringify(payload) });
+      const count = resp?.data?.created ?? 0;
+      drawer.hide();
+      toast({
+        type: "success",
+        title: "Project actuals synced",
+        message: `${count} project actual record${count !== 1 ? "s" : ""} created.`,
+      });
+    } catch (err) {
+      restoreButton(submitBtn, snap);
+      const msg = err?.data?.error?.message ?? "Failed to sync project actuals. Please try again.";
+      toast({ type: "error", title: "Error", message: msg });
+    }
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("rp-actuals-teams-container");
   if (!container) return;
@@ -459,4 +598,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initImportRowNavigation();
   initDownloadTemplateButton();
   initReviewCompleteButton();
+  initSyncProjectActualsButton();
 });

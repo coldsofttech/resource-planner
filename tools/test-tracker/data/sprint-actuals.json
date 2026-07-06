@@ -1,0 +1,768 @@
+{
+  "module": {
+    "slug": "sprint-actuals",
+    "name": "Sprint Actuals",
+    "sort_order": 22,
+    "parent": {
+      "slug": "planning",
+      "name": "Planning",
+      "sort_order": 6
+    }
+  },
+  "suites": [
+    {
+      "id": "TC-SA-100",
+      "name": "Page Access & Security",
+      "test_cases": [
+        {
+          "id": "TC-SA-101",
+          "severity": "P0",
+          "scenario": "Unauthenticated user is redirected to login when accessing the Actuals page",
+          "steps": "1. Open a browser with no active session.\n2. Navigate directly to /sprints/SPRINT-x/actuals/.",
+          "expected": "The user is redirected to the login page. No actuals data or team information is visible."
+        },
+        {
+          "id": "TC-SA-102",
+          "severity": "P0",
+          "scenario": "Authenticated user can access the Sprint Actuals page",
+          "steps": "1. Log in with a valid account.\n2. Navigate to Planning > Sprints.\n3. Open a sprint detail page.\n4. Click the Actuals button in the sprint detail page actions.",
+          "expected": "The Sprint Actuals page loads. The page title reads '{Sprint Name} — Actuals'. The Teams panel is visible with accordion rows for each active team."
+        },
+        {
+          "id": "TC-SA-103",
+          "severity": "P1",
+          "scenario": "Import button is not visible to users without the import_actuals permission",
+          "steps": "1. Log in as a user without the sprints.import_actuals permission.\n2. Open the Sprint Actuals page.",
+          "expected": "No Import button appears on any team accordion row. The file input element is not rendered in the page."
+        },
+        {
+          "id": "TC-SA-104",
+          "severity": "P1",
+          "scenario": "Import button is visible to users with the import_actuals permission",
+          "steps": "1. Log in as a user with the sprints.import_actuals permission.\n2. Open the Sprint Actuals page.",
+          "expected": "An Import button (with upload icon) is visible on every team accordion row header."
+        },
+        {
+          "id": "TC-SA-105",
+          "severity": "P1",
+          "scenario": "Review Complete button is initially disabled and enables after a team is confirmed",
+          "steps": "1. Open the Sprint Actuals page for a sprint where no team has a confirmed import.\n2. Observe the Review Complete button state.",
+          "expected": "The Review Complete button is disabled. After at least one team confirms an import, the button becomes enabled."
+        },
+        {
+          "id": "TC-SA-106",
+          "severity": "P1",
+          "scenario": "Sync Project Actuals button is not visible to users without the review_complete permission",
+          "steps": "1. Log in as a user without the sprints.review_complete permission.\n2. Open the Sprint Actuals page.",
+          "expected": "The Sync Project Actuals button is not shown in the page actions."
+        },
+        {
+          "id": "TC-SA-107",
+          "severity": "P1",
+          "scenario": "Sync Project Actuals button is disabled before Review Complete is marked",
+          "steps": "1. Log in as a user with the sprints.review_complete permission.\n2. Open the Sprint Actuals page before Review Complete has been triggered.",
+          "expected": "The Sync Project Actuals button is visible but disabled. It becomes enabled only after Review Complete is confirmed for the sprint."
+        },
+        {
+          "id": "TC-SA-108",
+          "severity": "P0",
+          "scenario": "Sprint Actuals page shows a locked state when the sprint is closed",
+          "steps": "1. Navigate to the Actuals page for a sprint whose status is Closed.",
+          "expected": "The Teams panel shows a locked state: a lock icon, the message 'Sprint is closed', and a description that actuals cannot be imported. The Import button is not rendered."
+        }
+      ]
+    },
+    {
+      "id": "TC-SA-200",
+      "name": "Page Layout & Initial Render",
+      "test_cases": [
+        {
+          "id": "TC-SA-201",
+          "severity": "P1",
+          "scenario": "Page title updates to include the sprint name after loading",
+          "steps": "1. Open the Sprint Actuals page.\n2. Wait for the page to finish loading.",
+          "expected": "The page title changes from 'Actuals' to '{Sprint Name} — Actuals'. The breadcrumbs update to show: Project / Planning / Sprints / {Sprint Name} / Actuals."
+        },
+        {
+          "id": "TC-SA-202",
+          "severity": "P1",
+          "scenario": "Loading spinner is shown while teams are being fetched",
+          "steps": "1. Open the Sprint Actuals page on a throttled network.\n2. Observe the Teams panel immediately after the page loads.",
+          "expected": "A loading spinner with the text 'Loading teams…' is shown inside the Teams panel until the API responds."
+        },
+        {
+          "id": "TC-SA-203",
+          "severity": "P2",
+          "scenario": "Empty state is shown when there are no active teams",
+          "steps": "1. Open the Sprint Actuals page for an instance where no active teams exist.",
+          "expected": "The Teams panel shows an empty state with a people icon and the message 'No active teams found.'"
+        },
+        {
+          "id": "TC-SA-204",
+          "severity": "P1",
+          "scenario": "Download Template button is always visible regardless of permissions",
+          "steps": "1. Log in as any authenticated user.\n2. Open the Sprint Actuals page.",
+          "expected": "The Download Template button is visible in the page header actions for all authenticated users."
+        }
+      ]
+    },
+    {
+      "id": "TC-SA-300",
+      "name": "Team Accordion",
+      "test_cases": [
+        {
+          "id": "TC-SA-301",
+          "severity": "P1",
+          "scenario": "Each active team appears as a separate accordion row",
+          "steps": "1. Open the Sprint Actuals page for a sprint.\n2. Count the accordion rows in the Teams panel.",
+          "expected": "One accordion row is shown per active team. Inactive teams are not listed."
+        },
+        {
+          "id": "TC-SA-302",
+          "severity": "P1",
+          "scenario": "Team status badge shows Active (blue) when the latest import is not confirmed",
+          "steps": "1. Upload a CSV for a team without confirming it.\n2. Return to the Sprint Actuals page.",
+          "expected": "The team's accordion row shows an 'Active' badge in blue next to the team name."
+        },
+        {
+          "id": "TC-SA-303",
+          "severity": "P1",
+          "scenario": "Team status badge shows Confirmed (green) when the latest import is confirmed",
+          "steps": "1. Upload and confirm an actuals import for a team.\n2. Return to the Sprint Actuals page.",
+          "expected": "The team's accordion row shows a 'Confirmed' badge in green next to the team name."
+        },
+        {
+          "id": "TC-SA-304",
+          "severity": "P2",
+          "scenario": "Team status badge shows Superseded (grey) for an older import replaced by a newer one",
+          "steps": "1. Upload and confirm an actuals import for a team.\n2. Upload a second CSV for the same team.\n3. Open the import history table for that team.",
+          "expected": "The first import shows a 'Superseded' badge in grey. The second import shows 'Active' in blue."
+        },
+        {
+          "id": "TC-SA-305",
+          "severity": "P1",
+          "scenario": "Expanding an accordion row shows the import history table",
+          "steps": "1. Open the Sprint Actuals page.\n2. Click to expand a team accordion row.",
+          "expected": "The accordion body expands to reveal the import history table with columns: Version, File Name, Status, Imported At, Imported By."
+        },
+        {
+          "id": "TC-SA-306",
+          "severity": "P2",
+          "scenario": "Import history shows empty state when no imports exist for the team",
+          "steps": "1. Expand a team accordion that has had no files uploaded.",
+          "expected": "The import history table shows the empty message 'No actuals data imported yet for this team.'"
+        },
+        {
+          "id": "TC-SA-307",
+          "severity": "P1",
+          "scenario": "Clicking Import on a team accordion header triggers the file picker",
+          "steps": "1. Log in as a user with import_actuals permission.\n2. Open the Sprint Actuals page.\n3. Click the Import button on any team row (without expanding the accordion).",
+          "expected": "A file picker opens. Clicking Import does not expand or collapse the accordion."
+        }
+      ]
+    },
+    {
+      "id": "TC-SA-400",
+      "name": "Download Template",
+      "test_cases": [
+        {
+          "id": "TC-SA-401",
+          "severity": "P1",
+          "scenario": "Download Template button initiates a file download",
+          "steps": "1. Open the Sprint Actuals page.\n2. Click the Download Template button.",
+          "expected": "A CSV file is downloaded. The file contains the expected column headers for the actuals import format."
+        },
+        {
+          "id": "TC-SA-402",
+          "severity": "P2",
+          "scenario": "Downloaded template is specific to the current sprint",
+          "steps": "1. Open the Sprint Actuals page for sprint S1.\n2. Download the template.\n3. Open the Sprint Actuals page for sprint S2.\n4. Download the template.",
+          "expected": "Each download produces a template file scoped to its respective sprint."
+        }
+      ]
+    },
+    {
+      "id": "TC-SA-500",
+      "name": "CSV Upload",
+      "test_cases": [
+        {
+          "id": "TC-SA-501",
+          "severity": "P0",
+          "scenario": "Valid CSV file uploads successfully and the import history table refreshes",
+          "steps": "1. Log in with import_actuals permission.\n2. On the Sprint Actuals page, click Import on a team.\n3. Select a valid CSV file from the file picker.",
+          "expected": "A success toast appears: 'Actuals uploaded — The file has been recorded successfully.' The team's import history table refreshes and shows the new import as version v1 (or next version) with status Active."
+        },
+        {
+          "id": "TC-SA-502",
+          "severity": "P0",
+          "scenario": "Uploading a second CSV creates a new version and supersedes the previous one",
+          "steps": "1. Upload a CSV for a team (v1, Active).\n2. Upload a second CSV for the same team.",
+          "expected": "The first import changes status to Superseded. The second import appears as the new Active version. The team's status badge updates to Active."
+        },
+        {
+          "id": "TC-SA-503",
+          "severity": "P1",
+          "scenario": "Uploading a non-CSV file shows an error",
+          "steps": "1. Click Import on a team.\n2. Select a non-CSV file (e.g. a PNG or XLSX).",
+          "expected": "An error toast is displayed. The import history table does not gain a new entry."
+        },
+        {
+          "id": "TC-SA-504",
+          "severity": "P1",
+          "scenario": "Uploading an empty CSV file shows an error",
+          "steps": "1. Click Import on a team.\n2. Select a CSV file with no data rows (headers only or fully empty).",
+          "expected": "An error toast is displayed with a relevant error message. No new import record is created."
+        },
+        {
+          "id": "TC-SA-505",
+          "severity": "P2",
+          "scenario": "Upload error shows the API error message in the toast",
+          "steps": "1. Submit a malformed CSV or trigger an API failure.\n2. Observe the toast message.",
+          "expected": "The error toast displays the message returned by the API. The toast type is 'error'."
+        },
+        {
+          "id": "TC-SA-506",
+          "severity": "P2",
+          "scenario": "The same CSV file can be re-selected after a previous upload",
+          "steps": "1. Upload a CSV for a team.\n2. Click Import again immediately and select the same file.",
+          "expected": "The file picker accepts the same file. The upload proceeds and creates a new version. The file input is reset between uploads."
+        }
+      ]
+    },
+    {
+      "id": "TC-SA-600",
+      "name": "Import History Table",
+      "test_cases": [
+        {
+          "id": "TC-SA-601",
+          "severity": "P1",
+          "scenario": "Import history table shows correct columns and data",
+          "steps": "1. Upload a CSV for a team.\n2. Expand the team accordion.",
+          "expected": "The import history table shows: Version (e.g. v1), File Name, Status badge, Imported At (formatted date/time), Imported By (user display name)."
+        },
+        {
+          "id": "TC-SA-602",
+          "severity": "P1",
+          "scenario": "Clicking an import history row navigates to the import detail page",
+          "steps": "1. Expand a team accordion with at least one import.\n2. Click any row in the import history table.",
+          "expected": "The user is navigated to the actuals import detail page at /sprints/{code}/actuals/{import_code}/."
+        },
+        {
+          "id": "TC-SA-603",
+          "severity": "P2",
+          "scenario": "Multiple imports are listed with version numbers incrementing correctly",
+          "steps": "1. Upload two CSV files for the same team.\n2. Expand the accordion and inspect the import history table.",
+          "expected": "Both imports are listed. The version numbers increment correctly (v1, v2). No duplicate rows appear."
+        }
+      ]
+    },
+    {
+      "id": "TC-SA-700",
+      "name": "Review Complete Drawer",
+      "test_cases": [
+        {
+          "id": "TC-SA-701",
+          "severity": "P1",
+          "scenario": "Review Complete drawer shows a loading state while checking team statuses",
+          "steps": "1. On the Sprint Actuals page, click Review Complete.\n2. Observe the drawer immediately after it opens.",
+          "expected": "A loading spinner is shown with the text 'Checking team statuses…'. The drawer body is hidden until the API responds."
+        },
+        {
+          "id": "TC-SA-702",
+          "severity": "P0",
+          "scenario": "Review Complete drawer shows all-confirmed message when every team has a confirmed import",
+          "steps": "1. Confirm the actuals import for every team in the sprint.\n2. Click Review Complete.",
+          "expected": "After loading, the drawer shows a success message: 'All teams have confirmed actuals imports.' The Complete button is enabled."
+        },
+        {
+          "id": "TC-SA-703",
+          "severity": "P0",
+          "scenario": "Review Complete drawer lists teams with unconfirmed actuals imports",
+          "steps": "1. Leave at least one team without a confirmed import.\n2. Click Review Complete.",
+          "expected": "The drawer lists the unconfirmed teams by name. The message reads 'The following teams do not have a confirmed actuals import for this sprint:'. The Complete button is disabled until the Override checkbox is ticked."
+        },
+        {
+          "id": "TC-SA-704",
+          "severity": "P0",
+          "scenario": "Review Complete requires Override checkbox to proceed when teams are unconfirmed",
+          "steps": "1. Open the Review Complete drawer with at least one unconfirmed team.\n2. Attempt to click Complete without ticking the Override checkbox.",
+          "expected": "The Complete button remains disabled. The Override checkbox must be ticked before Complete becomes active."
+        },
+        {
+          "id": "TC-SA-705",
+          "severity": "P1",
+          "scenario": "Notes field in the Review Complete drawer accepts free text",
+          "steps": "1. Open the Review Complete drawer.\n2. Type a message in the Notes field.\n3. Click Complete.",
+          "expected": "The notes are submitted with the review complete action. No validation error is shown for the Notes field — it is optional."
+        },
+        {
+          "id": "TC-SA-706",
+          "severity": "P1",
+          "scenario": "Review Complete succeeds with override when teams are unconfirmed",
+          "steps": "1. Open the Review Complete drawer with one unconfirmed team.\n2. Tick the Override checkbox.\n3. Enter a note.\n4. Click Complete.",
+          "expected": "The review complete action is submitted. A success toast appears. The Sync Project Actuals button becomes enabled."
+        },
+        {
+          "id": "TC-SA-707",
+          "severity": "P2",
+          "scenario": "Review Complete drawer can be cancelled without submitting",
+          "steps": "1. Open the Review Complete drawer.\n2. Click Cancel.",
+          "expected": "The drawer closes. No review complete action is submitted. The sprint status is unchanged."
+        }
+      ]
+    },
+    {
+      "id": "TC-SA-800",
+      "name": "Sync Project Actuals",
+      "test_cases": [
+        {
+          "id": "TC-SA-801",
+          "severity": "P0",
+          "scenario": "Sync Project Actuals button becomes enabled after Review Complete is marked",
+          "steps": "1. Complete the Review Complete action for the sprint.\n2. Observe the Sync Project Actuals button.",
+          "expected": "The Sync Project Actuals button becomes enabled. It was previously disabled."
+        },
+        {
+          "id": "TC-SA-802",
+          "severity": "P1",
+          "scenario": "Sync drawer opens with a warning banner when clicked",
+          "steps": "1. Click Sync Project Actuals.\n2. Observe the drawer content.",
+          "expected": "A drawer opens titled 'Sync Project Actuals'. A warning banner is displayed explaining that syncing will update project cost records and recharge detail records."
+        },
+        {
+          "id": "TC-SA-803",
+          "severity": "P0",
+          "scenario": "Sync scope 'All Projects' option is available in the drawer",
+          "steps": "1. Open the Sync Project Actuals drawer.\n2. Inspect the scope radio options.",
+          "expected": "Two options are shown: 'All Projects' and 'Specific Projects'. 'All Projects' is the default selection."
+        },
+        {
+          "id": "TC-SA-804",
+          "severity": "P1",
+          "scenario": "Selecting 'Specific Projects' shows a project selector field",
+          "steps": "1. Open the Sync Project Actuals drawer.\n2. Select 'Specific Projects'.",
+          "expected": "A multi-select project field appears. The user can search for and select specific projects to include in the sync."
+        },
+        {
+          "id": "TC-SA-805",
+          "severity": "P1",
+          "scenario": "Specific Projects field is required when the 'Specific Projects' scope is selected",
+          "steps": "1. Open the Sync drawer.\n2. Select 'Specific Projects'.\n3. Leave the project selector empty.\n4. Click Sync.",
+          "expected": "A validation error is shown. The sync does not proceed without at least one project selected."
+        },
+        {
+          "id": "TC-SA-806",
+          "severity": "P0",
+          "scenario": "Sync with All Projects completes and shows a success message",
+          "steps": "1. Open the Sync drawer.\n2. Keep 'All Projects' selected.\n3. Click Sync.",
+          "expected": "A loading state is shown in the drawer. After the API responds, a success toast appears. The drawer closes. Project actuals records are updated across all projects in the sprint."
+        },
+        {
+          "id": "TC-SA-807",
+          "severity": "P0",
+          "scenario": "Sync with Specific Projects completes and updates only the selected projects",
+          "steps": "1. Open the Sync drawer.\n2. Select 'Specific Projects'.\n3. Select 2 projects.\n4. Click Sync.",
+          "expected": "A success toast appears after sync. Only the selected projects' actuals are updated. Other projects in the sprint are unaffected."
+        },
+        {
+          "id": "TC-SA-808",
+          "severity": "P2",
+          "scenario": "Sync failure shows an error toast with the API error message",
+          "steps": "1. Open the Sync drawer.\n2. Trigger a sync when the API is unavailable.\n3. Observe the feedback.",
+          "expected": "An error toast is displayed with the API error message. The drawer closes or remains open. No partial data is silently written."
+        },
+        {
+          "id": "TC-SA-809",
+          "severity": "P2",
+          "scenario": "Sync can be cancelled from the drawer",
+          "steps": "1. Open the Sync drawer.\n2. Click Cancel.",
+          "expected": "The drawer closes. No sync is performed. No project actuals are modified."
+        },
+        {
+          "id": "TC-SA-810",
+          "severity": "P1",
+          "scenario": "Sync can be run multiple times for the same sprint",
+          "steps": "1. Run Sync once successfully.\n2. Re-open the Sync drawer.\n3. Run Sync again.",
+          "expected": "The second sync completes without error. Project actuals are updated with the latest confirmed actuals data. No duplicate or inconsistent records are created."
+        }
+      ]
+    },
+    {
+      "id": "TC-SA-900",
+      "name": "Actuals Import Detail — Page Layout",
+      "test_cases": [
+        {
+          "id": "TC-SA-901",
+          "severity": "P1",
+          "scenario": "Import detail page loads with correct title and breadcrumbs",
+          "steps": "1. From the Sprint Actuals page, click an import history row.\n2. Wait for the detail page to load.",
+          "expected": "The page title shows '{Sprint Name} — Actuals Import — v{N}'. Breadcrumbs show: Project / Planning / Sprints / {Sprint Name} / Actuals / Import v{N}."
+        },
+        {
+          "id": "TC-SA-902",
+          "severity": "P1",
+          "scenario": "Page actions show Review, Add Row, and Confirm buttons",
+          "steps": "1. Open an actuals import detail page.",
+          "expected": "Three buttons are visible in the page actions: 'Add Row', 'Review', and 'Confirm'. Confirm is initially disabled."
+        },
+        {
+          "id": "TC-SA-903",
+          "severity": "P1",
+          "scenario": "Rows tab is active by default on the import detail page",
+          "steps": "1. Open an actuals import detail page.",
+          "expected": "The Rows tab is the active tab. The rows table is visible. The Engineer Capacity tab is also present."
+        },
+        {
+          "id": "TC-SA-904",
+          "severity": "P2",
+          "scenario": "Confirmed import shows locked state — action buttons are disabled",
+          "steps": "1. Open the import detail page for an import that is already confirmed.",
+          "expected": "The Review, Add Row, and Confirm buttons are disabled. Row-level Edit and Delete actions are hidden. The import is read-only."
+        }
+      ]
+    },
+    {
+      "id": "TC-SA-1000",
+      "name": "Actuals Import Detail — Rows Tab",
+      "test_cases": [
+        {
+          "id": "TC-SA-1001",
+          "severity": "P1",
+          "scenario": "Rows table shows all columns from the uploaded CSV",
+          "steps": "1. Upload a CSV with data rows.\n2. Open the import detail page.",
+          "expected": "The Rows table shows: Story Type, Jira ID, Title, Assignee, Efforts, Days, Sprint, Label, Mapping, and Checks columns."
+        },
+        {
+          "id": "TC-SA-1002",
+          "severity": "P2",
+          "scenario": "Rows table shows empty state when the import has no rows",
+          "steps": "1. Create an import with no rows.\n2. Open the import detail page.",
+          "expected": "The rows table shows the empty message 'No rows found for this import.'"
+        },
+        {
+          "id": "TC-SA-1003",
+          "severity": "P2",
+          "scenario": "Checks column shows a dash before review has been run",
+          "steps": "1. Open the import detail page for a newly uploaded import.\n2. Inspect the Checks column without running Review.",
+          "expected": "Every row's Checks cell shows a muted dash (—). No check icons appear until Review is run."
+        },
+        {
+          "id": "TC-SA-1004",
+          "severity": "P2",
+          "scenario": "Search field filters rows by keyword",
+          "steps": "1. Open the import detail page with multiple rows.\n2. Type a keyword in the search field (e.g. a Jira ID or title).",
+          "expected": "The rows table filters to show only matching rows. Non-matching rows are hidden."
+        },
+        {
+          "id": "TC-SA-1005",
+          "severity": "P2",
+          "scenario": "Check Type filter narrows rows to those with a specific failing check",
+          "steps": "1. Run Review on an import with at least one row failing the Assignee check.\n2. Select 'Assignee' from the Check Type dropdown.",
+          "expected": "Only rows with a failing Assignee check are shown. Rows that passed all checks or have other failing checks are hidden."
+        }
+      ]
+    },
+    {
+      "id": "TC-SA-1100",
+      "name": "Actuals Import Detail — Review Checks",
+      "test_cases": [
+        {
+          "id": "TC-SA-1101",
+          "severity": "P0",
+          "scenario": "Running Review updates the Checks column for all rows",
+          "steps": "1. Open the import detail page.\n2. Click the Review button.\n3. Wait for the review to complete.",
+          "expected": "Every row's Checks column is updated. Rows that pass all checks show a green tick. Rows with failures show red icons for each failing check."
+        },
+        {
+          "id": "TC-SA-1102",
+          "severity": "P1",
+          "scenario": "Assignee check fails and highlights the Assignee cell in red",
+          "steps": "1. Upload a CSV where one row has an assignee name that does not match any active member.\n2. Run Review.",
+          "expected": "The Assignee cell for that row is highlighted in red bold text. The Checks cell shows the person-x-fill icon with tooltip 'Assignee not found or inactive'."
+        },
+        {
+          "id": "TC-SA-1103",
+          "severity": "P1",
+          "scenario": "Sprint check fails and highlights the Sprint cell in red",
+          "steps": "1. Upload a CSV where one row has a sprint name that does not match any active sprint.\n2. Run Review.",
+          "expected": "The Sprint cell for that row is highlighted in red. The Checks cell shows the calendar-x-fill icon with tooltip 'Sprint not found or inactive'."
+        },
+        {
+          "id": "TC-SA-1104",
+          "severity": "P1",
+          "scenario": "Label check fails and highlights the Label cell in red",
+          "steps": "1. Upload a CSV where one row references a project label that does not exist.\n2. Run Review.",
+          "expected": "The Label cell for that row is highlighted in red. The Checks cell shows the tag-fill icon with tooltip 'Label not found in system'."
+        },
+        {
+          "id": "TC-SA-1105",
+          "severity": "P1",
+          "scenario": "Mapping check fails and highlights the Mapping cell in red",
+          "steps": "1. Upload a CSV where one row has an invalid recharge type mapping for the label's project type.\n2. Run Review.",
+          "expected": "The Mapping cell for that row is highlighted in red. The Checks cell shows the diagram-3-fill icon with tooltip 'Mapping invalid for project type'."
+        },
+        {
+          "id": "TC-SA-1106",
+          "severity": "P1",
+          "scenario": "Rows that pass all checks show a green tick",
+          "steps": "1. Upload a CSV with at least one fully valid row.\n2. Run Review.",
+          "expected": "Rows where all four checks pass show a single green tick icon in the Checks column. No red icons appear for those rows."
+        },
+        {
+          "id": "TC-SA-1107",
+          "severity": "P2",
+          "scenario": "Re-running Review after editing a row updates the check result",
+          "steps": "1. Run Review — one row fails the Assignee check.\n2. Edit that row to set a valid assignee.\n3. Run Review again.",
+          "expected": "The Assignee check for the edited row now passes. The Checks column updates to a green tick if all checks pass."
+        },
+        {
+          "id": "TC-SA-1108",
+          "severity": "P1",
+          "scenario": "Confirm button becomes enabled after review is run",
+          "steps": "1. Open the import detail page.\n2. Observe Confirm button — it is disabled.\n3. Click Review and wait for completion.",
+          "expected": "After Review completes, the Confirm button becomes enabled regardless of whether checks passed or failed."
+        }
+      ]
+    },
+    {
+      "id": "TC-SA-1200",
+      "name": "Actuals Import Detail — Engineer Capacity Tab",
+      "test_cases": [
+        {
+          "id": "TC-SA-1201",
+          "severity": "P1",
+          "scenario": "Engineer Capacity tab populates after first review is run",
+          "steps": "1. Open the import detail page.\n2. Run Review.\n3. Click the Engineer Capacity tab.",
+          "expected": "Each engineer in the team is listed with their Net Capacity (days) and Allocated (days) calculated from the import rows."
+        },
+        {
+          "id": "TC-SA-1202",
+          "severity": "P2",
+          "scenario": "Capacity check shows green tick when allocated days equal net capacity",
+          "steps": "1. Upload a CSV where an engineer's rows total exactly their net sprint capacity.\n2. Run Review.\n3. Check the Engineer Capacity tab.",
+          "expected": "That engineer's Checks cell shows a green tick icon with tooltip 'Capacity fully allocated'."
+        },
+        {
+          "id": "TC-SA-1203",
+          "severity": "P2",
+          "scenario": "Capacity check shows red icon when allocated days are less than net capacity",
+          "steps": "1. Upload a CSV where an engineer's rows total less than their net sprint capacity.\n2. Run Review.\n3. Check the Engineer Capacity tab.",
+          "expected": "That engineer's Checks cell shows a red icon with tooltip 'Allocated days less than net capacity'."
+        },
+        {
+          "id": "TC-SA-1204",
+          "severity": "P2",
+          "scenario": "Search in Engineer Capacity tab filters engineers by name",
+          "steps": "1. Run Review.\n2. Click the Engineer Capacity tab.\n3. Type a partial engineer name in the search field.",
+          "expected": "Only engineers whose names match the search term are shown."
+        }
+      ]
+    },
+    {
+      "id": "TC-SA-1300",
+      "name": "Actuals Import Detail — Add, Edit, Delete Rows",
+      "test_cases": [
+        {
+          "id": "TC-SA-1301",
+          "severity": "P1",
+          "scenario": "Add Row drawer opens with all expected fields",
+          "steps": "1. Open the actuals import detail page.\n2. Click Add Row.",
+          "expected": "A drawer opens titled 'Add Row' with fields: Story Type, Jira ID, Title, Assignee (searchable member picker), Efforts (seconds), Sprint, Label, and Mapping."
+        },
+        {
+          "id": "TC-SA-1302",
+          "severity": "P1",
+          "scenario": "Submitting a valid Add Row form creates a new row in the table",
+          "steps": "1. Click Add Row.\n2. Fill in Story Type, Title, Assignee, Efforts, Sprint, Label, and Mapping.\n3. Click Add Row in the drawer.",
+          "expected": "The drawer closes. The new row appears in the Rows table. A success toast is shown."
+        },
+        {
+          "id": "TC-SA-1303",
+          "severity": "P2",
+          "scenario": "Add Row drawer can be cancelled without saving",
+          "steps": "1. Click Add Row.\n2. Fill in some fields.\n3. Click Cancel.",
+          "expected": "The drawer closes. No new row is added to the table."
+        },
+        {
+          "id": "TC-SA-1304",
+          "severity": "P1",
+          "scenario": "Edit Row drawer pre-populates all fields from the existing row",
+          "steps": "1. Click the Edit action on any row.\n2. Inspect the drawer fields.",
+          "expected": "The Edit Row drawer opens with all fields pre-filled with the row's current values."
+        },
+        {
+          "id": "TC-SA-1305",
+          "severity": "P1",
+          "scenario": "Saving an edited row updates it in the table",
+          "steps": "1. Click Edit on a row.\n2. Change the Title field.\n3. Click Save Changes.",
+          "expected": "The drawer closes. The row in the table reflects the updated Title. A success toast is shown."
+        },
+        {
+          "id": "TC-SA-1306",
+          "severity": "P1",
+          "scenario": "Delete Row confirmation modal appears before deletion",
+          "steps": "1. Click the Delete action on any row.",
+          "expected": "A delete confirmation modal opens with the row's title. The user must confirm before deletion proceeds."
+        },
+        {
+          "id": "TC-SA-1307",
+          "severity": "P1",
+          "scenario": "Confirming delete removes the row from the table",
+          "steps": "1. Click Delete on a row.\n2. Confirm the deletion.",
+          "expected": "The row is removed from the Rows table. A success toast is shown. The deletion cannot be undone."
+        }
+      ]
+    },
+    {
+      "id": "TC-SA-1400",
+      "name": "Actuals Import Detail — Confirm Import",
+      "test_cases": [
+        {
+          "id": "TC-SA-1401",
+          "severity": "P0",
+          "scenario": "Confirming an import with all checks passed does not require override notes",
+          "steps": "1. Run Review on an import with no check failures.\n2. Click Confirm.",
+          "expected": "The Confirm drawer opens with a message indicating all checks passed. The Override Notes field is hidden. Clicking Confirm completes the action."
+        },
+        {
+          "id": "TC-SA-1402",
+          "severity": "P0",
+          "scenario": "Confirming an import with failing checks shows the Override Notes field",
+          "steps": "1. Run Review on an import that has at least one failing row.\n2. Click Confirm.",
+          "expected": "The Confirm drawer opens with a message noting that checks have failed. The Override Notes field is visible."
+        },
+        {
+          "id": "TC-SA-1403",
+          "severity": "P1",
+          "scenario": "Override Notes field is required when checks have failed",
+          "steps": "1. Run Review on an import with at least one failing row.\n2. Click Confirm.\n3. Leave Override Notes blank.\n4. Click Confirm in the drawer.",
+          "expected": "The confirm action does not proceed. A validation message indicates that Override Notes are required."
+        },
+        {
+          "id": "TC-SA-1404",
+          "severity": "P0",
+          "scenario": "After confirming, the import status changes to Confirmed and the team badge turns green",
+          "steps": "1. Confirm an actuals import.\n2. Navigate back to the Sprint Actuals page.",
+          "expected": "The team's status badge shows 'Confirmed' in green. The import history table shows the import's status as 'Confirmed'."
+        },
+        {
+          "id": "TC-SA-1405",
+          "severity": "P0",
+          "scenario": "Confirmed import is locked — no further edits are possible",
+          "steps": "1. Confirm an actuals import.\n2. Return to the import detail page.",
+          "expected": "The Review, Add Row, and Confirm buttons are disabled. Row-level Edit and Delete actions are not visible. The import is read-only."
+        }
+      ]
+    },
+    {
+      "id": "TC-SA-1500",
+      "name": "Project Actuals Integration",
+      "test_cases": [
+        {
+          "id": "TC-SA-1501",
+          "severity": "P0",
+          "scenario": "Syncing actuals creates or updates project actuals cost records",
+          "steps": "1. Complete a sprint actuals flow: upload, review, confirm, and sync for at least one project.\n2. Navigate to that project's Actuals page.",
+          "expected": "The project's Actuals page shows updated cost and day totals corresponding to the synced sprint actuals data."
+        },
+        {
+          "id": "TC-SA-1502",
+          "severity": "P0",
+          "scenario": "Syncing actuals creates recharge detail records for relevant projects",
+          "steps": "1. Complete a full sprint actuals sync for a project configured with recharges.\n2. Navigate to the project's Recharges section.",
+          "expected": "Recharge detail records are created for the sprint period, reflecting the confirmed actuals for that team."
+        },
+        {
+          "id": "TC-SA-1503",
+          "severity": "P1",
+          "scenario": "Re-syncing after a corrected import updates the project actuals with latest data",
+          "steps": "1. Sync actuals for a project.\n2. Upload a corrected CSV for the same team and confirm it.\n3. Run Sync again.",
+          "expected": "The project's actuals records are updated to reflect the corrected import data. No duplicate cost records are created."
+        },
+        {
+          "id": "TC-SA-1504",
+          "severity": "P2",
+          "scenario": "Syncing specific projects does not affect actuals for unselected projects in the same sprint",
+          "steps": "1. Open the Sync drawer.\n2. Select 'Specific Projects' and choose Project A only.\n3. Run Sync.\n4. Check Project B's actuals.",
+          "expected": "Project A's actuals are updated. Project B's actuals remain unchanged from before the sync."
+        }
+      ]
+    },
+    {
+      "id": "TC-SA-1600",
+      "name": "Non-Functional — Performance, Accessibility & Responsive",
+      "test_cases": [
+        {
+          "id": "TC-SA-1601",
+          "severity": "P2",
+          "scenario": "Sprint Actuals page loads within acceptable time on a standard connection",
+          "steps": "1. Open the Sprint Actuals page on a standard broadband connection.\n2. Measure time from navigation to teams panel fully rendered.",
+          "expected": "The teams panel renders within 3 seconds. No visible layout shift occurs after the initial render."
+        },
+        {
+          "id": "TC-SA-1602",
+          "severity": "P2",
+          "scenario": "Import detail page renders all rows within acceptable time for large imports",
+          "steps": "1. Upload a CSV with 500+ rows.\n2. Open the import detail page.\n3. Measure time for the rows table to render.",
+          "expected": "The rows table renders within 5 seconds. Scrolling through rows is smooth with no browser freeze."
+        },
+        {
+          "id": "TC-SA-1603",
+          "severity": "P2",
+          "scenario": "Sprint Actuals page is usable on a mobile viewport (375px width)",
+          "steps": "1. Open the Sprint Actuals page in a browser set to 375px width (or on a mobile device).\n2. Inspect the Teams panel and accordion rows.",
+          "expected": "The Teams panel is fully visible. Accordion rows are readable. The Import button and status badge are visible without horizontal scrolling."
+        },
+        {
+          "id": "TC-SA-1604",
+          "severity": "P2",
+          "scenario": "Import detail page is usable on a tablet viewport (768px width)",
+          "steps": "1. Open the actuals import detail page at 768px width.\n2. Check the rows table and page actions.",
+          "expected": "The rows table is horizontally scrollable if needed. All action buttons are accessible. Tab panels switch correctly."
+        },
+        {
+          "id": "TC-SA-1605",
+          "severity": "P2",
+          "scenario": "Sync drawer is usable on a mobile viewport",
+          "steps": "1. Open the Sync Project Actuals drawer on a mobile viewport (375px).\n2. Interact with the scope radio options and project selector.",
+          "expected": "The drawer is fully rendered and scrollable. Radio options are selectable. The project multi-select is operable."
+        },
+        {
+          "id": "TC-SA-1606",
+          "severity": "P2",
+          "scenario": "All interactive elements are keyboard accessible",
+          "steps": "1. Open the Sprint Actuals page.\n2. Use Tab to navigate through accordion rows, buttons, and drawers.\n3. Use Enter/Space to activate focused elements.",
+          "expected": "All buttons, accordion toggles, and drawer controls are reachable and operable via keyboard. Focus order is logical."
+        },
+        {
+          "id": "TC-SA-1607",
+          "severity": "P2",
+          "scenario": "Check icons in the Rows table have accessible tooltips/aria-labels",
+          "steps": "1. Run Review on an import with failing rows.\n2. Inspect the Checks column icons with a screen reader or aria-label attributes.",
+          "expected": "Each icon has an aria-label or title attribute describing the failure (e.g. 'Assignee not found or inactive'). Screen readers can announce the check status."
+        },
+        {
+          "id": "TC-SA-1608",
+          "severity": "P3",
+          "scenario": "API failure during team load shows an error state in the Teams panel",
+          "steps": "1. Open the Sprint Actuals page while the API is unavailable.\n2. Wait for the loading state to resolve.",
+          "expected": "The Teams panel shows an error state with a message: 'Failed to load teams. Refresh the page to retry.'"
+        },
+        {
+          "id": "TC-SA-1609",
+          "severity": "P2",
+          "scenario": "Sync failure mid-process does not leave project actuals in an inconsistent state",
+          "steps": "1. Trigger a sync.\n2. Simulate an API failure mid-sync (e.g. network drop).\n3. After the failure, check the project's actuals.",
+          "expected": "Project actuals records are either fully updated or unchanged from before the sync. No partial data is written."
+        },
+        {
+          "id": "TC-SA-1610",
+          "severity": "P2",
+          "scenario": "Page works correctly after browser back/forward navigation",
+          "steps": "1. Open the Sprint Actuals page.\n2. Navigate to an import detail page.\n3. Press the browser Back button.\n4. Press the browser Forward button.",
+          "expected": "The Sprint Actuals page shows the correct team accordion state. Navigating forward restores the import detail page with correct data."
+        }
+      ]
+    }
+  ]
+}

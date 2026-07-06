@@ -27,6 +27,15 @@ def get_sprint_by_code(code: str) -> Sprint | None:
         return None
 
 
+def get_sprint_by_number(sprint_number: int) -> Sprint | None:
+    try:
+        return Sprint.objects.select_related(
+            "financial_year", "created_by", "updated_by", "closed_by"
+        ).get(sprint_number=sprint_number)
+    except Sprint.DoesNotExist:
+        return None
+
+
 def get_in_progress_sprint() -> Sprint | None:
     return (
         Sprint.objects.select_related(
@@ -57,6 +66,21 @@ def get_sprint_options(fy_code: str | None = None) -> QuerySet[Sprint]:
     if fy_code:
         qs = qs.filter(financial_year__code=fy_code)
     return qs.order_by("sprint_number")
+
+
+def get_distinct_months_for_fy(fy_code: str) -> list[str]:
+    """Distinct sprint months (YYYY-MM) for a financial year, in chronological order."""
+    months: list[str] = []
+    seen: set[str] = set()
+    for month in (
+        Sprint.objects.filter(financial_year__code=fy_code, is_active=True)
+        .order_by("start_date")
+        .values_list("month", flat=True)
+    ):
+        if month not in seen:
+            seen.add(month)
+            months.append(month)
+    return months
 
 
 def get_sprint_stats() -> dict:
@@ -114,4 +138,13 @@ def get_active_and_future_sprints() -> QuerySet[Sprint]:
     return Sprint.objects.filter(
         status__in=[SprintStatus.IN_PROGRESS, SprintStatus.FUTURE],
         is_active=True,
+    )
+
+
+def get_first_sprint_starting_on_or_after(fy_code: str, date) -> Sprint | None:
+    return (
+        Sprint.objects.select_related("financial_year")
+        .filter(financial_year__code=fy_code, start_date__gte=date)
+        .order_by("sprint_number")
+        .first()
     )

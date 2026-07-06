@@ -13,7 +13,10 @@
   <span id="rp-actuals-title">Actuals</span>
 {% endblock page_title %}
 {% block page_actions %}
-  <success-button id="rp-actuals-review-complete-btn" label="Review Complete" prefix-icon="bi-check-circle-fill"></success-button>
+  {% if can_review_complete %}
+    <secondary-button id="rp-actuals-sync-btn" label="Sync Project Actuals" prefix-icon="bi-arrow-repeat" disabled></secondary-button>
+  {% endif %}
+  <success-button id="rp-actuals-review-complete-btn" label="Review Complete" prefix-icon="bi-check-circle-fill" disabled></success-button>
   <primary-button id="rp-actuals-template-btn" label="Download Template" prefix-icon="bi-file-earmark-arrow-down"></primary-button>
 {% endblock page_actions %}
 {% block content %}
@@ -34,6 +37,30 @@
   </div>
   {% if can_import_actuals %}
     <input type="file" id="rp-actuals-file-input" accept=".csv" hidden>
+  {% endif %}
+  {% if can_review_complete %}
+    <drawer-modal id="rp-actuals-sync-drawer" width="900">
+      <drawer-header eyebrow="Sprint Actuals" title="Sync Project Actuals" no-sizes></drawer-header>
+      <drawer-panel>
+        <flash-banner type="warning" id="rp-actuals-sync-warning-banner">
+          <banner-message>It is generally recommended to wait at least 3 to 5 days since review complete before syncing the project actuals.</banner-message>
+        </flash-banner>
+        <div class="mt-4">
+          <radio-group-field id="rp-actuals-sync-scope" label="Scope">
+            <option-field value="all" label="All Projects" checked></option-field>
+            <option-field value="specific" label="Specific Projects"></option-field>
+          </radio-group-field>
+        </div>
+        <div id="rp-actuals-sync-projects-section" hidden class="mt-3">
+          <div id="rp-actuals-sync-projects-loading" class="rp-empty-state" style="min-height:80px">
+            <span class="rp-empty-icon bi bi-hourglass-split"></span>
+            <p class="rp-empty-title">Loading projects…</p>
+          </div>
+          <div id="rp-actuals-sync-projects-list" hidden></div>
+        </div>
+      </drawer-panel>
+      <drawer-footer close="Cancel" primary="Sync" primary-icon="bi-arrow-repeat" data-footer-primary></drawer-footer>
+    </drawer-modal>
   {% endif %}
   <drawer-modal id="rp-actuals-review-complete-drawer" width="900">
     <drawer-header eyebrow="Sprint Actuals" title="Review Complete" no-sizes></drawer-header>

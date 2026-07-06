@@ -1,13 +1,20 @@
 from __future__ import annotations
 
-from .capacity import get_capacity_for_sprint
+from .capacity import (
+    get_capacity_by_ids,
+    get_capacity_for_member_sprint,
+    get_capacity_for_sprint,
+)
 from .sprint import (
     get_active_and_future_sprints,
     get_active_sprints,
     get_all_sprints,
+    get_distinct_months_for_fy,
+    get_first_sprint_starting_on_or_after,
     get_in_progress_sprint,
     get_max_sprint_number,
     get_sprint_by_code,
+    get_sprint_by_number,
     get_sprint_options,
     get_sprint_stats,
     get_sprints_for_fy,
@@ -30,8 +37,10 @@ __all__ = [
     "get_all_sprints",
     "get_active_sprints",
     "get_sprint_by_code",
+    "get_sprint_by_number",
     "get_in_progress_sprint",
     "get_sprints_for_fy",
+    "get_distinct_months_for_fy",
     "get_sprint_options",
     "get_sprint_stats",
     "has_overlapping_sprint",
@@ -39,7 +48,10 @@ __all__ = [
     "get_sprints_overlapping_date",
     "get_sprints_overlapping_range",
     "get_active_and_future_sprints",
+    "get_first_sprint_starting_on_or_after",
     "get_capacity_for_sprint",
+    "get_capacity_for_member_sprint",
+    "get_capacity_by_ids",
     "get_imports_for_sprint_team",
     "get_latest_active_import",
     "get_import_by_code",

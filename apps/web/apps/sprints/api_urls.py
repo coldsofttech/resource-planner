@@ -31,6 +31,11 @@ urlpatterns = [
         name="sprint-options",
     ),
     path(
+        "sprints/months/",
+        SprintViewSet.as_view({"get": "months"}),
+        name="sprint-months",
+    ),
+    path(
         "sprints/generate/",
         SprintViewSet.as_view({"post": "generate"}),
         name="sprint-generate",
@@ -156,6 +161,16 @@ urlpatterns = [
         "sprints/<str:sprint_code>/actuals/template/",
         SprintDataImportActualViewSet.as_view({"get": "download_template"}),
         name="sprint-actuals-template",
+    ),
+    path(
+        "sprints/<str:sprint_code>/actuals/projects/",
+        SprintDataImportActualViewSet.as_view({"get": "list_actuals_projects"}),
+        name="sprint-actuals-projects",
+    ),
+    path(
+        "sprints/<str:sprint_code>/actuals/sync-project-actuals/",
+        SprintDataImportActualViewSet.as_view({"post": "sync_project_actuals"}),
+        name="sprint-actuals-sync-project-actuals",
     ),
     path(
         "sprints/<str:sprint_code>/actuals/<str:team_code>/upload/",

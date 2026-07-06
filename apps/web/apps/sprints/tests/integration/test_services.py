@@ -414,6 +414,28 @@ class SprintServiceOptionsTest(TestCase):
         self.assertEqual(len(result), 1)
 
 
+class SprintServiceMonthsTest(TestCase):
+    def test_raises_without_fy_code(self):
+        with self.assertRaises(ValidationException):
+            _svc().months(fy_code="")
+
+    def test_returns_distinct_months_with_labels(self):
+        fy = make_financial_year(
+            start_date=date(2024, 4, 1), end_date=date(2025, 3, 31)
+        )
+        make_sprint(
+            financial_year=fy,
+            sprint_number=1,
+            start_date=date(2024, 4, 1),
+            end_date=date(2024, 4, 14),
+        )
+        result = _svc().months(fy_code=fy.code)
+        self.assertEqual(result, [{"value": "2024-04", "label": "Apr 2024"}])
+
+    def test_unknown_fy_code_returns_empty_list(self):
+        self.assertEqual(_svc().months(fy_code="FY-999999"), [])
+
+
 # ── SprintService.stats ───────────────────────────────────────────────────────
 
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from django.db.models import Q
-from drf_spectacular.utils import OpenApiResponse, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -134,6 +134,7 @@ class SprintViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
             "retrieve": "sprints.view_sprint",
             "active": "sprints.view_sprint",
             "options": "sprints.view_sprint",
+            "months": "sprints.view_sprint",
             "create": "sprints.add_sprint",
             "partial_update": "sprints.change_sprint",
             "destroy": "sprints.delete_sprint",
@@ -412,6 +413,30 @@ class SprintViewSet(ImportMixin, ExportMixin, StatisticsMixin, BaseViewSet):
         return self.response(
             data=self.service.options(fy_code=fy_code),
             message="Sprint options retrieved successfully.",
+        )
+
+    @extend_schema(
+        summary="List distinct months for a financial year",
+        description=(
+            "Returns distinct sprint months (YYYY-MM) for the given financial "
+            "year, ordered chronologically, for picker fields."
+        ),
+        parameters=[
+            OpenApiParameter(
+                name="fy_code", type=str, location=OpenApiParameter.QUERY, required=True
+            ),
+        ],
+        responses={
+            200: OpenApiResponse(description="List of month options."),
+            422: OpenApiResponse(description="Validation error."),
+        },
+    )
+    def months(self, request: Request):
+        """GET /sprints/months/"""
+        fy_code = request.query_params.get("fy_code") or ""
+        return self.response(
+            data=self.service.months(fy_code=fy_code),
+            message="Months retrieved successfully.",
         )
 
     @extend_schema(
