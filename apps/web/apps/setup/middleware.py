@@ -9,6 +9,7 @@ _BYPASS_PREFIXES = (
     "/api/v1/meta/",
     "/api/v1/setup/",
     "/api/v1/auth/",
+    "/api/v1/products/options/",
     "/static/",
     "/favicon",
     "/media/",

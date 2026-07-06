@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Products
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/products.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Organisations
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Products
+{% endblock page_title %}
+{% block page_sub %}
+  Manage your organisation's products.
+{% endblock page_sub %}
+{% block page_actions %}
+  <secondary-button id="rp-products-import-btn" label="Import" prefix-icon="bi-upload" hidden></secondary-button>
+  <secondary-button id="rp-products-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+  <primary-button id="rp-products-add-btn" label="Add Product" prefix-icon="bi-plus-lg" hidden></primary-button>
+{% endblock page_actions %}
+{% block content %}
+  <list-view show-active-filters>
+  <filter-panel id="rp-products-filter-panel">
+  <search-field id="rp-products-search" name="search" placeholder="Search products..." shortcut="/" show-label></search-field>
+  <business-unit-field id="rp-products-bu-filter" name="bu" allow-all show-label></business-unit-field>
+  <is-active-field id="rp-products-status" name="is_active" value="true" show-label></is-active-field>
+  </filter-panel>
+  <data-table id="rp-products-table"
+              url="/api/v1/products/"
+              paginated
+              page-size="25"
+              row-template="renderProductsRow"
+              empty-message="No products found.">
+    <table-columns>
+      <table-column width="52px">
+      </table-column>
+      <table-column label="Name" key="name" sortable>
+      </table-column>
+      <table-column label="Code" key="code" mono width="130px" hide-mobile>
+      </table-column>
+      <table-column label="Short Name" key="short_name" hide-mobile>
+      </table-column>
+      <table-column label="Business Unit" key="business_unit" hide-mobile>
+      </table-column>
+      <table-column label="Status" key="is_active">
+      </table-column>
+      <table-column label="Created" key="created_at" hide-mobile sortable>
+      </table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_product %}
+        <table-action icon="bi-pencil" label="Edit" event="rp:product:edit">
+        </table-action>
+        <table-action icon="bi-toggle-on" label="Toggle" event="rp:product:toggle" color-key="is_active">
+        </table-action>
+      {% endif %}
+      {% if can_delete_product %}
+        <table-action icon="bi-trash" label="Delete" event="rp:product:delete" danger>
+        </table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+  </list-view>
+  <!-- Create drawer -->
+  <drawer-modal id="rp-product-create-drawer" width="900">
+  <drawer-header eyebrow="New record" title="Create product" no-sizes></drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-new-product-name" col="col-md-12" label="Product name" placeholder="e.g. Core Platform" required maxlength="255" show-counter></text-field>
+    <text-field id="rp-new-product-short-name" col="col-md-6" label="Short name" placeholder="e.g. CP" required maxlength="10" show-counter></text-field>
+    <business-unit-field id="rp-new-product-bu" col="col-md-6" label="Business Unit" required show-label></business-unit-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Create product" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <!-- Edit drawer -->
+  <drawer-modal id="rp-product-edit-drawer" width="900">
+  <drawer-header eyebrow="Edit record" title="Edit product" no-sizes>
+  <identicon-field id="rp-edit-product-identicon" size="lg"></identicon-field>
+  </drawer-header>
+  <drawer-panel>
+  <div class="row g-3">
+    <text-field id="rp-edit-product-name" col="col-md-12" label="Product name" placeholder="e.g. Core Platform" required maxlength="255" show-counter></text-field>
+    <text-field id="rp-edit-product-short-name" col="col-md-6" label="Short name" placeholder="e.g. CP" required maxlength="10" show-counter></text-field>
+    <business-unit-field id="rp-edit-product-bu" col="col-md-6" label="Business Unit" required show-label></business-unit-field>
+  </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+  <!-- View drawer -->
+  <drawer-modal id="rp-product-view-drawer" width="900">
+  <drawer-header eyebrow="Product" title="Product" no-sizes>
+  <identicon-field id="rp-view-product-identicon" size="lg"></identicon-field>
+  </drawer-header>
+  <drawer-panel>
+  <view-field id="rp-view-product-name" label="Name"></view-field>
+  <view-field id="rp-view-product-short-name" label="Short Name" code></view-field>
+  <view-field id="rp-view-product-bu" label="Business Unit"></view-field>
+  <view-field id="rp-view-product-code" label="Code" code></view-field>
+  <view-field id="rp-view-product-status" label="Status"></view-field>
+  <view-field id="rp-view-product-created" label="Created" meta></view-field>
+  <view-field id="rp-view-product-created-by" label="Created by" meta></view-field>
+  </drawer-panel>
+  {% if can_change_product %}
+    <drawer-footer close="Close" primary="Edit product" primary-icon="bi-pencil"></drawer-footer>
+  {% else %}
+    <drawer-footer close="Close"></drawer-footer>
+  {% endif %}
+  </drawer-modal>
+  <delete-modal id="rp-product-delete-modal" action-label="Delete product"></delete-modal>
+  <activate-modal id="rp-product-activate-modal"></activate-modal>
+  <deactivate-modal id="rp-product-deactivate-modal"></deactivate-modal>
+  <import-view id="rp-products-import-view" title="Import Products" eyebrow="Products"></import-view>
+  <export-view id="rp-products-export-view" title="Export Products" eyebrow="Products" active-filter-id="rp-products-filter-panel"></export-view>
+{% endblock content %}

@@ -10,6 +10,7 @@ import "./is-active-field.js";
 import "./location-field.js";
 import "./member-field.js";
 import "./priority-field.js";
+import "./product-field.js";
 import "./programme-field.js";
 import "./project-estimate-status-field.js";
 import "./project-field.js";

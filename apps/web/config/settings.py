@@ -81,6 +81,7 @@ INSTALLED_APPS = [
     "apps.projects.apps.ProjectConfig",
     "apps.dashboard.apps.DashboardConfig",
     "apps.business_units.apps.BusinessUnitConfig",
+    "apps.products.apps.ProductConfig",
     "apps.tags.apps.TagConfig",
     "apps.contacts.apps.ContactConfig",
     "apps.comments.apps.CommentsConfig",
