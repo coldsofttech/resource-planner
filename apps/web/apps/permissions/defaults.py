@@ -705,6 +705,61 @@ _SPRINTS_CATEGORIES = {
     ],
 }
 
+_REPORTS_CATEGORIES = {
+    "module": "reports",
+    "entries": [
+        {
+            "name": "View Standard Reports",
+            "codename": "view_standard",
+            "order": 1,
+            "perms": [
+                "reports.view_report",
+            ],
+        },
+        {
+            "name": "Manage Standard Reports",
+            "codename": "manage_standard",
+            "order": 2,
+            "perms": [
+                "reports.view_report",
+                "reports.add_report",
+                "reports.change_report",
+                "reports.delete_report",
+            ],
+        },
+        {
+            "name": "View Custom Reports",
+            "codename": "view_custom",
+            "order": 3,
+            "perms": [
+                "reports.view_customreport",
+            ],
+        },
+        {
+            "name": "Manage Custom Reports",
+            "codename": "manage_custom",
+            "order": 4,
+            "perms": [
+                "reports.view_customreport",
+                "reports.add_customreport",
+                "reports.change_customreport",
+                "reports.delete_customreport",
+            ],
+        },
+        {
+            "name": "Manage Demand vs. Capacity Config",
+            "codename": "manage_demand_capacity_config",
+            "order": 5,
+            "perms": [
+                "reports.view_demandcapacityreportconfig",
+                "reports.add_demandcapacityreportconfig",
+                "reports.change_demandcapacityreportconfig",
+                "reports.delete_demandcapacityreportconfig",
+            ],
+        },
+    ],
+}
+
 PERMISSION_CATEGORIES = [
     _BUSINESS_UNITS_CATEGORIES,
     _EMPLOYMENT_TYPES_CATEGORIES,
@@ -718,6 +773,7 @@ PERMISSION_CATEGORIES = [
     _PROJECT_STATUSES_CATEGORIES,
     _PROJECT_SUB_STATUSES_CATEGORIES,
     _PROJECT_TYPES_CATEGORIES,
+    _REPORTS_CATEGORIES,
     _SKILLS_CATEGORIES,
     _SPRINTS_CATEGORIES,
     _TEAMS_CATEGORIES,

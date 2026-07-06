@@ -1,6 +1,7 @@
 from django.db.models import Count, Q, QuerySet
 
 from apps.teams.models import Assignment, Team
+from apps.users.models import User
 
 
 def get_all_teams() -> QuerySet[Team]:
@@ -51,3 +52,10 @@ def get_assignment(member_pk: int, team_pk: int) -> Assignment | None:
         return Assignment.objects.get(member_id=member_pk, team_id=team_pk)
     except Assignment.DoesNotExist:
         return None
+
+
+def get_active_members_for_team(team: Team) -> QuerySet[User]:
+    member_ids = Assignment.objects.filter(team=team).values_list(
+        "member_id", flat=True
+    )
+    return User.objects.filter(id__in=member_ids)

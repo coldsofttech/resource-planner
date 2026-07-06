@@ -1,0 +1,54 @@
+{% extends "base.html" %} {% load static %} {% block title %} Demand vs. Capacity Report {% endblock title %} {% block
+scripts %}
+<script type="module" src="{% static 'js/dist/reports.min.js' %}"></script>
+{% endblock scripts %} {% block page_eyebrow %} Reports &rsaquo; Standard Reports {% endblock page_eyebrow %} {% block
+page_title %}
+<icon-field icon="bi-bar-chart-line" size="lg"></icon-field>
+<span class="ms-2">Demand vs. Capacity</span>
+{% endblock page_title %} {% block page_sub %} Monthly demand (by configured category) against available capacity for a
+selected Resource Plan version. {% endblock page_sub %} {% block page_actions %} {% if can_manage_config %}
+<secondary-button id="rp-dvc-config-btn" label="Configure" prefix-icon="bi-gear"></secondary-button>
+{% endif %}
+<secondary-button id="rp-dvc-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+{% endblock page_actions %} {% block content %}
+<section-panel class="mb-3">
+  <panel-body>
+    <div class="row g-3 align-items-end">
+      <resource-plan-field id="rp-dvc-plan" col="col-12 col-md-3" show-label required></resource-plan-field>
+      <resource-plan-version-field
+        id="rp-dvc-version"
+        col="col-12 col-md-3"
+        show-label
+        required
+      ></resource-plan-version-field>
+      <team-field id="rp-dvc-team" col="col-12 col-md-3" show-label allow-all></team-field>
+      <employment-type-field id="rp-dvc-emp-type" col="col-12 col-md-3" show-label allow-all></employment-type-field>
+      <div class="col-auto">
+        <primary-button id="rp-dvc-load-btn" label="Load Report" prefix-icon="bi-search"></primary-button>
+      </div>
+    </div>
+  </panel-body>
+</section-panel>
+
+<section-panel id="rp-dvc-hint-panel" hidden>
+  <panel-body>
+    <div class="text-center py-5">
+      <icon-field icon="bi-inboxes" size="2x" color="muted"></icon-field>
+      <p class="mt-3 mb-0" style="color: var(--rp-text-muted)">
+        No allocation data has been generated yet for this resource plan version. Run the engine on this version to
+        generate demand.
+      </p>
+    </div>
+  </panel-body>
+</section-panel>
+
+<div id="rp-dvc-results" hidden>
+  <section-panel>
+    <panel-body>
+      <div id="rp-dvc-tabs-container"></div>
+    </panel-body>
+  </section-panel>
+</div>
+
+<export-view id="rp-dvc-export-view" title="Export Demand vs. Capacity" eyebrow="Reports"></export-view>
+{% endblock content %}

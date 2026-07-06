@@ -10,3 +10,5 @@ class Action(models.TextChoices):
     ACTIVATE = "activate", "Activate"
     DEACTIVATE = "deactivate", "Deactivate"
     SET_DEFAULT = "set_default", "Set Default"
+    RESTORE = "restore", "Restore"
+    LOCK = "lock", "Lock"

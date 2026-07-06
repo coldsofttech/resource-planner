@@ -1,0 +1,73 @@
+from django.urls import path
+
+from apps.reports.views import (
+    CustomReportBuilderView,
+    CustomReportsListView,
+    DemandVsCapacityConfigView,
+    DemandVsCapacityReportView,
+    KPIEstimateAccuracyConfigView,
+    KPIEstimateAccuracyReportView,
+    MonthlyFinanceReportView,
+    MonthlyWinsReportView,
+    SprintForecastVsActualsReportView,
+    StandardReportsListView,
+    WeeklyWinsReportView,
+)
+
+urlpatterns = [
+    path(
+        "reports/standard/",
+        StandardReportsListView.as_view(),
+        name="reports-standard-list",
+    ),
+    path(
+        "reports/standard/weekly-wins/",
+        WeeklyWinsReportView.as_view(),
+        name="reports-standard-weekly-wins",
+    ),
+    path(
+        "reports/standard/monthly-wins/",
+        MonthlyWinsReportView.as_view(),
+        name="reports-standard-monthly-wins",
+    ),
+    path(
+        "reports/standard/sprint-forecast-vs-actuals/",
+        SprintForecastVsActualsReportView.as_view(),
+        name="reports-standard-sprint-forecast-vs-actuals",
+    ),
+    path(
+        "reports/standard/demand-vs-capacity/",
+        DemandVsCapacityReportView.as_view(),
+        name="reports-standard-demand-vs-capacity",
+    ),
+    path(
+        "reports/standard/demand-vs-capacity/config/",
+        DemandVsCapacityConfigView.as_view(),
+        name="reports-standard-demand-vs-capacity-config",
+    ),
+    path(
+        "reports/standard/kpi-estimate-accuracy/",
+        KPIEstimateAccuracyReportView.as_view(),
+        name="reports-standard-kpi-estimate-accuracy",
+    ),
+    path(
+        "reports/standard/monthly-finance-report/",
+        MonthlyFinanceReportView.as_view(),
+        name="reports-standard-monthly-finance-report",
+    ),
+    path(
+        "reports/standard/kpi-estimate-accuracy/config/",
+        KPIEstimateAccuracyConfigView.as_view(),
+        name="reports-standard-kpi-estimate-accuracy-config",
+    ),
+    path(
+        "reports/custom/",
+        CustomReportsListView.as_view(),
+        name="reports-custom-list",
+    ),
+    path(
+        "reports/custom/<str:code>/",
+        CustomReportBuilderView.as_view(),
+        name="reports-custom-builder",
+    ),
+]

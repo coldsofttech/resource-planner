@@ -1,0 +1,97 @@
+{% extends "base.html" %} {% load static %} {% block title %} Demand vs. Capacity — Configure Categories {% endblock
+title %} {% block scripts %}
+<script type="module" src="{% static 'js/dist/reports.min.js' %}"></script>
+{% endblock scripts %} {% block page_eyebrow %} Reports &rsaquo; Standard Reports &rsaquo; Demand vs. Capacity {%
+endblock page_eyebrow %} {% block page_title %} Configure Categories {% endblock page_title %} {% block page_sub %} Map
+each programme to a category shown as a row on the Demand vs. Capacity report. {% endblock page_sub %} {% block
+page_actions %} {% if can_add_config %}
+<primary-button id="rp-dvc-configs-add-btn" label="Add Mapping" prefix-icon="bi-plus-lg" hidden></primary-button>
+{% endif %} {% endblock page_actions %} {% block content %}
+<section-panel class="mb-3">
+  <panel-body>
+    <div class="row g-3 align-items-end">
+      <resource-plan-field id="rp-dvc-configs-plan" col="col-12 col-md-4" show-label required></resource-plan-field>
+      <resource-plan-version-field
+        id="rp-dvc-configs-version"
+        col="col-12 col-md-4"
+        show-label
+        required
+      ></resource-plan-version-field>
+    </div>
+  </panel-body>
+</section-panel>
+
+<section-panel id="rp-dvc-configs-hint-panel">
+  <panel-body>
+    <div class="text-center py-5">
+      <icon-field icon="bi-diagram-3" size="2x" color="muted"></icon-field>
+      <p class="mt-3 mb-0" style="color: var(--rp-text-muted)">
+        Select a resource plan and version to view or manage its category mappings.
+      </p>
+    </div>
+  </panel-body>
+</section-panel>
+
+<data-table
+  id="rp-dvc-configs-table"
+  row-template="renderDvcConfigRow"
+  empty-message="No category mappings yet."
+  hidden
+>
+  <table-columns>
+    <table-column label="Category" key="category" sortable> </table-column>
+    <table-column label="Programme" key="programme_name"> </table-column>
+    <table-column label="Code" key="code" mono width="130px" hide-mobile> </table-column>
+    <table-column label="Created" key="created_at" hide-mobile sortable> </table-column>
+  </table-columns>
+  <table-actions>
+    {% if can_change_config %}
+    <table-action icon="bi-pencil" label="Edit" event="rp:dvc-config:edit"> </table-action>
+    {% endif %} {% if can_delete_config %}
+    <table-action icon="bi-trash" label="Delete" event="rp:dvc-config:delete" danger> </table-action>
+    {% endif %}
+  </table-actions>
+</data-table>
+
+<!-- Create drawer -->
+<drawer-modal id="rp-dvc-config-create-drawer" width="600">
+  <drawer-header eyebrow="New mapping" title="Map a programme to a category" no-sizes></drawer-header>
+  <drawer-panel>
+    <div class="row g-3">
+      <programme-field id="rp-new-dvc-config-programme" col="col-12" show-label required></programme-field>
+      <text-field
+        id="rp-new-dvc-config-category"
+        col="col-12"
+        label="Category"
+        placeholder="e.g. BAU"
+        required
+        maxlength="100"
+        show-counter
+      ></text-field>
+    </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Add mapping" primary-icon="bi-check2"></drawer-footer>
+</drawer-modal>
+
+<!-- Edit drawer -->
+<drawer-modal id="rp-dvc-config-edit-drawer" width="600">
+  <drawer-header eyebrow="Edit mapping" title="Edit category mapping" no-sizes></drawer-header>
+  <drawer-panel>
+    <div class="row g-3">
+      <programme-field id="rp-edit-dvc-config-programme" col="col-12" show-label required></programme-field>
+      <text-field
+        id="rp-edit-dvc-config-category"
+        col="col-12"
+        label="Category"
+        placeholder="e.g. BAU"
+        required
+        maxlength="100"
+        show-counter
+      ></text-field>
+    </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
+</drawer-modal>
+
+<delete-modal id="rp-dvc-config-delete-modal" action-label="Delete mapping"></delete-modal>
+{% endblock content %}

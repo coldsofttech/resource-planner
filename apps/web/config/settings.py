@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     "apps.recharges.apps.RechargeConfig",
     "apps.how_to.apps.HowToConfig",
     "apps.notifications.apps.NotificationsConfig",
+    "apps.reports.apps.ReportConfig",
 ]
 
 MIDDLEWARE = [

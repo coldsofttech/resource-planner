@@ -9,6 +9,7 @@ import "./fy-status-field.js";
 import "./is-active-field.js";
 import "./location-field.js";
 import "./member-field.js";
+import "./month-field.js";
 import "./priority-field.js";
 import "./product-field.js";
 import "./programme-field.js";

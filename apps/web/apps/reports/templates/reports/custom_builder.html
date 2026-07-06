@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Custom Report
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/reports.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Reports &rsaquo; Custom Reports
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <span id="rp-crb-title">Custom Report</span>
+{% endblock page_title %}
+{% block page_sub %}
+  Configure a data source, fields, filters, and visualization, then preview and save.
+{% endblock page_sub %}
+{% block page_actions %}
+  {% if can_change_customreport %}
+    <secondary-button id="rp-crb-share-btn" label="Share" prefix-icon="bi-people" hidden></secondary-button>
+    <secondary-button id="rp-crb-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+    <primary-button id="rp-crb-save-btn" label="Save" prefix-icon="bi-check2"></primary-button>
+  {% endif %}
+{% endblock page_actions %}
+{% block content %}
+  <section-panel class="mb-3">
+    <panel-body>
+      <div class="row g-3 align-items-end">
+        <dropdown-field id="rp-crb-datasource" col="col-12 col-md-4" label="Data Source" show-label required placeholder="Select a data source…"></dropdown-field>
+        <dropdown-field id="rp-crb-visualization" col="col-12 col-md-4" label="Visualization" show-label required>
+          <values-list>
+            <value value="table" selected>Table</value>
+            <value value="card">KPI Cards</value>
+            <value value="bar">Bar Chart</value>
+            <value value="line">Line Chart</value>
+            <value value="pie">Pie Chart</value>
+          </values-list>
+        </dropdown-field>
+        <div class="col-auto">
+          <primary-button id="rp-crb-preview-btn" label="Preview" prefix-icon="bi-eye"></primary-button>
+        </div>
+      </div>
+    </panel-body>
+  </section-panel>
+
+  <section-panel id="rp-crb-config-panel" class="mb-3" hidden>
+    <panel-body>
+      <div id="rp-crb-tabs-container"></div>
+    </panel-body>
+  </section-panel>
+
+  <section-panel id="rp-crb-empty-panel">
+    <panel-body>
+      <div class="text-center py-5">
+        <icon-field icon="bi-bar-chart" size="2x" color="muted"></icon-field>
+        <p class="mt-3 mb-0" style="color: var(--rp-text-muted)">
+          Select a data source above to start building your report.
+        </p>
+      </div>
+    </panel-body>
+  </section-panel>
+
+  <div id="rp-crb-results" hidden>
+    <section-panel>
+      <panel-body>
+        <div id="rp-crb-result-container"></div>
+      </panel-body>
+    </section-panel>
+  </div>
+
+  <export-view id="rp-crb-export-view" title="Export Custom Report" eyebrow="Reports"></export-view>
+
+  <drawer-modal id="rp-crb-share-drawer" width="700">
+    <drawer-header eyebrow="Sharing" title="Share Report" no-sizes></drawer-header>
+    <drawer-panel>
+      <div class="row g-3 align-items-end mb-3">
+        <member-field id="rp-crb-share-member" col="col-12 col-md-7" show-label required></member-field>
+        <dropdown-field id="rp-crb-share-permission" col="col-12 col-md-3" label="Permission" show-label>
+          <values-list>
+            <value value="view" selected>View</value>
+            <value value="edit">Edit</value>
+          </values-list>
+        </dropdown-field>
+        <div class="col-12 col-md-2">
+          <secondary-button id="rp-crb-share-add-btn" label="Add" prefix-icon="bi-plus-lg"></secondary-button>
+        </div>
+      </div>
+      <div id="rp-crb-share-list"></div>
+    </drawer-panel>
+    <drawer-footer close="Done"></drawer-footer>
+  </drawer-modal>
+{% endblock content %}

@@ -66,6 +66,7 @@ urlpatterns = [
     path("", include("apps.how_to.urls")),
     path("", include("apps.configurations.urls")),
     path("", include("apps.notifications.urls")),
+    path("", include("apps.reports.urls")),
     path("api/v1/", include("apps.setup.api_urls")),
     path("api/v1/", include("apps.meta.api_urls")),
     path("api/v1/", include("apps.auth.api_urls")),
@@ -89,6 +90,7 @@ urlpatterns = [
     path("api/v1/", include("apps.recharges.api_urls")),
     path("api/v1/", include("apps.configurations.api_urls")),
     path("api/v1/", include("apps.notifications.api_urls")),
+    path("api/v1/", include("apps.reports.api_urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

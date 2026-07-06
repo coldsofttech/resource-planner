@@ -149,3 +149,43 @@ class AuditService:
             after=after,
             actor=actor,
         )
+
+    @staticmethod
+    def log_restore(
+        *,
+        module: str,
+        resource_type: str,
+        resource_code: str | None = None,
+        before: dict,
+        after: dict,
+        actor=None,
+    ) -> Audit:
+        return AuditService.log(
+            module=module,
+            resource_type=resource_type,
+            resource_code=resource_code,
+            action=Action.RESTORE,  # type: ignore[arg-type]
+            before=before,
+            after=after,
+            actor=actor,
+        )
+
+    @staticmethod
+    def log_lock(
+        *,
+        module: str,
+        resource_type: str,
+        resource_code: str | None = None,
+        before: dict,
+        after: dict,
+        actor=None,
+    ) -> Audit:
+        return AuditService.log(
+            module=module,
+            resource_type=resource_type,
+            resource_code=resource_code,
+            action=Action.LOCK,  # type: ignore[arg-type]
+            before=before,
+            after=after,
+            actor=actor,
+        )

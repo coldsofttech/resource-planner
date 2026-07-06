@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Standard Reports
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/reports.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Reports
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Standard Reports
+{% endblock page_title %}
+{% block page_sub %}
+  Browse the built-in report catalog.
+{% endblock page_sub %}
+{% block content %}
+  <div id="rp-reports-standard-cards" class="row g-3">
+    <div class="col-12 text-center py-5" style="color:var(--rp-text-muted)">
+      <div class="spinner-border" role="status"></div>
+    </div>
+  </div>
+{% endblock content %}

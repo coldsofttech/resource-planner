@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  KPI Report - Estimate % Accuracy
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/reports.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Reports &rsaquo; Standard Reports
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <icon-field icon="bi-bullseye" size="lg"></icon-field>
+  <span class="ms-2">KPI Report - Estimate % Accuracy</span>
+{% endblock page_title %}
+{% block page_sub %}
+  Reviews projects completed in a selected month and measures estimate accuracy based on total cost vs. estimate value.
+{% endblock page_sub %}
+{% block page_actions %}
+  {% if can_manage_config %}
+    <secondary-button id="rp-kpi-eea-config-btn" label="Configure" prefix-icon="bi-gear"></secondary-button>
+  {% endif %}
+  <secondary-button id="rp-kpi-eea-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+{% endblock page_actions %}
+{% block content %}
+  <section-panel class="mb-3">
+    <panel-body>
+      <div class="row g-3 align-items-end">
+        <financial-year-field id="rp-kpi-eea-fy" col="col-12 col-md-3" show-label required></financial-year-field>
+        <month-field id="rp-kpi-eea-month" col="col-12 col-md-3" show-label required></month-field>
+        <div class="col-auto">
+          <primary-button id="rp-kpi-eea-load-btn" label="Load Report" prefix-icon="bi-search"></primary-button>
+        </div>
+      </div>
+    </panel-body>
+  </section-panel>
+
+  <section-panel id="rp-kpi-eea-hint-panel" hidden>
+    <panel-body>
+      <div class="text-center py-5">
+        <icon-field icon="bi-inboxes" size="2x" color="muted"></icon-field>
+        <p class="mt-3 mb-0" style="color: var(--rp-text-muted)">
+          No projects were completed in this month.
+        </p>
+      </div>
+    </panel-body>
+  </section-panel>
+
+  <div id="rp-kpi-eea-results" hidden>
+    <section-panel>
+      <panel-body>
+        <div id="rp-kpi-eea-tabs-container"></div>
+      </panel-body>
+    </section-panel>
+  </div>
+
+  <export-view id="rp-kpi-eea-export-view" title="Export KPI Report - Estimate % Accuracy" eyebrow="Reports"></export-view>
+{% endblock content %}

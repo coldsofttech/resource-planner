@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  KPI Report - Estimate % Accuracy — Configure Exceptions
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/reports.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Reports &rsaquo; Standard Reports &rsaquo; KPI Report - Estimate % Accuracy
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Configure Exceptions
+{% endblock page_title %}
+{% block page_sub %}
+  Record an exception comment against a completed project for a month — it will be banded as "Exception" on the report.
+{% endblock page_sub %}
+{% block page_actions %}
+  {% if can_add_config %}
+    <primary-button id="rp-kpi-eea-configs-add-btn" label="Add Comment" prefix-icon="bi-plus-lg" hidden></primary-button>
+  {% endif %}
+{% endblock page_actions %}
+{% block content %}
+  <section-panel class="mb-3">
+    <panel-body>
+      <div class="row g-3 align-items-end">
+        <financial-year-field id="rp-kpi-eea-configs-fy" col="col-12 col-md-4" show-label required></financial-year-field>
+        <month-field id="rp-kpi-eea-configs-month" col="col-12 col-md-4" show-label required></month-field>
+      </div>
+    </panel-body>
+  </section-panel>
+
+  <section-panel id="rp-kpi-eea-configs-hint-panel">
+    <panel-body>
+      <div class="text-center py-5">
+        <icon-field icon="bi-chat-square-text" size="2x" color="muted"></icon-field>
+        <p class="mt-3 mb-0" style="color: var(--rp-text-muted)">
+          Select a financial year and month to view or manage its exception comments.
+        </p>
+      </div>
+    </panel-body>
+  </section-panel>
+
+  <data-table
+    id="rp-kpi-eea-configs-table"
+    row-template="renderKpiEeaConfigRow"
+    empty-message="No exception comments yet."
+    hidden
+  >
+    <table-columns>
+      <table-column label="Project" key="project_name" sortable></table-column>
+      <table-column label="Comment" key="comment"></table-column>
+      <table-column label="Code" key="code" mono width="130px" hide-mobile></table-column>
+      <table-column label="Created" key="created_at" hide-mobile sortable></table-column>
+    </table-columns>
+    <table-actions>
+      {% if can_change_config %}
+        <table-action icon="bi-pencil" label="Edit" event="rp:kpi-eea-config:edit"></table-action>
+      {% endif %}
+      {% if can_delete_config %}
+        <table-action icon="bi-trash" label="Delete" event="rp:kpi-eea-config:delete" danger></table-action>
+      {% endif %}
+    </table-actions>
+  </data-table>
+
+  <!-- Create drawer -->
+  <drawer-modal id="rp-kpi-eea-config-create-drawer" width="600">
+    <drawer-header eyebrow="New comment" title="Record an exception comment" no-sizes></drawer-header>
+    <drawer-panel>
+      <div class="row g-3">
+        <project-field id="rp-new-kpi-eea-config-project" col="col-12" show-label required></project-field>
+        <text-field
+          id="rp-new-kpi-eea-config-comment"
+          col="col-12"
+          label="Comment"
+          placeholder="Explain why this project is an exception…"
+          required
+          cols="4"
+          maxlength="1000"
+          show-counter
+        ></text-field>
+      </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Add comment" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+
+  <!-- Edit drawer -->
+  <drawer-modal id="rp-kpi-eea-config-edit-drawer" width="600">
+    <drawer-header eyebrow="Edit comment" title="Edit exception comment" no-sizes></drawer-header>
+    <drawer-panel>
+      <div class="row g-3">
+        <dl class="col-12 mb-0">
+          <view-field id="rp-edit-kpi-eea-config-project" label="Project"></view-field>
+        </dl>
+        <text-field
+          id="rp-edit-kpi-eea-config-comment"
+          col="col-12"
+          label="Comment"
+          placeholder="Explain why this project is an exception…"
+          required
+          cols="4"
+          maxlength="1000"
+          show-counter
+        ></text-field>
+      </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
+  </drawer-modal>
+
+  <delete-modal id="rp-kpi-eea-config-delete-modal" action-label="Delete comment"></delete-modal>
+{% endblock content %}

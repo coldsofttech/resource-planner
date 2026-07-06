@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Weekly Wins Report
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/reports.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Reports &rsaquo; Standard Reports
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <icon-field icon="bi-trophy" size="lg"></icon-field>
+  <span class="ms-2">Weekly Wins</span>
+{% endblock page_title %}
+{% block page_sub %}
+  Team wins captured for a selected week or the week containing a given date.
+{% endblock page_sub %}
+{% block page_actions %}
+  <secondary-button id="rp-weekly-wins-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+{% endblock page_actions %}
+{% block content %}
+  <section-panel class="mb-3">
+    <panel-body>
+      <div class="row g-3 align-items-end">
+        <div class="col-auto">
+          <toggle-field id="rp-weekly-wins-mode" label="Select by Date"></toggle-field>
+        </div>
+        <div class="col-auto" id="rp-weekly-wins-week-wrapper">
+          <wins-week-field id="rp-weekly-wins-week" show-label required></wins-week-field>
+        </div>
+        <div class="col-auto" id="rp-weekly-wins-date-wrapper" style="display:none">
+          <date-field id="rp-weekly-wins-date" label="Date" required></date-field>
+        </div>
+        <div class="col-auto">
+          <primary-button id="rp-weekly-wins-load-btn" label="Load Report" prefix-icon="bi-search"></primary-button>
+        </div>
+      </div>
+    </panel-body>
+  </section-panel>
+
+  <section-panel id="rp-weekly-wins-results-panel" hidden>
+    <panel-title>Weekly Wins - <span id="rp-weekly-wins-range-label"></span></panel-title>
+    <panel-body>
+      <div id="rp-weekly-wins-table-container"></div>
+    </panel-body>
+  </section-panel>
+
+  <export-view id="rp-weekly-wins-export-view" title="Export Weekly Wins" eyebrow="Reports"></export-view>
+{% endblock content %}

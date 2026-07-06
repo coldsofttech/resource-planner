@@ -1,0 +1,11 @@
+import "./standard.js";
+import "./custom.js";
+import "./custom-builder.js";
+import "./weekly-wins.js";
+import "./monthly-wins.js";
+import "./sprint-forecast-vs-actuals.js";
+import "./demand-vs-capacity.js";
+import "./demand-vs-capacity-config.js";
+import "./kpi-estimate-accuracy.js";
+import "./kpi-estimate-accuracy-config.js";
+import "./monthly-finance-report.js";

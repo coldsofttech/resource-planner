@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Monthly Wins Report
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/reports.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Reports &rsaquo; Standard Reports
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <icon-field icon="bi-trophy-fill" size="lg"></icon-field>
+  <span class="ms-2">Monthly Wins</span>
+{% endblock page_title %}
+{% block page_sub %}
+  Phase 1 nominations and Phase 2 declared results for a Monthly Wins round.
+{% endblock page_sub %}
+{% block page_actions %}
+  <secondary-button id="rp-monthly-wins-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+{% endblock page_actions %}
+{% block content %}
+  <section-panel class="mb-3">
+    <panel-body>
+      <div class="row g-3 align-items-end">
+        <div class="col-auto">
+          <monthly-win-field id="rp-monthly-wins-select" show-label required></monthly-win-field>
+        </div>
+        <div class="col-auto">
+          <primary-button id="rp-monthly-wins-load-btn" label="Load Report" prefix-icon="bi-search"></primary-button>
+        </div>
+      </div>
+    </panel-body>
+  </section-panel>
+
+  <div id="rp-monthly-wins-results-container" hidden>
+    <tab-panel id="rp-monthly-wins-tabs">
+      <tab-items>
+        <tab-item id="phase1" active>
+          <tab-header title="Phase 1" icon="bi-people-fill"></tab-header>
+          <tab-content>
+            <data-table id="rp-monthly-wins-phase1-table" row-template="renderMonthlyWinsPhase1Row" empty-message="No Phase 1 nominations recorded for this round.">
+              <table-columns>
+                <table-column label="Label" key="label"></table-column>
+                <table-column label="Phase 1" key="phase1_votes" numeric></table-column>
+                <table-column label="Status" key="status_display"></table-column>
+                <table-column label="Team" key="team"></table-column>
+                <table-column label="Week" key="week" hide-mobile></table-column>
+                <table-column label="Date Range" key="date_range" hide-mobile></table-column>
+                <table-column label="Win" key="win" hide-mobile></table-column>
+                <table-column label="Selected As" key="category_display"></table-column>
+              </table-columns>
+            </data-table>
+          </tab-content>
+        </tab-item>
+        <tab-item id="phase2">
+          <tab-header title="Phase 2" icon="bi-trophy"></tab-header>
+          <tab-content>
+            <div class="row g-3">
+              <div class="col-12 col-lg-6">
+                <section-panel>
+                  <panel-title>Delivery</panel-title>
+                  <panel-body>
+                    <div id="rp-monthly-wins-phase2-delivery"></div>
+                  </panel-body>
+                </section-panel>
+              </div>
+              <div class="col-12 col-lg-6">
+                <section-panel>
+                  <panel-title>Operational Excellence</panel-title>
+                  <panel-body>
+                    <div id="rp-monthly-wins-phase2-operational_excellence"></div>
+                  </panel-body>
+                </section-panel>
+              </div>
+            </div>
+          </tab-content>
+        </tab-item>
+      </tab-items>
+    </tab-panel>
+  </div>
+
+  <export-view id="rp-monthly-wins-export-view" title="Export Monthly Wins" eyebrow="Reports"></export-view>
+{% endblock content %}

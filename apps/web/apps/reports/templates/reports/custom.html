@@ -1,0 +1,96 @@
+{% extends "base.html" %} {% load static %} {% block title %} Custom Reports {% endblock title %} {% block scripts %}
+<script type="module" src="{% static 'js/dist/reports.min.js' %}"></script>
+{% endblock scripts %} {% block page_eyebrow %} Reports {% endblock page_eyebrow %} {% block page_title %} Custom
+Reports {% endblock page_title %} {% block page_sub %} Reports you own or that have been shared with you. {% endblock
+page_sub %} {% block page_actions %}
+<primary-button id="rp-reports-custom-add-btn" label="Create Report" prefix-icon="bi-plus-lg" hidden></primary-button>
+{% endblock page_actions %} {% block content %}
+<list-view>
+  <filter-panel id="rp-reports-custom-filter-panel">
+    <search-field
+      id="rp-reports-custom-search"
+      name="search"
+      placeholder="Search custom reports..."
+      shortcut="/"
+      show-label
+    ></search-field>
+  </filter-panel>
+  <data-table
+    id="rp-reports-custom-table"
+    url="/api/v1/reports/custom/"
+    paginated
+    page-size="25"
+    row-template="renderCustomReportsRow"
+    empty-message="No custom reports yet."
+  >
+    <table-columns>
+      <table-column width="52px"> </table-column>
+      <table-column label="Name" key="name" sortable> </table-column>
+      <table-column label="Data Source" key="data_source_display" hide-mobile> </table-column>
+      <table-column label="Owner" key="owner" hide-mobile> </table-column>
+      <table-column label="Shared" key="is_shared"> </table-column>
+      <table-column label="Updated" key="updated_at" hide-mobile sortable> </table-column>
+    </table-columns>
+    <table-actions>
+      <table-action icon="bi-sliders" label="Open Builder" event="rp:customreport:open"> </table-action>
+      <table-action icon="bi-pencil" label="Rename" event="rp:customreport:edit" hidden-key="is_readonly">
+      </table-action>
+      <table-action icon="bi-trash" label="Delete" event="rp:customreport:delete" hidden-key="is_readonly" danger>
+      </table-action>
+    </table-actions>
+  </data-table>
+</list-view>
+<!-- Create drawer -->
+<drawer-modal id="rp-customreport-create-drawer" width="700">
+  <drawer-header eyebrow="New record" title="Create custom report" no-sizes></drawer-header>
+  <drawer-panel>
+    <div class="row g-3">
+      <text-field
+        id="rp-new-customreport-name"
+        col="col-12"
+        label="Report name"
+        placeholder="e.g. My Team Utilisation"
+        required
+        maxlength="255"
+        show-counter
+      ></text-field>
+      <text-field
+        id="rp-new-customreport-desc"
+        col="col-12"
+        label="Description"
+        placeholder="What does this report show?"
+        cols="3"
+      ></text-field>
+      <checkbox-field id="rp-new-customreport-shared" col="col-12" label="Share with all users"></checkbox-field>
+    </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Create report" primary-icon="bi-check2"></drawer-footer>
+</drawer-modal>
+<!-- Edit drawer -->
+<drawer-modal id="rp-customreport-edit-drawer" width="700">
+  <drawer-header eyebrow="Edit record" title="Edit custom report" no-sizes></drawer-header>
+  <drawer-panel>
+    <div class="row g-3">
+      <text-field
+        id="rp-edit-customreport-name"
+        col="col-12"
+        label="Report name"
+        placeholder="e.g. My Team Utilisation"
+        required
+        maxlength="255"
+        show-counter
+      ></text-field>
+      <text-field
+        id="rp-edit-customreport-desc"
+        col="col-12"
+        label="Description"
+        placeholder="What does this report show?"
+        cols="3"
+      ></text-field>
+      <checkbox-field id="rp-edit-customreport-shared" col="col-12" label="Share with all users"></checkbox-field>
+    </div>
+  </drawer-panel>
+  <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"></drawer-footer>
+</drawer-modal>
+<delete-modal id="rp-customreport-delete-modal" action-label="Delete report"></delete-modal>
+{% endblock content %}

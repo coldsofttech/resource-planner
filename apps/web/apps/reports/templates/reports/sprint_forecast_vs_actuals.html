@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Sprint Forecast vs. Actuals Report
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/reports.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Reports &rsaquo; Standard Reports
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <icon-field icon="bi-file-diff" size="lg"></icon-field>
+  <span class="ms-2">Sprint Forecast vs. Actuals</span>
+{% endblock page_title %}
+{% block page_sub %}
+  Compares forecast and actuals effort for a selected sprint, broken down by team, engineer, label, project, programme, and finance type.
+{% endblock page_sub %}
+{% block page_actions %}
+  <secondary-button id="rp-sfva-export-btn" label="Export" prefix-icon="bi-download" hidden></secondary-button>
+{% endblock page_actions %}
+{% block content %}
+  <section-panel class="mb-3">
+    <panel-body>
+      <div class="row g-3 align-items-end">
+        <financial-year-field id="rp-sfva-fy" col="col-12 col-md-3" show-label required></financial-year-field>
+        <sprint-field id="rp-sfva-sprint" col="col-12 col-md-3" show-label required></sprint-field>
+        <team-field id="rp-sfva-team" col="col-12 col-md-3" show-label allow-all></team-field>
+        <div class="col-auto">
+          <primary-button id="rp-sfva-load-btn" label="Load Report" prefix-icon="bi-search"></primary-button>
+        </div>
+      </div>
+    </panel-body>
+  </section-panel>
+
+  <section-panel id="rp-sfva-hint-panel" hidden>
+    <panel-body>
+      <div class="text-center py-5">
+        <icon-field icon="bi-inboxes" size="2x" color="muted"></icon-field>
+        <p class="mt-3 mb-0" style="color:var(--rp-text-muted)">
+          No forecast or actuals data has been confirmed yet for this sprint<span id="rp-sfva-hint-team-suffix"></span>.
+        </p>
+      </div>
+    </panel-body>
+  </section-panel>
+
+  <div id="rp-sfva-results" hidden>
+    <div class="row g-3 mb-3">
+      <section-panel col="col-12 col-md-4">
+        <panel-title><i class="bi bi-graph-up-arrow me-1"></i> Total Forecast Days</panel-title>
+        <panel-body>
+          <div id="rp-sfva-total-forecast" class="fw-bold fs-4 mb-0">—</div>
+        </panel-body>
+      </section-panel>
+      <section-panel col="col-12 col-md-4">
+        <panel-title><i class="bi bi-receipt me-1"></i> Total Actuals Days</panel-title>
+        <panel-body>
+          <div id="rp-sfva-total-actual" class="fw-bold fs-4 mb-0">—</div>
+        </panel-body>
+      </section-panel>
+      <section-panel col="col-12 col-md-4">
+        <panel-title><i class="bi bi-arrow-left-right me-1"></i> Variance</panel-title>
+        <panel-body>
+          <div id="rp-sfva-total-variance" class="fw-bold fs-4 mb-0">—</div>
+        </panel-body>
+      </section-panel>
+    </div>
+
+    <flash-banner
+      id="rp-sfva-no-actuals-banner"
+      class="mb-3"
+      type="info"
+      title="No actuals confirmed yet"
+      subtitle="Forecast data is confirmed for this sprint, but no actuals have been confirmed yet — all rows below show forecast only."
+    ></flash-banner>
+
+    <section-panel>
+      <panel-body>
+        <div id="rp-sfva-tabs-container"></div>
+      </panel-body>
+    </section-panel>
+  </div>
+
+  <export-view id="rp-sfva-export-view" title="Export Sprint Forecast vs. Actuals" eyebrow="Reports"></export-view>
+{% endblock content %}
