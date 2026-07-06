@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  AI Configuration
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/ai-config.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Administration / Configuration
+{% endblock page_eyebrow %}
+{% block page_title %}
+  AI Configuration
+{% endblock page_title %}
+{% block page_sub %}
+  Configure the AI provider and credentials used for AI-powered features across the platform.
+{% endblock page_sub %}
+{% block page_actions %}
+  <toggle-field id="rp-ai-enabled" label="Enable AI Features" show-label></toggle-field>
+{% endblock page_actions %}
+{% block content %}
+  <div id="rp-ai-disabled-hint">
+    <hint-field type="info" col="col-12" title="AI features disabled">
+      Enable the checkbox to configure the AI functionality.
+    </hint-field>
+  </div>
+
+  <div id="rp-ai-form" hidden>
+    <section-panel>
+      <panel-title>AI Provider</panel-title>
+      <panel-body>
+        <div class="row g-3">
+          <div class="col-12 col-md-6 col-xl-4">
+            <ai-model-type-field id="rp-ai-provider" name="ai_provider" label="AI Provider" show-label required></ai-model-type-field>
+          </div>
+          <div class="col-12 col-md-6 col-xl-4">
+            <text-field id="rp-ai-model" name="ai_model" label="Model" placeholder="e.g. claude-sonnet-4-6" show-label></text-field>
+          </div>
+        </div>
+      </panel-body>
+    </section-panel>
+
+    <div class="mt-4" id="rp-ai-anthropic-section" hidden>
+      <section-panel>
+        <panel-title>Anthropic</panel-title>
+        <panel-body>
+          <div class="row g-3">
+            <div class="col-12 col-md-6 col-xl-4">
+              <secret-field id="rp-ai-anthropic-key" name="ai_anthropic_api_key" label="API Key" placeholder="sk-ant-…" show-label prefix-icon></secret-field>
+            </div>
+          </div>
+        </panel-body>
+      </section-panel>
+    </div>
+
+    <div class="mt-4" id="rp-ai-bedrock-section" hidden>
+      <section-panel>
+        <panel-title>AWS Bedrock</panel-title>
+        <panel-body>
+          <div class="row g-3">
+            <div class="col-12 col-md-6 col-xl-4">
+              <text-field id="rp-ai-bedrock-region" name="ai_bedrock_region" label="AWS Region" placeholder="us-east-1" show-label></text-field>
+            </div>
+            <div class="col-12 col-md-6 col-xl-4">
+              <ai-bedrock-auth-type-field id="rp-ai-bedrock-auth-mode" name="ai_bedrock_auth_mode" label="Authentication Mode" show-label></ai-bedrock-auth-type-field>
+            </div>
+          </div>
+          <div class="row g-3 mt-1" id="rp-ai-bedrock-iam-user-row" hidden>
+            <div class="col-12 col-md-6 col-xl-4">
+              <secret-field id="rp-ai-bedrock-iam-key" name="ai_bedrock_iam_key" label="IAM Access Key ID" placeholder="AKIA…" show-label prefix-icon></secret-field>
+            </div>
+            <div class="col-12 col-md-6 col-xl-4">
+              <secret-field id="rp-ai-bedrock-iam-secret" name="ai_bedrock_iam_secret" label="IAM Secret Access Key" show-label prefix-icon></secret-field>
+            </div>
+          </div>
+        </panel-body>
+      </section-panel>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-end">
+      <primary-button id="rp-ai-save-btn" label="Save Changes" prefix-icon="bi-check2"></primary-button>
+    </div>
+  </div>
+{% endblock content %}

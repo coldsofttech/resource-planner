@@ -1,3 +1,5 @@
+import "./ai-bedrock-auth-type-field.js";
+import "./ai-model-type-field.js";
 import "./auth-type-field.js";
 import "./business-unit-field.js";
 import "./confidence-field.js";

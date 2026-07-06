@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Security Configuration
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/security-config.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Administration / Configuration
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Security Configuration
+{% endblock page_title %}
+{% block page_sub %}
+  Configure password policy and session timeout settings for the platform.
+{% endblock page_sub %}
+{% block content %}
+  <div id="rp-security-classic-hint" hidden>
+    <hint-field type="info" col="col-12" title="Classic authentication only">
+      Password policy settings only apply when Authentication Mode is set to Classic.
+      They are ignored for SSO (SAML/OAuth) accounts.
+    </hint-field>
+  </div>
+
+  <section-panel>
+    <panel-title>Password Policy</panel-title>
+    <panel-body>
+      <div class="row g-3">
+        <div class="col-12 col-md-6 col-xl-4">
+          <number-field id="rp-security-rotation-days" name="password_rotation_days" label="Password Rotation Period (days)" min="0" show-label></number-field>
+        </div>
+        <div class="col-12 col-md-6 col-xl-4">
+          <number-field id="rp-security-min-length" name="password_min_length" label="Password Minimum Length" min="1" show-label></number-field>
+        </div>
+        <div class="col-12 col-md-6 col-xl-4">
+          <number-field id="rp-security-history-count" name="password_history_count" label="Password History Count" min="0" show-label></number-field>
+        </div>
+      </div>
+      <div class="row g-3 mt-1">
+        <div class="col-12 col-md-6 col-xl-3">
+          <toggle-field id="rp-security-require-uppercase" name="password_require_uppercase" label="Require Uppercase Letter" show-label></toggle-field>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+          <toggle-field id="rp-security-require-lowercase" name="password_require_lowercase" label="Require Lowercase Letter" show-label></toggle-field>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+          <toggle-field id="rp-security-require-digits" name="password_require_digits" label="Require Digit" show-label></toggle-field>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+          <toggle-field id="rp-security-require-special" name="password_require_special" label="Require Special Character" show-label></toggle-field>
+        </div>
+      </div>
+    </panel-body>
+  </section-panel>
+
+  <div class="mt-4">
+    <section-panel>
+      <panel-title>Session</panel-title>
+      <panel-body>
+        <div class="row g-3">
+          <div class="col-12 col-md-6 col-xl-4">
+            <number-field id="rp-security-session-timeout" name="session_timeout_minutes" label="Session Timeout (minutes)" min="0" show-label></number-field>
+          </div>
+        </div>
+      </panel-body>
+    </section-panel>
+  </div>
+
+  <div class="mt-4 d-flex justify-content-end">
+    <primary-button id="rp-security-save-btn" label="Save Changes" prefix-icon="bi-check2"></primary-button>
+  </div>
+{% endblock content %}

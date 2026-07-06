@@ -5,7 +5,9 @@
     <meta charset="utf-8" />
     <meta name="viewport"
           content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}" />
+    <link rel="icon"
+          type="image/svg+xml"
+          href="{% static 'images/favicon.svg' %}" />
     <link rel="alternate icon" href="{% static 'images/favicon.ico' %}" />
     <title>
       {% block title %}
@@ -49,146 +51,201 @@
               <search-field id="global-search" name="q"></search-field>
               <sprint-pill id="active-sprint"></sprint-pill>
               <theme-toggle></theme-toggle>
-              <div class="rp-iconbtn-wrap">
-                <button class="rp-iconbtn" title="Notifications">
-                <icon-field icon="bi-bell"></icon-field><span class="rp-count-pill">5</span>
-              </button>
+              <notifications-panel id="app-notifications"></notifications-panel>
+              <todo-panel id="app-todo"></todo-panel>
+              <user-profile></user-profile>
             </div>
-            <user-profile></user-profile>
           </div>
         </div>
         <menu-bar id="app-menu-bar">
           <menu-items>
             <menu-item name="Dashboard" href="/dashboard" icon="bi-speedometer2"></menu-item>
               <menu-group name="Organisation" icon="bi-diagram-3">
-                {% if "business_units.view_businessunit" in rp_permissions %}
+                {% if "business_units.view_businessunit" in rp_permissions or "products.view_product" in rp_permissions %}
                   <menu-section label="Structure">
-                    <menu-item name="Business Units" href="/bu/" icon="bi-building"></menu-item>
-                  </menu-section>
-                {% endif %}
-                <menu-section label="People">
-                  {% if "teams.view_team" in rp_permissions %}
-                    <menu-item name="Teams" href="/teams" icon="bi-people"></menu-item>
-                    {% endif %}
-                    {% if "auth.view_user" in rp_permissions %}
-                      <menu-item name="Members" href="/members" icon="bi-person-lines-fill"></menu-item>
+                    {% if "business_units.view_businessunit" in rp_permissions %}
+                      <menu-item name="Business Units" href="/bu/" icon="bi-building"></menu-item>
                       {% endif %}
-                    </menu-section>
-                    <menu-section label="Holidays">
-                      {% if "holidays.view_holiday" in rp_permissions %}
-                        <menu-item name="Holidays" href="/holidays" icon="bi-calendar-check"></menu-item>
+                      {% if "products.view_product" in rp_permissions %}
+                        <menu-item name="Products" href="/products/" icon="bi-box-seam"></menu-item>
                         {% endif %}
-                        {% if "leaves.view_leave" in rp_permissions %}
-                          <menu-item name="Leaves" href="/leaves" icon="bi-calendar-minus"></menu-item>
+                      </menu-section>
+                    {% endif %}
+                    <menu-section label="People">
+                      {% if "teams.view_team" in rp_permissions %}
+                        <menu-item name="Teams" href="/teams" icon="bi-people"></menu-item>
+                        {% endif %}
+                        {% if "auth.view_user" in rp_permissions %}
+                          <menu-item name="Members" href="/members" icon="bi-person-lines-fill"></menu-item>
                           {% endif %}
                         </menu-section>
-                        <menu-section label="Configurations">
-                          {% if "skills.view_skill" in rp_permissions %}
-                            <menu-item name="Skills" href="/skills" icon="bi-tools"></menu-item>
+                        <menu-section label="Holidays">
+                          {% if "holidays.view_holiday" in rp_permissions %}
+                            <menu-item name="Holidays" href="/holidays" icon="bi-calendar-check"></menu-item>
                             {% endif %}
-                            {% if "roles.view_role" in rp_permissions %}
-                              <menu-item name="Roles" href="/roles" icon="bi-person-badge"></menu-item>
+                            {% if "leaves.view_leave" in rp_permissions %}
+                              <menu-item name="Leaves" href="/leaves" icon="bi-calendar-minus"></menu-item>
                               {% endif %}
-                              {% if "locations.view_location" in rp_permissions %}
-                                <menu-item name="Locations" href="/locations" icon="bi-geo-alt"></menu-item>
+                            </menu-section>
+                            <menu-section label="Configurations">
+                              {% if "skills.view_skill" in rp_permissions %}
+                                <menu-item name="Skills" href="/skills" icon="bi-tools"></menu-item>
                                 {% endif %}
-                                {% if "employment_types.view_employmenttype" in rp_permissions %}
-                                  <menu-item name="Employment Types" href="/emp-types" icon="bi-briefcase"></menu-item>
+                                {% if "roles.view_role" in rp_permissions %}
+                                  <menu-item name="Roles" href="/roles" icon="bi-person-badge"></menu-item>
                                   {% endif %}
-                                </menu-section>
-                              </menu-group>
-                              {% if "sprints.view_sprint" in rp_permissions or "projects.view_project" in rp_permissions or "projects.view_programme" in rp_permissions or "projects.view_projecttype" in rp_permissions or "projects.view_projectstatus" in rp_permissions or "configurations.change_configuration" in rp_permissions or "recharges.view_rechargetype" in rp_permissions %}
-                                <menu-group name="Project" icon="bi-kanban">
-                                  {% if "projects.view_project" in rp_permissions or "projects.view_programme" in rp_permissions %}
-                                    <menu-section label="Projects">
-                                      {% if "projects.view_project" in rp_permissions %}
-                                        <menu-item name="Projects" href="/projects/" icon="bi-kanban"></menu-item>
-                                      {% endif %}
-                                      {% if "projects.view_programme" in rp_permissions %}
-                                        <menu-item name="Programmes" href="/programmes/" icon="bi-collection"></menu-item>
-                                      {% endif %}
-                                    </menu-section>
-                                  {% endif %}
-                                  {% if "sprints.view_sprint" in rp_permissions %}
-                                    <menu-section label="Planning">
-                                      <menu-item name="Sprints" href="/sprints/" icon="bi-lightning"></menu-item>
-                                    </menu-section>
-                                  {% endif %}
-                                  {% if "projects.view_projecttype" in rp_permissions or "projects.view_projectstatus" in rp_permissions or "configurations.change_configuration" in rp_permissions or "recharges.view_rechargetype" in rp_permissions %}
-                                    <menu-section label="Configurations">
-                                      {% if "projects.view_projecttype" in rp_permissions %}
-                                        <menu-item name="Project Types" href="/projects/types/" icon="bi-tag"></menu-item>
-                                      {% endif %}
-                                      {% if "projects.view_projectstatus" in rp_permissions %}
-                                        <menu-item name="Project Statuses" href="/projects/statuses/" icon="bi-flag"></menu-item>
-                                      {% endif %}
-                                      {% if "configurations.change_configuration" in rp_permissions %}
-                                        <menu-item name="Project Sizes" href="/projects/sizes/" icon="bi-rulers"></menu-item>
-                                      {% endif %}
-                                      {% if "recharges.view_rechargetype" in rp_permissions %}
-                                        <menu-item name="Recharge Types" href="/recharges/types/" icon="bi-arrow-repeat"></menu-item>
-                                      {% endif %}
-                                    </menu-section>
-                                  {% endif %}
-                                </menu-group>
-                              {% endif %}
-                              {% if "financial_years.view_financialyear" in rp_permissions or "auth.view_user" in rp_permissions or "users.view_group" in rp_permissions or "tags.view_tag" in rp_permissions %}
-                                <menu-group name="Administration" icon="bi-gear">
-                                  {% if "financial_years.view_financialyear" in rp_permissions %}
-                                  <menu-section label="Planning">
-                                    <menu-item name="Financial Years" href="/fy/" icon="bi-calendar2-range"></menu-item>
-                                  </menu-section>
-                                  {% endif %}
-                                  {% if "tags.view_tag" in rp_permissions %}
-                                  <menu-section label="Content">
-                                    <menu-item name="Tags" href="/tags/" icon="bi-hash"></menu-item>
-                                  </menu-section>
-                                  {% endif %}
-                                  {% if "auth.view_user" in rp_permissions or "users.view_group" in rp_permissions %}
-                                  <menu-section label="Users">
-                                    {% if "auth.view_user" in rp_permissions %}
-                                    <menu-item name="Users" href="/users/" icon="bi-people"></menu-item>
+                                  {% if "locations.view_location" in rp_permissions %}
+                                    <menu-item name="Locations" href="/locations" icon="bi-geo-alt"></menu-item>
                                     {% endif %}
-                                    {% if "users.view_group" in rp_permissions %}
-                                    <menu-item name="Groups" href="/groups/" icon="bi-shield-lock"></menu-item>
-                                    {% endif %}
-                                  </menu-section>
-                                  {% endif %}
-                                </menu-group>
-                              {% endif %}
-                              </menu-items>
-                            </menu-bar>
-                          </header>
-                          <fy-flash-banner id="fy-banner" type="warning" link-label="Open Financial Years" link-href="/fy/" dismissable></fy-flash-banner>
-                          <div class="rp-page">
-                            <div class="rp-stack-8 mb-3">
-                              <flash-banner id="page-flash"></flash-banner>
-                            </div>
-                            <div class="rp-page-head">
-                              <div id="page-head-left">
-                                <div class="rp-eyebrow mb-1" id="page-eyebrow">
-                                  {% block page_eyebrow %}
-                                  {% endblock page_eyebrow %}
-                                </div>
-                                <h1 class="rp-page-title" id="page-title">
-                                  {% block page_title %}
-                                    Dashboard
-                                  {% endblock page_title %}
-                                </h1>
-                                <p class="rp-page-sub" id="page-sub">
-                                  {% block page_sub %}
-                                  {% endblock page_sub %}
-                                </p>
-                              </div>
-                              <div class="rp-page-actions" id="page-actions">
-                                {% block page_actions %}
-                                {% endblock page_actions %}
-                              </div>
-                            </div>
-                            {% block content %}
-                            {% endblock content %}
-                          </div>
-                        </main>
-                      </div>
-                    </body>
-                  </html>
+                                    {% if "employment_types.view_employmenttype" in rp_permissions %}
+                                      <menu-item name="Employment Types" href="/emp-types" icon="bi-briefcase"></menu-item>
+                                      {% endif %}
+                                    </menu-section>
+                                  </menu-group>
+                                  {% if "projects.view_project" in rp_permissions or "projects.view_programme" in rp_permissions or "projects.view_projecttype" in rp_permissions or "projects.view_projectstatus" in rp_permissions or "configurations.change_configuration" in rp_permissions or "recharges.view_rechargetype" in rp_permissions %}
+                                    <menu-group name="Project" icon="bi-kanban">
+                                      {% if "projects.view_project" in rp_permissions or "projects.view_programme" in rp_permissions %}
+                                        <menu-section label="Projects">
+                                          {% if "projects.view_project" in rp_permissions %}
+                                            <menu-item name="Projects" href="/projects/" icon="bi-kanban"></menu-item>
+                                            {% endif %}
+                                            {% if "projects.view_project" in rp_permissions %}
+                                              <menu-item name="Demand Requests" href="/demands/" icon="bi-inbox"></menu-item>
+                                              {% endif %}
+                                              {% if "projects.view_programme" in rp_permissions %}
+                                                <menu-item name="Programmes" href="/programmes/" icon="bi-collection"></menu-item>
+                                                {% endif %}
+                                              </menu-section>
+                                            {% endif %}
+                                            {% if "projects.view_project" in rp_permissions or "recharges.view_recharge" in rp_permissions %}
+                                                  <menu-section label="Finance">
+                                                    {% if "projects.view_project" in rp_permissions %}
+                                                      <menu-item name="Burn Tracker" href="/projects/finance/" icon="bi-fire"></menu-item>
+                                                      {% endif %}
+                                                      {% if "recharges.view_recharge" in rp_permissions %}
+                                                        <menu-item name="Recharges" href="/recharges/" icon="bi-cash-stack"></menu-item>
+                                                        {% endif %}
+                                                      </menu-section>
+                                                    {% endif %}
+                                                    {% if "projects.view_projecttype" in rp_permissions or "projects.view_projectstatus" in rp_permissions or "configurations.change_configuration" in rp_permissions or "recharges.view_rechargetype" in rp_permissions %}
+                                                      <menu-section label="Configurations">
+                                                        {% if "projects.view_projecttype" in rp_permissions %}
+                                                          <menu-item name="Project Types" href="/projects/types/" icon="bi-tag"></menu-item>
+                                                          {% endif %}
+                                                          {% if "projects.view_projectstatus" in rp_permissions %}
+                                                            <menu-item name="Project Statuses" href="/projects/statuses/" icon="bi-flag"></menu-item>
+                                                            {% endif %}
+                                                            {% if "configurations.change_configuration" in rp_permissions %}
+                                                              <menu-item name="Project Sizes" href="/projects/sizes/" icon="bi-rulers"></menu-item>
+                                                              {% endif %}
+                                                              {% if "recharges.view_rechargetype" in rp_permissions %}
+                                                                <menu-item name="Recharge Types" href="/recharges/types/" icon="bi-arrow-repeat"></menu-item>
+                                                                {% endif %}
+                                                              </menu-section>
+                                                            {% endif %}
+                                                          </menu-group>
+                                                        {% endif %}
+                                                        {% if "sprints.view_sprint" in rp_permissions or "resource_plans.view_plan" in rp_permissions %}
+                                                          <menu-group name="Planning" icon="bi-calendar3">
+                                                            <menu-section label="Planning">
+                                                              {% if "sprints.view_sprint" in rp_permissions %}
+                                                                <menu-item name="Sprints" href="/sprints/" icon="bi-lightning"></menu-item>
+                                                                {% endif %}
+                                                                {% if "resource_plans.view_plan" in rp_permissions %}
+                                                                  <menu-item name="Resource Plans" href="/resource-plans/" icon="bi-diagram-3"></menu-item>
+                                                                  {% endif %}
+                                                                </menu-section>
+                                                              </menu-group>
+                                                            {% endif %}
+                                                        {% if "wins.view_win" in rp_permissions or "configurations.change_configuration" in rp_permissions %}
+                                                          <menu-group name="Insights" icon="bi-graph-up">
+                                                            {% if "wins.view_win" in rp_permissions %}
+                                                              <menu-section label="Wins">
+                                                                <menu-item name="Weekly Wins" href="/wins/" icon="bi-trophy"></menu-item>
+                                                              </menu-section>
+                                                              {% endif %}
+                                                              {% if "configurations.change_configuration" in rp_permissions %}
+                                                                <menu-section label="Configurations">
+                                                                  <menu-item name="Wins Configuration" href="/wins/config/" icon="bi-sliders"></menu-item>
+                                                                </menu-section>
+                                                                {% endif %}
+                                                              </menu-group>
+                                                            {% endif %}
+                                                        {% if "reports.view_report" in rp_permissions or "reports.view_customreport" in rp_permissions %}
+                                                          <menu-group name="Reports" icon="bi-file-earmark-bar-graph">
+                                                            <menu-section label="Reports">
+                                                              {% if "reports.view_report" in rp_permissions %}
+                                                                <menu-item name="Standard Reports" href="/reports/standard/" icon="bi-bar-chart"></menu-item>
+                                                                {% endif %}
+                                                                {% if "reports.view_customreport" in rp_permissions %}
+                                                                  <menu-item name="Custom Reports" href="/reports/custom/" icon="bi-sliders"></menu-item>
+                                                                  {% endif %}
+                                                                </menu-section>
+                                                              </menu-group>
+                                                            {% endif %}
+                                                        {% if "financial_years.view_financialyear" in rp_permissions or "auth.view_user" in rp_permissions or "users.view_group" in rp_permissions or "tags.view_tag" in rp_permissions or "configurations.change_configuration" in rp_permissions %}
+                                                          <menu-group name="Administration" icon="bi-gear">
+                                                            {% if "financial_years.view_financialyear" in rp_permissions %}
+                                                              <menu-section label="Planning">
+                                                                <menu-item name="Financial Years" href="/fy/" icon="bi-calendar2-range"></menu-item>
+                                                                </menu-section>
+                                                              {% endif %}
+                                                              {% if "tags.view_tag" in rp_permissions %}
+                                                                <menu-section label="Content">
+                                                                  <menu-item name="Tags" href="/tags/" icon="bi-hash"></menu-item>
+                                                                  </menu-section>
+                                                                {% endif %}
+                                                                {% if "configurations.change_configuration" in rp_permissions %}
+                                                                  <menu-section label="Configuration">
+                                                                    <menu-item name="AI" href="/configurations/ai/" icon="bi-robot"></menu-item>
+                                                                    <menu-item name="Security" href="/configurations/security/" icon="bi-shield-check"></menu-item>
+                                                                    </menu-section>
+                                                                  {% endif %}
+                                                                  {% if "auth.view_user" in rp_permissions or "users.view_group" in rp_permissions %}
+                                                                    <menu-section label="Users">
+                                                                      {% if "auth.view_user" in rp_permissions %}
+                                                                        <menu-item name="Users" href="/users/" icon="bi-people"></menu-item>
+                                                                        {% endif %}
+                                                                        {% if "users.view_group" in rp_permissions %}
+                                                                          <menu-item name="Groups" href="/groups/" icon="bi-shield-lock"></menu-item>
+                                                                          {% endif %}
+                                                                        </menu-section>
+                                                                      {% endif %}
+                                                                    </menu-group>
+                                                                  {% endif %}
+                                                                </menu-items>
+                                                              </menu-bar>
+                                                            </header>
+                                                            <fy-flash-banner id="fy-banner" type="warning" link-label="Open Financial Years" link-href="/fy/" dismissable></fy-flash-banner>
+                                                            <div class="rp-page">
+                                                              <div class="rp-stack-8 mb-3">
+                                                                <flash-banner id="page-flash"></flash-banner>
+                                                              </div>
+                                                              <div class="rp-page-head">
+                                                                <div id="page-head-left">
+                                                                  <div class="rp-eyebrow mb-1" id="page-eyebrow">
+                                                                    {% block page_eyebrow %}
+                                                                    {% endblock page_eyebrow %}
+                                                                  </div>
+                                                                  <h1 class="rp-page-title" id="page-title">
+                                                                    {% block page_title %}
+                                                                      Dashboard
+                                                                    {% endblock page_title %}
+                                                                  </h1>
+                                                                  <p class="rp-page-sub" id="page-sub">
+                                                                    {% block page_sub %}
+                                                                    {% endblock page_sub %}
+                                                                  </p>
+                                                                </div>
+                                                                <div class="rp-page-actions" id="page-actions">
+                                                                  {% block page_actions %}
+                                                                  {% endblock page_actions %}
+                                                                </div>
+                                                              </div>
+                                                              {% block content %}
+                                                              {% endblock content %}
+                                                            </div>
+                                                          </main>
+                                                        </div>
+                                                      </body>
+                                                    </html>
