@@ -15,6 +15,7 @@ runs:
       run: |
         test -f apps/web/static/css/dist/styles.min.css
         test -f apps/web/static/css/dist/swagger.min.css
+        test -f apps/web/static/js/dist/ai-config.min.js
         test -f apps/web/static/js/dist/auth.min.js
         test -f apps/web/static/js/dist/business-units.min.js
         test -f apps/web/static/js/dist/components.min.js
@@ -24,12 +25,17 @@ runs:
         test -f apps/web/static/js/dist/leaves.min.js
         test -f apps/web/static/js/dist/locations.min.js
         test -f apps/web/static/js/dist/main.min.js
+        test -f apps/web/static/js/dist/onboarding.min.js
+        test -f apps/web/static/js/dist/products.min.js
         test -f apps/web/static/js/dist/programmes.min.js
         test -f apps/web/static/js/dist/project-sizes.min.js
         test -f apps/web/static/js/dist/project-statuses.min.js
         test -f apps/web/static/js/dist/project-types.min.js
         test -f apps/web/static/js/dist/projects.min.js
+        test -f apps/web/static/js/dist/recharge-email-review.min.js
         test -f apps/web/static/js/dist/recharge-types.min.js
+        test -f apps/web/static/js/dist/recharges.min.js
+        test -f apps/web/static/js/dist/resource-plans.min.js
         test -f apps/web/static/js/dist/roles.min.js
         test -f apps/web/static/js/dist/setup.min.js
         test -f apps/web/static/js/dist/skills.min.js

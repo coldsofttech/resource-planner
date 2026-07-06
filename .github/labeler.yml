@@ -39,3 +39,14 @@ tests:
 test-tracker:
   - changed-files:
       - any-glob-to-any-file: "tools/test-tracker/**"
+
+security:
+  - changed-files:
+      - any-glob-to-any-file: ".github/workflows/security.yml"
+      - any-glob-to-any-file: ".github/workflows/semgrep.yml"
+      - any-glob-to-any-file: ".github/workflows/dependency-review.yml"
+      - any-glob-to-any-file: "pyproject.toml"
+      - any-glob-to-any-file: "apps/web/apps/auth/**"
+      - any-glob-to-any-file: "apps/web/apps/oauth/**"
+      - any-glob-to-any-file: "apps/web/apps/saml/**"
+      - any-glob-to-any-file: "apps/web/apps/permissions/**"
