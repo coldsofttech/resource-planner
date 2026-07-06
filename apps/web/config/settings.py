@@ -90,6 +90,7 @@ INSTALLED_APPS = [
     "apps.notifications.apps.NotificationsConfig",
     "apps.reports.apps.ReportConfig",
     "apps.resource_plans.apps.ResourcePlanConfig",
+    "apps.wins.apps.WinsConfig",
 ]
 
 MIDDLEWARE = [

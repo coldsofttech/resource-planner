@@ -68,6 +68,7 @@ urlpatterns = [
     path("", include("apps.notifications.urls")),
     path("", include("apps.reports.urls")),
     path("", include("apps.resource_plans.urls")),
+    path("", include("apps.wins.urls")),
     path("api/v1/", include("apps.setup.api_urls")),
     path("api/v1/", include("apps.meta.api_urls")),
     path("api/v1/", include("apps.auth.api_urls")),
@@ -93,6 +94,7 @@ urlpatterns = [
     path("api/v1/", include("apps.notifications.api_urls")),
     path("api/v1/", include("apps.reports.api_urls")),
     path("api/v1/", include("apps.resource_plans.api_urls")),
+    path("api/v1/", include("apps.wins.api_urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

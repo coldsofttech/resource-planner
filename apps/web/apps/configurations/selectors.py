@@ -306,3 +306,14 @@ class PasswordPolicy:
     @staticmethod
     def get_history_count() -> int:
         return int(get_config_value("PASSWORD_HISTORY_COUNT"))
+
+
+class Wins:
+    @staticmethod
+    def get_start_number() -> int:
+        return int(get_config_value("WIN_START_NUMBER"))
+
+    @staticmethod
+    def get_review_email_recipients() -> list[str]:
+        raw = get_config_value("WINS_REVIEW_EMAIL_RECIPIENTS")
+        return [addr.strip() for addr in raw.split(",") if addr.strip()]

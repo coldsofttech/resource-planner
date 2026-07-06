@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Monthly Wins
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/wins.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Insights / Weekly Wins
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Monthly Wins
+{% endblock page_title %}
+{% block page_sub %}
+  Run the Delivery and Operational Excellence nomination rounds across weeks.
+{% endblock page_sub %}
+{% block page_actions %}
+  <secondary-button id="rp-monthly-wins-recipients-btn" label="Manage Recipients" prefix-icon="bi-people" hidden></secondary-button>
+  <primary-button id="rp-monthly-wins-add-btn" label="New Survey" prefix-icon="bi-plus-lg" hidden></primary-button>
+{% endblock page_actions %}
+{% block content %}
+  <list-view show-active-filters>
+    <filter-panel id="rp-monthly-wins-filter-panel">
+      <search-field id="rp-monthly-wins-search" name="search" placeholder="Search monthly wins..." shortcut="/" show-label></search-field>
+    </filter-panel>
+    <data-table id="rp-monthly-wins-table"
+                url="/api/v1/wins/monthly/"
+                paginated
+                page-size="25"
+                row-template="renderMonthlyWinsRow"
+                empty-message="No Monthly Wins found.">
+      <table-columns>
+        <table-column label="Name" key="name" sortable>
+        </table-column>
+        <table-column label="Status" key="status">
+        </table-column>
+        <table-column label="Weeks" key="weeks_count" width="80px">
+        </table-column>
+        <table-column label="Phase 1 Deadline" key="phase1_deadline" hide-mobile>
+        </table-column>
+        <table-column label="Phase 2 Deadline" key="phase2_deadline" hide-mobile>
+        </table-column>
+        <table-column label="Created" key="created_at" sortable hide-mobile>
+        </table-column>
+      </table-columns>
+      <table-actions>
+        {% if can_delete_monthlywin %}
+          <table-action icon="bi-trash" label="Delete" event="rp:monthly-win:delete" danger>
+          </table-action>
+        {% endif %}
+      </table-actions>
+    </data-table>
+  </list-view>
+
+  <!-- New Survey drawer -->
+  <drawer-modal id="rp-monthly-win-create-drawer" width="600">
+    <drawer-header eyebrow="New survey" title="Start a new Monthly Win" no-sizes></drawer-header>
+    <drawer-panel>
+      <div class="row g-3">
+        <text-field id="rp-new-monthly-win-name" col="col-12" label="Name" placeholder="e.g. January 2026 Monthly Wins" required maxlength="255" show-counter></text-field>
+        <wins-week-field id="rp-new-monthly-win-weeks" col="col-12" label="Weeks to include" multi-select required show-label></wins-week-field>
+        <date-field id="rp-new-monthly-win-phase1-deadline" col="col-12" label="Phase 1 Deadline" hint="Surveys must be submitted by end of day on this date."></date-field>
+      </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Create survey" primary-icon="bi-check2"> </drawer-footer>
+  </drawer-modal>
+
+  <delete-modal id="rp-monthly-win-delete-modal" action-label="Delete Monthly Win"></delete-modal>
+
+  <!-- Manage Recipients drawer -->
+  <drawer-modal id="rp-monthly-recipients-drawer" width="800">
+    <drawer-header eyebrow="Monthly Wins" title="Manage Recipients" no-sizes></drawer-header>
+    <drawer-panel>
+      <hint-field type="info" col="col-12" title="Recipients">
+        Recipients receive the Phase 1 and Phase 2 surveys for their team(s).
+      </hint-field>
+      <div class="row g-3 mt-1">
+        <team-field id="rp-new-recipient-team" col="col-6" label="Team" show-label required></team-field>
+        <member-field id="rp-new-recipient-user" col="col-6" label="Member" show-label required></member-field>
+      </div>
+      <div class="d-flex justify-content-end mt-2 mb-3">
+        <primary-button id="rp-recipient-add-btn" label="Add Recipient" prefix-icon="bi-plus-lg"></primary-button>
+      </div>
+      <data-table id="rp-recipients-table"
+                  url="/api/v1/wins/monthly/recipients/"
+                  paginated
+                  page-size="25"
+                  row-template="renderRecipientsRow"
+                  empty-message="No recipients configured yet.">
+        <table-columns>
+          <table-column label="Team" key="team" width="160px">
+          </table-column>
+          <table-column label="Member" key="user">
+          </table-column>
+        </table-columns>
+        <table-actions>
+          {% if can_change_monthlywinsrecipient %}
+            <table-action icon="bi-pencil" label="Edit" event="rp:recipient:edit">
+            </table-action>
+          {% endif %}
+          {% if can_delete_monthlywinsrecipient %}
+            <table-action icon="bi-trash" label="Delete" event="rp:recipient:delete" danger>
+            </table-action>
+          {% endif %}
+        </table-actions>
+      </data-table>
+    </drawer-panel>
+    <drawer-footer close="Close"> </drawer-footer>
+  </drawer-modal>
+
+  <!-- Edit Recipient drawer (stacked above Manage Recipients) -->
+  <drawer-modal id="rp-recipient-edit-drawer" width="500">
+    <drawer-header eyebrow="Edit record" title="Edit recipient" no-sizes></drawer-header>
+    <drawer-panel>
+      <div class="row g-3">
+        <team-field id="rp-edit-recipient-team" col="col-12" label="Team" show-label required></team-field>
+        <member-field id="rp-edit-recipient-user" col="col-12" label="Member" show-label required></member-field>
+      </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Save changes" primary-icon="bi-check2"> </drawer-footer>
+  </drawer-modal>
+
+  <delete-modal id="rp-recipient-delete-modal" action-label="Remove recipient"></delete-modal>
+{% endblock content %}

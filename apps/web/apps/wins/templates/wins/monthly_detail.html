@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Monthly Win
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/wins.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Insights / Weekly Wins / Monthly Wins
+{% endblock page_eyebrow %}
+{% block page_title %}
+  <span id="rp-monthly-win-detail-title">Monthly Win</span>
+{% endblock page_title %}
+{% block page_actions %}
+  <secondary-button id="rp-monthly-win-preview-phase1-btn" label="Preview Phase 1" prefix-icon="bi-eye" hidden></secondary-button>
+  <primary-button id="rp-monthly-win-launch-phase1-btn" label="Launch Phase 1" prefix-icon="bi-play-fill" hidden></primary-button>
+  <success-button id="rp-monthly-win-complete-phase1-btn" label="Complete Phase 1" prefix-icon="bi-check2-circle" hidden></success-button>
+  <secondary-button id="rp-monthly-win-preview-phase2-btn" label="Preview Phase 2" prefix-icon="bi-eye" hidden></secondary-button>
+  <primary-button id="rp-monthly-win-launch-phase2-btn" label="Launch Phase 2" prefix-icon="bi-play-fill" hidden></primary-button>
+  <success-button id="rp-monthly-win-complete-phase2-btn" label="Complete Phase 2" prefix-icon="bi-check2-circle" hidden></success-button>
+  <success-button id="rp-monthly-win-declare-btn" label="Declare Winners" prefix-icon="bi-trophy" hidden></success-button>
+  <secondary-button id="rp-monthly-win-download-results-btn" label="Download Results" prefix-icon="bi-file-earmark-pdf" hidden></secondary-button>
+  <success-button id="rp-monthly-win-send-results-btn" label="Send Results" prefix-icon="bi-send" hidden></success-button>
+{% endblock page_actions %}
+{% block content %}
+  <section-panel>
+    <panel-body>
+      <div class="row g-3">
+        <view-field id="rp-monthly-win-detail-status" label="Status" col="col-6 col-md-3"></view-field>
+        <view-field id="rp-monthly-win-detail-weeks" label="Weeks" col="col-6 col-md-3"></view-field>
+        <view-field id="rp-monthly-win-detail-phase1-deadline" label="Phase 1 Deadline" col="col-6 col-md-3" meta></view-field>
+        <view-field id="rp-monthly-win-detail-phase2-deadline" label="Phase 2 Deadline" col="col-6 col-md-3" meta></view-field>
+      </div>
+    </panel-body>
+  </section-panel>
+
+  <div class="mt-4">
+    <section-panel>
+      <panel-title>How it works</panel-title>
+      <panel-body>
+        <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
+          <li class="d-flex align-items-start gap-2"><icon-field icon="bi-1-circle-fill" color="muted"></icon-field> <span><strong>Draft</strong> — select the weeks to include, then launch Phase 1 when ready.</span></li>
+          <li class="d-flex align-items-start gap-2"><icon-field icon="bi-2-circle-fill" color="info"></icon-field> <span><strong>Phase 1</strong> — each recipient is emailed a survey to nominate up to 2 wins per category, per team.</span></li>
+          <li class="d-flex align-items-start gap-2"><icon-field icon="bi-3-circle-fill" color="warning"></icon-field> <span><strong>Phase 1 Closed</strong> — no more Phase 1 nominations are accepted. Review nominations before launching Phase 2.</span></li>
+          <li class="d-flex align-items-start gap-2"><icon-field icon="bi-4-circle-fill" color="info"></icon-field> <span><strong>Phase 2</strong> — one consolidated survey per recipient covering all nominated wins; final selection of up to 2 per category.</span></li>
+          <li class="d-flex align-items-start gap-2"><icon-field icon="bi-5-circle-fill" color="warning"></icon-field> <span><strong>Phase 2 Closed</strong> — no more Phase 2 votes are accepted.</span></li>
+          <li class="d-flex align-items-start gap-2"><icon-field icon="bi-check-circle-fill" color="success"></icon-field> <span><strong>Wins Declared</strong> — the top 2 wins per category are ranked from Phase 2 votes. Download or send the results at any time.</span></li>
+        </ul>
+      </panel-body>
+    </section-panel>
+  </div>
+
+  <div class="mt-4">
+    <section-panel>
+      <panel-title>Surveys</panel-title>
+      <panel-body>
+        <data-table id="rp-monthly-win-surveys-table"
+                    row-template="renderMonthlySurveyRow"
+                    empty-message="No surveys have been sent yet.">
+          <table-columns>
+            <table-column label="Recipient" key="recipient">
+            </table-column>
+            <table-column label="Phase" key="phase" width="100px">
+            </table-column>
+            <table-column label="Teams" key="teams" hide-mobile>
+            </table-column>
+            <table-column label="Status" key="status" width="110px">
+            </table-column>
+            <table-column label="Sent" key="sent_at" hide-mobile>
+            </table-column>
+          </table-columns>
+          <table-actions>
+            {% if can_manage_monthlywin %}
+              <table-action icon="bi-pencil-square" label="Override" event="rp:survey:override">
+              </table-action>
+            {% endif %}
+          </table-actions>
+        </data-table>
+      </panel-body>
+    </section-panel>
+  </div>
+
+  <div class="mt-4" id="rp-monthly-win-results-col" hidden>
+    <section-panel>
+      <panel-title>Declared Results</panel-title>
+      <panel-body>
+        <div id="rp-monthly-win-results-body"></div>
+      </panel-body>
+    </section-panel>
+  </div>
+
+  <!-- Preview drawer (read-only, shared for Phase 1 / Phase 2) -->
+  <drawer-modal id="rp-monthly-win-preview-drawer" width="700">
+    <drawer-header eyebrow="Read-only preview" title="Survey Preview" id="rp-monthly-win-preview-header" no-sizes></drawer-header>
+    <drawer-panel>
+      <p class="rp-muted" id="rp-monthly-win-preview-subtitle">Select a team to see the exact survey recipients will receive.</p>
+      <div class="row g-3" id="rp-monthly-win-preview-team-row">
+        <dropdown-field id="rp-monthly-win-preview-team" col="col-12" label="Select Team to Preview"></dropdown-field>
+      </div>
+      <hint-field type="info" col="col-12" title="Read-only">
+        This is a read-only preview of what recipients will see.
+      </hint-field>
+      <div id="rp-monthly-win-preview-body" class="mt-3"></div>
+    </drawer-panel>
+    <drawer-footer close="Close"> </drawer-footer>
+  </drawer-modal>
+
+  <!-- Override survey drawer -->
+  <drawer-modal id="rp-monthly-win-override-drawer" width="700">
+    <drawer-header eyebrow="Admin override" title="Override Survey" id="rp-monthly-win-override-header" no-sizes></drawer-header>
+    <drawer-panel>
+      <hint-field type="warning" col="col-12" title="Overriding a survey">
+        Use this only if the recipient could not submit their survey in time. This will mark the survey as overridden and cannot be undone.
+      </hint-field>
+      <div id="rp-monthly-win-override-body" class="mt-3"></div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Save override" primary-icon="bi-check2"> </drawer-footer>
+  </drawer-modal>
+{% endblock content %}

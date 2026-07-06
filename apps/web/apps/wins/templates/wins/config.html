@@ -1,0 +1,57 @@
+{% extends "base.html" %} {% load static %} {% block title %} Wins Configuration {% endblock title %} {% block scripts
+%}
+<script type="module" src="{% static 'js/dist/wins.min.js' %}"></script>
+{% endblock scripts %} {% block page_eyebrow %} Insights / Wins / Configurations {% endblock page_eyebrow %} {% block
+page_title %} Wins Configuration {% endblock page_title %} {% block page_sub %} Configure Weekly Win week numbering and
+review email recipients. {% endblock page_sub %} {% block content %}
+<section-panel>
+  <panel-title>Weekly Wins</panel-title>
+  <panel-body>
+    <div class="row g-3">
+      <div class="col-12 col-md-6 col-xl-4">
+        {% if can_change_wins_config %}
+        <number-field
+          id="rp-wins-config-start-number"
+          label="Win Start Number"
+          placeholder="1"
+          min="1"
+          required
+          show-label
+        ></number-field>
+        {% else %}
+        <view-field id="rp-wins-config-start-number-view" label="Win Start Number" show-label></view-field>
+        {% endif %}
+        <div class="mt-2">
+          <hint-field
+            >Starting week number assigned to the first Weekly Win entry. Subsequent weeks auto-increment from this
+            value.</hint-field
+          >
+        </div>
+      </div>
+      <div class="col-12 col-md-6 col-xl-8">
+        {% if can_change_wins_config %}
+        <text-field
+          id="rp-wins-config-review-recipients"
+          label="Review Email Recipients"
+          placeholder="manager@example.com, team@example.com"
+          show-label
+        ></text-field>
+        {% else %}
+        <view-field id="rp-wins-config-review-recipients-view" label="Review Email Recipients" show-label></view-field>
+        {% endif %}
+        <div class="mt-2">
+          <hint-field
+            >Comma-separated list of email addresses that receive the Weekly Wins review document when Review Complete
+            is triggered.</hint-field
+          >
+        </div>
+      </div>
+    </div>
+    {% if can_change_wins_config %}
+    <div class="mt-4 d-flex justify-content-end">
+      <primary-button id="rp-wins-config-save-btn" label="Save Changes" prefix-icon="bi-check2"></primary-button>
+    </div>
+    {% endif %}
+  </panel-body>
+</section-panel>
+{% endblock content %}

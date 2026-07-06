@@ -690,6 +690,35 @@ _AI_DEFAULTS = {
 }
 
 
+_WINS_DEFAULTS = {
+    "WIN_START_NUMBER": {
+        "label": "Win Start Number",
+        "value": "1",
+        "description": (
+            "The starting week number assigned to the first Weekly Win entry. "
+            "Subsequent weeks auto-increment from this value."
+        ),
+        "data_type": "integer",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "wins",
+    },
+    "WINS_REVIEW_EMAIL_RECIPIENTS": {
+        "label": "Weekly Win Review Email Recipients",
+        "value": "",
+        "description": (
+            "Comma-separated list of email addresses that receive the Weekly "
+            "Wins review document when Review Complete is triggered "
+            "(e.g. manager@example.com, team@example.com)."
+        ),
+        "data_type": "string",
+        "is_secret": False,  # nosec B105
+        "is_admin": False,
+        "module": "wins",
+    },
+}
+
+
 CONFIGURATION_DEFAULTS = {
     **_SETUP_DEFAULTS,
     **_GENERAL_DEFAULTS,
@@ -703,4 +732,5 @@ CONFIGURATION_DEFAULTS = {
     **_PROJECT_DEFAULTS,
     **_AI_DEFAULTS,
     **_SECURITY_PASSWORD_DEFAULTS,
+    **_WINS_DEFAULTS,
 }

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Weekly Wins
+{% endblock title %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/dist/wins.min.js' %}"></script>
+{% endblock scripts %}
+{% block page_eyebrow %}
+  Insights
+{% endblock page_eyebrow %}
+{% block page_title %}
+  Weekly Wins
+{% endblock page_title %}
+{% block page_sub %}
+  Track and review each team's weekly wins.
+{% endblock page_sub %}
+{% block page_actions %}
+  <secondary-button id="rp-wins-monthly-btn" label="Monthly Wins" prefix-icon="bi-trophy" hidden></secondary-button>
+  <primary-button id="rp-wins-add-btn" label="New Week" prefix-icon="bi-plus-lg" hidden></primary-button>
+{% endblock page_actions %}
+{% block content %}
+  <list-view show-active-filters>
+    <filter-panel id="rp-wins-filter-panel">
+      <search-field id="rp-wins-search" name="search" placeholder="Search weeks..." shortcut="/" show-label></search-field>
+    </filter-panel>
+    <data-table id="rp-wins-table"
+                url="/api/v1/wins/"
+                paginated
+                page-size="25"
+                row-template="renderWinsRow"
+                empty-message="No Weekly Wins found.">
+      <table-columns>
+        <table-column label="Week" key="week_number" sortable width="90px">
+        </table-column>
+        <table-column label="Start Date" key="start_date" sortable>
+        </table-column>
+        <table-column label="End Date" key="end_date" sortable>
+        </table-column>
+        <table-column label="Entries" key="entries_count" width="90px">
+        </table-column>
+        <table-column label="Teams Submitted" key="teams">
+        </table-column>
+        <table-column label="Status" key="status">
+        </table-column>
+      </table-columns>
+      <table-actions>
+        {% if can_delete_win %}
+          <table-action icon="bi-trash" label="Delete" event="rp:win:delete" danger>
+          </table-action>
+        {% endif %}
+      </table-actions>
+    </data-table>
+  </list-view>
+  <!-- New Week drawer -->
+  <drawer-modal id="rp-win-create-drawer" width="500">
+    <drawer-header eyebrow="New week" title="Start a new Weekly Win week" no-sizes></drawer-header>
+    <drawer-panel>
+      <div class="row g-3">
+        <date-field id="rp-new-win-start-date" col="col-12" label="Week start date" required></date-field>
+      </div>
+    </drawer-panel>
+    <drawer-footer close="Cancel" primary="Create week" primary-icon="bi-check2"> </drawer-footer>
+  </drawer-modal>
+  <delete-modal id="rp-win-delete-modal" action-label="Delete week"></delete-modal>
+{% endblock content %}

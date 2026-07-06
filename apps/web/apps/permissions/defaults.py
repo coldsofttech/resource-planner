@@ -705,6 +705,68 @@ _SPRINTS_CATEGORIES = {
     ],
 }
 
+_WINS_CATEGORIES = {
+    "module": "wins",
+    "entries": [
+        {
+            "name": "View",
+            "codename": "view",
+            "order": 1,
+            "perms": [
+                "wins.view_win",
+                "wins.view_winentry",
+            ],
+        },
+        {
+            "name": "Manage",
+            "codename": "manage",
+            "order": 2,
+            "perms": [
+                "wins.view_win",
+                "wins.add_win",
+                "wins.delete_win",
+                "wins.view_winentry",
+                "wins.add_winentry",
+                "wins.change_winentry",
+                "wins.delete_winentry",
+            ],
+        },
+        {
+            "name": "Review",
+            "codename": "review",
+            "order": 3,
+            "perms": [
+                "wins.view_win",
+                "wins.review_complete_win",
+            ],
+        },
+        {
+            "name": "Monthly Wins",
+            "codename": "monthly",
+            "order": 4,
+            "perms": [
+                "wins.view_monthlywin",
+                "wins.add_monthlywin",
+                "wins.change_monthlywin",
+                "wins.delete_monthlywin",
+                "wins.view_monthlywinsrecipient",
+                "wins.add_monthlywinsrecipient",
+                "wins.change_monthlywinsrecipient",
+                "wins.delete_monthlywinsrecipient",
+            ],
+        },
+        {
+            "name": "Monthly Wins — Manage Phases",
+            "codename": "monthly_manage",
+            "order": 5,
+            "perms": [
+                "wins.view_monthlywin",
+                "wins.manage_monthlywin",
+            ],
+        },
+    ],
+}
+
 _REPORTS_CATEGORIES = {
     "module": "reports",
     "entries": [
@@ -778,4 +840,5 @@ PERMISSION_CATEGORIES = [
     _SPRINTS_CATEGORIES,
     _TEAMS_CATEGORIES,
     _USERS_CATEGORIES,
+    _WINS_CATEGORIES,
 ]
