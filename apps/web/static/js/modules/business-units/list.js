@@ -132,32 +132,6 @@ function initToggleModals(table) {
   deactivateModal.addEventListener("rp:confirm", () => handleToggleConfirm(deactivateModal, false));
 }
 
-function openViewDrawer(row) {
-  const drawer = document.getElementById("rp-business-unit-view-drawer");
-  if (!drawer) return;
-
-  pendingRow = row;
-
-  document.getElementById("rp-view-business-unit-identicon")?.setAttribute("name", row.name);
-  document.getElementById("rp-view-business-unit-identicon")?.setAttribute("variant", "monogram");
-
-  drawer.setTitle(row.name);
-
-  const setView = (id, val) => {
-    const el = document.getElementById(id);
-    if (el) el.value = val || "—";
-  };
-
-  setView("rp-view-business-unit-name", row.name);
-  setView("rp-view-business-unit-short-name", row.short_name);
-  setView("rp-view-business-unit-code", row.code);
-  setView("rp-view-business-unit-status", row.is_active ? "Active" : "Inactive");
-  setView("rp-view-business-unit-created", formatDate(row.created_at));
-  setView("rp-view-business-unit-created-by", row.created_by?.email || "—");
-
-  drawer.show();
-}
-
 function openEditDrawer(row) {
   const drawer = document.getElementById("rp-business-unit-edit-drawer");
   if (!drawer) return;
@@ -246,10 +220,7 @@ function initEditDrawer(table) {
   });
 }
 
-function initViewDrawer(table) {
-  const drawer = document.getElementById("rp-business-unit-view-drawer");
-  if (!drawer) return;
-
+function initRowNavigation(table) {
   table.addEventListener("click", (e) => {
     if (e.target.closest("[data-rp-action]") || e.target.closest(".rp-table-more-btn")) return;
     const tr = e.target.closest("tr[data-rp-row]");
@@ -257,13 +228,7 @@ function initViewDrawer(table) {
     const idx = parseInt(tr.getAttribute("data-rp-row"), 10);
     const row = table.rows[idx];
     if (!row) return;
-    openViewDrawer(row);
-  });
-
-  drawer.addEventListener("rp:footer-primary", () => {
-    if (!pendingRow) return;
-    drawer.hide();
-    openEditDrawer(pendingRow);
+    window.location.href = UI_URLS.businessUnits.detail(row.code);
   });
 }
 
@@ -375,7 +340,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ]);
 
   initActions(table);
-  initViewDrawer(table);
+  initRowNavigation(table);
 
   if (hasPermission("business_units.add_businessunit")) {
     document.getElementById("rp-business-units-add-btn")?.removeAttribute("hidden");

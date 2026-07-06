@@ -7,6 +7,7 @@ export const UI_URLS = {
     login: () => "/login/",
     forgotPassword: () => "/forgot-password/",
     register: () => "/register/",
+    forceChangePassword: () => "/change-password-required/",
   },
   setup: {
     wizard: () => "/setup/",
@@ -51,6 +52,19 @@ export const UI_URLS = {
   fy: {
     list: () => "/fy/",
   },
+  reports: {
+    standardList: () => "/reports/standard/",
+    standardWeeklyWins: () => "/reports/standard/weekly-wins/",
+    standardMonthlyWins: () => "/reports/standard/monthly-wins/",
+    standardSprintForecastVsActuals: () => "/reports/standard/sprint-forecast-vs-actuals/",
+    standardDemandVsCapacity: () => "/reports/standard/demand-vs-capacity/",
+    standardDemandVsCapacityConfig: () => "/reports/standard/demand-vs-capacity/config/",
+    standardKpiEstimateAccuracy: () => "/reports/standard/kpi-estimate-accuracy/",
+    standardKpiEstimateAccuracyConfig: () => "/reports/standard/kpi-estimate-accuracy/config/",
+    standardMonthlyFinanceReport: () => "/reports/standard/monthly-finance-report/",
+    customList: () => "/reports/custom/",
+    customBuilder: (code) => `/reports/custom/${code}/`,
+  },
   sprints: {
     list: () => "/sprints/",
     detail: (code) => `/sprints/${code}/`,
@@ -66,6 +80,15 @@ export const UI_URLS = {
   },
   businessUnits: {
     list: () => "/bu/",
+    detail: (code) => `/bu/${code}/`,
+  },
+  onboarding: {
+    portal: () => "/onboarding/",
+    review: () => "/demands/",
+    create: () => "/demands/new/",
+  },
+  products: {
+    list: () => "/products/",
   },
   projectSizes: {
     list: () => "/projects/sizes/",
@@ -74,8 +97,13 @@ export const UI_URLS = {
     list: () => "/projects/types/",
   },
   recharges: {
+    index: () => "/recharges/",
+    detail: (code) => `/recharges/${code}/`,
     types: () => "/recharges/types/",
-    detail: (code) => `/recharges/types/${code}/`,
+    typeDetail: (code) => `/recharges/types/${code}/`,
+    projectGroups: () => "/recharges/project-groups/",
+    emailReviewForecasts: (sprintCode) => `/recharges/${sprintCode}/forecasts/`,
+    emailReviewActuals: (sprintCode) => `/recharges/${sprintCode}/actuals/`,
   },
   projectStatuses: {
     list: () => "/projects/statuses/",
@@ -83,6 +111,44 @@ export const UI_URLS = {
   projects: {
     list: () => "/projects/",
     detail: (code) => `/projects/${code}/`,
+  },
+  wins: {
+    list: () => "/wins/",
+    detail: (code) => `/wins/${code}/`,
+    monthlyList: () => "/wins/monthly/",
+    monthlyDetail: (code) => `/wins/monthly/${code}/`,
+    monthlySurvey: (token) => `/wins/monthly/survey/${token}/`,
+  },
+  winsConfig: {
+    page: () => "/wins/config/",
+  },
+  aiConfig: {
+    page: () => "/configurations/ai/",
+  },
+  securityConfig: {
+    page: () => "/configurations/security/",
+  },
+  notifications: {
+    list: () => "/notifications/",
+    preferences: () => "/notifications/preferences/",
+  },
+  toDo: {
+    list: () => "/to-do/",
+    preferences: () => "/to-do/preferences/",
+  },
+  resourcePlans: {
+    list: () => "/resource-plans/",
+    detail: (code) => `/resource-plans/${code}/`,
+    versionDetail: (code, version) => `/resource-plans/${code}/versions/v${version}/`,
+    versionGrid: (code, version) => `/resource-plans/${code}/versions/v${version}/grid/`,
+    versionConflicts: (code, version) => `/resource-plans/${code}/versions/v${version}/conflicts/`,
+    versionPlaceholderLeaves: (code, version) =>
+      `/resource-plans/${code}/versions/v${version}/placeholder-leaves/`,
+    versionUtilisation: (code, version) =>
+      `/resource-plans/${code}/versions/v${version}/utilisation/`,
+    versionSnapshots: (code, version) => `/resource-plans/${code}/versions/v${version}/snapshots/`,
+    versionSnapshotAllocations: (code, version, snapshotCode) =>
+      `/resource-plans/${code}/versions/v${version}/snapshots/${snapshotCode}/allocations/`,
   },
 };
 
@@ -115,6 +181,10 @@ export const API_URLS = {
     },
     logout: () => ({ method: "POST", href: `${API_BASE}auth/logout/` }),
     me: () => ({ method: "GET", href: `${API_BASE}auth/me/` }),
+    forceChangePassword: () => ({
+      method: "POST",
+      href: `${API_BASE}auth/force-change-password/`,
+    }),
   },
   users: {
     me: () => ({ method: "GET", href: `${API_BASE}users/me/` }),
@@ -350,6 +420,7 @@ export const API_URLS = {
     create: () => ({ method: "POST", href: `${API_BASE}sprints/` }),
     stats: () => ({ method: "GET", href: `${API_BASE}sprints/stats/` }),
     options: () => ({ method: "GET", href: `${API_BASE}sprints/options/` }),
+    months: () => ({ method: "GET", href: `${API_BASE}sprints/months/` }),
     active: () => ({ method: "GET", href: `${API_BASE}sprints/active/` }),
     generate: () => ({ method: "POST", href: `${API_BASE}sprints/generate/` }),
     detail: (code) => ({ method: "GET", href: `${API_BASE}sprints/${code}/` }),
@@ -457,10 +528,34 @@ export const API_URLS = {
       method: "POST",
       href: `${API_BASE}sprints/${sprintCode}/actuals/review-complete/`,
     }),
+    actualsProjects: (sprintCode) => ({
+      method: "GET",
+      href: `${API_BASE}sprints/${sprintCode}/actuals/projects/`,
+    }),
+    actualsSyncProjectActuals: (sprintCode) => ({
+      method: "POST",
+      href: `${API_BASE}sprints/${sprintCode}/actuals/sync-project-actuals/`,
+    }),
   },
   projectSizes: {
     get: () => ({ method: "GET", href: `${API_BASE}projects/sizes/` }),
     update: () => ({ method: "PATCH", href: `${API_BASE}projects/sizes/` }),
+  },
+  projectActuals: {
+    list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/actuals/` }),
+    summary: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/actuals/summary/` }),
+    config: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/actuals/config/` }),
+    updateConfig: (code) => ({
+      method: "PATCH",
+      href: `${API_BASE}projects/${code}/actuals/config/`,
+    }),
+  },
+  burnTracker: {
+    list: () => ({ method: "GET", href: `${API_BASE}projects/burn-tracker/` }),
+    markDone: (code) => ({
+      method: "POST",
+      href: `${API_BASE}projects/burn-tracker/${code}/done/`,
+    }),
   },
   projectBudgets: {
     list: (code) => ({ method: "GET", href: `${API_BASE}projects/${code}/budgets/` }),
@@ -485,6 +580,35 @@ export const API_URLS = {
     exportSpecs: () => ({ method: "GET", href: `${API_BASE}projects/budgets/export/specs/` }),
     export: () => ({ method: "GET", href: `${API_BASE}projects/budgets/export/` }),
   },
+  recharges: {
+    summary: (sprintCode) => ({
+      method: "GET",
+      href: `${API_BASE}recharges/summary/?sprint=${encodeURIComponent(sprintCode)}`,
+    }),
+    list: (sprintCode, type) => ({
+      method: "GET",
+      href: `${API_BASE}recharges/?sprint=${encodeURIComponent(sprintCode)}&type=${encodeURIComponent(type)}`,
+    }),
+    details: (code, groupBy) => ({
+      method: "GET",
+      href: `${API_BASE}recharges/${encodeURIComponent(code)}/details/?group_by=${encodeURIComponent(groupBy)}`,
+    }),
+    jira: (code) => ({
+      method: "GET",
+      href: `${API_BASE}recharges/${encodeURIComponent(code)}/jira/`,
+    }),
+  },
+  rechargeEmails: {
+    list: (sprintCode, type) => ({
+      method: "GET",
+      href: `${API_BASE}recharges/email-review/?sprint=${encodeURIComponent(sprintCode)}&type=${encodeURIComponent(type)}`,
+    }),
+    triggerAll: () => ({ method: "POST", href: `${API_BASE}recharges/email-review/trigger/` }),
+    resend: (code) => ({
+      method: "POST",
+      href: `${API_BASE}recharges/email-review/${encodeURIComponent(code)}/resend/`,
+    }),
+  },
   rechargeTypes: {
     list: () => ({ method: "GET", href: `${API_BASE}recharges/types/` }),
     create: () => ({ method: "POST", href: `${API_BASE}recharges/types/` }),
@@ -506,6 +630,14 @@ export const API_URLS = {
     import: () => ({ method: "POST", href: `${API_BASE}recharges/types/import/` }),
     exportSpecs: () => ({ method: "GET", href: `${API_BASE}recharges/types/export/specs/` }),
     export: () => ({ method: "GET", href: `${API_BASE}recharges/types/export/` }),
+  },
+  rechargeProjectGroups: {
+    list: () => ({ method: "GET", href: `${API_BASE}recharges/project-groups/` }),
+    create: () => ({ method: "POST", href: `${API_BASE}recharges/project-groups/` }),
+    stats: () => ({ method: "GET", href: `${API_BASE}recharges/project-groups/stats/` }),
+    detail: (code) => ({ method: "GET", href: `${API_BASE}recharges/project-groups/${code}/` }),
+    update: (code) => ({ method: "PATCH", href: `${API_BASE}recharges/project-groups/${code}/` }),
+    delete: (code) => ({ method: "DELETE", href: `${API_BASE}recharges/project-groups/${code}/` }),
   },
   projectTypeMappings: {
     list: (rc) => ({ method: "GET", href: `${API_BASE}recharges/types/${rc}/mappings/` }),
@@ -647,6 +779,51 @@ export const API_URLS = {
     import: () => ({ method: "POST", href: `${API_BASE}bu/import/` }),
     exportSpecs: () => ({ method: "GET", href: `${API_BASE}bu/export/specs/` }),
     export: () => ({ method: "GET", href: `${API_BASE}bu/export/` }),
+  },
+  onboarding: {
+    submit: () => ({ method: "POST", href: `${API_BASE}onboarding/submit/` }),
+    options: () => ({ method: "GET", href: `${API_BASE}onboarding/options/` }),
+    stats: () => ({ method: "GET", href: `${API_BASE}onboarding/stats/` }),
+    uploadAttachment: (code) => ({
+      method: "POST",
+      href: `${API_BASE}onboarding/${code}/attachments/`,
+    }),
+  },
+  demands: {
+    list: () => ({ method: "GET", href: `${API_BASE}demands/` }),
+    detail: (code) => ({ method: "GET", href: `${API_BASE}demands/${code}/` }),
+    accept: (code) => ({ method: "POST", href: `${API_BASE}demands/${code}/accept/` }),
+    reject: (code) => ({ method: "POST", href: `${API_BASE}demands/${code}/reject/` }),
+    attachments: {
+      list: (code) => ({ method: "GET", href: `${API_BASE}demands/${code}/attachments/` }),
+      download: (code, attCode) => ({
+        method: "GET",
+        href: `${API_BASE}demands/${code}/attachments/${attCode}/download/`,
+      }),
+      delete: (code, attCode) => ({
+        method: "DELETE",
+        href: `${API_BASE}demands/${code}/attachments/${attCode}/`,
+      }),
+    },
+  },
+  products: {
+    list: () => ({ method: "GET", href: `${API_BASE}products/` }),
+    create: () => ({ method: "POST", href: `${API_BASE}products/` }),
+    stats: () => ({ method: "GET", href: `${API_BASE}products/stats/` }),
+    options: () => ({ method: "GET", href: `${API_BASE}products/options/` }),
+    detail: (code) => ({ method: "GET", href: `${API_BASE}products/${code}/` }),
+    update: (code) => ({ method: "PATCH", href: `${API_BASE}products/${code}/` }),
+    delete: (code) => ({ method: "DELETE", href: `${API_BASE}products/${code}/` }),
+    activate: (code) => ({ method: "POST", href: `${API_BASE}products/${code}/activate/` }),
+    deactivate: (code) => ({
+      method: "POST",
+      href: `${API_BASE}products/${code}/deactivate/`,
+    }),
+    importSpecs: () => ({ method: "GET", href: `${API_BASE}products/import/specs/` }),
+    importSample: () => ({ method: "GET", href: `${API_BASE}products/import/sample/` }),
+    import: () => ({ method: "POST", href: `${API_BASE}products/import/` }),
+    exportSpecs: () => ({ method: "GET", href: `${API_BASE}products/export/specs/` }),
+    export: () => ({ method: "GET", href: `${API_BASE}products/export/` }),
   },
   programmes: {
     list: () => ({ method: "GET", href: `${API_BASE}programmes/` }),
@@ -829,5 +1006,847 @@ export const API_URLS = {
     samlTest: () => ({ method: "POST", href: `${API_BASE}setup/test/saml/` }),
     oauthTest: () => ({ method: "POST", href: `${API_BASE}setup/test/oauth/` }),
     genKey: () => ({ method: "POST", href: `${API_BASE}setup/gen-key/` }),
+  },
+  aiConfig: {
+    get: () => ({ method: "GET", href: `${API_BASE}ai/config/` }),
+    update: () => ({ method: "PATCH", href: `${API_BASE}ai/config/` }),
+  },
+  securityConfig: {
+    get: () => ({ method: "GET", href: `${API_BASE}security/config/` }),
+    update: () => ({ method: "PATCH", href: `${API_BASE}security/config/` }),
+  },
+  wins: {
+    list: () => ({ method: "GET", href: `${API_BASE}wins/` }),
+    create: () => ({ method: "POST", href: `${API_BASE}wins/` }),
+    detail: (code) => ({ method: "GET", href: `${API_BASE}wins/${code}/` }),
+    delete: (code) => ({ method: "DELETE", href: `${API_BASE}wins/${code}/` }),
+    reviewComplete: (code) => ({
+      method: "POST",
+      href: `${API_BASE}wins/${code}/review-complete/`,
+    }),
+    reviewPdf: (code) => ({
+      method: "GET",
+      href: `${API_BASE}wins/${code}/review-pdf/`,
+    }),
+    sendReview: (code) => ({
+      method: "POST",
+      href: `${API_BASE}wins/${code}/send-review/`,
+    }),
+    entries: {
+      list: (winCode) => ({
+        method: "GET",
+        href: `${API_BASE}wins/${winCode}/entries/`,
+      }),
+      create: (winCode) => ({
+        method: "POST",
+        href: `${API_BASE}wins/${winCode}/entries/`,
+      }),
+      update: (winCode, code) => ({
+        method: "PATCH",
+        href: `${API_BASE}wins/${winCode}/entries/${code}/`,
+      }),
+      delete: (winCode, code) => ({
+        method: "DELETE",
+        href: `${API_BASE}wins/${winCode}/entries/${code}/`,
+      }),
+      suggest: (winCode) => ({
+        method: "POST",
+        href: `${API_BASE}wins/${winCode}/entries/suggest/`,
+      }),
+    },
+    options: () => ({ method: "GET", href: `${API_BASE}wins/options/` }),
+    monthly: {
+      list: () => ({ method: "GET", href: `${API_BASE}wins/monthly/` }),
+      create: () => ({ method: "POST", href: `${API_BASE}wins/monthly/` }),
+      options: () => ({ method: "GET", href: `${API_BASE}wins/monthly/options/` }),
+      detail: (code) => ({
+        method: "GET",
+        href: `${API_BASE}wins/monthly/${code}/`,
+      }),
+      delete: (code) => ({
+        method: "DELETE",
+        href: `${API_BASE}wins/monthly/${code}/`,
+      }),
+      previewTeams: (code) => ({
+        method: "GET",
+        href: `${API_BASE}wins/monthly/${code}/preview-teams/`,
+      }),
+      previewSurvey: (code, phase, teamCode) => {
+        const params = new URLSearchParams({ phase });
+        if (teamCode) params.set("team", teamCode);
+        return {
+          method: "GET",
+          href: `${API_BASE}wins/monthly/${code}/preview-survey/?${params.toString()}`,
+        };
+      },
+      surveys: (code) => ({
+        method: "GET",
+        href: `${API_BASE}wins/monthly/${code}/surveys/`,
+      }),
+      results: (code) => ({
+        method: "GET",
+        href: `${API_BASE}wins/monthly/${code}/results/`,
+      }),
+      launchPhase1: (code) => ({
+        method: "POST",
+        href: `${API_BASE}wins/monthly/${code}/launch-phase1/`,
+      }),
+      completePhase1: (code) => ({
+        method: "POST",
+        href: `${API_BASE}wins/monthly/${code}/complete-phase1/`,
+      }),
+      launchPhase2: (code) => ({
+        method: "POST",
+        href: `${API_BASE}wins/monthly/${code}/launch-phase2/`,
+      }),
+      completePhase2: (code) => ({
+        method: "POST",
+        href: `${API_BASE}wins/monthly/${code}/complete-phase2/`,
+      }),
+      declare: (code) => ({
+        method: "POST",
+        href: `${API_BASE}wins/monthly/${code}/declare/`,
+      }),
+      resultsPdf: (code) => ({
+        method: "GET",
+        href: `${API_BASE}wins/monthly/${code}/results-pdf/`,
+      }),
+      sendResults: (code) => ({
+        method: "POST",
+        href: `${API_BASE}wins/monthly/${code}/send-results/`,
+      }),
+      surveyAdminData: (surveyCode) => ({
+        method: "GET",
+        href: `${API_BASE}wins/monthly/surveys/${surveyCode}/admin-data/`,
+      }),
+      overrideSurvey: (surveyCode) => ({
+        method: "POST",
+        href: `${API_BASE}wins/monthly/surveys/${surveyCode}/override/`,
+      }),
+      recipients: {
+        list: () => ({
+          method: "GET",
+          href: `${API_BASE}wins/monthly/recipients/`,
+        }),
+        create: () => ({
+          method: "POST",
+          href: `${API_BASE}wins/monthly/recipients/`,
+        }),
+        update: (code) => ({
+          method: "PATCH",
+          href: `${API_BASE}wins/monthly/recipients/${code}/`,
+        }),
+        delete: (code) => ({
+          method: "DELETE",
+          href: `${API_BASE}wins/monthly/recipients/${code}/`,
+        }),
+      },
+      survey: {
+        get: (token) => ({
+          method: "GET",
+          href: `${API_BASE}wins/monthly/survey/${token}/`,
+        }),
+        submit: (token) => ({
+          method: "POST",
+          href: `${API_BASE}wins/monthly/survey/${token}/submit/`,
+        }),
+      },
+    },
+  },
+  winsConfig: {
+    get: () => ({ method: "GET", href: `${API_BASE}wins/config/` }),
+    update: () => ({ method: "PATCH", href: `${API_BASE}wins/config/` }),
+  },
+  notifications: {
+    list: () => ({ method: "GET", href: `${API_BASE}notifications/` }),
+    create: () => ({ method: "POST", href: `${API_BASE}notifications/` }),
+    delete: (code) => ({ method: "DELETE", href: `${API_BASE}notifications/${code}/` }),
+    markRead: (code) => ({
+      method: "POST",
+      href: `${API_BASE}notifications/${code}/read/`,
+    }),
+    markUnread: (code) => ({
+      method: "POST",
+      href: `${API_BASE}notifications/${code}/unread/`,
+    }),
+    dismiss: (code) => ({
+      method: "POST",
+      href: `${API_BASE}notifications/${code}/dismiss/`,
+    }),
+    markAllRead: () => ({
+      method: "POST",
+      href: `${API_BASE}notifications/mark-all-read/`,
+    }),
+    unreadCount: () => ({ method: "GET", href: `${API_BASE}notifications/unread-count/` }),
+    preferences: {
+      list: () => ({ method: "GET", href: `${API_BASE}notifications/preferences/` }),
+      update: (category) => ({
+        method: "PATCH",
+        href: `${API_BASE}notifications/preferences/${category}/`,
+      }),
+    },
+  },
+  toDo: {
+    list: () => ({ method: "GET", href: `${API_BASE}to-do/` }),
+    create: () => ({ method: "POST", href: `${API_BASE}to-do/` }),
+    update: (code) => ({ method: "PATCH", href: `${API_BASE}to-do/${code}/` }),
+    delete: (code) => ({ method: "DELETE", href: `${API_BASE}to-do/${code}/` }),
+    complete: (code) => ({
+      method: "POST",
+      href: `${API_BASE}to-do/${code}/complete/`,
+    }),
+    reopen: (code) => ({
+      method: "POST",
+      href: `${API_BASE}to-do/${code}/reopen/`,
+    }),
+    openCount: () => ({ method: "GET", href: `${API_BASE}to-do/open-count/` }),
+    dueReminders: () => ({
+      method: "GET",
+      href: `${API_BASE}to-do/due-reminders/`,
+    }),
+    preferences: {
+      list: () => ({ method: "GET", href: `${API_BASE}to-do/preferences/` }),
+      update: (category) => ({
+        method: "PATCH",
+        href: `${API_BASE}to-do/preferences/${category}/`,
+      }),
+    },
+  },
+  resourcePlans: {
+    list: () => ({ method: "GET", href: `${API_BASE}resource-plans/` }),
+    create: () => ({ method: "POST", href: `${API_BASE}resource-plans/` }),
+    stats: () => ({ method: "GET", href: `${API_BASE}resource-plans/stats/` }),
+    options: () => ({ method: "GET", href: `${API_BASE}resource-plans/options/` }),
+    detail: (code) => ({ method: "GET", href: `${API_BASE}resource-plans/${code}/` }),
+    update: (code) => ({ method: "PATCH", href: `${API_BASE}resource-plans/${code}/` }),
+    delete: (code) => ({ method: "DELETE", href: `${API_BASE}resource-plans/${code}/` }),
+    activate: (code) => ({ method: "POST", href: `${API_BASE}resource-plans/${code}/activate/` }),
+    deactivate: (code) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/deactivate/`,
+    }),
+    comments: (code) => ({ method: "GET", href: `${API_BASE}resource-plans/${code}/comments/` }),
+    commentCreate: (code) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/comments/`,
+    }),
+    commentDetail: (code, commentCode) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/comments/${commentCode}/`,
+    }),
+    commentUpdate: (code, commentCode) => ({
+      method: "PATCH",
+      href: `${API_BASE}resource-plans/${code}/comments/${commentCode}/`,
+    }),
+    commentDelete: (code, commentCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}resource-plans/${code}/comments/${commentCode}/`,
+    }),
+    commentPin: (code, commentCode) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/comments/${commentCode}/pin/`,
+    }),
+    commentUnpin: (code, commentCode) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/comments/${commentCode}/unpin/`,
+    }),
+    versionCreate: (code) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/`,
+    }),
+    versionHistory: (code) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/history/`,
+    }),
+    versionDetail: (code, version) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/`,
+    }),
+    versionDelete: (code, version) => ({
+      method: "DELETE",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/`,
+    }),
+    versionActivate: (code, version) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/activate/`,
+    }),
+    versionRestore: (code, version) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/restore/`,
+    }),
+    versionLock: (code, version) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/lock/`,
+    }),
+    engineJobsList: (code, version) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/engine-jobs/`,
+    }),
+    engineJobsCreate: (code, version) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/engine-jobs/`,
+    }),
+    engineJobDetail: (code, version, jobCode) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/engine-jobs/${jobCode}/`,
+    }),
+    engineJobDelete: (code, version, jobCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/engine-jobs/${jobCode}/`,
+    }),
+    versionProjectsUnmapped: (code, version) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/unmapped/`,
+    }),
+    versionProjectBudget: (code, version) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/budget/`,
+    }),
+    versionProjectCreate: (code, version) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/`,
+    }),
+    versionProjectsList: (code, version) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/`,
+    }),
+    versionProjectDelete: (code, version, projectVersionCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/`,
+    }),
+    versionProjectConfigGet: (code, version, projectVersionCode) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/`,
+    }),
+    versionProjectConfigUpdate: (code, version, projectVersionCode) => ({
+      method: "PATCH",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/`,
+    }),
+    versionProjectResync: (code, version, projectVersionCode) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/resync/`,
+    }),
+    versionProjectBudgetReleasesList: (code, version, projectVersionCode) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/budget-releases/`,
+    }),
+    versionProjectBudgetReleasesCreate: (code, version, projectVersionCode) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/budget-releases/`,
+    }),
+    versionProjectBudgetReleasesUpdate: (
+      code,
+      version,
+      projectVersionCode,
+      budgetReleaseVersionCode,
+    ) => ({
+      method: "PATCH",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/budget-releases/${budgetReleaseVersionCode}/`,
+    }),
+    versionProjectBudgetReleasesDelete: (
+      code,
+      version,
+      projectVersionCode,
+      budgetReleaseVersionCode,
+    ) => ({
+      method: "DELETE",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/budget-releases/${budgetReleaseVersionCode}/`,
+    }),
+    versionProjectTeamsList: (code, version, projectVersionCode) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/`,
+    }),
+    versionProjectTeamCreate: (code, version, projectVersionCode) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/`,
+    }),
+    versionProjectTeamUpdate: (code, version, projectVersionCode, teamVersionCode) => ({
+      method: "PATCH",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/`,
+    }),
+    versionProjectTeamDelete: (code, version, projectVersionCode, teamVersionCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/`,
+    }),
+    versionProjectTeamPhasesList: (code, version, projectVersionCode, teamVersionCode) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/phases/`,
+    }),
+    versionProjectTeamPhaseCreate: (code, version, projectVersionCode, teamVersionCode) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/phases/`,
+    }),
+    versionProjectTeamPhaseUpdate: (
+      code,
+      version,
+      projectVersionCode,
+      teamVersionCode,
+      phaseVersionCode,
+    ) => ({
+      method: "PATCH",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/phases/${phaseVersionCode}/`,
+    }),
+    versionProjectTeamPhaseDelete: (
+      code,
+      version,
+      projectVersionCode,
+      teamVersionCode,
+      phaseVersionCode,
+    ) => ({
+      method: "DELETE",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/phases/${phaseVersionCode}/`,
+    }),
+    versionProjectTeamPhaseSegmentsList: (
+      code,
+      version,
+      projectVersionCode,
+      teamVersionCode,
+      phaseVersionCode,
+    ) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/phases/${phaseVersionCode}/segments/`,
+    }),
+    versionProjectTeamPhaseSegmentCreate: (
+      code,
+      version,
+      projectVersionCode,
+      teamVersionCode,
+      phaseVersionCode,
+    ) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/phases/${phaseVersionCode}/segments/`,
+    }),
+    versionProjectTeamPhaseSegmentDelete: (
+      code,
+      version,
+      projectVersionCode,
+      teamVersionCode,
+      phaseVersionCode,
+      segmentVersionCode,
+    ) => ({
+      method: "DELETE",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/phases/${phaseVersionCode}/segments/${segmentVersionCode}/`,
+    }),
+    versionProjectTeamPhaseDependencyAvailablePredecessors: (
+      code,
+      version,
+      projectVersionCode,
+      teamVersionCode,
+      phaseVersionCode,
+    ) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/phases/${phaseVersionCode}/dependencies/available-predecessors/`,
+    }),
+    versionProjectTeamPhaseDependenciesList: (
+      code,
+      version,
+      projectVersionCode,
+      teamVersionCode,
+      phaseVersionCode,
+    ) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/phases/${phaseVersionCode}/dependencies/`,
+    }),
+    versionProjectTeamPhaseDependencyCreate: (
+      code,
+      version,
+      projectVersionCode,
+      teamVersionCode,
+      phaseVersionCode,
+    ) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/phases/${phaseVersionCode}/dependencies/`,
+    }),
+    versionProjectTeamPhaseDependencyUpdate: (
+      code,
+      version,
+      projectVersionCode,
+      teamVersionCode,
+      phaseVersionCode,
+      dependencyVersionCode,
+    ) => ({
+      method: "PATCH",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/phases/${phaseVersionCode}/dependencies/${dependencyVersionCode}/`,
+    }),
+    versionProjectTeamPhaseDependencyDelete: (
+      code,
+      version,
+      projectVersionCode,
+      teamVersionCode,
+      phaseVersionCode,
+      dependencyVersionCode,
+    ) => ({
+      method: "DELETE",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/phases/${phaseVersionCode}/dependencies/${dependencyVersionCode}/`,
+    }),
+    versionProjectTeamPhasePausesList: (
+      code,
+      version,
+      projectVersionCode,
+      teamVersionCode,
+      phaseVersionCode,
+    ) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/phases/${phaseVersionCode}/pauses/`,
+    }),
+    versionProjectTeamPhasePauseCreate: (
+      code,
+      version,
+      projectVersionCode,
+      teamVersionCode,
+      phaseVersionCode,
+    ) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/phases/${phaseVersionCode}/pauses/`,
+    }),
+    versionProjectTeamPhasePauseUpdate: (
+      code,
+      version,
+      projectVersionCode,
+      teamVersionCode,
+      phaseVersionCode,
+      pauseVersionCode,
+    ) => ({
+      method: "PATCH",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/phases/${phaseVersionCode}/pauses/${pauseVersionCode}/`,
+    }),
+    versionProjectTeamPhasePauseDelete: (
+      code,
+      version,
+      projectVersionCode,
+      teamVersionCode,
+      phaseVersionCode,
+      pauseVersionCode,
+    ) => ({
+      method: "DELETE",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/phases/${phaseVersionCode}/pauses/${pauseVersionCode}/`,
+    }),
+    versionProjectTeamPhaseAssignmentsList: (
+      code,
+      version,
+      projectVersionCode,
+      teamVersionCode,
+      phaseVersionCode,
+    ) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/phases/${phaseVersionCode}/assignments/`,
+    }),
+    versionProjectTeamPhaseAssignmentCreate: (
+      code,
+      version,
+      projectVersionCode,
+      teamVersionCode,
+      phaseVersionCode,
+    ) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/phases/${phaseVersionCode}/assignments/`,
+    }),
+    versionProjectTeamPhaseAssignmentUpdate: (
+      code,
+      version,
+      projectVersionCode,
+      teamVersionCode,
+      phaseVersionCode,
+      assignmentVersionCode,
+    ) => ({
+      method: "PATCH",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/phases/${phaseVersionCode}/assignments/${assignmentVersionCode}/`,
+    }),
+    versionProjectTeamPhaseAssignmentDelete: (
+      code,
+      version,
+      projectVersionCode,
+      teamVersionCode,
+      phaseVersionCode,
+      assignmentVersionCode,
+    ) => ({
+      method: "DELETE",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/projects/${projectVersionCode}/teams/${teamVersionCode}/phases/${phaseVersionCode}/assignments/${assignmentVersionCode}/`,
+    }),
+    allocationSetsList: (code, version) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/allocation-sets/`,
+    }),
+    allocationSetDetail: (code, version, allocationSetCode) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/allocation-sets/${allocationSetCode}/`,
+    }),
+    allocationSetActivate: (code, version, allocationSetCode) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/allocation-sets/${allocationSetCode}/activate/`,
+    }),
+    allocationOverride: (code, version, allocationSetCode, allocationCode) => ({
+      method: "PATCH",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/allocation-sets/${allocationSetCode}/allocations/${allocationCode}/override/`,
+    }),
+    gridCapacity: (code, version) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/grid/capacity/`,
+    }),
+    gridAbsences: (code, version) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/grid/absences/`,
+    }),
+    gridAllocatedCapacity: (code, version) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/grid/allocated-capacity/`,
+    }),
+    gridAllocations: (code, version) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/grid/allocations/`,
+    }),
+    conflictsList: (code, version, allocationSetCode) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/allocation-sets/${allocationSetCode}/conflicts/`,
+    }),
+    conflictDetail: (code, version, allocationSetCode, conflictCode) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/allocation-sets/${allocationSetCode}/conflicts/${conflictCode}/`,
+    }),
+    conflictResolve: (code, version, allocationSetCode, conflictCode) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/allocation-sets/${allocationSetCode}/conflicts/${conflictCode}/resolve/`,
+    }),
+    manpowerRequestsList: (code, version, allocationSetCode) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/allocation-sets/${allocationSetCode}/manpower-requests/`,
+    }),
+    manpowerRequestDetail: (code, version, allocationSetCode, requestCode) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/allocation-sets/${allocationSetCode}/manpower-requests/${requestCode}/`,
+    }),
+    manpowerRequestHire: (code, version, allocationSetCode, requestCode) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/allocation-sets/${allocationSetCode}/manpower-requests/${requestCode}/hire/`,
+    }),
+    manpowerRequestRebalance: (code, version, allocationSetCode, requestCode) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/allocation-sets/${allocationSetCode}/manpower-requests/${requestCode}/rebalance/`,
+    }),
+    manpowerRequestDismiss: (code, version, allocationSetCode, requestCode) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/allocation-sets/${allocationSetCode}/manpower-requests/${requestCode}/dismiss/`,
+    }),
+    placeholderLeavesList: (code, version) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/placeholder-leaves/`,
+    }),
+    placeholderLeaveUpdate: (code, version, leaveCode) => ({
+      method: "PATCH",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/placeholder-leaves/${leaveCode}/`,
+    }),
+    placeholderLeaveDelete: (code, version, leaveCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/placeholder-leaves/${leaveCode}/`,
+    }),
+    placeholderLeavesRegenerate: (code, version) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/placeholder-leaves/regenerate/`,
+    }),
+    utilisationTeams: (code, version) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/utilisation/teams/`,
+    }),
+    utilisationMembers: (code, version) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/utilisation/members/`,
+    }),
+    utilisationProgrammes: (code, version) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/utilisation/programmes/`,
+    }),
+    snapshotsList: (code, version) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/snapshots/`,
+    }),
+    snapshotsCreate: (code, version) => ({
+      method: "POST",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/snapshots/`,
+    }),
+    snapshotsCompare: (code, version) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/snapshots/compare/`,
+    }),
+    snapshotDetail: (code, version, snapshotCode) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/snapshots/${snapshotCode}/`,
+    }),
+    snapshotDelete: (code, version, snapshotCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/snapshots/${snapshotCode}/`,
+    }),
+    snapshotAllocations: (code, version, snapshotCode) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/snapshots/${snapshotCode}/allocations/`,
+    }),
+    snapshotAllocationFilterOptions: (code, version, snapshotCode) => ({
+      method: "GET",
+      href: `${API_BASE}resource-plans/${code}/versions/v${version}/snapshots/${snapshotCode}/allocations/filter-options/`,
+    }),
+  },
+  reports: {
+    standardList: () => ({ method: "GET", href: `${API_BASE}reports/standard/` }),
+    standardDetail: (slug) => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/${slug}/`,
+    }),
+    weeklyWinsData: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/weekly-wins/data/`,
+    }),
+    weeklyWinsExportSpecs: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/weekly-wins/export/specs/`,
+    }),
+    weeklyWinsExport: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/weekly-wins/export/`,
+    }),
+    monthlyWinsData: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/monthly-wins/data/`,
+    }),
+    monthlyWinsExportSpecs: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/monthly-wins/export/specs/`,
+    }),
+    monthlyWinsExport: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/monthly-wins/export/`,
+    }),
+    sprintForecastVsActualsData: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/sprint-forecast-vs-actuals/data/`,
+    }),
+    sprintForecastVsActualsExportSpecs: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/sprint-forecast-vs-actuals/export/specs/`,
+    }),
+    sprintForecastVsActualsExport: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/sprint-forecast-vs-actuals/export/`,
+    }),
+    demandVsCapacityData: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/demand-vs-capacity/data/`,
+    }),
+    demandVsCapacityExportSpecs: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/demand-vs-capacity/export/specs/`,
+    }),
+    demandVsCapacityExport: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/demand-vs-capacity/export/`,
+    }),
+    demandVsCapacityConfigList: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/demand-vs-capacity/configs/`,
+    }),
+    demandVsCapacityConfigCreate: () => ({
+      method: "POST",
+      href: `${API_BASE}reports/standard/demand-vs-capacity/configs/`,
+    }),
+    demandVsCapacityConfigDetail: (code) => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/demand-vs-capacity/configs/${code}/`,
+    }),
+    demandVsCapacityConfigUpdate: (code) => ({
+      method: "PATCH",
+      href: `${API_BASE}reports/standard/demand-vs-capacity/configs/${code}/`,
+    }),
+    demandVsCapacityConfigDelete: (code) => ({
+      method: "DELETE",
+      href: `${API_BASE}reports/standard/demand-vs-capacity/configs/${code}/`,
+    }),
+    kpiEstimateAccuracyData: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/kpi-estimate-accuracy/data/`,
+    }),
+    kpiEstimateAccuracyExportSpecs: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/kpi-estimate-accuracy/export/specs/`,
+    }),
+    kpiEstimateAccuracyExport: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/kpi-estimate-accuracy/export/`,
+    }),
+    kpiEstimateAccuracyConfigList: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/kpi-estimate-accuracy/configs/`,
+    }),
+    kpiEstimateAccuracyConfigCreate: () => ({
+      method: "POST",
+      href: `${API_BASE}reports/standard/kpi-estimate-accuracy/configs/`,
+    }),
+    kpiEstimateAccuracyConfigDetail: (code) => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/kpi-estimate-accuracy/configs/${code}/`,
+    }),
+    kpiEstimateAccuracyConfigUpdate: (code) => ({
+      method: "PATCH",
+      href: `${API_BASE}reports/standard/kpi-estimate-accuracy/configs/${code}/`,
+    }),
+    kpiEstimateAccuracyConfigDelete: (code) => ({
+      method: "DELETE",
+      href: `${API_BASE}reports/standard/kpi-estimate-accuracy/configs/${code}/`,
+    }),
+    monthlyFinanceReportData: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/monthly-finance-report/data/`,
+    }),
+    monthlyFinanceReportExportSpecs: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/monthly-finance-report/export/specs/`,
+    }),
+    monthlyFinanceReportExport: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/standard/monthly-finance-report/export/`,
+    }),
+    customList: () => ({ method: "GET", href: `${API_BASE}reports/custom/` }),
+    customCreate: () => ({ method: "POST", href: `${API_BASE}reports/custom/` }),
+    customDetail: (code) => ({
+      method: "GET",
+      href: `${API_BASE}reports/custom/${code}/`,
+    }),
+    customUpdate: (code) => ({
+      method: "PATCH",
+      href: `${API_BASE}reports/custom/${code}/`,
+    }),
+    customDelete: (code) => ({
+      method: "DELETE",
+      href: `${API_BASE}reports/custom/${code}/`,
+    }),
+    customDataSources: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/custom/data-sources/`,
+    }),
+    customPreview: () => ({
+      method: "POST",
+      href: `${API_BASE}reports/custom/preview/`,
+    }),
+    customExecute: (code) => ({
+      method: "POST",
+      href: `${API_BASE}reports/custom/${code}/execute/`,
+    }),
+    customExportSpecs: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/custom/export/specs/`,
+    }),
+    customExport: () => ({
+      method: "GET",
+      href: `${API_BASE}reports/custom/export/`,
+    }),
+    customShareList: (code) => ({
+      method: "GET",
+      href: `${API_BASE}reports/custom/${code}/share/`,
+    }),
+    customShareCreate: (code) => ({
+      method: "POST",
+      href: `${API_BASE}reports/custom/${code}/share/`,
+    }),
+    customShareDelete: (code, memberCode) => ({
+      method: "DELETE",
+      href: `${API_BASE}reports/custom/${code}/share/${memberCode}/`,
+    }),
   },
 };
